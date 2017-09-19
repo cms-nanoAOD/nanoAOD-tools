@@ -74,7 +74,7 @@ if __name__ == "__main__":
         inTree = inFile.Get("Events")
 
         # pre-skimming
-        elist = preSkim(inTree, options.json, options.cut)
+        elist,jsonFilter = preSkim(inTree, options.json, options.cut)
         if options.justcount:
             print 'Would select %d entries from %s'%(elist.GetN() if elist else inTree.GetEntries(), fname)
             continue
@@ -95,8 +95,7 @@ if __name__ == "__main__":
         if options.friend:
             outTree = FriendOutput(inFile, inTree, outFile)
         else:
-            # FIXME process the other TTrees if there is a JSON
-            outTree = FullOutput(inFile, inTree, outFile, branchSelection = branchsel, fullClone = fullClone)
+            outTree = FullOutput(inFile, inTree, outFile, branchSelection = branchsel, fullClone = fullClone, jsonFilter = jsonFilter)
 
         # process events, if needed
         if not fullClone:
