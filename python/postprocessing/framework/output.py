@@ -82,7 +82,7 @@ class FullOutput(OutputTree):
             else:
                 self._otherObjects[kn] = inputFile.Get(kn)
     def fill(self):
-        self._inputTree.GetEntry(self._inputTree.entry)
+        self._inputTree.readAllBranches()
         self._tree.Fill()
     def write(self):
         OutputTree.write(self)
