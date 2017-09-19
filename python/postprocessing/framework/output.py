@@ -53,7 +53,7 @@ class OutputTree:
         self._tree.Write()
 
 class FullOutput(OutputTree):
-    def __init__(self, inputFile, inputTree, outputFile, branchSelection = None, fullClone = False, provenance = False):
+    def __init__(self, inputFile, inputTree, outputFile, branchSelection = None, fullClone = False, provenance = False, jsonFilter = None):
         outputFile.cd()
         if branchSelection: 
             branchSelection.selectBranches(inputTree)
@@ -69,7 +69,14 @@ class FullOutput(OutputTree):
             elif kn in ("MetaData", "ParameterSets"):
                 if provenance: self._otherTrees[tn] = inputFile.Get(kn).CopyTree('1')
             elif kn in ("LuminosityBlocks", "Runs"):
-                self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1')
+                if not jsonFilter: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1')
+                else:
+                    _isRun = (kn=="Runs")
+                    _it = inputFile.Get(kn)
+                    _ot = _it.CloneTree(0)
+                    for ev in _it:
+                        if (jsonFilter.filterRunOnly(ev.run) if _isRun else jsonFilter.filterRunLumi(ev.run,ev.luminosityBlock)): _ot.Fill()
+                    self._otherTrees[kn] = _ot
             elif k.GetClassName() == "TTree":
                 print "Not copying unknown tree %s" % kn
             else:

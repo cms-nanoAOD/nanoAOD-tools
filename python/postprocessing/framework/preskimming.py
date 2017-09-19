@@ -9,6 +9,8 @@ class JSONFileFilter:
             run = long(_run)
             if run not in self.keep: self.keep[run] = []
             self.keep[run] += lumis
+        for run in self.keep.keys():
+            if len(self.keep[run])==0: del self.keep[run]
     def filterRunLumi(self,run,lumi):
         try:
             for (l1,l2) in self.keep[run]:
@@ -28,7 +30,7 @@ class JSONFileFilter:
         filteredList = ROOT.TEntryList('filteredList','filteredList')
         if elist:
             for i in xrange(elist.GetN()):
-                entry = elist.GetEntry() if i == 0 else elist.Next()
+                entry = elist.GetEntry(0) if i == 0 else elist.Next()
                 tree.GetEntry(entry)
                 if self.filterRunLumi(tree.run, tree.luminosityBlock):
                     filteredList.Enter(entry)
@@ -43,8 +45,9 @@ class JSONFileFilter:
 
 def preSkim(tree, jsonFile = None, cutstring = None):
     if jsonFile == None and cutstring == None: 
-        return None
+        return None,None
     cut = None
+    jsonFilter = None
     if jsonFile != None:
         jsonFilter = JSONFileFilter(jsonFile)
         cut = jsonFilter.runCut()
@@ -53,5 +56,5 @@ def preSkim(tree, jsonFile = None, cutstring = None):
     tree.Draw('>>elist',cut,"entrylist")
     elist = ROOT.gDirectory.Get('elist')
     if jsonFile:
-        elist = jsonFilter.filterEList(elist)
-    return elist
+        elist = jsonFilter.filterEList(tree,elist)
+    return elist,jsonFilter
