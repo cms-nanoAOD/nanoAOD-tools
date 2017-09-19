@@ -9,6 +9,8 @@ class JSONFileFilter:
             run = long(_run)
             if run not in self.keep: self.keep[run] = []
             self.keep[run] += lumis
+        for run in self.keep.keys():
+            if len(self.keep[run])==0: del self.keep[run]
     def filterRunLumi(self,run,lumi):
         try:
             for (l1,l2) in self.keep[run]:
