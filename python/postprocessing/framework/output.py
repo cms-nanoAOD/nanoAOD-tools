@@ -67,7 +67,7 @@ class FullOutput(OutputTree):
             if kn == "Events":
                 continue # this we are doing
             elif kn in ("MetaData", "ParameterSets"):
-                if provenance: self._otherTrees[tn] = inputFile.Get(kn).CopyTree('1')
+                if provenance: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1')
             elif kn in ("LuminosityBlocks", "Runs"):
                 if not jsonFilter: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1')
                 else:

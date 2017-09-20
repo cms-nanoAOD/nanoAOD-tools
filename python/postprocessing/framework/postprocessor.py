@@ -9,7 +9,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.output import FriendOutp
 from PhysicsTools.NanoAODTools.postprocessing.framework.preskimming import preSkim
 
 class PostProcessor :
-    def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,json=None,noOut=False,justcount=False):
+    def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,json=None,noOut=False,justcount=False,provenance=False):
 	self.outputDir=outputDir
 	self.inputFiles=inputFiles
 	self.cut=cut
@@ -20,6 +20,7 @@ class PostProcessor :
 	self.noOut=noOut
 	self.friend=friend
 	self.justcount=justcount
+	self.provenance=provenance
  	self.branchsel = BranchSelection(branchsel) if branchsel else None 
     def run(self) :
     	if not self.noOut:
@@ -75,7 +76,7 @@ class PostProcessor :
 	    if self.friend:
 		outTree = FriendOutput(inFile, inTree, outFile)
 	    else:
-		outTree = FullOutput(inFile, inTree, outFile, branchSelection = self.branchsel, fullClone = fullClone, jsonFilter = jsonFilter)
+		outTree = FullOutput(inFile, inTree, outFile, branchSelection = self.branchsel, fullClone = fullClone, jsonFilter = jsonFilter,provenance=self.provenance)
 
 	    # process events, if needed
 	    if not fullClone:
