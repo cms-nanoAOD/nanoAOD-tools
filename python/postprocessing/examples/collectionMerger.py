@@ -9,11 +9,14 @@ _rootLeafType2rootBranchType = { 'UChar_t':'b', 'Char_t':'B', 'UInt_t':'i', 'Int
 
 class collectionMerger(Module):
 
-    def __init__(self,input,output,sortkey = lambda x : x.pt):
+    def __init__(self,input,output,sortkey = lambda x : x.pt,reverse=True,selector=None,maxObjects=None):
         self.input = input
         self.output = output
         self.nInputs = len(self.input)
         self.sortkey = lambda (obj,j,i) : sortkey(obj)
+        self.reverse = reverse
+        self.selector = selector # pass lambda function to be called on each object
+        self.maxObjects = maxObjects # save only the first maxObjects objects passing the selection in the merged collection
         self.branchType = {}
         self.nullValue = []
         pass
@@ -54,7 +57,10 @@ class collectionMerger(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         coll = [Collection(event,x) for x in self.input]
-        objects = sorted([(coll[j][i],j,i) for j in xrange(self.nInputs) for i in xrange(len(coll[j]))], key = self.sortkey)
+        objects = [(coll[j][i],j,i) for j in xrange(self.nInputs) for i in xrange(len(coll[j]))]
+        if self.selector: objects=filter(lambda (obj,j,i) : self.selector(obj), objects)
+        objects.sort(key = self.sortkey, reverse = self.reverse)
+        if self.maxObjects: objects = objects[:self.maxObjects]
         for bridx,br in enumerate(self.brlist_all):
             out = []
             nullvalue = self.nullValue[bridx]
