@@ -99,7 +99,7 @@ def _currentTreeEntry(tree):
     if tree._entrylist:
         return tree._entrylist.GetEntry(tree.entry)
     else:
-        tree.entry
+        return tree.entry
 
 def _gotoEntry(tree, entry):
     if tree.entry != entry:
