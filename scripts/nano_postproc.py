@@ -3,11 +3,7 @@ import os, sys
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 from importlib import import_module
-from PhysicsTools.NanoAODTools.postprocessing.framework.branchselection import BranchSelection 
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import InputTree 
-from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import eventLoop 
-from PhysicsTools.NanoAODTools.postprocessing.framework.output import FriendOutput, FullOutput 
-from PhysicsTools.NanoAODTools.postprocessing.framework.preskimming import preSkim
+from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 
 if __name__ == "__main__":
     from optparse import OptionParser
@@ -28,25 +24,10 @@ if __name__ == "__main__":
     if options.friend:
         if options.cut or options.json: raise RuntimeError("Can't apply JSON or cut selection when producing friends")
 
-    if not options.noOut:
-        outdir = args[0]; args = args[1:]
-        outpostfix = options.postfix if options.postfix != None else ("_Friend" if options.friend else "_Skim")
-        branchsel = BranchSelection(options.branchsel) if options.branchsel else None
-        if options.compression != "none":
-            ROOT.gInterpreter.ProcessLine("#include <Compression.h>")
-            (algo, level) = options.compression.split(":")
-            compressionLevel = int(level)
-            if   algo == "LZMA": compressionAlgo  = ROOT.ROOT.kLZMA
-            elif algo == "ZLIB": compressionAlgo  = ROOT.ROOT.kZLIB
-            else: raise RuntimeError("Unsupported compression %s" % algo)
-        else:
-            compressionLevel = 0 
-
-    if not options.noOut:
-        print "Will write selected trees to "+outdir
-        if not options.justcount:
-            if not os.path.exists(outdir):
-                os.system("mkdir -p "+outdir)
+    if len(args) < 2 :
+	 parser.print_help()
+         sys.exit(1)
+    outdir = args[0]; args = args[1:]
 
     modules = []
     for mod, names in options.imports: 
@@ -61,52 +42,6 @@ if __name__ == "__main__":
     if options.noOut:
         if len(modules) == 0: 
             raise RuntimeError("Running with --noout and no modules does nothing!")
+    p=PostProcessor(outdir,args,options.cut,options.branchsel,modules,options.compression,options.friend,options.postfix,options.json,options.noOut,options.justcount)
+    p.run()
 
-    for m in modules: m.beginJob()
-
-    fullClone = (len(modules) == 0)
-
-    for fname in args:
-        # open input file
-        inFile = ROOT.TFile.Open(fname)
-
-        #get input tree
-        inTree = inFile.Get("Events")
-
-        # pre-skimming
-        elist,jsonFilter = preSkim(inTree, options.json, options.cut)
-        if options.justcount:
-            print 'Would select %d entries from %s'%(elist.GetN() if elist else inTree.GetEntries(), fname)
-            continue
-
-        if fullClone:
-            # no need of a reader (no event loop), but set up the elist if available
-            if elist: inTree.SetEntryList(elist)
-        else:
-            # initialize reader
-            inTree = InputTree(inTree, elist) 
-
-        # prepare output file
-        outFileName = os.path.join(outdir, os.path.basename(fname).replace(".root",outpostfix+".root"))
-        outFile = ROOT.TFile.Open(outFileName, "RECREATE", "", compressionLevel)
-        if compressionLevel: outFile.SetCompressionAlgorithm(compressionAlgo)
-
-        # prepare output tree
-        if options.friend:
-            outTree = FriendOutput(inFile, inTree, outFile)
-        else:
-            outTree = FullOutput(inFile, inTree, outFile, branchSelection = branchsel, fullClone = fullClone, jsonFilter = jsonFilter)
-
-        # process events, if needed
-        if not fullClone:
-            (nall, npass, time) = eventLoop(modules, inFile, outFile, inTree, outTree)
-            print 'Processed %d entries from %s, selected %d entries' % (nall, fname, npass)
-        else:
-            print 'Selected %d entries from %s' % (outTree.tree().GetEntries(), fname)
-
-        # now write the output
-        outTree.write()
-        outFile.Close()
-        print "Done %s" % outFileName
-
-    for m in modules: m.endJob()
