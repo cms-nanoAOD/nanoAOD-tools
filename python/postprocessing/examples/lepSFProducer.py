@@ -16,8 +16,8 @@ class lepSFProducer(Module):
         if electronSelectionTag=="GPMVA90_2016":
             el_f = ["EGM2D_eleGSF.root","EGM2D_eleMVA90.root"]
             el_h = ["EGamma_SF2D", "EGamma_SF2D"]
-        mu_f = ["%s/src/PhysicsTools/NanoAOD/python/postprocessing/data/leptonSF/" % os.environ['CMSSW_BASE'] + f for f in mu_f]
-        el_f = ["%s/src/PhysicsTools/NanoAOD/python/postprocessing/data/leptonSF/" % os.environ['CMSSW_BASE'] + f for f in el_f]
+        mu_f = ["%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/leptonSF/" % os.environ['CMSSW_BASE'] + f for f in mu_f]
+        el_f = ["%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/leptonSF/" % os.environ['CMSSW_BASE'] + f for f in el_f]
 
         self.mu_f = ROOT.std.vector(str)(len(mu_f))
         self.mu_h = ROOT.std.vector(str)(len(mu_f))
@@ -28,7 +28,7 @@ class lepSFProducer(Module):
 
         if "/LeptonEfficiencyCorrector_cc.so" not in ROOT.gSystem.GetLibraries():
             print "Load C++ Worker"
-            ROOT.gROOT.ProcessLine(".L %s/src/PhysicsTools/NanoAOD/python/postprocessing/helpers/LeptonEfficiencyCorrector.cc+" % os.environ['CMSSW_BASE'])
+            ROOT.gROOT.ProcessLine(".L %s/src/PhysicsTools/NanoAODTools/python/postprocessing/helpers/LeptonEfficiencyCorrector.cc+" % os.environ['CMSSW_BASE'])
         pass
     def beginJob(self):
         self._worker_mu = ROOT.LeptonEfficiencyCorrector(self.mu_f,self.mu_h)

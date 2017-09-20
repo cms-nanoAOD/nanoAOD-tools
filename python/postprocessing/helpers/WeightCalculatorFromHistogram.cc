@@ -1,5 +1,5 @@
-#ifndef PhysicsTools_NanoAOD_WeightCalculatorFromHistogram_h
-#define PhysicsTools_NanoAOD_WeightCalculatorFromHistogram_h
+#ifndef PhysicsTools_NanoAODTools_WeightCalculatorFromHistogram_h
+#define PhysicsTools_NanoAODTools_WeightCalculatorFromHistogram_h
 
 #include <iostream>
 #include <TH1.h>
