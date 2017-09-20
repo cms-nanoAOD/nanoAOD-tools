@@ -1,5 +1,5 @@
-#ifndef PhysicsTools_NanoAOD_LeptonEfficiencyCorrector_h
-#define PhysicsTools_NanoAOD_LeptonEfficiencyCorrector_h
+#ifndef PhysicsTools_NanoAODTools_LeptonEfficiencyCorrector_h
+#define PhysicsTools_NanoAODTools_LeptonEfficiencyCorrector_h
 
 #include <iostream>
 #include <string>
@@ -7,7 +7,7 @@
 #include <TH2.h>
 #include <TFile.h>
 
-#include "PhysicsTools/NanoAODTools/python/postprocessing/helpers/WeightCalculatorFromHistogram.cc"
+#include "WeightCalculatorFromHistogram.cc"
 
 class LeptonEfficiencyCorrector {
  public:
