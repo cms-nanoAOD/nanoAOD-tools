@@ -7,13 +7,12 @@ You need to setup python 2.7 and a recent ROOT version first.
 
     git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git NanoAODTools
     cd NanoAODTools
+    source standalone/env_standalone.sh build
     source standalone/env_standalone.sh
 
-Repeat the source command at the beginning of every session.
+Repeat only the last command at the beginning of every session.
 
-It will create a build directory the first time it is run. This directory should never be committed.
-
-Also, do not commit any of the empty init.py files created by the script.
+Please never commit neither the build directory, nor the empty init.py files created by the script.
 
 ## checkout instructions: CMSSW
 
