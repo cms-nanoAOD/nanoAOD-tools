@@ -2,6 +2,14 @@
 
 # Please setup python 2.7 and ROOT into your environment first
 
+CWD=$PWD
+if [ ${0:0:1} == "/" ]; then
+    FULLPATH=$0
+else
+    FULLPATH=$PWD/$0
+fi
+cd ${FULLPATH/%env_standalone.sh/}/..
+
 if [ -f standalone/env_standalone.sh ]; then
     if [ ! -d build ]; then
 	if [ x${1} = 'xbuild' ]; then
@@ -21,6 +29,9 @@ if [ -f standalone/env_standalone.sh ]; then
 	    echo "Standalone environment set."
 	fi
     fi
+    cd $CWD
 else
-    echo "Please cd to the NanoAODTools main directory before trying to source standalone/env_standalone.sh"
+    echo "Error in moving to the NanoAODTools directory to setup the standalone environment"
+    cd $CWD
 fi
+
