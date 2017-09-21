@@ -61,9 +61,7 @@ class collectionMerger(Module):
         for bridx,br in enumerate(self.brlist_all):
             out = []
             for obj,j,i in objects:
-                val = getattr(obj,br) if self.is_there[bridx][j] else 0
-                if type(val)==str: val = ord(val)
-                out.append(val)
+                out.append(getattr(obj,br) if self.is_there[bridx][j] else 0)
             self.out.fillBranch("%s_%s"%(self.output,br), out)
         return True
 

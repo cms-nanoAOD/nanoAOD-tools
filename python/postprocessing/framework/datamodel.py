@@ -58,6 +58,7 @@ class Object:
         val = getattr(self._event,self._prefix+name)
         if self._index != None:
             val = val[self._index]
+        val = ord(val) if type(val)==str else val # convert char to integer number
         self.__dict__[name] = val ## cache
         return val
     def __getitem__(self,attr):

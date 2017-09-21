@@ -49,14 +49,16 @@ def readBranch(tree, branchName):
     if branchName in tree._ttras: 
         return tree._ttras[branchName]
     elif branchName in tree._ttrvs: 
-        return tree._ttrvs[branchName].Get()[0]
+        ret = tree._ttrvs[branchName].Get()[0]
+        return ord(ret) if type(ret)==str else ret
     else:
         branch = tree.GetBranch(branchName)
         if not branch: raise RuntimeError, "Unknown branch %s" % branchName
         leaf = branch.GetLeaf(branchName)
         typ = leaf.GetTypeName()
         if leaf.GetLen() == 1 and not bool(leaf.GetLeafCount()): 
-            return _makeValueReader(tree, typ, branchName).Get()[0]
+            ret = _makeValueReader(tree, typ, branchName).Get()[0]
+            return ord(ret) if type(ret)==str else ret
         else:
             return _makeArrayReader(tree, typ, branchName)
         
