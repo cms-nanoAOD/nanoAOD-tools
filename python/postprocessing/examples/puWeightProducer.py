@@ -14,6 +14,7 @@ class puWeightProducer(Module):
         self.norm = norm
         self.verbose = verbose
         self.nvtxVar = nvtx_var
+        self.fixLargeWeights = True
         if "/WeightCalculatorFromHistogram_cc.so" not in ROOT.gSystem.GetLibraries():
             print "Load C++ Worker"
             ROOT.gROOT.ProcessLine(".L %s/src/PhysicsTools/NanoAODTools/python/postprocessing/helpers/WeightCalculatorFromHistogram.cc+" % os.environ['CMSSW_BASE'])
@@ -24,7 +25,7 @@ class puWeightProducer(Module):
         tf.Close()
         return hist
     def beginJob(self):
-        self._worker = ROOT.WeightCalculatorFromHistogram(self.myh,self.targeth,self.norm,self.verbose)
+        self._worker = ROOT.WeightCalculatorFromHistogram(self.myh,self.targeth,self.norm,self.fixLargeWeights,self.verbose)
     def endJob(self):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -35,7 +36,6 @@ class puWeightProducer(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         nvtx = int(getattr(event,self.nvtxVar))
-        print "nvtx = ",nvtx
         weight = self._worker.getWeight(nvtx) if nvtx < self.myh.GetNbinsX() else 1
         self.out.fillBranch(self.name,weight)
         return True
@@ -44,4 +44,4 @@ class puWeightProducer(Module):
 
 pufile_mc="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/pileup_profile_Spring16.root" % os.environ['CMSSW_BASE']
 pufile_data="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/PileupData_GoldenJSON_Full2016.root" % os.environ['CMSSW_BASE']
-puWeight = lambda : puWeightProducer(pufile_mc,pufile_data,"pu_mc","pileup",verbose=True)
+puWeight = lambda : puWeightProducer(pufile_mc,pufile_data,"pu_mc","pileup",verbose=False)

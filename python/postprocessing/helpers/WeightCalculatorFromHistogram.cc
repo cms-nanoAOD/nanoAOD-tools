@@ -4,6 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include <algorithm>
 #include <TH1.h>
 
 class WeightCalculatorFromHistogram {
@@ -12,7 +13,7 @@ class WeightCalculatorFromHistogram {
   // get the weight from the bin content of the passed histogram
   WeightCalculatorFromHistogram(TH1 *histogram, bool verbose=false) : histogram_(histogram), verbose_(verbose) {}
   // get the weight from the bin content of the ratio hist/targethist
-  WeightCalculatorFromHistogram(TH1 *hist, TH1* targethist, bool norm=true, bool verbose=false);
+  WeightCalculatorFromHistogram(TH1 *hist, TH1* targethist, bool norm=true, bool fixLargeWeights=true, bool verbose=false);
   ~WeightCalculatorFromHistogram() {}
   
   float getWeight(float x, float y=0) const;
@@ -20,18 +21,29 @@ class WeightCalculatorFromHistogram {
   
  private:
   std::vector<float> loadVals(TH1 *hist, bool norm=true);
-  TH1* ratio(TH1 *hist, TH1* targethist);
-  
+  TH1* ratio(TH1 *hist, TH1* targethist, bool fixLargeWgts);
+  void fixLargeWeights(std::vector<float> &weights, float maxshift=0.0025,float hardmax=3);
+  float checkIntegral(std::vector<float> wgt1, std::vector<float> wgt2);
 
   TH1* histogram_;
+  std::vector<float> refvals_,targetvals_;
   bool verbose_;
   bool norm_;
 };
 
-WeightCalculatorFromHistogram::WeightCalculatorFromHistogram(TH1 *hist, TH1* targethist, bool norm, bool verbose) {
-  norm_=norm;
+WeightCalculatorFromHistogram::WeightCalculatorFromHistogram(TH1 *hist, TH1* targethist, bool norm, bool fixLargeWeights, bool verbose) {
+  norm_ = norm;
   verbose_ = verbose;
-  histogram_ = ratio(hist,targethist);
+  if(hist->GetNcells()!=targethist->GetNcells()) {
+    std::cout << "ERROR! Numerator and denominator histograms have different number of bins!" << std::endl;
+    histogram_=0;
+  } else {
+    for(int i=0; i<(int)hist->GetNcells(); ++i) {
+      refvals_.push_back(hist->GetBinContent(i));
+      targetvals_.push_back(targethist->GetBinContent(i));
+    }
+    histogram_ = ratio(hist,targethist,fixLargeWeights);
+  }
 }
 
 float WeightCalculatorFromHistogram::getWeight(float x, float y) const {
@@ -76,27 +88,55 @@ std::vector<float> WeightCalculatorFromHistogram::loadVals(TH1 *hist, bool norm)
   return vals;
 }
 
-TH1* WeightCalculatorFromHistogram::ratio(TH1 *hist, TH1* targethist) {
-  TH1* ret=0;
-  if(hist->GetNcells()!=targethist->GetNcells()) {
-    std::cout << "ERROR! Numerator and denominator histograms have different number of bins!" << std::endl;
-    return ret;
-  }
-
-  ret = (TH1*)hist->Clone("hweights");
+TH1* WeightCalculatorFromHistogram::ratio(TH1 *hist, TH1* targethist, bool fixLargeWgts) {
+  TH1 *ret = (TH1*)hist->Clone("hweights");
   ret->SetDirectory(0);
 
   std::vector<float> vals = loadVals(hist,norm_);
   std::vector<float> targetvals = loadVals(targethist,norm_);
+  std::vector<float> weights;
   int nbins = vals.size();
   if(verbose_) std::cout << "Weights for variable " << hist->GetName() << " with a number of bins equal to " << nbins << ":" << std::endl;
   for(int i=0; i<nbins; ++i) {
     float weight = targetvals[i] !=0 ? vals[i]/targetvals[i] : 1.;
-    if(verbose_) std::cout << weight << " ";
-    ret->SetBinContent(i,weight);
+    if(verbose_) std::cout <<  std::setprecision(3) << weight << " ";
+    weights.push_back(weight);
+  }
+  if(verbose_) std::cout << "." << std::endl;
+  if(fixLargeWgts) fixLargeWeights(weights);
+  if(verbose_) std::cout << "Final weights: " << std::endl;
+  for(int i=0; i<(int)weights.size(); ++i) {
+    ret->SetBinContent(i,weights[i]);
+    if(verbose_) std::cout << std::setprecision(3) << weights[i] << " ";
   }
   if(verbose_) std::cout << "." << std::endl;
   return ret;
+}
+
+float WeightCalculatorFromHistogram::checkIntegral(std::vector<float> wgt1, std::vector<float> wgt2) {
+  float myint=0;
+  float refint=0;
+  for(int i=0; i<(int)wgt1.size(); ++i) {
+    myint += wgt1[i]*refvals_[i];
+    refint += wgt2[i]*refvals_[i];
+  }
+  return (myint-refint)/refint;
+}
+
+void WeightCalculatorFromHistogram::fixLargeWeights(std::vector<float> &weights, float maxshift,float hardmax) {
+  float maxw = std::min(*(std::max_element(weights.begin(),weights.end())),float(5.));
+  std::vector<float> cropped;
+  while (maxw > hardmax) {
+    for(int i=0; i<(int)weights.size(); ++i) cropped.push_back(std::min(maxw,weights[i]));
+    float shift = checkIntegral(cropped,weights);
+    if(verbose_) std::cout << "For maximum weight " << maxw << ": integral relative change: " << shift << std::endl;
+    if(fabs(shift) > maxshift) break;
+    maxw *= 0.95;
+  }
+  maxw /= 0.95;
+  for(int i=0; i<(int)weights.size(); ++i) cropped[i] = std::min(maxw,weights[i]);
+  float normshift = checkIntegral(cropped,weights);
+  for(int i=0; i<(int)weights.size(); ++i) weights[i] = cropped[i]*(1-normshift);
 }
 
 #endif
