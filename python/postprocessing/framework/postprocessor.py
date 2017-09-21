@@ -103,7 +103,7 @@ class PostProcessor :
 	for m in self.modules: m.endJob()
 
 	if self.haddFileName :
-		os.system("haddnano.py %s %s" %(self.haddFileName," ".join(outFileNames)))
+		os.system("./haddnano.py %s %s" %(self.haddFileName," ".join(outFileNames))) #FIXME: remove "./" once haddnano.py is distributed with cms releases
 	if self.jobReport :
 		self.jobReport.addOutputFile(self.haddFileName)
 		self.jobReport.save()
