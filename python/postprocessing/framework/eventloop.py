@@ -1,4 +1,5 @@
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Event
+from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import clearExtraBranches
 import sys, time
 
 class Module:
@@ -26,6 +27,7 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
     for i in xrange(entries) if eventRange == None else eventRange:
         if maxEvents > 0 and i >= maxEvents-1: break
         e = Event(inputTree,i)
+        clearExtraBranches(inputTree)
         doneEvents += 1
         ret = True
         for m in modules: 
