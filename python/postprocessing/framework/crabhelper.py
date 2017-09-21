@@ -41,3 +41,26 @@ def inputFiles():
        print "Data is not local, using AAA/xrootd"
        crabFiles[i]="root://cms-xrd-global.cern.ch/"+crabFiles[i]
    return crabFiles
+
+def runsAndLumis():
+    if hasattr(PSet.process.source, "lumisToProcess"):
+         lumis = PSet.process.source.lumisToProcess
+	 runsAndLumis={}
+ 	 for l in lumis:
+  	     if "-" in  l:
+    		start,stop=l.split("-")
+    		rstart,lstart=start.split(":")
+    		rstop,lstop=start.split(":")
+  	     else:
+    		rstart,lstart=l.split(":")
+    		rstop,lstop=l.split(":")
+  	 if rstart!=rstop :
+              raise Exception("Cannot convert '%s' to runs and lumis json format"%l)
+         if rstart not in runsAndLumis:
+              runsAndLumis[rstart]=[]
+         runsAndLumis[rstart].append([int(lstart),int(lstop)])
+	 print "Runs and Lumis",runsAndLumis
+         return runsAndLumis 
+    return None
+
+

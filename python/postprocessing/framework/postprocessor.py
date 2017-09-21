@@ -11,14 +11,14 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.jobreport import JobRepo
 
 class PostProcessor :
     def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,
-		 json=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False):
+		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False):
 	self.outputDir=outputDir
 	self.inputFiles=inputFiles
 	self.cut=cut
 	self.modules=modules
 	self.compression=compression
 	self.postfix=postfix
-	self.json=json
+	self.json=jsonInput
 	self.noOut=noOut
 	self.friend=friend
 	self.justcount=justcount

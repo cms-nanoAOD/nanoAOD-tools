@@ -1,3 +1,10 @@
+#this is not mean to be run locally
+#
+echo Check if TTY
+if [ "`tty`" != "not a tty" ]; then
+  echo "YOU SHOULD NOT RUN THIS IN INTERACTIVE, IT DELETES YOUR LOCAL FILES"
+else
+
 ls -lR .
 echo "ENV..................................."
 env 
@@ -18,3 +25,4 @@ mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
 python crab_script.py $1
+fi
