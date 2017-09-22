@@ -7,7 +7,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class puWeightProducer(Module):
-    def __init__(self,myfile,targetfile,myhist="pileup",targethist="pileup",name="vtxWeight",norm=True,verbose=False,nvtx_var="PV_npvs"):
+    def __init__(self,myfile,targetfile,myhist="pileup",targethist="pileup",name="puWeight",norm=True,verbose=False,nvtx_var="Pileup_nTrueInt"):
         self.myh = self.loadHisto(myfile,myhist)
         self.targeth = self.loadHisto(targetfile,targethist)
         self.name = name
@@ -35,8 +35,10 @@ class puWeightProducer(Module):
         pass
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
-        nvtx = int(getattr(event,self.nvtxVar))
-        weight = self._worker.getWeight(nvtx) if nvtx < self.myh.GetNbinsX() else 1
+        if hasattr(event,self.nvtxVar):
+            nvtx = int(getattr(event,self.nvtxVar))
+            weight = self._worker.getWeight(nvtx) if nvtx < self.myh.GetNbinsX() else 1
+        else: weight = 1
         self.out.fillBranch(self.name,weight)
         return True
 
