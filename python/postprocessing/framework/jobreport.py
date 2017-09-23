@@ -1,4 +1,5 @@
 import xml.etree.cElementTree as ET
+import re
 #import lxml.etree.ElementTree as ET
 class JobReport :
        def __init__(self):
@@ -7,6 +8,11 @@ class JobReport :
            self.performancereport = ET.SubElement(self.fjr, "PerformanceReport")
            self.performancesummary = ET.SubElement(self.performancereport, "PerformanceSummary", Metric="StorageStatistics")
            ET.SubElement(self.performancesummary, "Metric", Name="Parameter-untracked-bool-enabled",Value="true")
+           ET.SubElement(self.performancesummary, "Metric", Name="Parameter-untracked-bool-stats",Value="true")
+           ET.SubElement(self.performancesummary, "Metric", Name="Parameter-untracked-string-cacheHint",Value="application-only")
+           ET.SubElement(self.performancesummary, "Metric", Name="Parameter-untracked-string-readHint",Value="auto-detect")
+           ET.SubElement(self.performancesummary, "Metric", Name="ROOT-tfile-read-totalMegabytes",Value="0")
+           ET.SubElement(self.performancesummary, "Metric", Name="ROOT-tfile-write-totalMegabytes",Value="0")
     #<Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
     #<Metric Name="Parameter-untracked-bool-stats" Value="true"/>
     #<Metric Name="Parameter-untracked-string-cacheHint" Value="application-only"/>
@@ -20,7 +26,7 @@ class JobReport :
 
        def addInputFile(self,filename,eventsRead=1,runsAndLumis={"1":[1]}) :
            infile = ET.SubElement(self.fjr, "InputFile")
-	   ET.SubElement(infile,"LFN").text=filename
+	   ET.SubElement(infile,"LFN").text=re.sub(r".*?(/store/.*\.root)(\?.*)?",r"\1", filename) 
 	   ET.SubElement(infile,"PFN").text=""
 	   ET.SubElement(infile,"Catalog").text=""
 	   ET.SubElement(infile,"InputType").text="primaryFiles"
