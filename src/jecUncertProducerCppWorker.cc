@@ -14,10 +14,11 @@ jecUncertProducerCppWorker::jecUncertProducerCppWorker(std::string unc_factorize
 
 void jecUncertProducerCppWorker::doCppOutput(TTree *outputTree, unsigned maxEntries){
 
+  if (_doCppOutput) throw cms::Exception("LogicError","doCppOutput cannot be called twice");
   _doCppOutput = true;
   _maxEntries = maxEntries;
   _buff_nJet.reset(new unsigned);
-  outputTree->Branch("nJet",_buff_nJet.get(),"nJet/i");
+  if (!(outputTree->GetBranch("nJet"))) outputTree->Branch("nJet",_buff_nJet.get(),"nJet/i");
   for (unsigned i=0; i<_nUnc; i++){
     _buffers.emplace_back(std::unique_ptr<float[]>(new float[_maxEntries]));
     outputTree->Branch(Form("Jet_jecUncert%s",_uncerts[i].c_str()),_buffers[i].get(),Form("Jet_jecUncert%s[nJet]/F",_uncerts[i].c_str()));
