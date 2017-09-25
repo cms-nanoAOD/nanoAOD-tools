@@ -42,6 +42,44 @@ class jecUncertProducer(Module):
   	    self.out.fillBranch(branchname, jetUn)
         return True
 
+class jecUncertProducerCpp(jecUncertProducer,object):
+    def __init__(self,*args,**kwargs):
+        super(jecUncertProducerCpp,self).__init__(*args, **kwargs)
+
+        if "/jecUncertProducerCppWorker_cc.so" not in ROOT.gSystem.GetLibraries():
+            print "Load C++ jecUncertProducerCppWorker worker module"
+            base = os.getenv("NANOAODTOOLS_BASE")
+            if base:
+                ROOT.gROOT.ProcessLine(".L %s/src/jecUncertProducerCppWorker.cc+O"%base)
+            else:
+                base = "%s/src/PhysicsTools/NanoAODTools"%os.getenv("CMSSW_BASE")
+                ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")
+                ROOT.gROOT.ProcessLine(".L %s/interface/jecUncertProducerCppWorker.h"%base)
+
+    def beginJob(self):
+        self.vec_uncerts = ROOT.std.vector(str)()
+        for x in self.uncerts: self.vec_uncerts.push_back(x[0])
+        self.worker = ROOT.jecUncertProducerCppWorker(self.unc_factorized_path,self.vec_uncerts)
+
+    def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        super(jecUncertProducerCpp,self).beginFile(inputFile, outputFile, inputTree, wrappedOutputTree)
+        self.initReaders(inputTree)
+
+    def initReaders(self,tree):
+        self.nJet = tree.valueReader("nJet")
+        self.Jet_pt = tree.arrayReader("Jet_pt")
+        self.Jet_eta = tree.arrayReader("Jet_eta")
+        self.worker.setJets(self.nJet,self.Jet_pt,self.Jet_eta)
+        self._ttreereaderversion = tree._ttreereaderversion
+
+    def analyze(self, event):
+        if event._tree._ttreereaderversion > self._ttreereaderversion:
+            self.initReaders(event._tree)
+        for i,(x,branchname) in enumerate(self.uncerts):
+            self.out.fillBranch(branchname,self.worker.getUnc(i))
+        return True
+
+
 allUncerts=[
         "AbsoluteStat",
         "AbsoluteScale",
@@ -103,4 +141,5 @@ allUncerts=[
 
 jecUncert = lambda : jecUncertProducer( "Summer16_23Sep2016V4_MC")
 jecUncertAll = lambda : jecUncertProducer( "Summer16_23Sep2016V4_MC",allUncerts)
-
+jecUncert_cpp = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC")
+jecUncertAll_cpp = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC",allUncerts)
