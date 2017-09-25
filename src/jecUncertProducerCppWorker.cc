@@ -8,6 +8,20 @@ jecUncertProducerCppWorker::jecUncertProducerCppWorker(std::string unc_factorize
   }
 
   _nUnc = _unc.size();
+  _uncerts = vec_uncerts;
+
+}
+
+void jecUncertProducerCppWorker::doCppOutput(TTree *outputTree, unsigned maxEntries){
+
+  _doCppOutput = true;
+  _maxEntries = maxEntries;
+  _buff_nJet.reset(new unsigned);
+  outputTree->Branch("nJet",_buff_nJet.get(),"nJet/i");
+  for (unsigned i=0; i<_nUnc; i++){
+    _buffers.emplace_back(std::unique_ptr<float[]>(new float[_maxEntries]));
+    outputTree->Branch(Form("Jet_jecUncert%s",_uncerts[i].c_str()),_buffers[i].get(),Form("Jet_jecUncert%s[nJet]/F",_uncerts[i].c_str()));
+  }
 
 }
 
@@ -26,5 +40,25 @@ std::vector<float> jecUncertProducerCppWorker::getUnc(unsigned j){
   }
 
   return output;
+
+}
+
+void jecUncertProducerCppWorker::fillAllUnc(){
+
+  if (!_doCppOutput) throw cms::Exception("LogicError","fillAllUnc only works if output is handled by the worker class");
+
+  unsigned n = (*nJet).Get()[0];
+  if (n>_maxEntries) throw cms::Exception("LogicError","Too many jets found in the event, please use a larger maxEntries value");
+  *(_buff_nJet.get())=n;
+
+  for (unsigned j=0; j<_nUnc; j++){
+    auto unc = _unc[j].get();
+    auto buff = _buffers[j].get();
+    for (unsigned i=0; i<n; i++){
+      unc->setJetEta((*Jet_eta)[i]);
+      unc->setJetPt((*Jet_pt)[i]);
+      buff[i] = unc->getUncertainty(true);
+    }
+  }
 
 }

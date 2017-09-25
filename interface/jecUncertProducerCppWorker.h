@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <TTree.h>
 #include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
@@ -19,7 +20,10 @@ public:
     nJet = nJet_; Jet_pt = Jet_pt_; Jet_eta = Jet_eta_;
   }
 
+  void doCppOutput(TTree *outputTree, unsigned maxEntries=50);
+
   std::vector<float> getUnc(unsigned);
+  void fillAllUnc();
 
 private:
   TTreeReaderValue<unsigned> *nJet = nullptr;
@@ -27,8 +31,14 @@ private:
   TTreeReaderArray<float> *Jet_eta = nullptr;
 
   unsigned _nUnc = 0;
+  std::vector<std::string> _uncerts;
   std::vector<std::unique_ptr<JetCorrectorParameters>> _pars;
   std::vector<std::unique_ptr<JetCorrectionUncertainty>> _unc;
+
+  bool _doCppOutput = false;
+  unsigned _maxEntries = 0;
+  std::unique_ptr<unsigned> _buff_nJet;
+  std::vector<std::unique_ptr<float[]>> _buffers;
 
 };
 

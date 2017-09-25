@@ -7,7 +7,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class jecUncertProducer(Module):
-    def __init__(self,globalTag,uncerts=["Total"],jetFlavour="AK4PFchs"):
+    def __init__(self,globalTag,uncerts=["Total"],jetFlavour="AK4PFchs",doCppOutput=False):
 	self.uncerts=[(x,"Jet_jecUncert%s"%x) for x in uncerts]
         self.unc_factorized_path = "%s/%s_UncertaintySources_%s.txt" % ("%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/jec/" % os.environ['CMSSW_BASE'], globalTag, jetFlavour)
 
@@ -45,6 +45,7 @@ class jecUncertProducer(Module):
 class jecUncertProducerCpp(jecUncertProducer,object):
     def __init__(self,*args,**kwargs):
         super(jecUncertProducerCpp,self).__init__(*args, **kwargs)
+        self.doCppOutput = kwargs.get('doCppOutput',False)
 
         if "/jecUncertProducerCppWorker_cc.so" not in ROOT.gSystem.GetLibraries():
             print "Load C++ jecUncertProducerCppWorker worker module"
@@ -62,7 +63,10 @@ class jecUncertProducerCpp(jecUncertProducer,object):
         self.worker = ROOT.jecUncertProducerCppWorker(self.unc_factorized_path,self.vec_uncerts)
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        super(jecUncertProducerCpp,self).beginFile(inputFile, outputFile, inputTree, wrappedOutputTree)
+        if not self.doCppOutput:
+            super(jecUncertProducerCpp,self).beginFile(inputFile, outputFile, inputTree, wrappedOutputTree)
+        else:
+            self.worker.doCppOutput(wrappedOutputTree.tree())
         self.initReaders(inputTree)
 
     def initReaders(self,tree):
@@ -75,6 +79,9 @@ class jecUncertProducerCpp(jecUncertProducer,object):
     def analyze(self, event):
         if event._tree._ttreereaderversion > self._ttreereaderversion:
             self.initReaders(event._tree)
+        if self.doCppOutput:
+            self.worker.fillAllUnc()
+            return True
         for i,(x,branchname) in enumerate(self.uncerts):
             self.out.fillBranch(branchname,self.worker.getUnc(i))
         return True
@@ -143,3 +150,5 @@ jecUncert = lambda : jecUncertProducer( "Summer16_23Sep2016V4_MC")
 jecUncertAll = lambda : jecUncertProducer( "Summer16_23Sep2016V4_MC",allUncerts)
 jecUncert_cpp = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC")
 jecUncertAll_cpp = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC",allUncerts)
+jecUncert_cppOut = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC",doCppOutput=True)
+jecUncertAll_cppOut = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC",allUncerts,doCppOutput=True)
