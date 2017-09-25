@@ -19,9 +19,9 @@ public:
   std::pair<float,float> getHT();
 
 private:
-  TTreeReaderValue<unsigned> *nJet = NULL;
-  TTreeReaderArray<float> *Jet_pt = NULL;
-  TTreeReaderArray<float> *Jet_phi = NULL;
+  TTreeReaderValue<unsigned> *nJet = nullptr;
+  TTreeReaderArray<float> *Jet_pt = nullptr;
+  TTreeReaderArray<float> *Jet_phi = nullptr;
 
 };
 
