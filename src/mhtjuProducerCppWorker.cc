@@ -1,6 +1,6 @@
 #include "../interface/mhtjuProducerCppWorker.h"
 
-std::vector<float> mhtjuProducerCppWorker::getHT(){
+std::pair<float,float> mhtjuProducerCppWorker::getHT(){
 
     math::XYZTLorentzVectorF ht(0,0,0,0);
 
@@ -9,7 +9,6 @@ std::vector<float> mhtjuProducerCppWorker::getHT(){
       ht += math::PtEtaPhiMLorentzVectorF((*Jet_pt)[i],0,(*Jet_phi)[i],0);
     }
 
-    std::vector<float> result = {ht.Pt(),ht.Phi()};
-    return result;
+    return std::pair<float,float>(ht.Pt(),ht.Phi());
 
 };

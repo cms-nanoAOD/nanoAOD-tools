@@ -2,7 +2,6 @@ import ROOT
 import os
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class mhtjuProducerCpp(Module): # MHT producer, unclean jets only (no lepton overlap cleaning, no jet selection)
@@ -10,9 +9,12 @@ class mhtjuProducerCpp(Module): # MHT producer, unclean jets only (no lepton ove
         if "/mhtjuProducerCppWorker_cc.so" not in ROOT.gSystem.GetLibraries():
             print "Load C++ mhtjuProducerCppWorker worker module"
             base = os.getenv("NANOAODTOOLS_BASE")
-            if not base:
+            if base:
+                ROOT.gROOT.ProcessLine(".L %s/src/mhtjuProducerCppWorker.cc+O"%base)
+            else:
                 base = "%s/src/PhysicsTools/NanoAODTools"%os.getenv("CMSSW_BASE")
-            ROOT.gROOT.ProcessLine(".L %s/src/mhtjuProducerCppWorker.cc+O"%base)
+                ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")
+                ROOT.gROOT.ProcessLine(".L %s/interface/mhtjuProducerCppWorker.h"%base)
         self.worker = ROOT.mhtjuProducerCppWorker()
         pass
     def beginJob(self):

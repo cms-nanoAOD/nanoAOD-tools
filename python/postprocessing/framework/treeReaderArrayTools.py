@@ -44,7 +44,7 @@ def getValueReader(tree, branchName):
 
 def readBranch(tree, branchName):
     """Return the branch value if the branch is a value, and a TreeReaderArray if the branch is an array"""
-    if tree._ttreereader._isClean: raise RuntimeError, "readBranch must not be called before setting the TTreeReader entry (or calling Next())"
+    if tree._ttreereader._isClean: raise RuntimeError, "readBranch must not be called before calling gotoEntry"
     if branchName in tree._ttras: 
         return tree._ttras[branchName]
     elif branchName in tree._ttrvs: 
