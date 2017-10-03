@@ -1,11 +1,14 @@
 import json
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-
-class JSONFileFilter:
-    def __init__(self,fname):
+class JSONFilter:
+    def __init__(self,fname="",runsAndLumis={}):
         self.keep = {}
-        for _run,lumis in json.load(open(fname, 'r')).iteritems():
+	if fname != "" :
+	    self.runsAndLumis= json.load(open(fname, 'r'));
+	else :
+	    self.runsAndLumis=runsAndLumis
+        for _run,lumis in self.runsAndLumis.iteritems():
             run = long(_run)
             if run not in self.keep: self.keep[run] = []
             self.keep[run] += lumis
@@ -43,18 +46,21 @@ class JSONFileFilter:
         return filteredList
                 
 
-def preSkim(tree, jsonFile = None, cutstring = None):
-    if jsonFile == None and cutstring == None: 
+def preSkim(tree, jsonInput = None, cutstring = None):
+    if jsonInput == None and cutstring == None: 
         return None,None
     cut = None
     jsonFilter = None
-    if jsonFile != None:
-        jsonFilter = JSONFileFilter(jsonFile)
+    if jsonInput != None:
+	if type(jsonInput) is dict:
+            jsonFilter = JSONFilter(runsAndLumis=jsonInput)
+	else:
+            jsonFilter = JSONFilter(jsonInput)
         cut = jsonFilter.runCut()
     if cutstring != None: 
         cut = "(%s) && (%s)" % (cutstring, cut) if cut else cutstring
     tree.Draw('>>elist',cut,"entrylist")
     elist = ROOT.gDirectory.Get('elist')
-    if jsonFile:
+    if jsonInput:
         elist = jsonFilter.filterEList(tree,elist)
     return elist,jsonFilter
