@@ -26,7 +26,7 @@ def getArrayReader(tree, branchName):
     if branchName not in tree._ttras:
        if not tree.GetBranch(branchName): raise RuntimeError, "Can't find branch '%s'" % branchName
        leaf = tree.GetBranch(branchName).GetLeaf(branchName)
-       if not leaf.GetLen() == 0: raise RuntimeError, "Branch %s is not a variable-length value array" % branchName
+       if not bool(leaf.GetLeafCount()): raise RuntimeError, "Branch %s is not a variable-length value array" % branchName
        typ = leaf.GetTypeName()
        tree._ttras[branchName] = _makeArrayReader(tree, typ, branchName)
     return tree._ttras[branchName]
@@ -36,7 +36,7 @@ def getValueReader(tree, branchName):
     if branchName not in tree._ttrvs:
        if not tree.GetBranch(branchName): raise RuntimeError, "Can't find branch '%s'" % branchName
        leaf = tree.GetBranch(branchName).GetLeaf(branchName)
-       if not leaf.GetLen() == 1: raise RuntimeError, "Branch %s is not a value" % branchName
+       if bool(leaf.GetLeafCount()) or leaf.GetLen()!=1 : raise RuntimeError, "Branch %s is not a value" % branchName
        typ = leaf.GetTypeName()
        tree._ttrvs[branchName] = _makeValueReader(tree, typ, branchName)
     return tree._ttrvs[branchName]
