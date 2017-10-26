@@ -29,11 +29,9 @@ class lepSFProducer(Module):
         if "/LeptonEfficiencyCorrector_cc.so" not in ROOT.gSystem.GetLibraries():
             print "Load C++ Worker"
             ROOT.gROOT.ProcessLine(".L %s/src/PhysicsTools/NanoAODTools/python/postprocessing/helpers/LeptonEfficiencyCorrector.cc+" % os.environ['CMSSW_BASE'])
-        pass
     def beginJob(self):
         self._worker_mu = ROOT.LeptonEfficiencyCorrector(self.mu_f,self.mu_h)
         self._worker_el = ROOT.LeptonEfficiencyCorrector(self.el_f,self.el_h)
-        pass
     def endJob(self):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
