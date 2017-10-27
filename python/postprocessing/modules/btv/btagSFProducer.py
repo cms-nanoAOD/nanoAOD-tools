@@ -196,6 +196,7 @@ class btagSFProducer(Module):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         jets = Collection(event, "Jet")
 
+        discr = None
         if self.algo == "csvv2":
             discr = "btagDeepB"
         elif self.algo == "cmva":
