@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import time
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 from PhysicsTools.NanoAODTools.postprocessing.framework.branchselection import BranchSelection
@@ -54,19 +55,24 @@ class PostProcessor :
 
 	fullClone = (len(self.modules) == 0)
 	outFileNames=[]
+        t0 = time.clock()
+	totEntriesRead=0
 	for fname in self.inputFiles:
+
 	    # open input file
 	    inFile = ROOT.TFile.Open(fname)
 
 	    #get input tree
 	    inTree = inFile.Get("Events")
-	    
+	    totEntriesRead+=inTree.GetEntries()
 	    # pre-skimming
 	    elist,jsonFilter = preSkim(inTree, self.json, self.cut)
 	    if self.justcount:
 		print 'Would select %d entries from %s'%(elist.GetN() if elist else inTree.GetEntries(), fname)
 		continue
-
+	    else:
+		print 'Pre-select %d entries out of %s '%(elist.GetN() if elist else inTree.GetEntries(),inTree.GetEntries())
+		
 	    if fullClone:
 		# no need of a reader (no event loop), but set up the elist if available
 		if elist: inTree.SetEntryList(elist)
@@ -88,8 +94,8 @@ class PostProcessor :
 
 	    # process events, if needed
 	    if not fullClone:
-		(nall, npass, time) = eventLoop(self.modules, inFile, outFile, inTree, outTree)
-		print 'Processed %d entries from %s, selected %d entries' % (nall, fname, npass)
+		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree)
+		print 'Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, inTree.GetEntries(), npass)
 	    else:
 		print 'Selected %d entries from %s' % (outTree.tree().GetEntries(), fname)
 
@@ -101,6 +107,9 @@ class PostProcessor :
 		self.jobReport.addInputFile(fname,nall)
 		
 	for m in self.modules: m.endJob()
+	
+	print  totEntriesRead/(time.clock()-t0), "Hz"
+
 
 	if self.haddFileName :
 		os.system("./haddnano.py %s %s" %(self.haddFileName," ".join(outFileNames))) #FIXME: remove "./" once haddnano.py is distributed with cms releases
