@@ -51,7 +51,7 @@ class btagSFProducer(Module):
         self.measurement_types = None
         if self.algo == "csvv2":
             self.inputFileName = "btagSF_CSVv2_ichep2016.csv"
-            print "Loading btagSF weights for CSV (v2) algorithm from file '%s'" % os.path.join(self.inputFilePath, self.inputFileName)
+            print("Loading btagSF weights for CSV (v2) algorithm from file '%s'" % os.path.join(self.inputFilePath, self.inputFileName))
             self.measurement_types = {
                 0 : "comb",  # b
                 1 : "comb",  # c
@@ -59,7 +59,7 @@ class btagSFProducer(Module):
             }
         elif self.algo == "cmva":
             self.inputFileName = "btagSF_cMVAv2_ichep2016.csv"
-            print "Loading btagSF weights for cMVA algorithm from file '%s'" % os.path.join(self.inputFilePath, self.inputFileName)
+            print("Loading btagSF weights for cMVA algorithm from file '%s'" % os.path.join(self.inputFilePath, self.inputFileName))
             self.measurement_types = {
                 0 : "ttbar", # b
                 1 : "ttbar", # c
@@ -71,7 +71,7 @@ class btagSFProducer(Module):
         # load libraries for accessing b-tag scale factors (SFs) from conditions database
         for library in [ "libCondFormatsBTauObjects", "libCondToolsBTau" ]:
             if library not in ROOT.gSystem.GetLibraries():
-                print "Load Library '%s'" % library.replace("lib", "")
+                print("Load Library '%s'" % library.replace("lib", ""))
                 ROOT.gSystem.Load(library)
 
         # define systematic uncertainties
@@ -201,7 +201,7 @@ class btagSFProducer(Module):
         elif self.algo == "cmva":
             discr = "btagCMVA"
         else:
-            raise ValueError("ERROR: Invalid algorithm '%s'! Please choose either 'csvv2' or 'cmva'." % algo)
+            raise ValueError("ERROR: Invalid algorithm '%s'! Please choose either 'csvv2' or 'cmva'." % self.algo)
 
         for central_or_syst in self.central_and_systs:
             scale_factors = []
