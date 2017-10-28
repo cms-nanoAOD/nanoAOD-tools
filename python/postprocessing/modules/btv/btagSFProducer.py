@@ -44,6 +44,7 @@ class btagSFProducer(Module):
         #
         self.max_abs_eta = 2.4
         self.min_pt = 30.
+        self.max_pt = 670.
 
         # define measurement type for each flavor
         self.inputFilePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/btagSF/"
@@ -155,7 +156,7 @@ class btagSFProducer(Module):
             If unknown wp/syst/mtype/flavor, returns -1.0
         """
 
-        if pt < self.min_pt or abs(eta) > self.max_abs_eta:
+        if not (pt > self.min_pt and pt < self.max_pt and abs(eta) < self.max_abs_eta):
             return 1.
 
         flavor_btv = None
