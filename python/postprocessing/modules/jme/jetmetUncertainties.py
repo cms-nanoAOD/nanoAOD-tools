@@ -3,7 +3,7 @@ import math, os
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
+from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 #----------------------------------------------------------------------------------------------------
@@ -69,6 +69,9 @@ class jetmetUncertaintiesProducer(Module):
 
         self.jesUncertainties = jesUncertainties
 
+        # smear jet pT to account for measured difference in JER between data and simulation.
+        self.applyJERCorr = True
+
         self.jetBranchName = "Jet"
         self.genJetBranchName = "GenJet"
         self.metBranchName = "MET"
@@ -88,17 +91,18 @@ class jetmetUncertaintiesProducer(Module):
         self.jerUncertaintyInputFileName = "Spring16_25nsV10_MC_SF_AK4PFchs.txt"
 
         # initialize random number generator
-        # (needed for jet energy smearing)
+        # (needed for jet pT smearing)
         self.rnd = ROOT.TRandom3(12345)
 
         # define energy threshold below which jets are considered as "unclustered energy"
         # (cf. JetMETCorrections/Type1MET/python/correctionTermsPfMetType1Type2_cff.py )
-        self.unclusteredEnThreshold = 15.
+        self.unclEnThreshold = 15.
 
         # load libraries for accessing JES and JER scale factors and uncertainties from txt files
-        for library in [ "libCondFormatsJetMETObjects", "libJetMETCorrectionsModules" ]:
+        for library in [ "libCondFormatsJetMETObjects", "libPhysicsToolsNanoAODTools" ]:
             if library not in ROOT.gSystem.GetLibraries():
                 print("Load Library '%s'" % library.replace("lib", ""))
+                ROOT.gSystem.Load(library)
 
     def beginJob(self):
 
@@ -108,11 +112,9 @@ class jetmetUncertaintiesProducer(Module):
         # initialize JER scale factors and uncertainties
         # (cf. PhysicsTools/PatUtils/interface/SmearedJetProducerT.h )
         print("Loading jet energy resolutions (JER) from file '%s'" % os.path.join(self.jerInputFilePath, self.jerInputFileName))
-        print ROOT.gROOT.GetClass("JetCorrectionUncertainty")
-        print ROOT.gROOT.GetClass("JetResolution")
-        self.jer = ROOT.JetResolution(os.path.join(self.jerInputFilePath, self.jerInputFileName))
+        self.jer = ROOT.PyJetResolutionWrapper(os.path.join(self.jerInputFilePath, self.jerInputFileName))
         print("Loading JER scale factors and uncertainties from file '%s'" % os.path.join(self.jerInputFilePath, self.jerUncertaintyInputFileName))
-        self.jerSF_and_Uncertainty = ROOT.JME.JetResolutionScaleFactor(os.path.join(self.jerInputFilePath, self.jerUncertaintyInputFileName))
+        self.jerSF_and_Uncertainty = ROOT.PyJetResolutionScaleFactorWrapper(os.path.join(self.jerInputFilePath, self.jerUncertaintyInputFileName))
 
     def endJob(self):
         pass
@@ -120,6 +122,8 @@ class jetmetUncertaintiesProducer(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("%s_pt_smeared" % self.jetBranchName, "F", lenVar="nJet")
+        self.out.branch("%s_pt_smeared" % self.metBranchName, "F")
+        self.out.branch("%s_phi_smeared" % self.metBranchName, "F")
         for shift in [ "Up", "Down" ]:
             self.out.branch("%s_pt_jer%s" % (self.jetBranchName, shift), "F", lenVar="nJet")
             self.out.branch("%s_pt_jer%s" % (self.metBranchName, shift), "F")
@@ -134,7 +138,7 @@ class jetmetUncertaintiesProducer(Module):
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
 
-    def getSmearedJetPt(jet, genJet, rho):
+    def getSmearedJetPt(self, jet, genJet, rho):
 
         #--------------------------------------------------------------------------------------------
         # CV: Smear jet pT to account for measured difference in JER between data and simulation.
@@ -152,20 +156,18 @@ class jetmetUncertaintiesProducer(Module):
         #--------------------------------------------------------------------------------------------
         # CV: define enums needed to access JER scale factors and uncertainties
         #    (cf. CondFormats/JetMETObjects/interface/JetResolutionObject.h) 
-        enum_binning_jet_pt  = 0
-        enum_binning_jet_eta = 1
-        enum_binning_rho     = 6
         enum_nominal         = 0
         enum_shift_up        = 2
         enum_shift_down      = 1
         #--------------------------------------------------------------------------------------------
-        
-        v_params_resolution = getattr(ROOT, 'vector<JetParameters>')()
-        v_params_resolution.push_back(JetParameters(enum_jet_pt_binning, jet.pt))
-        v_params_resolution.push_back(JetParameters(enum_jet_eta_binning, jet.eta))
-        v_params_resolution.push_back(JetParameters(binning_rho, rho))
-        jet_pt_resolution = self.jer.getResolution(v_params_resolution)
 
+        params_resolution = ROOT.PyJetParametersWrapper()
+        params_resolution.setJetPt(jet.pt)
+        params_resolution.setJetEta(jet.eta)
+        params_resolution.setRho(rho)
+        jet_pt_resolution = self.jer.getResolution(params_resolution)
+
+        jet_pt_sf_and_uncertainty = {}
         for central_or_shift in [ 'nominal', 'jerUp', 'jerDown' ]:
             enum_central_or_shift = None
             if central_or_shift == "nominal":
@@ -176,9 +178,9 @@ class jetmetUncertaintiesProducer(Module):
                 enum_central_or_shift = enum_shift_down
             else:
                 raise ValueError("ERROR: Undefined central_or_shift = '%s' !!" % central_or_shift)
-            v_params_sf_and_uncertainty = getattr(ROOT, 'vector<JetParameters>')()
-            v_params_sf_and_uncertainty.push_back(JetParameters(binning_jet_eta, jet.eta))
-            jet_pt_sf_and_uncertainty[central_or_shift] = self.jerSF_and_Uncertainty.getScaleFactor(v_params_sf_and_uncertainty, enum_central_or_shift)
+            params_sf_and_uncertainty = ROOT.PyJetParametersWrapper()
+            params_sf_and_uncertainty.setJetEta(jet.eta)
+            jet_pt_sf_and_uncertainty[central_or_shift] = self.jerSF_and_Uncertainty.getScaleFactor(params_sf_and_uncertainty, enum_central_or_shift)
 
         # generate random number with flat distribution between 0 and 1
         u = self.rnd.Rndm()
@@ -192,7 +194,7 @@ class jetmetUncertaintiesProducer(Module):
                 # Case 1: we have a "good" generator level jet matched to the reconstructed jet
                 #
                 dPt = jet.pt - genJet.pt
-                smearFactor = 1. + (jet_pt_sf_and_uncertainty - 1.) * dPt / jet_pt
+                smearFactor = 1. + (jet_pt_sf_and_uncertainty[central_or_shift] - 1.)*dPt/jet.pt
             elif jet_pt_sf_and_uncertainty[central_or_shift] > 1.:
                 #
                 # Case 2: we don't have a generator level jet. Smear jet pT using a random Gaussian variation
@@ -208,12 +210,12 @@ class jetmetUncertaintiesProducer(Module):
 
             # check that smeared jet energy remains positive,
             # as the direction of the jet would change ("flip") otherwise - and this is not what we want
-            if (smearFactor*jet_pt) < 1.e-2:
-                smearFactor = 1.e-2/jet_pt
+            if (smearFactor*jet.pt) < 1.e-2:
+                smearFactor = 1.e-2/jet.pt
 
-            jet_pt_smeared[central_or_shift] = smearFactor*jet_pt
+            jet_pt_smeared[central_or_shift] = smearFactor*jet.pt
         
-        return ( jet_pt_smeared['nominal'], jet_pt_smeared['up'], jet_pt_smeared['down'] )
+        return ( jet_pt_smeared['nominal'], jet_pt_smeared['jerUp'], jet_pt_smeared['jerDown'] )
     
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
@@ -271,9 +273,9 @@ class jetmetUncertaintiesProducer(Module):
                 # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties )
                 self.jesUncertainty.setJetPt(jet_pt_ref)
                 self.jesUncertainty.setJetEta(jet.eta)
-                jesUncertainty = self.jesUncertainty.getUncertainty(True)
-                jet_pt_jesUp[jesUncertainty]   = jet_pt_ref*(1. + jesUncertainty)
-                jet_pt_jesDown[jesUncertainty] = jet_pt_ref*(1. - jesUncertainty)
+                delta = self.jesUncertainty.getUncertainty(True)
+                jet_pt_jesUp[jesUncertainty]   = jet_pt_ref*(1. + delta)
+                jet_pt_jesDown[jesUncertainty] = jet_pt_ref*(1. - delta)
                 jets_pt_jesUp[jesUncertainty].append(jet_pt_jesUp[jesUncertainty])
                 jets_pt_jesDown[jesUncertainty].append(jet_pt_jesDown[jesUncertainty])
 
@@ -282,8 +284,8 @@ class jetmetUncertaintiesProducer(Module):
                 jet_cosPhi = math.cos(jet.phi)
                 jet_sinPhi = math.sin(jet.phi)
                 if self.applyJERCorr:
-                    met_px_smeared = met_px_smeared - (jet_pt_smeared - jet_pt)*jet_cosPhi
-                    met_py_smeared = met_py_smeared - (jet_pt_smeared - jet_pt)*jet_sinPhi
+                    met_px_smeared = met_px_smeared - (jet_pt_smeared - jet.pt)*jet_cosPhi
+                    met_py_smeared = met_py_smeared - (jet_pt_smeared - jet.pt)*jet_sinPhi
                 met_px_jerUp   = met_px_jerUp   - (jet_pt_jerUp   - jet_pt_ref)*jet_cosPhi
                 met_py_jerUp   = met_py_jerUp   - (jet_pt_jerUp   - jet_pt_ref)*jet_sinPhi
                 met_px_jerDown = met_px_jerDown - (jet_pt_jerDown - jet_pt_ref)*jet_cosPhi
@@ -295,7 +297,8 @@ class jetmetUncertaintiesProducer(Module):
                     met_py_jesDown[jesUncertainty] = met_py_jesDown[jesUncertainty] - (jet_pt_jesDown[jesUncertainty] - jet_pt_ref)*jet_sinPhi
 
         # propagate "unclustered energy" uncertainty to MET
-        ( met_px_unclEnUp, met_py_unclEnUDown ) = ( met_px, met_py )
+        ( met_px_unclEnUp,   met_py_unclEnUp   ) = ( met_px, met_py )
+        ( met_px_unclEnDown, met_py_unclEnDown ) = ( met_px, met_py )
         met_deltaPx_unclEn = getattr(event, self.metBranchName + "_MetUnclustEnUpDeltaX")
         met_deltaPy_unclEn = getattr(event, self.metBranchName + "_MetUnclustEnUpDeltaY")
         met_px_unclEnUp    = met_px_unclEnUp   + met_deltaPx_unclEn
@@ -304,7 +307,7 @@ class jetmetUncertaintiesProducer(Module):
         met_py_unclEnDown  = met_py_unclEnDown - met_deltaPy_unclEn
 
         # propagate effect of jet energy smearing to MET
-        if self.applyJERCorr:
+        if self.applyJERCorr:            
             met_px_jerUp   = met_px_jerUp   + (met_px_smeared - met_px)
             met_py_jerUp   = met_py_jerUp   + (met_py_smeared - met_py)
             met_px_jerDown = met_px_jerDown + (met_px_smeared - met_px)
@@ -320,6 +323,8 @@ class jetmetUncertaintiesProducer(Module):
             met_py_unclEnDown  = met_py_unclEnDown + (met_py_smeared - met_py)
 
         self.out.fillBranch("%s_pt_smeared" % self.jetBranchName, jets_pt_smeared)
+        self.out.fillBranch("%s_pt_smeared" % self.metBranchName, math.sqrt(square(met_px_smeared) + square(met_py_smeared)))
+        self.out.fillBranch("%s_phi_smeared" % self.metBranchName, math.atan2(met_py_smeared, met_px_smeared))
         self.out.fillBranch("%s_pt_jerUp" % self.jetBranchName, jets_pt_jerUp)
         self.out.fillBranch("%s_pt_jerUp" % self.metBranchName, math.sqrt(square(met_px_jerUp) + square(met_py_jerUp)))
         self.out.fillBranch("%s_phi_jerUp" % self.metBranchName, math.atan2(met_py_jerUp, met_px_jerUp))
@@ -327,12 +332,12 @@ class jetmetUncertaintiesProducer(Module):
         self.out.fillBranch("%s_pt_jerDown" % self.metBranchName, math.sqrt(square(met_px_jerDown) + square(met_py_jerDown)))
         self.out.fillBranch("%s_phi_jerDown" % self.metBranchName, math.atan2(met_py_jerDown, met_px_jerDown))
         for jesUncertainty in self.jesUncertainties:
-            self.out.fillBranch("%s_pt_jesUp" % self.jetBranchName, jets_pt_jesUp)
-            self.out.fillBranch("%s_pt_jesUp" % self.metBranchName, math.sqrt(square(met_px_jesUp) + square(met_py_jesUp)))
-            self.out.fillBranch("%s_phi_jesUp" % self.metBranchName, math.atan2(met_py_jesUp, met_px_jesUp))
-            self.out.fillBranch("%s_pt_jesDown" % self.jetBranchName, jets_pt_jesDown)
-            self.out.fillBranch("%s_pt_jesDown" % self.metBranchName, math.sqrt(square(met_px_jesDown) + square(met_py_jesDown)))
-            self.out.fillBranch("%s_phi_jesDown" % self.metBranchName, math.atan2(met_py_jesDown, met_px_jesDown))
+            self.out.fillBranch("%s_pt_jes%sUp" % (self.jetBranchName, jesUncertainty), jets_pt_jesUp[jesUncertainty])
+            self.out.fillBranch("%s_pt_jes%sUp" % (self.metBranchName, jesUncertainty), math.sqrt(square(met_px_jesUp[jesUncertainty]) + square(met_py_jesUp[jesUncertainty])))
+            self.out.fillBranch("%s_phi_jes%sUp" % (self.metBranchName, jesUncertainty), math.atan2(met_py_jesUp[jesUncertainty], met_px_jesUp[jesUncertainty]))
+            self.out.fillBranch("%s_pt_jes%sDown" % (self.jetBranchName, jesUncertainty), jets_pt_jesDown[jesUncertainty])
+            self.out.fillBranch("%s_pt_jes%sDown" % (self.metBranchName, jesUncertainty), math.sqrt(square(met_px_jesDown[jesUncertainty]) + square(met_py_jesDown[jesUncertainty])))
+            self.out.fillBranch("%s_phi_jes%sDown" % (self.metBranchName, jesUncertainty), math.atan2(met_py_jesDown[jesUncertainty], met_px_jesDown[jesUncertainty]))
         self.out.fillBranch("%s_pt_unclustEnUp" % self.metBranchName, math.sqrt(square(met_px_unclEnUp) + square(met_py_unclEnUp)))
         self.out.fillBranch("%s_phi_unclustEnUp" % self.metBranchName, math.atan2(met_py_unclEnUp, met_px_unclEnUp))
         self.out.fillBranch("%s_pt_unclustEnDown" % self.metBranchName, math.sqrt(square(met_px_unclEnDown) + square(met_py_unclEnDown)))

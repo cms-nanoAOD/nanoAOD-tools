@@ -1,0 +1,7 @@
+<lcgdict>
+<selection>
+  <class name="PyJetResolutionWrapper"/>
+  <class name="PyJetResolutionScaleFactorWrapper"/>
+  <class name="PyJetParametersWrapper"/>
+</selection>
+</lcgdict>

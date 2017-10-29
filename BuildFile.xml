@@ -1,2 +1,6 @@
 <use name="roottmva"/>
 <use name="CondFormats/JetMETObjects"/>
+<use name="JetMETCorrections/Modules"/>
+<export>
+  <lib   name="1"/>
+</export>
