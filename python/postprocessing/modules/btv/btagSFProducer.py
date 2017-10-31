@@ -31,7 +31,7 @@ class btagSFProducer(Module):
     """Calculate btagging scale factors
         algo has to be either 'csvv2' or 'cmva'
     """
-    def __init__(self, algo = 'csvv2', verbose = 0):
+    def __init__(self, algo = 'csvv2', verbose = 1):
 
         self.algo = algo.lower()
 
@@ -156,8 +156,8 @@ class btagSFProducer(Module):
             If unknown wp/syst/mtype/flavor, returns -1.0
         """
 
-        if not (pt > self.min_pt and pt < self.max_pt and abs(eta) < self.max_abs_eta):
-            return 1.
+        ##if not (pt > self.min_pt and pt < self.max_pt and abs(eta) < self.max_abs_eta):
+        ##    return 1.
 
         flavor_btv = None
         if abs(flavor) == 5:
