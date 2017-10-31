@@ -5,3 +5,6 @@ __init__.py
 #*#
 *~
 build
+*.d
+*.so
+*.pcm
