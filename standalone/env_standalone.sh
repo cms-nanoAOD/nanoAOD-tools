@@ -3,10 +3,10 @@
 # Please setup python 2.7 and ROOT into your environment first
 
 CWD=$PWD
-if [ ${0:0:1} == "/" ]; then
-    FULLPATH=$0
+if [ ${BASH_SOURCE[0]:0:1} == "/" ]; then
+    FULLPATH=${BASH_SOURCE[0]}
 else
-    FULLPATH=$PWD/$0
+    FULLPATH=$PWD/${BASH_SOURCE[0]}
 fi
 cd ${FULLPATH/%env_standalone.sh/}/..
 

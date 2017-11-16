@@ -8,7 +8,7 @@ You need to setup python 2.7 and a recent ROOT version first.
     git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git NanoAODTools
     cd NanoAODTools
     bash standalone/env_standalone.sh build
-    bash standalone/env_standalone.sh
+    source standalone/env_standalone.sh
 
 Repeat only the last command at the beginning of every session.
 
