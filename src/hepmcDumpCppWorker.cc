@@ -72,7 +72,6 @@ void hepmcDumpCppWorker::genEvent(){
     const double energy = std::abs(eta) > 100 ? pt : hypot(mass, pt*cosh(eta)); // FIXME: energy diverges for very high eta values. put just an arbitrary number
     HepMC::FourVector p4(px, py, pz, energy);
     HepMC::GenParticle* particle = new HepMC::GenParticle(p4, pdgId, status);
-if ( std::isnan(px) or std::isnan(py) or std::isnan(pz) or std::isnan(energy) ) cout << px << ' ' << py << ' ' << pz << ' ' << energy << endl;
 
     particles.push_back(particle);
     auto assoc = mother2DaughtersMap.find(mother);
