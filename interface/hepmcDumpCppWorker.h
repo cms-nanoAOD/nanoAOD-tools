@@ -8,6 +8,7 @@
 #include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>
 #include "HepMC/IO_GenEvent.h"
+#include "TDatabasePDG.h"
 
 class hepmcDumpCppWorker {
 
@@ -41,6 +42,7 @@ private:
   TTreeReaderArray<int> *b_GenPart_genPartIdxMother= nullptr;
 
   std::vector<int> signalParticlePdgIds_;
+  TDatabasePDG pTable_;
   HepMC::IO_GenEvent* fout_;
 };
 

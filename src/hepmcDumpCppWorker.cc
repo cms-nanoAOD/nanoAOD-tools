@@ -65,7 +65,8 @@ void hepmcDumpCppWorker::genEvent(){
     const int pdgId = b_GenPart_pdgId->At(i), status = b_GenPart_status->At(i);
     const int mother = b_GenPart_genPartIdxMother->At(i);
 
-    const double mass = 0; // FIXME: To be replaced to retrieve from PDG table
+    const auto pdgInfo = pTable_.GetParticle(pdgId);
+    const double mass = pdgInfo ? pdgInfo->Mass() : 0;
 
     const double px = pt*cos(phi), py = pt*sin(phi);
     const double pz = std::abs(eta) > 100 ? eta : pt*sinh(eta); // FIXME: pz diverges for very high eta values. put just an arbitrary number
