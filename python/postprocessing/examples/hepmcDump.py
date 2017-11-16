@@ -36,12 +36,15 @@ class hepmcDump(Module, object):
     def initReaders(self,tree):
         self.eventNumber     = tree.valueReader("event")
         self.genWeight       = tree.valueReader("genWeight")
+        self.Generator_x1    = tree.valueReader("Generator_x1")
+        self.Generator_x2    = tree.valueReader("Generator_x2")
         self.nLHEScaleWeight = tree.valueReader("nLHEScaleWeight")
         self.LHEScaleWeight  = tree.arrayReader("LHEScaleWeight")
         self.nLHEPdfWeight   = tree.valueReader("nLHEPdfWeight")
         self.LHEPdfWeight    = tree.arrayReader("LHEPdfWeight")
         #self.worker.setGenEventInfo(self.eventNumber, self.genWeight) ## If you don't want to keep weights for the systematic uncertainty
         self.worker.setGenEventInfo(self.eventNumber, self.genWeight,
+                                    self.Generator_x1, self.Generator_x2,
                                     self.nLHEScaleWeight, self.LHEScaleWeight,
                                     self.nLHEPdfWeight, self.LHEPdfWeight)
 
@@ -49,11 +52,12 @@ class hepmcDump(Module, object):
         self.GenPart_pt               = tree.arrayReader("GenPart_pt")
         self.GenPart_eta              = tree.arrayReader("GenPart_eta")
         self.GenPart_phi              = tree.arrayReader("GenPart_phi")
+        self.GenPart_mass             = tree.arrayReader("GenPart_mass")
         self.GenPart_pdgId            = tree.arrayReader("GenPart_pdgId")
         self.GenPart_status           = tree.arrayReader("GenPart_status")
         self.GenPart_genPartIdxMother = tree.arrayReader("GenPart_genPartIdxMother")
         self.worker.setGenParticles(self.nGenPart,
-                                    self.GenPart_pt, self.GenPart_eta, self.GenPart_phi,
+                                    self.GenPart_pt, self.GenPart_eta, self.GenPart_phi, self.GenPart_mass,
                                     self.GenPart_pdgId, self.GenPart_status, self.GenPart_genPartIdxMother)
 
         self._ttreereaderversion = tree._ttreereaderversion
