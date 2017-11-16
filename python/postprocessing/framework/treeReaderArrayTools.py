@@ -19,6 +19,7 @@ def InputTree(tree,entrylist=None):
     tree.gotoEntry = types.MethodType(_gotoEntry, tree)
     tree.readAllBranches = types.MethodType(_readAllBranches, tree)
     tree.entries = tree._ttreereader.GetEntries(False)
+    tree._extrabranches={}
     return tree
 
 def getArrayReader(tree, branchName):
@@ -41,11 +42,18 @@ def getValueReader(tree, branchName):
        tree._ttrvs[branchName] = _makeValueReader(tree, typ, branchName)
     return tree._ttrvs[branchName]
 
+def clearExtraBranches(tree):
+    tree._extrabranches = {}
+
+def setExtraBranch(tree,name,val):
+    tree._extrabranches[name] = val
 
 def readBranch(tree, branchName):
     """Return the branch value if the branch is a value, and a TreeReaderArray if the branch is an array"""
     if tree._ttreereader._isClean: raise RuntimeError, "readBranch must not be called before calling gotoEntry"
-    if branchName in tree._ttras: 
+    if branchName in tree._extrabranches:
+        return tree._extrabranches[branchName]
+    elif branchName in tree._ttras:
         return tree._ttras[branchName]
     elif branchName in tree._ttrvs: 
         ret = tree._ttrvs[branchName].Get()[0]

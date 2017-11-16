@@ -2,6 +2,8 @@ from array import array
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
+from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import setExtraBranch
+
 _rootBranchType2PythonArray = { 'b':'B', 'B':'b', 'i':'I', 'I':'i', 'F':'f', 'D':'d', 'l':'L', 'L':'l', 'O':'B' }
 
 class OutputBranch:
@@ -30,9 +32,10 @@ class OutputBranch:
             for i,v in enumerate(val): self.buff[i] = v
 
 class OutputTree:
-    def __init__(self, tfile, ttree):
+    def __init__(self, tfile, ttree, intree):
         self._file = tfile
         self._tree = ttree
+        self._intree = intree
         self._branches = {} 
     def branch(self, name, rootBranchType, n=1, lenVar=None, title=None):
         if (lenVar != None) and (lenVar not in self._branches) and (not self._tree.GetBranch(lenVar)):
@@ -43,7 +46,9 @@ class OutputTree:
         br = self._branches[name]
         if br.lenVar and (br.lenVar in self._branches):
             self._branches[br.lenVar].buff[0] = len(val)
+            setExtraBranch(self._intree,br.lenVar,len(val))
         br.fill(val)
+        setExtraBranch(self._intree,name,val)
     def tree(self):
         return self._tree
     def fill(self):
@@ -58,7 +63,7 @@ class FullOutput(OutputTree):
         if branchSelection: 
             branchSelection.selectBranches(inputTree)
         outputTree = inputTree.CopyTree('1') if fullClone else inputTree.CloneTree(0)
-        OutputTree.__init__(self, outputFile, outputTree)
+        OutputTree.__init__(self, outputFile, outputTree, inputTree)
         self._inputTree = inputTree
         self._otherTrees = {}
         self._otherObjects = {}
@@ -95,5 +100,5 @@ class FriendOutput(OutputTree):
     def __init__(self, inputFile, inputTree, outputFile, treeName="Friends"):
         outputFile.cd()
         outputTree = ROOT.TTree(treeName,"Friend tree for "+inputTree.GetName())
-        OutputTree.__init__(self, outputFile, outputTree)
+        OutputTree.__init__(self, outputFile, outputTree, inputTree)
 
