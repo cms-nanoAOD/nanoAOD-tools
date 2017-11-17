@@ -1,4 +1,4 @@
-from math import hypot
+from math import hypot, pi
 
 #### ========= UTILITIES =======================
 def deltaPhi(phi1,phi2):
@@ -29,3 +29,16 @@ def closest(obj,collection,presel=lambda x,y: True):
             ret = x; drMin = dr
     return (ret,drMin)
 
+def matchObjectCollection(objs,collection,dRmax=0.4,presel=lambda x,y: True):
+    pairs = {}
+    if len(objs)==0:
+        return pairs
+    if len(collection)==0:
+        return dict( list(zip(objs, [None]*len(objs))) )
+    for obj in objs:
+        ( bm, dR ) = closest(obj, [ mobj for mobj in collection if presel(obj,mobj) ])
+        if dR < dRmax:
+            pairs[obj] = bm
+        else:
+            pairs[obj] = None
+    return pairs
