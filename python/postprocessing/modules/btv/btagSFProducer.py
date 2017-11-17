@@ -38,13 +38,8 @@ class btagSFProducer(Module):
         self.verbose = verbose
 
         # CV: Return value of BTagCalibrationReader::eval_auto_bounds() is zero
-        #     in case no SF is defined for a given jet pT and eta in the btagSF.csv file !!
-        #
-        #     In the current version of the btagSF.csv files this is the case for jet pT < 30 GeV or abs(eta) > 2.4
-        #
+        #     in case jet abs(eta) > 2.4 !!
         self.max_abs_eta = 2.4
-        self.min_pt = 30.
-        self.max_pt = 670.
 
         # define measurement type for each flavor
         self.inputFilePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/btagSF/"
@@ -156,8 +151,11 @@ class btagSFProducer(Module):
             If unknown wp/syst/mtype/flavor, returns -1.0
         """
 
-        if not (pt > self.min_pt and pt < self.max_pt and abs(eta) < self.max_abs_eta):
-            return 1.
+        epsilon = 1.e-3
+        if eta <= -self.max_abs_eta:
+            eta = -self.max_abs_eta + epsilon
+        if eta >= +self.max_abs_eta:
+            eta = +self.max_abs_eta - epsilon
 
         flavor_btv = None
         if abs(flavor) == 5:
@@ -209,21 +207,22 @@ class btagSFProducer(Module):
             scale_factors = []
             for idx, jet in enumerate(jets):
                 sf = self.getSF(jet.pt, jet.eta, jet.partonFlavour, central_or_syst, 'M', 'auto', False, getattr(jet, discr))
-                if self.verbose > 0 and sf < 0.01:
-                    print("jet #%i: pT = %1.1f, eta = %1.1f, discr = %1.3f, flavor = %i" % (idx, jet.pt, jet.eta, getattr(jet, discr), jet.partonFlavour))
+                if sf < 0.01:
+                    if self.verbose > 0:
+                        print("jet #%i: pT = %1.1f, eta = %1.1f, discr = %1.3f, flavor = %i" % (idx, jet.pt, jet.eta, getattr(jet, discr), jet.partonFlavour))
+                    sf = 1.
                 scale_factors.append(sf)
             self.out.fillBranch(self.branchNames_central_and_systs[central_or_syst], scale_factors)
-            #print(self.branchNames_central_and_systs[central_or_syst], scale_factors)
         for central_or_syst in self.central_and_systs_shape_corr:
             scale_factors = []
             for idx, jet in enumerate(jets):
                 sf = self.getSF(jet.pt, jet.eta, jet.partonFlavour, central_or_syst, 'shape_corr', 'auto', True, getattr(jet, discr))
-                if self.verbose > 0 and sf < 0.01:
-                    print("jet #%i: pT = %1.1f, eta = %1.1f, discr = %1.3f, flavor = %i" % (idx, jet.pt, jet.eta, getattr(jet, discr), jet.partonFlavour))
+                if sf < 0.01:
+                    if self.verbose > 0:
+                        print("jet #%i: pT = %1.1f, eta = %1.1f, discr = %1.3f, flavor = %i" % (idx, jet.pt, jet.eta, getattr(jet, discr), jet.partonFlavour))
+                    sf = 1.
                 scale_factors.append(sf)
             self.out.fillBranch(self.branchNames_central_and_systs_shape_corr[central_or_syst], scale_factors)
-            #print(self.branchNames_central_and_systs_shape_corr[central_or_syst], scale_factors)
-        #print('-' * 120)
 
         return True
 
