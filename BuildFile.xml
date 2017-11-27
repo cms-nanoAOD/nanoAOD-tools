@@ -1,3 +1,7 @@
 <use name="roottmva"/>
 <use name="hepmc"/>
 <use name="CondFormats/JetMETObjects"/>
+<use name="JetMETCorrections/Modules"/>
+<export>
+  <lib   name="1"/>
+</export>
