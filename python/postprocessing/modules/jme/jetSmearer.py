@@ -8,7 +8,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.tools import matchObjectCollection
 
 class jetSmearer(Module):
-    def __init__(self, globalTag, jetType = "AK4PFchs"):
+    def __init__(self, globalTag, jetType = "AK4PFchs", jerInputFileName = "Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt", jerUncertaintyInputFileName = "Spring16_25nsV10_MC_SF_AK4PFchs.txt"):
 
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used, as there is no consistent set of txt files for
@@ -18,8 +18,8 @@ class jetSmearer(Module):
         # read jet energy resolution (JER) and JER scale factors and uncertainties
         # (the txt files were downloaded from https://github.com/cms-jet/JRDatabase/tree/master/textFiles/Spring16_25nsV10_MC )
         self.jerInputFilePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
-        self.jerInputFileName = "Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt" 
-        self.jerUncertaintyInputFileName = "Spring16_25nsV10_MC_SF_AK4PFchs.txt"
+        self.jerInputFileName = jerInputFileName
+        self.jerUncertaintyInputFileName = jerUncertaintyInputFileName
 
         self.params_sf_and_uncertainty = ROOT.PyJetParametersWrapper()
         self.params_resolution = ROOT.PyJetParametersWrapper()

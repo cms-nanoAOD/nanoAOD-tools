@@ -20,7 +20,9 @@ class jetmetUncertaintiesProducer(Module):
 
         # smear jet pT to account for measured difference in JER between data and simulation.
         self.applyJERCorr = True
-        self.jetSmearer = jetSmearer(globalTag, jetType)
+        self.jerInputFileName = "Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt"
+        self.jerUncertaintyInputFileName = "Spring16_25nsV10_MC_SF_AK4PFchs.txt"
+        self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName)
 
         self.jetBranchName = "Jet"
         self.genJetBranchName = "GenJet"
