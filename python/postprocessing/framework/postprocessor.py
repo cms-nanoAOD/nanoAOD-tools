@@ -46,6 +46,9 @@ class PostProcessor :
             if not self.justcount:
                 if not os.path.exists(self.outputDir):
                     os.system("mkdir -p "+self.outputDir)
+        else:
+            outpostfix = ''
+            compressionLevel = 0
 
 	if self.noOut:
 	    if len(self.modules) == 0: 
