@@ -103,7 +103,8 @@ class PostProcessor :
 		print 'Selected %d entries from %s' % (outTree.tree().GetEntries(), fname)
 
 	    # now write the output
-	    outTree.write()
+            if not self.noOut: 
+                outTree.write()
 	    outFile.Close()
 	    print "Done %s" % outFileName
 	    if self.jobReport:
