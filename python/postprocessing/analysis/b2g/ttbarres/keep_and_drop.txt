@@ -1,0 +1,4 @@
+# this is a comment
+keep * # start with all
+drop Photon_*
+drop Tau_*

@@ -5,10 +5,24 @@ import sys, time
 class Module:
     def __init__(self):
         pass
-    def beginJob(self):
-        pass
+    def beginJob(self,histFile=None,dirname=None):
+        if histFile != None : 
+            prevdir = ROOT.gDirectory
+            self.histFile = histFile
+            self.histFile.cd()
+            self.dir = self.histFile.mkdir( dirname )
+            prevdir.cd()
+            self.hists = []
     def endJob(self):
-        pass
+        if hasattr(self, 'hists') and self.hists != None:
+            prevdir = ROOT.gDirectory
+            self.dir.cd()
+            for hist in self.hists:
+                hist.Write()
+            prevdir.cd()
+            if hasattr(self, 'histFile') and self.histFile != None : 
+                self.histFile.Close()
+                
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -16,6 +30,10 @@ class Module:
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         pass
+    def addHist(self, alias, hist ):
+        setattr( self, alias, hist )
+        self.hists.append( getattr( self, alias ) )
+        
 
 def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxEvents=-1, eventRange=None, progress=(10000,sys.stdout), filterOutput=True): 
     for m in modules: 
