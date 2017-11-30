@@ -46,6 +46,9 @@ class PostProcessor :
             if not self.justcount:
                 if not os.path.exists(self.outputDir):
                     os.system("mkdir -p "+self.outputDir)
+        else:
+            outpostfix = ''
+            compressionLevel = 0
 
 	if self.noOut:
 	    if len(self.modules) == 0: 
@@ -100,7 +103,8 @@ class PostProcessor :
 		print 'Selected %d entries from %s' % (outTree.tree().GetEntries(), fname)
 
 	    # now write the output
-	    outTree.write()
+            if not self.noOut: 
+                outTree.write()
 	    outFile.Close()
 	    print "Done %s" % outFileName
 	    if self.jobReport:
