@@ -1,16 +1,18 @@
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Event
 from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import clearExtraBranches
 import sys, time
+import ROOT
 
 class Module:
     def __init__(self):
         pass
-    def beginJob(self,histFile=None,dirname=None):
-        if histFile != None : 
+    def beginJob(self,histFile=None,histDirName=None):
+        if histFile != None and histDirName != None:
+
             prevdir = ROOT.gDirectory
             self.histFile = histFile
             self.histFile.cd()
-            self.dir = self.histFile.mkdir( dirname )
+            self.dir = self.histFile.mkdir( histDirName )
             prevdir.cd()
             self.hists = []
     def endJob(self):
@@ -30,9 +32,9 @@ class Module:
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         pass
-    def addHist(self, alias, hist ):
-        setattr( self, alias, hist )
-        self.hists.append( getattr( self, alias ) )
+    def addHist(self, hist ):
+        setattr( self, hist.GetName(), hist )
+        self.hists.append( getattr( self, hist.GetName() ) )
         
 
 def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxEvents=-1, eventRange=None, progress=(10000,sys.stdout), filterOutput=True): 

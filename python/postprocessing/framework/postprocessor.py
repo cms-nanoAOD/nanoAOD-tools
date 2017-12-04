@@ -12,7 +12,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.jobreport import JobRepo
 
 class PostProcessor :
     def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,
-		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False):
+		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None):
 	self.outputDir=outputDir
 	self.inputFiles=inputFiles
 	self.cut=cut
@@ -30,6 +30,8 @@ class PostProcessor :
 		print "Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root"
 		self.haddFileName="tree.root"
  	self.branchsel = BranchSelection(branchsel) if branchsel else None 
+        self.histFileName=histFileName
+        self.histDirName=histDirName
     def run(self) :
     	if not self.noOut:
             outpostfix = self.postfix if self.postfix != None else ("_Friend" if self.friend else "_Skim")
@@ -54,7 +56,15 @@ class PostProcessor :
 	    if len(self.modules) == 0: 
 		raise RuntimeError("Running with --noout and no modules does nothing!")
 
-	for m in self.modules: m.beginJob()
+        # Open histogram file, if desired 
+        if (self.histFileName != None and self.histDirName == None) or (self.histFileName == None and self.histDirName != None) :
+            raise RuntimeError("Must specify both histogram file and histogram directory!")
+        elif self.histFileName != None and self.histDirName != None:
+            self.histFile = ROOT.TFile.Open( self.histFileName, "RECREATE" )
+        else :
+            self.histFile = None
+
+	for m in self.modules: m.beginJob(histFile=self.histFile,histDirName=self.histDirName)
 
 	fullClone = (len(self.modules) == 0)
 	outFileNames=[]

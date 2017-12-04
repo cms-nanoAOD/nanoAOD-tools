@@ -26,6 +26,6 @@ selection='''
 
 
 #p=PostProcessor(".",files,selection.replace('\n',' '),"keep_and_drop.txt",[btagSFProducer("cmva"),jecUncertAll_cppOut(),ttbarres()],provenance=True)
-p=PostProcessor(".",files,selection.replace('\n',' '),"keep_and_drop.txt",[ttbarres()],provenance=False, noOut=True)
+p=PostProcessor(".",files,selection.replace('\n',' '),"keep_and_drop.txt",[ttbarres()],provenance=False, noOut=True,histFileName='hists.root', histDirName='ttbarres')
 
 p.run()
