@@ -7,10 +7,10 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class jecUncertProducer(Module):
-    def __init__(self,globalTag,uncerts=["Total"],jetFlavour="AK4PFchs",doCppOutput=False):
-	self.uncerts=[(x,"Jet_jecUncert%s"%x) for x in uncerts]
-        self.unc_factorized_path = "%s/src/PhysicsTools/NanoAODTools/data/jme/%s_UncertaintySources_%s.txt" % (os.environ['CMSSW_BASE'], globalTag, jetFlavour)
-
+    def __init__(self,globalTag,uncerts=["Total"],jetFlavour="AK4PFchs",jetColl="Jet", doCppOutput=False):
+        self.jetColl = jetColl
+        self.uncerts=[(x,jetColl+"_jecUncert%s"%x) for x in uncerts]
+        self.unc_factorized_path = "%s/%s_UncertaintySources_%s.txt" % ("%s/src/PhysicsTools/NanoAODTools/data/jme/" % os.environ['CMSSW_BASE'], globalTag, jetFlavour)
 
     def beginJob(self):
         self.factorizedUncertainties = {}
@@ -31,7 +31,7 @@ class jecUncertProducer(Module):
         pass
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
-        jets = Collection(event, "Jet")
+        jets = Collection(event, self.jetColl)
 	for u,branchname in self.uncerts :
 	    uworker=self.factorizedUncertainties[u]
 	    jetUn=[]
@@ -71,8 +71,8 @@ class jecUncertProducerCpp(jecUncertProducer,object):
 
     def initReaders(self,tree):
         self.nJet = tree.valueReader("nJet")
-        self.Jet_pt = tree.arrayReader("Jet_pt")
-        self.Jet_eta = tree.arrayReader("Jet_eta")
+        self.Jet_pt = tree.arrayReader(self.jetColl+"_pt")
+        self.Jet_eta = tree.arrayReader(self.jetColl+"_eta")
         self.worker.setJets(self.nJet,self.Jet_pt,self.Jet_eta)
         self._ttreereaderversion = tree._ttreereaderversion
 
@@ -160,3 +160,7 @@ jecUncertAll_cpp = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC",allU
 # you cannot re-use the uncertainty values in modules running after this one in the same event loop
 jecUncert_cppOut = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC",doCppOutput=True)
 jecUncertAll_cppOut = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC",allUncerts,doCppOutput=True)
+
+
+jecUncertAK4Puppi = lambda : jecUncertProducer( "Summer16_23Sep2016V4_MC", jetFlavour="AK4PFPuppi")
+jecUncertAK8Puppi = lambda : jecUncertProducer( "Summer16_23Sep2016V4_MC", jetFlavour="AK8PFPuppi", jetColl="FatJet" )
