@@ -14,13 +14,13 @@ class Module:
             self.histFile.cd()
             self.dir = self.histFile.mkdir( histDirName )
             prevdir.cd()
-            self.hists = []
+            self.objs = []
     def endJob(self):
-        if hasattr(self, 'hists') and self.hists != None:
+        if hasattr(self, 'objs') and self.objs != None:
             prevdir = ROOT.gDirectory
             self.dir.cd()
-            for hist in self.hists:
-                hist.Write()
+            for obj in self.objs:
+                obj.Write()
             prevdir.cd()
             if hasattr(self, 'histFile') and self.histFile != None : 
                 self.histFile.Close()
@@ -32,9 +32,9 @@ class Module:
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         pass
-    def addHist(self, hist ):
-        setattr( self, hist.GetName(), hist )
-        self.hists.append( getattr( self, hist.GetName() ) )
+    def addObject(self, obj ):
+        setattr( self, obj.GetName(), obj )
+        self.objs.append( getattr( self, obj.GetName() ) )
         
 
 def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxEvents=-1, eventRange=None, progress=(10000,sys.stdout), filterOutput=True): 
