@@ -26,6 +26,8 @@ class PostProcessor :
 	self.provenance=provenance
 	self.jobReport = JobReport() if fwkJobReport else None
 	self.haddFileName=haddFileName
+	self.histFile = None
+	self.histDirName = None
 	if self.jobReport and not self.haddFileName :
 		print "Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root"
 		self.haddFileName="tree.root"
@@ -33,8 +35,9 @@ class PostProcessor :
         self.histFileName=histFileName
         self.histDirName=histDirName
     def run(self) :
+        outpostfix = self.postfix if self.postfix != None else ("_Friend" if self.friend else "_Skim")
     	if not self.noOut:
-            outpostfix = self.postfix if self.postfix != None else ("_Friend" if self.friend else "_Skim")
+            
             if self.compression != "none":
                 ROOT.gInterpreter.ProcessLine("#include <Compression.h>")
                 (algo, level) = self.compression.split(":")
@@ -49,7 +52,6 @@ class PostProcessor :
                 if not os.path.exists(self.outputDir):
                     os.system("mkdir -p "+self.outputDir)
         else:
-            outpostfix = ''
             compressionLevel = 0
 
 	if self.noOut:
@@ -64,7 +66,12 @@ class PostProcessor :
         else :
             self.histFile = None
 
-	for m in self.modules: m.beginJob(histFile=self.histFile,histDirName=self.histDirName)
+    
+        for m in self.modules:
+            if hasattr( m, 'writeHistFile') and m.writeHistFile :
+                m.beginJob(histFile=self.histFile,histDirName=self.histDirName)
+            else :
+                m.beginJob()
 
 	fullClone = (len(self.modules) == 0)
 	outFileNames=[]
@@ -94,16 +101,20 @@ class PostProcessor :
 		inTree = InputTree(inTree, elist) 
 
 	    # prepare output file
-	    outFileName = os.path.join(self.outputDir, os.path.basename(fname).replace(".root",outpostfix+".root"))
-	    outFile = ROOT.TFile.Open(outFileName, "RECREATE", "", compressionLevel)
-	    outFileNames.append(outFileName)
-	    if compressionLevel: outFile.SetCompressionAlgorithm(compressionAlgo)
-
-	    # prepare output tree
-	    if self.friend:
-		outTree = FriendOutput(inFile, inTree, outFile)
-	    else:
-		outTree = FullOutput(inFile, inTree, outFile, branchSelection = self.branchsel, fullClone = fullClone, jsonFilter = jsonFilter,provenance=self.provenance)
+            if not self.noOut:
+                outFileName = os.path.join(self.outputDir, os.path.basename(fname).replace(".root",outpostfix+".root"))
+                outFile = ROOT.TFile.Open(outFileName, "RECREATE", "", compressionLevel)
+                outFileNames.append(outFileName)
+                if compressionLevel: 
+                    outFile.SetCompressionAlgorithm(compressionAlgo)
+                # prepare output tree
+                if self.friend:
+                    outTree = FriendOutput(inFile, inTree, outFile)
+                else:
+                    outTree = FullOutput(inFile, inTree, outFile, branchSelection = self.branchsel, fullClone = fullClone, jsonFilter = jsonFilter,provenance=self.provenance)
+            else : 
+                outFile = None
+                outTree = None
 
 	    # process events, if needed
 	    if not fullClone:
@@ -115,8 +126,8 @@ class PostProcessor :
 	    # now write the output
             if not self.noOut: 
                 outTree.write()
-	    outFile.Close()
-	    print "Done %s" % outFileName
+                outFile.Close()
+                print "Done %s" % outFileName
 	    if self.jobReport:
 		self.jobReport.addInputFile(fname,nall)
 		

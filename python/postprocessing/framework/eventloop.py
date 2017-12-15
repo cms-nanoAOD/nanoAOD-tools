@@ -5,10 +5,10 @@ import ROOT
 
 class Module:
     def __init__(self):
-        pass
+        self.writeHistFile=False
     def beginJob(self,histFile=None,histDirName=None):
         if histFile != None and histDirName != None:
-
+            self.writeHistFile=True
             prevdir = ROOT.gDirectory
             self.histFile = histFile
             self.histFile.cd()
@@ -55,7 +55,7 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
             if not ret: break
         if ret:
             acceptedEvents += 1
-        if ret or not filterOutput: 
+        if (ret or not filterOutput) and wrappedOutputTree != None: 
             wrappedOutputTree.fill()
         if progress:
             if i > 0 and i % progress[0] == 0:
