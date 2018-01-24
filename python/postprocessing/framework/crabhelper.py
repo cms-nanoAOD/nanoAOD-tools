@@ -54,11 +54,11 @@ def runsAndLumis():
   	     else:
     		rstart,lstart=l.split(":")
     		rstop,lstop=l.split(":")
-  	 if rstart!=rstop :
+             if rstart!=rstop :
               raise Exception("Cannot convert '%s' to runs and lumis json format"%l)
-         if rstart not in runsAndLumis:
+             if rstart not in runsAndLumis:
               runsAndLumis[rstart]=[]
-         runsAndLumis[rstart].append([int(lstart),int(lstop)])
+             runsAndLumis[rstart].append([int(lstart),int(lstop)])
 	 print "Runs and Lumis",runsAndLumis
          return runsAndLumis 
     return None
