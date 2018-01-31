@@ -9,12 +9,12 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 class puWeightProducer(Module):
     def __init__(self,myfile,targetfile,myhist="pileup",targethist="pileup",name="puWeight",norm=True,verbose=False,nvtx_var="Pileup_nTrueInt"):
         self.targeth = self.loadHisto(targetfile,targethist)
-        self.fixLargeWeights = False
+        self.fixLargeWeights = True
 	if myfile != "auto" :
 		self.autoPU=False
 	        self.myh = self.loadHisto(myfile,myhist)
 	else :
-        	self.fixLargeWeights = True #AR: it seems to crash with it, to be deugged
+        	self.fixLargeWeights = False #AR: it seems to crash with it, to be deugged
 		self.autoPU=True
 		ROOT.gROOT.cd()
 		self.myh=self.targeth.Clone("autoPU")
@@ -62,4 +62,6 @@ class puWeightProducer(Module):
 pufile_mc="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/pileup_profile_Spring16.root" % os.environ['CMSSW_BASE']
 pufile_data="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/PileupData_GoldenJSON_Full2016.root" % os.environ['CMSSW_BASE']
 puWeight = lambda : puWeightProducer(pufile_mc,pufile_data,"pu_mc","pileup",verbose=False)
-puAutoWeight = lambda : puWeightProducer("auto",pufile_data,"pu_mc","pileup",verbose=False)
+
+pufile_data2017="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/Run2017-example.root" % os.environ['CMSSW_BASE']
+puAutoWeight = lambda : puWeightProducer("auto",pufile_data2017,"pu_mc","pileup",verbose=False)
