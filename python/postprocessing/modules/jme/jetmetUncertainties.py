@@ -49,7 +49,13 @@ class jetmetUncertaintiesProducer(Module):
     def beginJob(self):
 
         print("Loading jet energy scale (JES) uncertainties from file '%s'" % os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName))
-        self.jesUncertainty = ROOT.JetCorrectionUncertainty(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName))
+        #self.jesUncertainty = ROOT.JetCorrectionUncertainty(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName))
+    
+        self.jesUncertainty = {} 
+        # implementation didn't seem to work for factorized JEC, try again another way
+        for jesUncertainty in self.jesUncertainties:
+            pars = ROOT.JetCorrectorParameters(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName),jesUncertainty)
+            self.jesUncertainty[jesUncertainty] = ROOT.JetCorrectionUncertainty(pars)    
 
         self.jetSmearer.beginJob()
 
@@ -130,9 +136,9 @@ class jetmetUncertaintiesProducer(Module):
             jet_pt_jesDown = {}
             for jesUncertainty in self.jesUncertainties:
                 # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties )
-                self.jesUncertainty.setJetPt(jet_pt_ref)
-                self.jesUncertainty.setJetEta(jet.eta)
-                delta = self.jesUncertainty.getUncertainty(True)
+                self.jesUncertainty[jesUncertainty].setJetPt(jet_pt_ref)
+                self.jesUncertainty[jesUncertainty].setJetEta(jet.eta)
+                delta = self.jesUncertainty[jesUncertainty].getUncertainty(True)
                 jet_pt_jesUp[jesUncertainty]   = jet_pt_ref*(1. + delta)
                 jet_pt_jesDown[jesUncertainty] = jet_pt_ref*(1. - delta)
                 jets_pt_jesUp[jesUncertainty].append(jet_pt_jesUp[jesUncertainty])
