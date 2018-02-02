@@ -42,7 +42,10 @@ class puWeightProducer(Module):
 		print "Computing PU profile for this file"
 		ROOT.gROOT.cd()
 		inputFile.Get("Events").Project("autoPU",self.nvtxVar)#doitfrom inputFile
-		self.myh.Dump()
+		if outputFile : 
+		    outputFile.cd()
+		    self.myh.Write()    
+	
         self._worker = ROOT.WeightCalculatorFromHistogram(self.myh,self.targeth,self.norm,self.fixLargeWeights,self.verbose)
         self.out = wrappedOutputTree
         self.out.branch(self.name, "F")
