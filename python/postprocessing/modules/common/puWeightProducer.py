@@ -8,13 +8,21 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class puWeightProducer(Module):
     def __init__(self,myfile,targetfile,myhist="pileup",targethist="pileup",name="puWeight",norm=True,verbose=False,nvtx_var="Pileup_nTrueInt"):
-        self.myh = self.loadHisto(myfile,myhist)
         self.targeth = self.loadHisto(targetfile,targethist)
+        self.fixLargeWeights = True
+	if myfile != "auto" :
+		self.autoPU=False
+	        self.myh = self.loadHisto(myfile,myhist)
+	else :
+        	self.fixLargeWeights = False #AR: it seems to crash with it, to be deugged
+		self.autoPU=True
+		ROOT.gROOT.cd()
+		self.myh=self.targeth.Clone("autoPU")
+		self.myh.Reset()
         self.name = name
         self.norm = norm
         self.verbose = verbose
         self.nvtxVar = nvtx_var
-        self.fixLargeWeights = True
         if "/WeightCalculatorFromHistogram_cc.so" not in ROOT.gSystem.GetLibraries():
             print "Load C++ Worker"
             ROOT.gROOT.ProcessLine(".L %s/src/PhysicsTools/NanoAODTools/python/postprocessing/helpers/WeightCalculatorFromHistogram.cc+" % os.environ['CMSSW_BASE'])
@@ -25,10 +33,20 @@ class puWeightProducer(Module):
         tf.Close()
         return hist
     def beginJob(self):
-        self._worker = ROOT.WeightCalculatorFromHistogram(self.myh,self.targeth,self.norm,self.fixLargeWeights,self.verbose)
+	pass
     def endJob(self):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+	if self.autoPU :
+                self.myh.Reset()
+		print "Computing PU profile for this file"
+		ROOT.gROOT.cd()
+		inputFile.Get("Events").Project("autoPU",self.nvtxVar)#doitfrom inputFile
+		if outputFile : 
+		    outputFile.cd()
+		    self.myh.Write()    
+	
+        self._worker = ROOT.WeightCalculatorFromHistogram(self.myh,self.targeth,self.norm,self.fixLargeWeights,self.verbose)
         self.out = wrappedOutputTree
         self.out.branch(self.name, "F")
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -47,3 +65,6 @@ class puWeightProducer(Module):
 pufile_mc="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/pileup_profile_Spring16.root" % os.environ['CMSSW_BASE']
 pufile_data="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/PileupData_GoldenJSON_Full2016.root" % os.environ['CMSSW_BASE']
 puWeight = lambda : puWeightProducer(pufile_mc,pufile_data,"pu_mc","pileup",verbose=False)
+
+pufile_data2017="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/Run2017-example.root" % os.environ['CMSSW_BASE']
+puAutoWeight = lambda : puWeightProducer("auto",pufile_data2017,"pu_mc","pileup",verbose=False)
