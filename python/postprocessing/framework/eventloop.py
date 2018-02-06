@@ -1,14 +1,30 @@
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Event
 from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import clearExtraBranches
 import sys, time
+import ROOT
 
 class Module:
     def __init__(self):
-        pass
-    def beginJob(self):
-        pass
+        self.writeHistFile=False
+    def beginJob(self,histFile=None,histDirName=None):
+        if histFile != None and histDirName != None:
+            self.writeHistFile=True
+            prevdir = ROOT.gDirectory
+            self.histFile = histFile
+            self.histFile.cd()
+            self.dir = self.histFile.mkdir( histDirName )
+            prevdir.cd()
+            self.objs = []
     def endJob(self):
-        pass
+        if hasattr(self, 'objs') and self.objs != None:
+            prevdir = ROOT.gDirectory
+            self.dir.cd()
+            for obj in self.objs:
+                obj.Write()
+            prevdir.cd()
+            if hasattr(self, 'histFile') and self.histFile != None : 
+                self.histFile.Close()
+                
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -16,6 +32,10 @@ class Module:
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         pass
+    def addObject(self, obj ):
+        setattr( self, obj.GetName(), obj )
+        self.objs.append( getattr( self, obj.GetName() ) )
+        
 
 def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxEvents=-1, eventRange=None, progress=(10000,sys.stdout), filterOutput=True): 
     for m in modules: 
@@ -35,7 +55,7 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
             if not ret: break
         if ret:
             acceptedEvents += 1
-        if ret or not filterOutput: 
+        if (ret or not filterOutput) and wrappedOutputTree != None: 
             wrappedOutputTree.fill()
         if progress:
             if i > 0 and i % progress[0] == 0:
