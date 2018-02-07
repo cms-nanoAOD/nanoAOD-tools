@@ -11,7 +11,7 @@ config.JobType.scriptExe = 'crab_script.sh'
 config.JobType.inputFiles = ['crab_script.py','../scripts/haddnano.py'] #hadd nano will not be needed once nano tools are in cmssw
 config.JobType.sendPythonFolder	 = True
 config.section_("Data")
-config.Data.inputDataset = '/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/arizzi-NanoTest2-507dabe3d10b654abb8ddc59357bce9a/USER'
+config.Data.inputDataset = '/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAOD-PUMoriond17_94X_mcRun2_asymptotic_v2-v1/NANOAODSIM'
 config.Data.inputDBS = 'global'
 #config.Data.splitting = 'FileBased'
 config.Data.splitting = 'EventAwareLumiBased'
