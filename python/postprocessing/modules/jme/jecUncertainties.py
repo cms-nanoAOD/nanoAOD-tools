@@ -9,7 +9,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 class jecUncertProducer(Module):
     def __init__(self,globalTag,uncerts=["Total"],jetFlavour="AK4PFchs",doCppOutput=False):
 	self.uncerts=[(x,"Jet_jecUncert%s"%x) for x in uncerts]
-        self.unc_factorized_path = "%s/%s_UncertaintySources_%s.txt" % ("%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/jec/" % os.environ['CMSSW_BASE'], globalTag, jetFlavour)
+        self.unc_factorized_path = "%s/src/PhysicsTools/NanoAODTools/data/jme/%s_UncertaintySources_%s.txt" % (os.environ['CMSSW_BASE'], globalTag, jetFlavour)
 
 
     def beginJob(self):
