@@ -3,5 +3,6 @@
   <class name="PyJetResolutionWrapper"/>
   <class name="PyJetResolutionScaleFactorWrapper"/>
   <class name="PyJetParametersWrapper"/>
+  <class name="WeightCalculatorFromHistogram"/>
 </selection>
 </lcgdict>
