@@ -31,7 +31,7 @@ class btagSFProducer(Module):
     """Calculate btagging scale factors
         algo has to be either 'csvv2' or 'cmva'
     """
-    def __init__(self, algo = 'csvv2', verbose = 0):
+    def __init__(self, algo = 'csvv2', sfFileName = None, verbose = 0):
 
         self.algo = algo.lower()
 
@@ -43,19 +43,31 @@ class btagSFProducer(Module):
 
         # define measurement type for each flavor
         self.inputFilePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/btagSF/"
-        self.inputFileName = None
+        self.inputFileName = sfFileName
         self.measurement_types = None
         if self.algo == "csvv2":
-            self.inputFileName = "btagSF_CSVv2_ichep2016.csv"
+            if self.inputFileName is None:
+                self.inputFileName = "CSVv2_94XSF_V1_B_F.csv"
             print("Loading btagSF weights for CSV (v2) algorithm from file '%s'" % os.path.join(self.inputFilePath, self.inputFileName))
             self.measurement_types = {
                 0 : "comb",  # b
                 1 : "comb",  # c
                 2 : "incl"   # light
             }
+        elif self.algo == "deepcsv":
+            if self.inputFileName is None:
+                self.inputFileName = "DeepCSV_94XSF_V1_B_F.csv"
+            print("Loading btagSF weights for deep-CSV (b) algorithm from file '%s'" % os.path.join(self.inputFilePath, self.inputFileName))
+            self.measurement_types = {
+                0 : "comb",  # b
+                1 : "comb",  # c
+                2 : "incl"   # light
+            }
         elif self.algo == "cmva":
-            self.inputFileName = "btagSF_cMVAv2_ichep2016.csv"
+            if self.inputFileName is None:
+                self.inputFileName = "btagSF_cMVAv2_ichep2016.csv"
             print("Loading btagSF weights for cMVA algorithm from file '%s'" % os.path.join(self.inputFilePath, self.inputFileName))
+            print("Warning: btagSF weights have not been updated for 2017 ReReco data and RunIIFall17 MC yet. Will use old 2016 numbers instead !!")
             self.measurement_types = {
                 0 : "ttbar", # b
                 1 : "ttbar", # c
@@ -107,7 +119,9 @@ class btagSFProducer(Module):
         # (cf. https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration )
         self.calibration = ROOT.BTagCalibration(self.algo, os.path.join(self.inputFilePath, self.inputFileName))
         self.readers = {}
-        for wp in [ "L", "M", "T", "shape_corr" ]:
+        #for wp in [ "L", "M", "T", "shape_corr" ]:
+        # CV: shape corrections ('iterativefit' method) not supported for 2017 ReReco data and RunIIFall17 MC yet
+        for wp in [ "L", "M", "T" ]: 
             wp_btv = { "l" : 0, "m" : 1, "t" : 2, "shape_corr" : 3 }.get(wp.lower(), None)
             syts = None
             if wp_btv in [ 0, 1, 2 ]:
@@ -197,6 +211,8 @@ class btagSFProducer(Module):
 
         discr = None
         if self.algo == "csvv2":
+            discr = "btagCSVV2"
+        elif self.algo == "deepcsv":
             discr = "btagDeepB"
         elif self.algo == "cmva":
             discr = "btagCMVA"
