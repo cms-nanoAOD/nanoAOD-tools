@@ -31,7 +31,9 @@ class btagSFProducer(Module):
     """Calculate btagging scale factors
         algo has to be either 'csvv2' or 'cmva'
     """
-    def __init__(self, algo = 'csvv2', verbose = 0):
+    def __init__(self, era, algo = 'csvv2', sfFileName = None, verbose = 0):
+
+        self.era = era
 
         self.algo = algo.lower()
 
@@ -43,26 +45,79 @@ class btagSFProducer(Module):
 
         # define measurement type for each flavor
         self.inputFilePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/btagSF/"
-        self.inputFileName = None
+        self.inputFileName = sfFileName
         self.measurement_types = None
-        if self.algo == "csvv2":
-            self.inputFileName = "btagSF_CSVv2_ichep2016.csv"
-            print("Loading btagSF weights for CSV (v2) algorithm from file '%s'" % os.path.join(self.inputFilePath, self.inputFileName))
-            self.measurement_types = {
-                0 : "comb",  # b
-                1 : "comb",  # c
-                2 : "incl"   # light
+        self.supported_wp = None
+        supported_btagSF = {
+            'csvv2' : {
+                '2016' : {
+                    'inputFileName' : "btagSF_CSVv2_ichep2016.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr" ]
+                },
+                '2017' : {
+                    'inputFileName' : "CSVv2_94XSF_V1_B_F.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T" ] # CV: shape corrections ('iterativefit' method) not supported for 2017 ReReco data and RunIIFall17 MC yet
+                }
+            },
+            'deepcsv' : {
+                '2017' : {
+                    'inputFileName' : "DeepCSV_94XSF_V1_B_F.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T" ] # CV: shape corrections ('iterativefit' method) not supported for 2017 ReReco data and RunIIFall17 MC yet
+                }
+            },
+            'cmva' : {
+                '2016' : {
+                    'inputFileName' : "btagSF_cMVAv2_ichep2016.csv",
+                    'measurement_types' : {
+                        0 : "ttbar", # b
+                        1 : "ttbar", # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr" ]
+                }
             }
-        elif self.algo == "cmva":
-            self.inputFileName = "btagSF_cMVAv2_ichep2016.csv"
-            print("Loading btagSF weights for cMVA algorithm from file '%s'" % os.path.join(self.inputFilePath, self.inputFileName))
-            self.measurement_types = {
-                0 : "ttbar", # b
-                1 : "ttbar", # c
-                2 : "incl"   # light
-            }
+        }
+
+        supported_algos = []
+        for algo in supported_btagSF.keys():
+            if era in supported_btagSF[algo].keys():
+                supported_algos.append(algo)
+        if self.algo in supported_btagSF.keys():
+            if self.era in supported_btagSF[self.algo].keys():
+                if self.inputFileName is None:
+                    self.inputFileName = supported_btagSF[self.algo][self.era]['inputFileName']
+                self.measurement_types = supported_btagSF[self.algo][self.era]['measurement_types']
+                self.supported_wp = supported_btagSF[self.algo][self.era]['supported_wp']
+            else:
+                raise ValueError("ERROR: Algorithm '%s' not supported for era = '%s'! Please choose among { %s }." % (self.algo, self.era, supported_algos))
         else:
-            raise ValueError("ERROR: Invalid algorithm '%s'! Please choose either 'csvv2' or 'cmva'." % algo)
+            raise ValueError("ERROR: Algorithm '%s' not supported for era = '%s'! Please choose among { %s }." % (self.algo, self.era, supported_algos))
+        
+        algoLabel = None
+        if self.algo == "csvv2":
+            algoLabel = "CSV (v2)"
+        elif self.algo == "deepcsv":
+            algoLabel = "deep-CSV (b)"
+        elif self.algo == "cmva":
+            algoLabel = "cMVA"
+        else:
+            raise ValueError("ERROR: Algorithm '%s' not supported for era = '%s'! Please choose among { %s }." % (self.algo, self.era, supported_algos))
+        print("Loading btagSF weights for %s algorithm from file '%s'" % (algoLabel, os.path.join(self.inputFilePath, self.inputFileName)))
 
         # load libraries for accessing b-tag scale factors (SFs) from conditions database
         for library in [ "libCondFormatsBTauObjects", "libCondToolsBTau" ]:
@@ -107,7 +162,7 @@ class btagSFProducer(Module):
         # (cf. https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration )
         self.calibration = ROOT.BTagCalibration(self.algo, os.path.join(self.inputFilePath, self.inputFileName))
         self.readers = {}
-        for wp in [ "L", "M", "T", "shape_corr" ]:
+        for wp in self.supported_wp: 
             wp_btv = { "l" : 0, "m" : 1, "t" : 2, "shape_corr" : 3 }.get(wp.lower(), None)
             syts = None
             if wp_btv in [ 0, 1, 2 ]:
@@ -197,6 +252,8 @@ class btagSFProducer(Module):
 
         discr = None
         if self.algo == "csvv2":
+            discr = "btagCSVV2"
+        elif self.algo == "deepcsv":
             discr = "btagDeepB"
         elif self.algo == "cmva":
             discr = "btagCMVA"
@@ -228,5 +285,6 @@ class btagSFProducer(Module):
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-btagSF = lambda : btagSFProducer()
+btagSF2016 = lambda : btagSFProducer("2016")
+btagSF2017 = lambda : btagSFProducer("2017")
 
