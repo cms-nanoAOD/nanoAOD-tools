@@ -32,8 +32,9 @@ class jetmetUncertaintiesProducer(Module):
         # read jet energy scale (JES) uncertainties
         self.jesInputFilePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
         if len(jesUncertainties) == 1 and jesUncertainties[0] == "Total":
-            self.jesUncertaintyInputFileName = "Summer16_23Sep2016V4_MC_Uncertainty_AK4PFchs.txt"
+            self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V4_MC_Uncertainty_AK4PFchs.txt"
         else:
+            # 'UncertaintySources' file not yet updated for RunIIFall2017 MC
             self.jesUncertaintyInputFileName = "Summer16_23Sep2016V4_MC_UncertaintySources_AK4PFchs.txt"
 
         # define energy threshold below which jets are considered as "unclustered energy"
@@ -270,5 +271,5 @@ jesUncertaintySources = [
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-jetmetUncertainties = lambda : jetmetUncertaintiesProducer("Summer16_23Sep2016V4_MC", [ "Total" ])
+jetmetUncertainties = lambda : jetmetUncertaintiesProducer("Fall17_17Nov2017_V4_MC", [ "Total" ])
 jetmetUncertaintiesAll = lambda : jetmetUncertaintiesProducer("Summer16_23Sep2016V4_MC", jesUncertaintySources)
