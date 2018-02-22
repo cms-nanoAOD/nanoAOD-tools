@@ -9,7 +9,9 @@ from PhysicsTools.NanoAODTools.postprocessing.tools import matchObjectCollection
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetSmearer
 
 class jetmetUncertaintiesProducer(Module):
-    def __init__(self, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs"):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs"):
+
+        self.era = era
 
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used, as there is no consistent set of txt files for
@@ -32,7 +34,12 @@ class jetmetUncertaintiesProducer(Module):
         # read jet energy scale (JES) uncertainties
         self.jesInputFilePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
         if len(jesUncertainties) == 1 and jesUncertainties[0] == "Total":
-            self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V4_MC_Uncertainty_AK4PFchs.txt"
+            if self.era == "2016":
+                self.jesUncertaintyInputFileName = "Summer16_23Sep2016V4_MC_Uncertainty_AK4PFchs.txt"
+            elif self.era == "2017":
+                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V4_MC_Uncertainty_AK4PFchs.txt"
+            else:
+                raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
         else:
             # 'UncertaintySources' file not yet updated for RunIIFall2017 MC
             self.jesUncertaintyInputFileName = "Summer16_23Sep2016V4_MC_UncertaintySources_AK4PFchs.txt"
@@ -271,5 +278,8 @@ jesUncertaintySources = [
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-jetmetUncertainties = lambda : jetmetUncertaintiesProducer("Fall17_17Nov2017_V4_MC", [ "Total" ])
-jetmetUncertaintiesAll = lambda : jetmetUncertaintiesProducer("Summer16_23Sep2016V4_MC", jesUncertaintySources)
+jetmetUncertainties2016 = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "Total" ])
+jetmetUncertainties2016All = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", jesUncertaintySources)
+jetmetUncertainties2017 = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V4_MC", [ "Total" ])
+jetmetUncertainties2017All = lambda : jetmetUncertaintiesProducer("2017", "Summer16_23Sep2016V4_MC", jesUncertaintySources)
+
