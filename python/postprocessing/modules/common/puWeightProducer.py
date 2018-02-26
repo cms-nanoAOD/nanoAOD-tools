@@ -23,9 +23,19 @@ class puWeightProducer(Module):
         self.norm = norm
         self.verbose = verbose
         self.nvtxVar = nvtx_var
-        if "/WeightCalculatorFromHistogram_cc.so" not in ROOT.gSystem.GetLibraries():
-            print "Load C++ Worker"
-            ROOT.gROOT.ProcessLine(".L %s/python/PhysicsTools/NanoAODTools/postprocessing/helpers/WeightCalculatorFromHistogram.cc++" % os.environ['CMSSW_BASE'])
+       
+        #Try to load module via python dictionaries
+        try:
+            ROOT.gSystem.Load("libPhysicsToolsNanoAODTools")
+            dummy = ROOT.WeightCalculatorFromHistogram
+        #Load it via ROOT ACLIC. NB: this creates the object file in the CMSSW directory,
+        #causing problems if many jobs are working from the same CMSSW directory
+        except Exception as e:
+            print "Could not load module via python, trying via ROOT", e
+            if "/WeightCalculatorFromHistogram_cc.so" not in ROOT.gSystem.GetLibraries():
+                print "Load C++ Worker"
+                ROOT.gROOT.ProcessLine(".L %s/src/PhysicsTools/NanoAODTools/src/WeightCalculatorFromHistogram.cc++" % os.environ['CMSSW_BASE'])
+            dummy = ROOT.WeightCalculatorFromHistogram
     def loadHisto(self,filename,hname):
         tf = ROOT.TFile.Open(filename)
         hist = tf.Get(hname)

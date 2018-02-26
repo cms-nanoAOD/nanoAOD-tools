@@ -12,7 +12,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.jobreport import JobRepo
 
 class PostProcessor :
     def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,
-		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None):
+		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None):
 	self.outputDir=outputDir
 	self.inputFiles=inputFiles
 	self.cut=cut
@@ -32,6 +32,7 @@ class PostProcessor :
 		print "Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root"
 		self.haddFileName="tree.root"
  	self.branchsel = BranchSelection(branchsel) if branchsel else None 
+        self.outputbranchsel = BranchSelection(outputbranchsel) if outputbranchsel else None
         self.histFileName=histFileName
         self.histDirName=histDirName
     def run(self) :
@@ -124,6 +125,8 @@ class PostProcessor :
 		print 'Selected %d entries from %s' % (outTree.tree().GetEntries(), fname)
 
 	    # now write the output
+            if self.outputbranchsel:
+                self.outputbranchsel.selectBranches(outTree._tree)
             if not self.noOut: 
                 outTree.write()
                 outFile.Close()

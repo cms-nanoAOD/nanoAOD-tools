@@ -35,7 +35,13 @@ class Module:
     def addObject(self, obj ):
         setattr( self, obj.GetName(), obj )
         self.objs.append( getattr( self, obj.GetName() ) )
-        
+    def addObjectList(self, names, obj ):
+        objlist = []
+        for iname,name in enumerate(names):
+            setattr( self, obj.GetName() + '_' + name, obj.Clone( obj.GetName() + '_' + name ) )
+            objlist.append( getattr(self, obj.GetName() + '_' + name ) )
+            self.objs.append( getattr( self, obj.GetName() + '_' + name ) )
+        setattr( self, obj.GetName(), objlist )
 
 def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxEvents=-1, eventRange=None, progress=(10000,sys.stdout), filterOutput=True): 
     for m in modules: 
