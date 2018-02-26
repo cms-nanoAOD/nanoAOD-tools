@@ -42,3 +42,17 @@ def matchObjectCollection(objs,collection,dRmax=0.4,presel=lambda x,y: True):
         else:
             pairs[obj] = None
     return pairs
+
+def matchObjectCollectionMultiple(objs,collection,dRmax=0.4,presel=lambda x,y: True):
+    pairs = {}
+    if len(objs)==0:
+        return pairs
+    if len(collection)==0:
+        return dict( list(zip(objs, [None]*len(objs))) )
+    for obj in objs:
+        matched = [] 
+        for c in collection :
+            if presel(obj,c) and deltaR( obj, c ) < dRmax :
+                matched.append( c )
+        pairs[obj] = matched
+    return pairs
