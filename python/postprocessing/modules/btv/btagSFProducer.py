@@ -203,8 +203,8 @@ class btagSFProducer(Module):
         wp_btv = { "l" : 0, "m" : 1, "t" : 2, "shape_corr" : 3 }.get(wp.lower(), None)
         if wp_btv == None or not wp_btv in self.readers.keys():
             if self.verbose > 0:
-                print("WARNING: Unknown working point '%s', setting b-tagging SF to -1!" % wp)
-            return -1.
+                print("WARNING: Unknown working point '%s', setting b-tagging SF reader to None!" % wp)
+            return None
         return self.readers[wp_btv]
 
     def getFlavorBTV(self, flavor):
@@ -227,6 +227,12 @@ class btagSFProducer(Module):
         return flavor_btv
 
     def getSFs(self, jet_data, syst, reader,  measurement_type = 'auto', shape_corr = False):
+        if reader is None:
+            if self.verbose > 0:
+                print("WARNING: Reader not available, setting b-tagging SF to -1!")
+            for i in range(len(jet_data)):
+                yield 1
+            raise StopIteration
         for idx, (pt, eta, flavor_btv, discr) in enumerate(jet_data):
             epsilon = 1.e-3
             max_abs_eta = self.max_abs_eta
