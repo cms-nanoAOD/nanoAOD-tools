@@ -57,6 +57,7 @@ for e in fileHandles[0].GetListOfKeys() :
 				branchNames.add(br)
 				zeroFill(obj,br,otherObj.GetListOfBranches().FindObject(br))
 			#merge immediately for trees
+                if isTree:
 	        	obj.Merge(inputs,"fast" if goFast else "")
 			inputs.Clear()
 	
