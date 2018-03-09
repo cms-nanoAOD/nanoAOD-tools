@@ -50,7 +50,7 @@ def runsAndLumis():
   	     if "-" in  l:
     		start,stop=l.split("-")
     		rstart,lstart=start.split(":")
-    		rstop,lstop=start.split(":")
+    		rstop,lstop=stop.split(":")
   	     else:
     		rstart,lstart=l.split(":")
     		rstop,lstop=l.split(":")
