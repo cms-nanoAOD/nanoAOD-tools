@@ -107,7 +107,9 @@ void WeightCalculatorFromHistogram::fixLargeWeights(std::vector<float> &weights,
     maxw *= 0.95;
   }
   maxw /= 0.95;
-  for(int i=0; i<(int)weights.size(); ++i) cropped[i] = std::min(maxw,weights[i]);
-  float normshift = checkIntegral(cropped,weights);
-  for(int i=0; i<(int)weights.size(); ++i) weights[i] = cropped[i]*(1-normshift);
+  if (cropped.size()>0) {
+      for(int i=0; i<(int)weights.size(); ++i) cropped[i] = std::min(maxw,weights[i]);
+      float normshift = checkIntegral(cropped,weights);
+      for(int i=0; i<(int)weights.size(); ++i) weights[i] = cropped[i]*(1-normshift);
+  }
 }
