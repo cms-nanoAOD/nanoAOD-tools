@@ -101,4 +101,3 @@ class JetReCalibrator:
         newmass = jet.mass*raw*corr
         return (newpt, newmass)
 
-

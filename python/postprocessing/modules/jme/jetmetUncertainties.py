@@ -476,7 +476,6 @@ jetmetUncertainties2017All = lambda : jetmetUncertaintiesProducer("2017", "Fall1
 jetmetUncertainties2018 = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ])
 jetmetUncertainties2018All = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "All" ], redoJEC=True)
 
-
 jetmetUncertainties2016AK4Puppi = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "Total" ], jetType="AK4PFPuppi")
 jetmetUncertainties2016AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC",  [ "All" ], jetType="AK4PFPuppi")
 
