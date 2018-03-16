@@ -11,15 +11,13 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import
 class jetRecalib(Module):
     def __init__(self,  globalTag, archive, jetType = "AK4PFchs"):
 
-        self.jetType = jetType
-
-        if "AK4" in self.jetType : 
+      if "AK4" in jetType : 
             self.jetBranchName = "Jet"
-        elif "AK8" in self.jetType :
+        elif "AK8" in jetType :
             self.jetBranchName = "FatJet"
             self.subJetBranchName = "SubJet"
         else:
-            raise ValueError("ERROR: Invalid jet type = '%s'!" % self.jetType)
+            raise ValueError("ERROR: Invalid jet type = '%s'!" % jetType)
         self.rhoBranchName = "fixedGridRhoFastjetAll"
         self.lenVar = "n" + self.jetBranchName        
 
@@ -29,7 +27,7 @@ class jetRecalib(Module):
         self.jesInputFilePath = tempfile.mkdtemp()
         self.jesArchive.extractall(self.jesInputFilePath)
 
-        self.jetReCalibrator = JetReCalibrator(globalTag, self.jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
+        self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
 	
         # load libraries for accessing JES scale factors and uncertainties from txt files
         for library in [ "libCondFormatsJetMETObjects", "libPhysicsToolsNanoAODTools" ]:
@@ -80,14 +78,17 @@ class jetRecalib(Module):
             jets_mass_raw.append(jet_mass_raw)
 
 	    jet_pt=jet.pt
-            corr = self.jetReCalibrator.correct(jet,rho)
-            jet_pt =  corr[0]
-            jet_mass =  corr[1]
+            (jet_pt, jet_mass) = self.jetReCalibrator.correct(jet,rho)
             jet_pt_nom           = jet_pt # don't smear resolution in data
             if jet_pt_nom < 0.0:
                 jet_pt_nom *= -1.0
             jets_pt_nom    .append(jet_pt_nom)
-            jets_mass_nom    .append(jet_mass)
+
+            jet_mass_nom         = jet_mass
+            if jet_mass_nom < 0.0:
+                jet_mass_nom *= -1.0
+            jets_mass_nom    .append(jet_mass_nom)
+
             if jet_pt_nom > 15.:
                 jet_cosPhi = math.cos(jet.phi)
                 jet_sinPhi = math.sin(jet.phi)
