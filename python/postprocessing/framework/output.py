@@ -12,7 +12,7 @@ class OutputBranch:
         self.buff   = array(_rootBranchType2PythonArray[rootBranchType], n*[0. if rootBranchType in 'FD' else 0])
         self.lenVar = lenVar
         self.n = n
-        #check if a branch was already there. In case SetStatus to 0
+        #check if a branch was already there. In case, scratch it first 
         for b in tree.GetListOfBranches():
           if b.GetName() == name:
              tree.GetListOfBranches().Remove(b)
