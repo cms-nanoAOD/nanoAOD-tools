@@ -43,6 +43,8 @@ class jetRecalib(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("%s_pt_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
+        self.out.branch("MET_pt_nom" , "F")
+        self.out.branch("MET_phi_nom", "F")
             
                         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -51,27 +53,39 @@ class jetRecalib(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         jets = Collection(event, self.jetBranchName )
+        met = Object(event, "MET") 
 
         jets_pt_nom = []
+        ( met_px,         met_py         ) = ( met.pt*math.cos(met.phi), met.pt*math.sin(met.phi) )
+        ( met_px_nom, met_py_nom ) = ( met_px, met_py )
+        met_px_nom = met_px
+        met_py_nom = met_py
                 
         rho = getattr(event, self.rhoBranchName)
         
         for jet in jets:
 	    jet_pt=jet.pt
 	    jet_pt = self.jetReCalibrator.correct(jet,rho)
-            jet_pt_nom           = jet_pt_jerNomVal *jet_pt
+            jet_pt_nom           = jet_pt # don't smear resolution in data
             if jet_pt_nom < 0.0:
                 jet_pt_nom *= -1.0
             jets_pt_nom    .append(jet_pt_nom)
+            if jet_pt_nom > 15.:
+                jet_cosPhi = math.cos(jet.phi)
+                jet_sinPhi = math.sin(jet.phi)
+                met_px_nom = met_px_nom - (jet_pt_nom - jet.pt)*jet_cosPhi
+                met_py_nom = met_py_nom - (jet_pt_nom - jet.pt)*jet_sinPhi
         self.out.fillBranch("%s_pt_nom" % self.jetBranchName, jets_pt_nom)
+        self.out.fillBranch("MET_pt_nom", math.sqrt(met_px_nom**2 + met_py_nom**2))
+        self.out.fillBranch("MET_phi_nom", math.atan2(met_py_nom, met_px_nom))        
 
         return True
 
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-jetRecalib2017B = lambda : jetmetUncertaintiesProducer("Fall17_17Nov2017B_V6_DATA")
-jetRecalib2017C = lambda : jetmetUncertaintiesProducer("Fall17_17Nov2017C_V6_DATA")
-jetRecalib2017D = lambda : jetmetUncertaintiesProducer("Fall17_17Nov2017D_V6_DATA")
-jetRecalib2017E = lambda : jetmetUncertaintiesProducer("Fall17_17Nov2017E_V6_DATA")
-jetRecalib2017F = lambda : jetmetUncertaintiesProducer("Fall17_17Nov2017F_V6_DATA")
+jetRecalib2017B = lambda : jetRecalib("Fall17_17Nov2017B_V6_DATA")
+jetRecalib2017C = lambda : jetRecalib("Fall17_17Nov2017C_V6_DATA")
+jetRecalib2017D = lambda : jetRecalib("Fall17_17Nov2017D_V6_DATA")
+jetRecalib2017E = lambda : jetRecalib("Fall17_17Nov2017E_V6_DATA")
+jetRecalib2017F = lambda : jetRecalib("Fall17_17Nov2017F_V6_DATA")
