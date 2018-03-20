@@ -37,7 +37,8 @@ class jetmetUncertaintiesProducer(Module):
             self.subJetBranchName = "SubJet"
             self.genJetBranchName = "GenJetAK8"
             self.genSubJetBranchName = "SubGenJetAK8"
-            self.doGroomed = True
+            self.doGroomed = False
+            ###self.doGroomed = True
             self.corrMET = False
         else:
             raise ValueError("ERROR: Invalid jet type = '%s'!" % jetType)
