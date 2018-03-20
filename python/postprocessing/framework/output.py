@@ -2,16 +2,30 @@ from array import array
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
+reduceMantissa="""
+float reduceMantissaToNbits(const float &f, int bits)
+        {
+            uint32_t mask = (0xFFFFFFFF >> (23-bits)) << (23-bits);
+            union { float flt; uint32_t i32; } conv;
+            conv.flt=f;
+            conv.i32&=mask;
+            return conv.flt;
+        }
+"""
+print "load reduce mantissa"
+ROOT.gROOT.ProcessLine(reduceMantissa)
+
 from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import setExtraBranch
 
 _rootBranchType2PythonArray = { 'b':'B', 'B':'b', 'i':'I', 'I':'i', 'F':'f', 'D':'d', 'l':'L', 'L':'l', 'O':'B' }
 
 class OutputBranch:
-    def __init__(self, tree, name, rootBranchType, n=1, lenVar=None, title=None):
+    def __init__(self, tree, name, rootBranchType, n=1, lenVar=None, title=None, limitedPrecision=False):
         n = int(n)
         self.buff   = array(_rootBranchType2PythonArray[rootBranchType], n*[0. if rootBranchType in 'FD' else 0])
         self.lenVar = lenVar
         self.n = n
+	self.precision = limitedPrecision
         if lenVar != None:
             self.branch = tree.Branch(name, self.buff, "%s[%s]/%s" % (name,lenVar,rootBranchType))
         elif n == 1:
@@ -24,9 +38,9 @@ class OutputBranch:
             if len(self.buff) < len(val): # realloc
                 self.buff = array(self.buff.typecode, max(len(val),2*len(self.buff))*[0. if self.buff.typecode in 'fd' else 0])
                 self.branch.SetAddress(self.buff)
-            for i,v in enumerate(val): self.buff[i] = v
+            for i,v in enumerate(val): self.buff[i] = ROOT.reduceMantissaToNbits(v,self.precision) if self.precision else v
         elif self.n == 1: 
-            self.buff[0] = val
+            self.buff[0] = ROOT.reduceMantissaToNbits(val,precision) if self.precision else val
         else:
             if len(val) != self.n: raise RuntimeError("Mismatch in filling branch %s of fixed length %d with %d values (%s)" % (self.Branch.GetName(),self.n,len(val),val))
             for i,v in enumerate(val): self.buff[i] = v
