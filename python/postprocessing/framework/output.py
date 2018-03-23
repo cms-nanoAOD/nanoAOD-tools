@@ -57,13 +57,41 @@ class OutputTree:
         self._file.cd()
         self._tree.Write()
 
+
 class FullOutput(OutputTree):
-    def __init__(self, inputFile, inputTree, outputFile, branchSelection = None, fullClone = False, provenance = False, jsonFilter = None):
+    def __init__(
+            self,
+            inputFile,
+            inputTree,
+            outputFile,
+            branchSelection=None,
+            outputbranchSelection=None,
+            fullClone=False,
+            provenance=False,
+            jsonFilter=None
+    ):
+
         outputFile.cd()
-        if branchSelection: 
-            branchSelection.selectBranches(inputTree)
-        outputTree = inputTree.CopyTree('1') if fullClone else inputTree.CloneTree(0)
+
+        # enable/disable the output branches as requested in outputbranchSelection
+        if outputbranchSelection:
+            outputbranchSelection.selectBranches(inputTree)
+
+        if fullClone:
+            outputTree = inputTree.CopyTree('1')
+        else:
+            
+            outputTree = inputTree.CloneTree(0)
+            
+
+            # enable all branches in inputTree, then disable the branches as requested in branchSelection
+            #
+            inputTree.SetBranchStatus("*",1)
+            if branchSelection:
+                branchSelection.selectBranches(inputTree)
+
         OutputTree.__init__(self, outputFile, outputTree, inputTree)
+        
         self._inputTree = inputTree
         self._otherTrees = {}
         self._otherObjects = {}
