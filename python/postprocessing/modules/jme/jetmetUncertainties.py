@@ -84,7 +84,6 @@ class jetmetUncertaintiesProducer(Module):
             else:
                 raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
 
-
         # read all uncertainty source names from the loaded file
         if jesUncertainties[0] == "All":
             with open(self.jesInputFilePath+'/'+self.jesUncertaintyInputFileName) as f:
@@ -93,7 +92,6 @@ class jetmetUncertaintiesProducer(Module):
                 sources = map(lambda x: x[1:-1], sources)
                 self.jesUncertainties = sources
             
-
         if self.redoJEC :
             self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
         
