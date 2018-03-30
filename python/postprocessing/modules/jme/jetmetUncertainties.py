@@ -471,7 +471,6 @@ class jetmetUncertaintiesProducer(Module):
         return True
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
-
 jetmetUncertainties2016 = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "Total" ])
 jetmetUncertainties2016All = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "All" ])
 
