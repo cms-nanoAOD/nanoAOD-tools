@@ -10,10 +10,11 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetS
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
 class jetmetUncertaintiesProducer(Module):
-    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False):
 
         self.era = era
 	self.redoJEC = redoJEC
+        self.noGroom = noGroom
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used, as there is no consistent set of txt files for
         #     JES uncertainties and JER scale factors and uncertainties yet
@@ -37,13 +38,10 @@ class jetmetUncertaintiesProducer(Module):
             self.subJetBranchName = "SubJet"
             self.genJetBranchName = "GenJetAK8"
             self.genSubJetBranchName = "SubGenJetAK8"
-            if self.era == "2016":
-                # don't have necessary inputs in 2016 MINIAOD to recalculate soft drop mass
-                self.doGroomed = False
-            elif self.era == "2017":
+            if not self.noGroom:
                 self.doGroomed = True
             else:
-                raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
+                self.doGroomed = False
             self.corrMET = False
         else:
             raise ValueError("ERROR: Invalid jet type = '%s'!" % jetType)
@@ -425,3 +423,5 @@ jetmetUncertainties2016AK8Puppi = lambda : jetmetUncertaintiesProducer("2016", "
 jetmetUncertainties2016AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC",  [ "All" ], jetType="AK8PFPuppi")
 jetmetUncertainties2017AK8Puppi = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V6_MC", [ "Total" ], jetType="AK8PFPuppi")
 jetmetUncertainties2017AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V6_MC",  [ "All" ], jetType="AK8PFPuppi")
+jetmetUncertainties2016AK8PuppiNoGroom = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "Total" ], jetType="AK8PFPuppi",redoJEC=False,noGroom=True)
+jetmetUncertainties2016AK8PuppiAllNoGroom = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", jesUncertaintySources, jetType="AK8PFPuppi",redoJEC=False,noGroom=True)
