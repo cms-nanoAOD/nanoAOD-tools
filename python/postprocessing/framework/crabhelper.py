@@ -7,7 +7,8 @@ import PSet
 
 def inputFiles():
    print "ARGV:",sys.argv
-   JobNumber=sys.argv[1]
+   JobNumber=sys.argv[1].strip("--test=")
+   #JobNumber=sys.argv[1]
    crabFiles=PSet.process.source.fileNames
    print crabFiles
    firstInput = crabFiles[0]
