@@ -37,8 +37,13 @@ class jetmetUncertaintiesProducer(Module):
             self.subJetBranchName = "SubJet"
             self.genJetBranchName = "GenJetAK8"
             self.genSubJetBranchName = "SubGenJetAK8"
-            self.doGroomed = False
-            ###self.doGroomed = True
+            if self.era == "2016":
+                # don't have necessary inputs in 2016 MINIAOD to recalculate soft drop mass
+                self.doGroomed = False
+            elif self.era == "2017":
+                self.doGroomed = True
+            else:
+                raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
             self.corrMET = False
         else:
             raise ValueError("ERROR: Invalid jet type = '%s'!" % jetType)
