@@ -26,6 +26,7 @@ class muonScaleResProducer(Module):
         self.out = wrappedOutputTree
         self.out.branch("Muon_pt_corrected", "F", lenVar="nMuon")
         # self.out.branch("Muon_pt_err", "F", lenVar="nMuon")
+        self.is_mc = bool(inputTree.GetBranch("GenJet_pt"))
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -33,12 +34,8 @@ class muonScaleResProducer(Module):
     def analyze(self, event):
         muons = Collection(event, "Muon")
         roccor = self._roccor
-        try:
-            is_mc = bool(getattr(event, 'GenJet_pt'))
-        except RuntimeError:
-            is_mc = False
 
-        if is_mc:
+        if self.is_mc:
             u1 = random.uniform(0.0, 1.0)
             u2 = random.uniform(0.0, 1.0)
             pt_corr = list(mu.pt * roccor.kScaleAndSmearMC(mu.charge, mu.pt, mu.eta, mu.phi, mu.nTrackerLayers, u1, u2) for mu in muons)
