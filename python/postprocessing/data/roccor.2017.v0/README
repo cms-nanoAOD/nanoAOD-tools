@@ -1,0 +1,67 @@
+Information:
+------------
+First version of muon calibration package for full 2017 dataset
+Data: Run2017{B..F}-17Nov2017
+MC: RunIIFall17MiniAOD-RECOSIMstep_94X_mc2017_realistic_v10
+
+
+Example 
+-------------------------------------------------------------------------------------
+//for root macro
+#include "RoccoR.cc"
+RoccoR  rc("RoccoR2017v0.txt"); 
+
+//Or in cmssw:
+#include "RoccoR.h"
+RoccoR rc; 
+rc.init(edm::FileInPath("path/to/RoccoR2017v0.txt").fullPath());
+------
+//scale factors for momentum of each muon:
+double dtSF = rc.kScaleDT(Q, pt, eta, phi, s=0, m=0); //data
+double mcSF = rc.kScaleFromGenMC(Q, pt, eta, phi, nl, genPt, u1, s=0, m=0); //(recommended), MC when matched gen muon is available
+double mcSF = rc.kScaleAndSmearMC(Q, pt, eta, phi, nl, u1, u2, s=0, m=0); //extra smearing when matched gen muon is not available
+-------------------------------------------------------------------------------------
+Here: 
+Q is charge
+nl is trackerLayersWithMeasurement \\
+u1 and u2 are random numbers distributed uniformly between 0 and 1 (gRandom->Rndm());
+s is error set (default is 0)
+m is error member (default is 0, ranges from 0 to nmembers-1)
+For MC, when switching to different error sets/members for a given muon, u1 and u2 should remain unchanged. 
+
+-------------------------------------------------------------------------------------
+Following variations are provided:
+-------------------------------------------------------------------------------------
+	 set        nmembers	comment
+Default  0	    1		default, reference based on madgraph sample, with adhoc ewk (sw2eff and Z width) and Z pt (to match data) weights. 
+Stat     1          100         pre-generated stat. replicas; 
+Zpt      2          1           derived without reweighting reference pt to data. 
+Ewk      3          1           derived without applying ad-hoc ewk weights. 
+deltaM   4          1           one representative set for alternative profile deltaM mass window 
+-------------------------------------------------------------------------------------
+For statistical replicas, std. dev. gives uncertainty.
+For the rest, difference wrt the cental is assigned as syst. error.
+Total uncertainty is calculated as the quadrature sum of the four components. 
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+Additional notes:
+
+Normally, uncertainties are negligible compared to other uncertainties in the analysis. 
+As a simple check, one can compare results with and without applying these corrections. 
+If the effect on the analysis is small compared to other uncertainties, then muon calibration 
+uncertainties can probably be neglected. 
+
+Functions below return uncertainties evaluated for each muon (propagated with the procedure above):
+----
+double deltaDtSF = rc.kScaleDTerror(Q, pt, eta, phi);
+double deltaMcSF = rc.kScaleFromGenMCerror(Q, pt, eta, phi, nl, genPt, u1);
+double deltaMcSF = rc.kScaleAndSmearMCerror(Q, pt, eta, phi, nl, u1, u2);
+----
+Since there is no information on correlations between charges or different eta/phi bins, these functions 
+are recommended to only be used as an estimate of an upper bound for uncertainty to see if it's negligible 
+(to do so, scale-factors should be varied by these delta's up or down for different charges and bins in 
+a most conservative way for a given analysis). 
+-------------------------------------------------------------------------------------
+
+In case of questions or problems, please email Aleko. 
