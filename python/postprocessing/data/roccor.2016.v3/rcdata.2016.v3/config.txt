@@ -1,0 +1,9 @@
+Default  0	    1  
+Stat     1          100
+Zpt      2          1  
+Ewk      3          1  
+CorDm    4          5  
+FitDm    5          5  
+LHEw     6          0  
+Run      7          7  
+AMCNLO   8          1  
