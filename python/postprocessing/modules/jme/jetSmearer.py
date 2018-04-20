@@ -108,9 +108,7 @@ class jetSmearer(Module):
                 # Case 2: we don't have a generator level jet. Smear jet pT using a random Gaussian variation
                 #
                 sigma = jet_pt_resolution*math.sqrt(jet_pt_sf_and_uncertainty[central_or_shift]**2 - 1.)
-                # generate random number with flat distribution between 0 and 1
-                u = self.rnd.Rndm()
-                smearFactor = 1. + u
+                smearFactor = self.rnd.Gaus(1., sigma)
             else:
                 #
                 # Case 3: we cannot smear this jet, as we don't have a generator level jet and the resolution in data is better than the resolution in the simulation,
@@ -181,7 +179,7 @@ class jetSmearer(Module):
                 # Case 2: we don't have a generator level jet. Smear jet m using a random Gaussian variation
                 #
                 sigma = jet_m_resolution*math.sqrt(jet_m_sf_and_uncertainty[central_or_shift]**2 - 1.)
-                smearFactor = 1. + u
+                smearFactor = self.rnd.Gaus(1., sigma)
             else:
                 #
                 # Case 3: we cannot smear this jet, as we don't have a generator level jet and the resolution in data is better than the resolution in the simulation,
