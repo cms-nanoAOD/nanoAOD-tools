@@ -1,13 +1,19 @@
-import ROOT
+import logging
 import numpy as np
 import itertools
+
+import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 _rootLeafType2rootBranchType = { 'UChar_t':'b', 'Char_t':'B', 'UInt_t':'i', 'Int_t':'I', 'Float_t':'F', 'Double_t':'D', 'ULong64_t':'l', 'Long64_t':'L', 'Bool_t':'O' }
 
-class collectionMerger(Module):
+# logger
+logger = logging.getLogger(__name__)
+
+
+class CollectionMerger(Module):
 
     def __init__(self,input,output,sortkey = lambda x : x.pt,reverse=True,selector=None,maxObjects=None):
         self.input = input
@@ -53,22 +59,48 @@ class collectionMerger(Module):
 
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
+        
+        logger = logging.getLogger(
+            '.'.join([__name__, 'CollectionMerger',
+                      'analyze'])
+        )
+ 
+        logger.debug('\n Processing run:lumi:event: {run}:{lumi}:{event} '.format(
+            run=event.run, lumi=event.luminosityBlock, event=long(event.event)))
+        
+
         coll = [Collection(event,x) for x in self.input]
         objects = [(coll[j][i],j,i) for j in xrange(self.nInputs) for i in xrange(len(coll[j]))]
+        
+        logger.debug(
+            ''.join(
+                ['\n Merge {nObj} objects from collection {coll} '.format(nObj=len(coll[j]), coll=self.input[j])
+                 for j in xrange(self.nInputs)]
+            )
+        )
+
+        
         if self.selector: objects=filter(lambda (obj,j,i) : self.selector[j](obj), objects)
         objects.sort(key = self.sortkey, reverse = self.reverse)
         if self.maxObjects: objects = objects[:self.maxObjects]
-        for bridx,br in enumerate(self.brlist_all):
+        
+        for bridx, br in enumerate(self.brlist_all):
             out = []
-            for obj,j,i in objects:
-                out.append(getattr(obj,br) if self.is_there[bridx][j] else 0)
-            self.out.fillBranch("%s_%s"%(self.output,br), out)
+            for obj, j, i in objects:
+                out.append(getattr(obj, br) if self.is_there[bridx][j] else 0)
+            self.out.fillBranch("%s_%s" % (self.output, br), out)
+
+            logger.debug(
+                '\n Branch {branch} values for all {coll_output} objects: \n {out}'.format(
+                    branch=br, coll_output=self.output, out=out)
+            )
+
         return True
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-lepMerger = lambda : collectionMerger(input=["Electron","Muon"],output="Lepton")
-lepMerger_exampleSelection = lambda : collectionMerger(input=["Electron","Muon"],output="Lepton", # this will keep only the two leading leptons among electrons with pt > 20 and muons with pt > 40
+lepMerger = lambda : CollectionMerger(input=["Electron","Muon"],output="Lepton")
+lepMerger_exampleSelection = lambda : CollectionMerger(input=["Electron","Muon"],output="Lepton", # this will keep only the two leading leptons among electrons with pt > 20 and muons with pt > 40
                                                        maxObjects=2,
                                                        selector=dict([("Electron",lambda x : x.pt>20),("Muon",lambda x : x.pt>40)]),
                                                        )
