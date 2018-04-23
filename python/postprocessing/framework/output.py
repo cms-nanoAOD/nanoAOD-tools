@@ -12,6 +12,12 @@ class OutputBranch:
         self.buff   = array(_rootBranchType2PythonArray[rootBranchType], n*[0. if rootBranchType in 'FD' else 0])
         self.lenVar = lenVar
         self.n = n
+        #check if a branch was already there. In case, scratch it first 
+        for b in tree.GetListOfBranches():
+          if b.GetName() == name:
+             tree.GetListOfBranches().Remove(b)
+             l= tree.GetLeaf(name)
+             tree.GetListOfLeaves().Remove(l)
         if lenVar != None:
             self.branch = tree.Branch(name, self.buff, "%s[%s]/%s" % (name,lenVar,rootBranchType))
         elif n == 1:
