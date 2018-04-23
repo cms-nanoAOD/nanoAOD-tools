@@ -13,7 +13,12 @@ class OutputBranch:
         self.lenVar = lenVar
         self.n = n
         self.precision = ROOT.ReduceMantissaToNbitsRounding(limitedPrecision) if limitedPrecision and rootBranchType=='F' else lambda x : x
-
+        #check if a branch was already there. In case, scratch it first 
+        for b in tree.GetListOfBranches():
+          if b.GetName() == name:
+             tree.GetListOfBranches().Remove(b)
+             l= tree.GetLeaf(name)
+             tree.GetListOfLeaves().Remove(l)
         if lenVar != None:
             self.branch = tree.Branch(name, self.buff, "%s[%s]/%s" % (name,lenVar,rootBranchType))
         elif n == 1:
