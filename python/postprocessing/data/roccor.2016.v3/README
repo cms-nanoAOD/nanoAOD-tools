@@ -1,0 +1,50 @@
+Information:
+------------
+First version of muon calibration package for full 2016 dataset
+Data: 23Sep2016 re-reco (B-G) and Prompt-Reco(H)
+MC: RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6
+
+
+
+Example:
+-------------------------------------------------------------------------------------
+#include "RoccoR.cc"
+
+RoccoR  rc("rcdata.2016.v3"); //directory path as input for now; initialize only once, contains all variations
+
+//for each data muon in the loop, use this function to get a scale factor for its momentum:
+double dataSF = rc.kScaleDT(charge, pt, eta, phi, s=0, m=0);
+
+//for MC, if matched gen-level muon (genPt) is available, use this function
+double mcSF = rc.kScaleFromGenMC(Q, pt, eta, phi, nl, genPt, u1, s=0, m=0);
+
+//if not, then:
+double mcSF = rc.kScaleAndSmearMC(Q, pt, eta, phi, nl, u1, u2, s=0, m=0);
+-------------------------------------------------------------------------------------
+
+Here: 
+Q is charge
+nl is trackerLayersWithMeasurement \\
+u1 and u2 are random numbers distributed uniformly between 0 and 1 (gRandom->Rndm());
+s is error set (default is 0)
+m is error member (default is 0)
+For MC, when switching to different error sets/members for a given muon, random numbers (u1 and u2) should remain unchanged. 
+
+-------------------------------------------------------------------------------------
+Following variations are provided currently
+-------------------------------------------------------------------------------------
+	 set        members	comment
+Default  0	    1		default, reference based on madgraph sample, with pt distribution reweighted to data in |Y| bins. 
+Stat     1          100         pre-generated stat. variations; can include more (e.g. 400). RMS over these would give stat. uncertainty
+Zpt      2          1           derived without reweighting reference to data. Difference wrt central can be taken as systematics
+Ewk      3          1           Ad-hoc weighting applied to reference to change sw2 and Zw. Use for x-check for now. Need to compare with Powheg (may become default). 
+CorDm    4          5           varied profile mass window; one can take maximum deviation as systematics
+FitDm    5          5           varied fitting mass window; one can take maximum deviation as systematics
+LHEw     6          0           (please ignore for now)
+Run      7          7           derived from B,C,D,E,F,G,H; for cross-check study. No dramatic run denendence observed. MC's should be split by lumi if applied this way. 
+AMCNLO   8          1           derived from limited stat. amcnlo sample; for cross-check study
+-------------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------------
+If you have any problem with using the code please email Aleko. 
