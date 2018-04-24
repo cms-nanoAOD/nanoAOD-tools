@@ -13,14 +13,23 @@ class OutputBranch:
         self.lenVar = lenVar
         self.n = n
         self.precision = ROOT.ReduceMantissaToNbitsRounding(limitedPrecision) if limitedPrecision and rootBranchType=='F' else lambda x : x
-
-        if lenVar != None:
+        #check if a branch was already there 
+        existingBranch = tree.GetBranch(name)
+        print name, existingBranch
+        if (existingBranch):
+          #print name,"is an existing branch"
+          self.branch = existingBranch
+          self.branch.SetAddress(self.buff)
+        else:  
+          #print name,"is a new branch"
+          if lenVar != None:
             self.branch = tree.Branch(name, self.buff, "%s[%s]/%s" % (name,lenVar,rootBranchType))
-        elif n == 1:
+          elif n == 1:
             self.branch = tree.Branch(name, self.buff, name+"/"+rootBranchType)
-        else:
+          else:
             self.branch = tree.Branch(name, self.buff, "%s[%d]/%s" % (name,n,rootBranchType))
         if title: self.branch.SetTitle(title)
+
     def fill(self, val):
         if self.lenVar:
             if len(self.buff) < len(val): # realloc
@@ -40,7 +49,7 @@ class OutputTree:
         self._intree = intree
         self._branches = {} 
     def branch(self, name, rootBranchType, n=1, lenVar=None, title=None,limitedPrecision=False):
-        if (lenVar != None) and (lenVar not in self._branches) and (not self._tree.GetBranch(lenVar)):
+        if (lenVar != None) and (lenVar not in self._branches): #and (not self._tree.GetBranch(lenVar)):
             self._branches[lenVar] = OutputBranch(self._tree, lenVar, "i")
         self._branches[name] = OutputBranch(self._tree, name, rootBranchType, n=n, lenVar=lenVar, title=title,limitedPrecision=limitedPrecision)
         return self._branches[name]
