@@ -15,13 +15,10 @@ class OutputBranch:
         self.precision = ROOT.ReduceMantissaToNbitsRounding(limitedPrecision) if limitedPrecision and rootBranchType=='F' else lambda x : x
         #check if a branch was already there 
         existingBranch = tree.GetBranch(name)
-        print name, existingBranch
         if (existingBranch):
-          #print name,"is an existing branch"
           self.branch = existingBranch
           self.branch.SetAddress(self.buff)
         else:  
-          #print name,"is a new branch"
           if lenVar != None:
             self.branch = tree.Branch(name, self.buff, "%s[%s]/%s" % (name,lenVar,rootBranchType))
           elif n == 1:
