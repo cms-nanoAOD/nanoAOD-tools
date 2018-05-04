@@ -12,19 +12,20 @@ class OutputBranch:
         self.buff   = array(_rootBranchType2PythonArray[rootBranchType], n*[0. if rootBranchType in 'FD' else 0])
         self.lenVar = lenVar
         self.n = n
-        #check if a branch was already there. In case, scratch it first 
-        for b in tree.GetListOfBranches():
-          if b.GetName() == name:
-             tree.GetListOfBranches().Remove(b)
-             l= tree.GetLeaf(name)
-             tree.GetListOfLeaves().Remove(l)
-        if lenVar != None:
+        #check if a branch was already there 
+        existingBranch = tree.GetBranch(name)
+        if (existingBranch):
+          self.branch = existingBranch
+          self.branch.SetAddress(self.buff)
+        else:  
+          if lenVar != None:
             self.branch = tree.Branch(name, self.buff, "%s[%s]/%s" % (name,lenVar,rootBranchType))
-        elif n == 1:
+          elif n == 1:
             self.branch = tree.Branch(name, self.buff, name+"/"+rootBranchType)
-        else:
+          else:
             self.branch = tree.Branch(name, self.buff, "%s[%d]/%s" % (name,n,rootBranchType))
         if title: self.branch.SetTitle(title)
+
     def fill(self, val):
         if self.lenVar:
             if len(self.buff) < len(val): # realloc
@@ -44,7 +45,7 @@ class OutputTree:
         self._intree = intree
         self._branches = {} 
     def branch(self, name, rootBranchType, n=1, lenVar=None, title=None):
-        if (lenVar != None) and (lenVar not in self._branches) and (not self._tree.GetBranch(lenVar)):
+        if (lenVar != None) and (lenVar not in self._branches): #and (not self._tree.GetBranch(lenVar)):
             self._branches[lenVar] = OutputBranch(self._tree, lenVar, "i")
         self._branches[name] = OutputBranch(self._tree, name, rootBranchType, n=n, lenVar=lenVar, title=title)
         return self._branches[name]
