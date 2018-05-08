@@ -217,6 +217,12 @@ class JetSelection(Module):
             self.out.branch("nSelectedJets_"+group,"I")
             self.out.branch("ht_"+group,"F")
             self.out.branch("mht_"+group,"F")
+            
+            if group.find("central")>=0:
+                for nmax in range(0,4):
+                    self.out.branch("max_llp"+str(nmax+1)+"_"+group,"F")
+                    self.out.branch("max_b"+str(nmax+1)+"_"+group,"F")
+                    self.out.branch("max_deepCSV"+str(nmax+1)+"_"+group,"F")
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -235,7 +241,8 @@ class JetSelection(Module):
             event.selectedJets[group] = {
                 "loose":[],
                 "ht":0.0,
-                "mht":0.0
+                "mht":0.0,
+                
             }
             vecsum = ROOT.TLorentzVector()
             for ijet,jet in enumerate(jets):
@@ -265,8 +272,22 @@ class JetSelection(Module):
                     event.selectedJets[group]["ht"]+=jet.pt
                     vecsum += jet.p4()
             event.selectedJets[group]["mht"] = vecsum.Pt()
-                    
-                        
+            
+            if group.find("central")>=0:
+                jetsByLLP = sorted(map(lambda j:j.llpdnnx_isLLP,event.selectedJets[group]["loose"]),reverse=True)
+                jetsByB = sorted(map(lambda j:j.llpdnnx_isB,event.selectedJets[group]["loose"]),reverse=True)
+                jetsByDeepCSV = sorted(map(lambda j:j.btagCSVV2 if j.btagCSVV2>0 else -1,event.selectedJets[group]["loose"]),reverse=True)
+                
+                for nmax in range(0,4):
+                    if len(event.selectedJets[group]["loose"])>=(nmax+1):
+                        self.out.fillBranch("max_llp"+str(nmax+1)+"_"+group,jetsByLLP[nmax])
+                        self.out.fillBranch("max_b"+str(nmax+1)+"_"+group,jetsByB[nmax])
+                        self.out.fillBranch("max_deepCSV"+str(nmax+1)+"_"+group,jetsByDeepCSV[nmax])
+                    else:
+                        self.out.fillBranch("max_llp"+str(nmax+1)+"_"+group,-1)
+                        self.out.fillBranch("max_b"+str(nmax+1)+"_"+group,-1)
+                        self.out.fillBranch("max_deepCSV"+str(nmax+1)+"_"+group,-1)
+            
             self.out.fillBranch("nSelectedJets_"+group,len(event.selectedJets[group]["loose"]))
             self.out.fillBranch("ht_"+group,event.selectedJets[group]["ht"])
             self.out.fillBranch("mht_"+group,event.selectedJets[group]["mht"])
@@ -277,7 +298,10 @@ class JetTagging(Module):
         self.isData=isData
         self.getJetCollection = getJetCollection
         self.tagGroups = {
-            "looseB":lambda jet: jet.isB>0.9
+            "looseLLP":lambda jet: jet.llpdnnx_isLLP>0.0500, #eff: 84% @ 1/10 bkg
+            "mediumLLP":lambda jet: jet.llpdnnx_isLLP>0.2383, #eff: 67% @ 1/100 bkg
+            "tightLLP":lambda jet: jet.llpdnnx_isLLP>0.6514, #eff: 57% @ 1/1000 bkg
+            "ultraLLP":lambda jet: jet.llpdnnx_isLLP>0.9021, #eff: 48% @ 1/10000 bkg
         }
         
     def beginJob(self):
@@ -286,6 +310,9 @@ class JetTagging(Module):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
+        
+        for tagGroup in self.tagGroups.keys():
+            self.out.branch("n"+tagGroup,"I")
         
         if not self.isData:
             self.out.branch("nTruePU","I")
@@ -303,36 +330,56 @@ class JetTagging(Module):
         jets = self.getJetCollection(event)
         if jets==None:
             return True
-        
-        if not self.isData:
-            event.jetTag = {
-                "nTruePU":0,
-                "nTrueB":0,
-                "nTrueC":0,
-                "nTrueUDS":0,
-                "nTrueG":0,
-                "nTrueLLP":0,
-            }
-            for jet in jets:
+            
+        event.jetTag = {}
+            
+        for tagGroup in self.tagGroups.keys():
+            event.jetTag[tagGroup] = 0
+            
+        for jet in jets:
+            for tagGroup,groupSelector in self.tagGroups.iteritems():
+                if groupSelector(jet):
+                    event.jetTag[tagGroup] += 1
+             
+            if not self.isData:
+                event.jetTagTruth = {
+                    "nTruePU":0,
+                    "nTrueB":0,
+                    "nTrueC":0,
+                    "nTrueUDS":0,
+                    "nTrueG":0,
+                    "nTrueLLP":0,
+                }
+                
                 if jet.genJetIdx<0:
-                    event.jetTag["nTruePU"]+=1 
+                    event.jetTagTruth["nTruePU"]+=1 
                 if abs(jet.partonFlavour)==9:
-                    event.jetTag["nTrueLLP"]+=1 
+                    event.jetTagTruth["nTrueLLP"]+=1 
                 elif abs(jet.hadronFlavour)==5:
-                    event.jetTag["nTrueB"]+=1
+                    event.jetTagTruth["nTrueB"]+=1
                 elif abs(jet.hadronFlavour)==4:
-                    event.jetTag["nTrueC"]+=1
+                    event.jetTagTruth["nTrueC"]+=1
                 elif abs(jet.partonFlavour)>0 and abs(jet.partonFlavour)<4:
-                    event.jetTag["nTrueUDS"]+=1
+                    event.jetTagTruth["nTrueUDS"]+=1
                 elif abs(jet.partonFlavour)==0:
-                    event.jetTag["nTrueG"]+=1
-                    
-            self.out.fillBranch("nTruePU",event.jetTag["nTruePU"])
-            self.out.fillBranch("nTrueB",event.jetTag["nTrueB"])
-            self.out.fillBranch("nTrueC",event.jetTag["nTrueC"])
-            self.out.fillBranch("nTrueUDS",event.jetTag["nTrueUDS"])
-            self.out.fillBranch("nTrueG",event.jetTag["nTrueG"])
-            self.out.fillBranch("nTrueLLP",event.jetTag["nTrueLLP"])
+                    event.jetTagTruth["nTrueG"]+=1
+                        
+                        
+        for tagGroup in self.tagGroups.keys():
+            self.out.fillBranch("n"+tagGroup,event.jetTag[tagGroup])
+        
+                  
+        if not self.isData:               
+            self.out.fillBranch("nTruePU",event.jetTagTruth["nTruePU"])
+            self.out.fillBranch("nTrueB",event.jetTagTruth["nTrueB"])
+            self.out.fillBranch("nTrueC",event.jetTagTruth["nTrueC"])
+            self.out.fillBranch("nTrueUDS",event.jetTagTruth["nTrueUDS"])
+            self.out.fillBranch("nTrueG",event.jetTagTruth["nTrueG"])
+            self.out.fillBranch("nTrueLLP",event.jetTagTruth["nTrueLLP"])
+                
+            
+            
+        
                     
         #self.out.fillBranch("nSelectedJets",len(event.selectedJets["loose"]))
         return True
@@ -399,22 +446,22 @@ class categoryProducer(Module):
     def analyze(self, event):
         self.out.fillBranch("cat",event.nB*10+event.nLLP)
         return True
-
+'''
 files=[
     [
     "root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mkomm/LLP/NANOX_180425-v2/SMS-T1qqqq_ctau-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/SMS-T1qqqq_ctau-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/NANOX_180425-v2/180425_183459/0000/nano_6.root",
     "/vols/cms/mkomm/LLP/NANOX_180425-v2_eval/SMS-T1qqqq_ctau-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/nano_6.root.friend",
     ]
 ]
-
 '''
+
 files=[
     [
     "root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mkomm/LLP/NANOX_180425-v2/SingleMuon_Run2016B-03Feb2017_ver2-v2/SingleMuon/Run2016B-03Feb2017_ver2-v2_NANOX_180425-v2/180425_185224/0000/nano_100.root",
-    "/vols/cms/mkomm/LLP/NANOX_180425-v2_eval/SingleMuon_Run2016B-03Feb2017_ver2-v2/nano_100.root"
+    "/vols/cms/mkomm/LLP/NANOX_180425-v2_eval/SingleMuon_Run2016B-03Feb2017_ver2-v2/nano_100.root.friend"
     ]
 ]
-'''
+
 '''
 files = [
     [
@@ -423,9 +470,12 @@ files = [
     ]
 ]
 '''
+
+isData=True
+
 p=PostProcessor(".",files,cut=None,branchsel=None,modules=[
-    MuonSelection(isData=False),
-    JetSelection(isData=False,getLeptonCollection=lambda event: event.selectedMuons["tight"]),
-    JetTagging(isData=False,getJetCollection=lambda event: event.selectedJets["central"]["loose"])
+    MuonSelection(isData=isData),
+    JetSelection(isData=isData,getLeptonCollection=lambda event: event.selectedMuons["tight"]),
+    JetTagging(isData=isData,getJetCollection=lambda event: event.selectedJets["central"]["loose"])
 ],friend=True)
 p.run()
