@@ -1,6 +1,22 @@
 # nanoAOD-tools
 Tools for working with NanoAOD (requiring only python + root, not CMSSW)
 
+## Checkout instructions: LLP-specific
+
+Using recent CMSSW release which is shipped with all the required software.
+```
+cmsrel CMSSW_10_2_0_pre2
+cd CMSSW_10_2_0_pre2/src
+cmsenv
+git clone -b llp-analysis https://github.com/LLPDNNX/nanoAOD-tools.git PhysicsTools/NanoAODTools
+scram b
+```
+
+Run the analysis using NANOX+XTagger files (work in progress)
+```
+python PhysicsTools/NanoAODTools/test/LLP/processNANOX.py
+```
+
 ## Checkout instructions: standalone
 
 You need to setup python 2.7 and a recent ROOT version first.
