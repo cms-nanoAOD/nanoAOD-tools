@@ -78,13 +78,16 @@ class PostProcessor :
 	outFileNames=[]
         t0 = time.clock()
 	totEntriesRead=0
-	for fname in self.inputFiles:
+	for friendList in self.inputFiles:
 
+	    fname = friendList[0]
 	    # open input file
 	    inFile = ROOT.TFile.Open(fname)
 
 	    #get input tree
 	    inTree = inFile.Get("Events")
+	    for friend in friendList[1:]:
+	        inTree.AddFriend("Events",friend)
 	    totEntriesRead+=inTree.GetEntries()
 	    # pre-skimming
 	    elist,jsonFilter = preSkim(inTree, self.json, self.cut)
