@@ -13,19 +13,20 @@ class OutputBranch:
         self.lenVar = lenVar
         self.n = n
         self.precision = ROOT.ReduceMantissaToNbitsRounding(limitedPrecision) if limitedPrecision and rootBranchType=='F' else lambda x : x
-        #check if a branch was already there. In case, scratch it first 
-        for b in tree.GetListOfBranches():
-          if b.GetName() == name:
-             tree.GetListOfBranches().Remove(b)
-             l= tree.GetLeaf(name)
-             tree.GetListOfLeaves().Remove(l)
-        if lenVar != None:
+        #check if a branch was already there 
+        existingBranch = tree.GetBranch(name)
+        if (existingBranch):
+          self.branch = existingBranch
+          self.branch.SetAddress(self.buff)
+        else:  
+          if lenVar != None:
             self.branch = tree.Branch(name, self.buff, "%s[%s]/%s" % (name,lenVar,rootBranchType))
-        elif n == 1:
+          elif n == 1:
             self.branch = tree.Branch(name, self.buff, name+"/"+rootBranchType)
-        else:
+          else:
             self.branch = tree.Branch(name, self.buff, "%s[%d]/%s" % (name,n,rootBranchType))
         if title: self.branch.SetTitle(title)
+
     def fill(self, val):
         if self.lenVar:
             if len(self.buff) < len(val): # realloc
@@ -45,7 +46,7 @@ class OutputTree:
         self._intree = intree
         self._branches = {} 
     def branch(self, name, rootBranchType, n=1, lenVar=None, title=None,limitedPrecision=False):
-        if (lenVar != None) and (lenVar not in self._branches) and (not self._tree.GetBranch(lenVar)):
+        if (lenVar != None) and (lenVar not in self._branches): #and (not self._tree.GetBranch(lenVar)):
             self._branches[lenVar] = OutputBranch(self._tree, lenVar, "i")
         self._branches[name] = OutputBranch(self._tree, name, rootBranchType, n=n, lenVar=lenVar, title=title,limitedPrecision=limitedPrecision)
         return self._branches[name]
@@ -65,11 +66,35 @@ class OutputTree:
         self._tree.Write()
 
 class FullOutput(OutputTree):
-    def __init__(self, inputFile, inputTree, outputFile, branchSelection = None, fullClone = False, provenance = False, jsonFilter = None):
+    def __init__(
+            self,
+            inputFile,
+            inputTree,
+            outputFile,
+            branchSelection=None,
+            outputbranchSelection=None,
+            fullClone=False,
+            provenance=False,
+            jsonFilter=None
+    ):
         outputFile.cd()
-        if branchSelection: 
+
+        # enable/disable the output branches as requested in outputbranchSelection,
+        # then clone the input tree
+        if outputbranchSelection:
+            outputbranchSelection.selectBranches(inputTree)
+
+        if fullClone:
+            outputTree = inputTree.CopyTree('1')
+        else:            
+            outputTree = inputTree.CloneTree(0)
+            
+        # enable back all branches in inputTree, then disable for computation
+        # the branches as requested in branchSelection
+        inputTree.SetBranchStatus("*",1)
+        if branchSelection:
             branchSelection.selectBranches(inputTree)
-        outputTree = inputTree.CopyTree('1') if fullClone else inputTree.CloneTree(0)
+
         OutputTree.__init__(self, outputFile, outputTree, inputTree)
         self._inputTree = inputTree
         self._otherTrees = {}

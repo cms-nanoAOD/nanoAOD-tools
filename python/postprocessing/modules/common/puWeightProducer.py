@@ -7,8 +7,11 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class puWeightProducer(Module):
-    def __init__(self,myfile,targetfile,myhist="pileup",targethist="pileup",name="puWeight",norm=True,verbose=False,nvtx_var="Pileup_nTrueInt"):
+    def __init__(self,myfile,targetfile,myhist="pileup",targethist="pileup",name="puWeight",norm=True,verbose=False,nvtx_var="Pileup_nTrueInt",doSysVar=True):
         self.targeth = self.loadHisto(targetfile,targethist)
+        if doSysVar:
+            self.targeth_plus = self.loadHisto(targetfile,targethist+"_plus")
+            self.targeth_minus = self.loadHisto(targetfile,targethist+"_minus")
         self.fixLargeWeights = True
 	if myfile != "auto" :
 		self.autoPU=False
@@ -23,6 +26,7 @@ class puWeightProducer(Module):
         self.norm = norm
         self.verbose = verbose
         self.nvtxVar = nvtx_var
+        self.doSysVar = doSysVar
        
         #Try to load module via python dictionaries
         try:
@@ -58,6 +62,11 @@ class puWeightProducer(Module):
         self._worker = ROOT.WeightCalculatorFromHistogram(self.myh,self.targeth,self.norm,self.fixLargeWeights,self.verbose)
         self.out = wrappedOutputTree
         self.out.branch(self.name, "F")
+        if self.doSysVar:
+            self._worker_plus = ROOT.WeightCalculatorFromHistogram(self.myh,self.targeth_plus,self.norm,self.fixLargeWeights,self.verbose)
+            self._worker_minus = ROOT.WeightCalculatorFromHistogram(self.myh,self.targeth_minus,self.norm,self.fixLargeWeights,self.verbose)
+            self.out.branch(self.name+"Up","F")
+            self.out.branch(self.name+"Down","F")
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
     def analyze(self, event):
@@ -65,8 +74,14 @@ class puWeightProducer(Module):
         if hasattr(event,self.nvtxVar):
             nvtx = int(getattr(event,self.nvtxVar))
             weight = self._worker.getWeight(nvtx) if nvtx < self.myh.GetNbinsX() else 1
+            if self.doSysVar:
+                weight_plus = self._worker_plus.getWeight(nvtx) if nvtx < self.myh.GetNbinsX() else 1
+                weight_minus = self._worker_minus.getWeight(nvtx) if nvtx < self.myh.GetNbinsX() else 1
         else: weight = 1
         self.out.fillBranch(self.name,weight)
+        if self.doSysVar:
+            self.out.fillBranch(self.name+"Up",weight_plus)
+            self.out.fillBranch(self.name+"Down",weight_minus)
         return True
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
@@ -75,5 +90,5 @@ pufile_mc="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/pi
 pufile_data="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/PileupData_GoldenJSON_Full2016.root" % os.environ['CMSSW_BASE']
 puWeight = lambda : puWeightProducer(pufile_mc,pufile_data,"pu_mc","pileup",verbose=False)
 
-pufile_data2017="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/Run2017-example.root" % os.environ['CMSSW_BASE']
+pufile_data2017="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/pileup_Cert_294927-306462_13TeV_PromptReco_Collisions17_withVar.root" % os.environ['CMSSW_BASE']
 puAutoWeight = lambda : puWeightProducer("auto",pufile_data2017,"pu_mc","pileup",verbose=False)

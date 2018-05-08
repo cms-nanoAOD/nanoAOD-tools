@@ -66,7 +66,7 @@ class btagSFProducer(Module):
                         1 : "comb",  # c
                         2 : "incl"   # light
                     },
-                    'supported_wp' : [ "L", "M", "T" ] # CV: shape corrections ('iterativefit' method) not supported for 2017 ReReco data and RunIIFall17 MC yet
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 }
             },
             'deepcsv' : {
@@ -77,7 +77,7 @@ class btagSFProducer(Module):
                         1 : "comb",  # c
                         2 : "incl"   # light
                     },
-                    'supported_wp' : [ "L", "M", "T" ] # CV: shape corrections ('iterativefit' method) not supported for 2017 ReReco data and RunIIFall17 MC yet
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 }
             },
             'cmva' : {
@@ -252,7 +252,7 @@ class btagSFProducer(Module):
             # check if SF is OK
             if sf < 0.01:
                 if self.verbose > 0:
-                    print("jet #%i: pT = %1.1f, eta = %1.1f, discr = %1.3f, flavor = %i" % (idx, jet_pt, jet_eta, jet_discr, jet_partonFlavour))
+                    print("jet #%i: pT = %1.1f, eta = %1.1f, discr = %1.3f, flavor = %i" % (idx, pt, eta, discr, flavor_btv))
                 sf = 1.
             yield sf
 

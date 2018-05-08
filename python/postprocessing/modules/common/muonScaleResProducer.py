@@ -6,6 +6,18 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
+
+def mk_safe(fct, *args):
+    try:
+        return fct(*args)
+    except Exception as e:
+        if any('Error in function boost::math::erf_inv' in arg for arg in e.args):
+            print 'WARNING: catching exception and returning -1. Exception arguments: %s' % e.args
+            return -1.
+        else:
+            raise e
+
+
 class muonScaleResProducer(Module):
     def __init__(self, rc_dir, rc_corrections):
         p_postproc = '%s/src/PhysicsTools/NanoAODTools/python/postprocessing' % os.environ['CMSSW_BASE']
@@ -38,10 +50,18 @@ class muonScaleResProducer(Module):
         if self.is_mc:
             u1 = random.uniform(0.0, 1.0)
             u2 = random.uniform(0.0, 1.0)
-            pt_corr = list(mu.pt * roccor.kScaleAndSmearMC(mu.charge, mu.pt, mu.eta, mu.phi, mu.nTrackerLayers, u1, u2) for mu in muons)
+            pt_corr = list(
+                mu.pt * mk_safe(
+                    roccor.kScaleAndSmearMC,
+                    mu.charge, mu.pt, mu.eta, mu.phi, mu.nTrackerLayers, u1, u2
+                ) for mu in muons)
             # pt_err  = list(mu.pt * roccor.kScaleAndSmearMCerror(mu.charge, mu.pt, mu.eta, mu.phi, mu.nTrackerLayers, u1, u2) for mu in muons)
         else:
-            pt_corr = list(mu.pt * roccor.kScaleDT(mu.charge, mu.pt, mu.eta, mu.phi) for mu in muons)
+            pt_corr = list(
+                mu.pt * mk_safe(
+                    roccor.kScaleDT,
+                    mu.charge, mu.pt, mu.eta, mu.phi
+                ) for mu in muons)
             # pt_err  = list(mu.pt * roccor.kScaleDTerror(mu.charge, mu.pt, mu.eta, mu.phi) for mu in muons)
 
         self.out.fillBranch("Muon_pt_corrected", pt_corr)
