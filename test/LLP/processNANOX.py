@@ -9,9 +9,9 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
-
-    
-    
+if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
+    print "Cannot load 'libPhysicsToolsNanoAODTools'"
+    sys.exit(1)
 
 class MuonSelection(Module):
     def __init__(self,isData=True):
@@ -217,6 +217,13 @@ class JetSelection(Module):
             self.out.branch("nSelectedJets_"+group,"I")
             self.out.branch("ht_"+group,"F")
             self.out.branch("mht_"+group,"F")
+            self.out.branch("minPhi_"+group,"F")
+            
+            self.out.branch("alphaT_"+group,"F")
+            self.out.branch("C_"+group,"F")
+            self.out.branch("D_"+group,"F")
+            self.out.branch("isotropy_"+group,"F")
+            self.out.branch("sphericity_"+group,"F")
             
             if group.find("central")>=0:
                 for nmax in range(0,4):
@@ -242,9 +249,17 @@ class JetSelection(Module):
                 "loose":[],
                 "ht":0.0,
                 "mht":0.0,
+                "minPhi":0.0,
                 
+                "alphaT":0.0,
+                "isotropy":0.0,
+                "sphericity":0.0,
+                "C":0.0,
+                "D":0.0,
             }
             vecsum = ROOT.TLorentzVector()
+            eventShapes = ROOT.EventShapes()
+            
             for ijet,jet in enumerate(jets):
                 if groupSelector(jet):
                     #jet cleaning
@@ -269,9 +284,30 @@ class JetSelection(Module):
                             
                                    
                     event.selectedJets[group]["loose"].append(jet)
+                    eventShapes.addObject(jet.pt, jet.eta, jet.phi, 0)# jet.mass)
                     event.selectedJets[group]["ht"]+=jet.pt
                     vecsum += jet.p4()
             event.selectedJets[group]["mht"] = vecsum.Pt()
+            
+            if len(event.selectedJets[group]["loose"])>1:
+                event.selectedJets[group]["alphaT"] = eventShapes.alphaT()
+                event.selectedJets[group]["isotropy"] = eventShapes.isotropy()
+                event.selectedJets[group]["sphericity"] = eventShapes.sphericity()
+                event.selectedJets[group]["C"] = eventShapes.C()
+                event.selectedJets[group]["D"] = eventShapes.D()
+                 
+            self.out.fillBranch("alphaT_"+group,event.selectedJets[group]["alphaT"])
+            self.out.fillBranch("isotropy_"+group,event.selectedJets[group]["isotropy"])
+            self.out.fillBranch("sphericity_"+group,event.selectedJets[group]["sphericity"])
+            self.out.fillBranch("C_"+group,event.selectedJets[group]["C"])
+            self.out.fillBranch("D_"+group,event.selectedJets[group]["D"])
+            
+            minPhi = math.pi
+            for jet in event.selectedJets[group]["loose"]:
+                negSum = -(vecsum-jet.p4())
+                minPhi = min(minPhi,math.fabs(self.deltaPhi(negSum.Phi(),jet.phi)))
+            event.selectedJets[group]["minPhi"] = minPhi
+            self.out.fillBranch("minPhi_"+group,minPhi)
             
             if group.find("central")>=0:
                 jetsByLLP = sorted(map(lambda j:j.llpdnnx_isLLP,event.selectedJets[group]["loose"]),reverse=True)
