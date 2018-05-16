@@ -7,11 +7,12 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools imp
 _rootBranchType2PythonArray = { 'b':'B', 'B':'b', 'i':'I', 'I':'i', 'F':'f', 'D':'d', 'l':'L', 'L':'l', 'O':'B' }
 
 class OutputBranch:
-    def __init__(self, tree, name, rootBranchType, n=1, lenVar=None, title=None):
+    def __init__(self, tree, name, rootBranchType, n=1, lenVar=None, title=None, limitedPrecision=False):
         n = int(n)
         self.buff   = array(_rootBranchType2PythonArray[rootBranchType], n*[0. if rootBranchType in 'FD' else 0])
         self.lenVar = lenVar
         self.n = n
+        self.precision = ROOT.ReduceMantissaToNbitsRounding(limitedPrecision) if limitedPrecision and rootBranchType=='F' else lambda x : x
         #check if a branch was already there 
         existingBranch = tree.GetBranch(name)
         if (existingBranch):
@@ -31,9 +32,9 @@ class OutputBranch:
             if len(self.buff) < len(val): # realloc
                 self.buff = array(self.buff.typecode, max(len(val),2*len(self.buff))*[0. if self.buff.typecode in 'fd' else 0])
                 self.branch.SetAddress(self.buff)
-            for i,v in enumerate(val): self.buff[i] = v
+            for i,v in enumerate(val): self.buff[i] = self.precision(v)
         elif self.n == 1: 
-            self.buff[0] = val
+            self.buff[0] = self.precision(val)
         else:
             if len(val) != self.n: raise RuntimeError("Mismatch in filling branch %s of fixed length %d with %d values (%s)" % (self.Branch.GetName(),self.n,len(val),val))
             for i,v in enumerate(val): self.buff[i] = v
@@ -44,10 +45,10 @@ class OutputTree:
         self._tree = ttree
         self._intree = intree
         self._branches = {} 
-    def branch(self, name, rootBranchType, n=1, lenVar=None, title=None):
+    def branch(self, name, rootBranchType, n=1, lenVar=None, title=None,limitedPrecision=False):
         if (lenVar != None) and (lenVar not in self._branches): #and (not self._tree.GetBranch(lenVar)):
             self._branches[lenVar] = OutputBranch(self._tree, lenVar, "i")
-        self._branches[name] = OutputBranch(self._tree, name, rootBranchType, n=n, lenVar=lenVar, title=title)
+        self._branches[name] = OutputBranch(self._tree, name, rootBranchType, n=n, lenVar=lenVar, title=title,limitedPrecision=limitedPrecision)
         return self._branches[name]
     def fillBranch(self, name, val):
         br = self._branches[name]
