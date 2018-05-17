@@ -41,6 +41,7 @@ Send jobs:
 
 #### What is this doing? It reads a nanoAOD and:
 - Applies a string-like skim
+- Use the module skimNRecoLeps to select events with 2 leptons with pT > 18, eta < 2.5
 - Removes plenty of branches
 - Produces PU weights
 - Produces Count / SumWeights histograms
@@ -49,7 +50,7 @@ Send jobs:
 
 #### What am I missing?
 - Jet energy uncertianties (module is ready, but produces too many branches...)
-- Functions to perform more useful skims (e.g.: 2 leptons with pT > x, 2 tight leptons, etc...)
+- Functions to perform more useful skims (e.g.: 2 tight leptons, etc...)
 - Some high-level variables: it would be nice to produce at this level some variables such as:
      lepton pt ratio, lepton pt rel, n ISR jets...
 - LHE weights: they exist in nanoAOD but the format may be different from what is expected
