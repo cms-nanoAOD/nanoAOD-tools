@@ -2,6 +2,7 @@
 import os
 import time
 import ROOT
+from ROOT import *
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 from PhysicsTools.NanoAODTools.postprocessing.framework.branchselection import BranchSelection
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import InputTree
@@ -10,10 +11,13 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.output import FriendOutp
 from PhysicsTools.NanoAODTools.postprocessing.framework.preskimming import preSkim
 from PhysicsTools.NanoAODTools.postprocessing.framework.jobreport import JobReport
 
+ROOT.gROOT.SetBatch(1)
+
 class PostProcessor :
     def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,
-		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None):
+		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None, outname=None):
 	self.outputDir=outputDir
+	self.outname=outname
 	self.inputFiles=inputFiles
 	self.cut=cut
 	self.modules=modules
@@ -32,11 +36,12 @@ class PostProcessor :
 		print "Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root"
 		self.haddFileName="tree.root"
  	self.branchsel = BranchSelection(branchsel) if branchsel else None 
+        #self.outputbranchsel = BranchSelection(branchsel) if branchsel else None
         self.outputbranchsel = BranchSelection(outputbranchsel) if outputbranchsel else None
         self.histFileName=histFileName
         self.histDirName=histDirName
     def run(self) :
-        outpostfix = self.postfix if self.postfix != None else ("_Friend" if self.friend else "_Skim")
+        outpostfix = self.postfix if self.postfix != None else ("Friend" if self.friend else "Skim")
     	if not self.noOut:
             
             if self.compression != "none":
@@ -78,7 +83,15 @@ class PostProcessor :
 	outFileNames=[]
         t0 = time.clock()
 	totEntriesRead=0
+	hCount         = TH1F('Count', 'Count', 1, 0, 1)
+	nfiles = 0
+	outfilename = self.outname
 	for fname in self.inputFiles:
+	    if outfilename == None:	outfilename = fname[fname.rfind('/')+1:]
+	    if not outfilename.startswith('Tree_'): outfilename = 'Tree_' + outfilename
+	    if outfilename.endswith('.root'):       outfilename = outfilename[:-5]
+	    if len(self.inputFiles) <= 1: outputName = outfilename + '_' + outpostfix + '.root'
+	    else                   : outputName = outfilename + '_' + outpostfix + '_' + str(nfiles) + '.root'
 
 	    # open input file
 	    inFile = ROOT.TFile.Open(fname)
@@ -87,7 +100,26 @@ class PostProcessor :
 	    inTree = inFile.Get("Events")
 	    totEntriesRead+=inTree.GetEntries()
 	    # pre-skimming
-	    elist,jsonFilter = preSkim(inTree, self.json, self.cut)
+ 	    elist,jsonFilter = preSkim(inTree, self.json, self.cut)
+
+ 	    # Fill SumGenWeights
+ 	    htemp = TH1F('temp', 'temp', 1, 0, 1)
+ 	    if nfiles == 0:
+ 	      print 'Drawing SumGenWeights...'
+ 	      inTree.Draw("0.5>>SumGenWeights", "genWeight")
+ 	      hSumGenWeights = gDirectory.Get("SumGenWeights")
+ 	      hSumGenWeights.Rebin(hSumGenWeights.GetXaxis().GetNbins())
+ 	      print 'nEntries: ', hSumGenWeights.GetEntries(), ', bin content: ', hSumGenWeights.GetBinContent(1)
+ 	    else:
+ 	      inTree.Draw("0.5>>htemp", "genWeight")
+ 	      htemp = gDirectory.Get("htemp")
+ 	      htemp.Rebin(htemp.GetXaxis().GetNbins())
+ 	      hSumGenWeights.Add(htemp)
+ 	    hCount.SetBinContent(1, totEntriesRead)
+
+	    nfiles += 1
+
+
 	    if self.justcount:
 		print 'Would select %d entries from %s'%(elist.GetN() if elist else inTree.GetEntries(), fname)
 		continue
@@ -103,7 +135,8 @@ class PostProcessor :
 
 	    # prepare output file
             if not self.noOut:
-                outFileName = os.path.join(self.outputDir, os.path.basename(fname).replace(".root",outpostfix+".root"))
+                print 'Output file: ', outputName
+                outFileName = os.path.join(self.outputDir, outputName)
                 outFile = ROOT.TFile.Open(outFileName, "RECREATE", "", compressionLevel)
                 outFileNames.append(outFileName)
                 if compressionLevel: 
@@ -134,6 +167,8 @@ class PostProcessor :
 
 	    # now write the output
             if not self.noOut: 
+                hCount.Write()
+                hSumGenWeights.Write()
                 outTree.write()
                 outFile.Close()
                 print "Done %s" % outFileName
