@@ -36,6 +36,14 @@ Send jobs:
 
     crab submit -c crab_script.sh
 
+## Run in local:
+
+The code is prepared to run an example. After setting the enviroment:
+
+    cd PhysicsTools/NanoAODTools/python/postprocessing/
+    python NanoPAFprepare.py
+
+This shoud run on a nanoAOD file and produce an output.
 
 ## Some important info:
 
