@@ -1,4 +1,4 @@
-from WMCore.Configuration import Configuration
+,'../python/postprocessing/SlimFile.txt'from WMCore.Configuration import Configuration
 config = Configuration()
 
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
@@ -11,7 +11,7 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
 config.JobType.scriptExe = 'crab_script.sh'
-config.JobType.inputFiles = ['crab_script.py','../scripts/haddnano.py'] #hadd nano will not be needed once nano tools are in cmssw
+config.JobType.inputFiles = ['crab_script.py','../scripts/haddnano.py', '../python/postprocessing/SlimFile.txt'] #hadd nano will not be needed once nano tools are in cmssw
 config.JobType.sendPythonFolder	 = True
 
 config.section_("Data")
