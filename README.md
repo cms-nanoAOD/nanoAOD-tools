@@ -34,7 +34,7 @@ Prepare the files:
 
 Send jobs:
 
-    crab submit -c crab_script.sh
+    crab submit -c crab_cfg.oy
 
 ## Run in local:
 
