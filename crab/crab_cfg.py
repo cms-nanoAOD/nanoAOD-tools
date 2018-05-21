@@ -1,4 +1,4 @@
-,'../python/postprocessing/SlimFile.txt'from WMCore.Configuration import Configuration
+from WMCore.Configuration import Configuration
 config = Configuration()
 
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
