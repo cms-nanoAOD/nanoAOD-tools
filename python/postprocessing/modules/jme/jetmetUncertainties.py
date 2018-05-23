@@ -23,8 +23,14 @@ class jetmetUncertaintiesProducer(Module):
         self.jesUncertainties = jesUncertainties
 
         # smear jet pT to account for measured difference in JER between data and simulation.
-        self.jerInputFileName = "Spring16_25nsV10_MC_PtResolution_" + jetType + ".txt"
-        self.jerUncertaintyInputFileName = "Spring16_25nsV10_MC_SF_" + jetType + ".txt"
+        if self.era == "2016":
+            jer_prefix = "Spring16_25nsV10"
+        elif self.era == "2017":
+            jer_prefix = "Fall17_25nsV1"
+        else:
+            raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
+        self.jerInputFileName = jet_prefix + "_MC_PtResolution_" + jetType + ".txt"
+        self.jerUncertaintyInputFileName = jer_prefix + "_MC_SF_" + jetType + ".txt"
         self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName)
 
         if "AK4" in jetType : 
