@@ -5,8 +5,8 @@ Tools for working with NanoAOD (requiring only python + root, not CMSSW)
 
 You need to install a recent version of CMSSW
 
-    cmsrel CMSSW_9_4_6_patch1
-    cd CMSSW_9_4_6_patch1/src
+    cmsrel CMSSW_9_4_6
+    cd CMSSW_9_4_6/src
     cmsenv
 
 Clone the code from the Oviedo-PAF group.
