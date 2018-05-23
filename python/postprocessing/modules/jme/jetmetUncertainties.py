@@ -29,7 +29,7 @@ class jetmetUncertaintiesProducer(Module):
             jer_prefix = "Fall17_25nsV1"
         else:
             raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
-        self.jerInputFileName = jet_prefix + "_MC_PtResolution_" + jetType + ".txt"
+        self.jerInputFileName = jer_prefix + "_MC_PtResolution_" + jetType + ".txt"
         self.jerUncertaintyInputFileName = jer_prefix + "_MC_SF_" + jetType + ".txt"
         self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName)
 
