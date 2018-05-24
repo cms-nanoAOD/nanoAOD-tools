@@ -20,6 +20,7 @@ def mk_safe(fct, *args):
 
 class muonScaleResProducer(Module):
     def __init__(self, rc_dir, rc_corrections):
+        self.is_2017 = '2017' in rc_dir
         p_postproc = '%s/src/PhysicsTools/NanoAODTools/python/postprocessing' % os.environ['CMSSW_BASE']
         p_roccor = p_postproc + '/data/' + rc_dir
         if "/RoccoR_cc.so" not in ROOT.gSystem.GetLibraries():
@@ -37,7 +38,8 @@ class muonScaleResProducer(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("Muon_pt_corrected", "F", lenVar="nMuon")
-        # self.out.branch("Muon_pt_err", "F", lenVar="nMuon")
+        if self.is_2017:
+            self.out.branch("Muon_pt_sys_uncert", "F", lenVar="nMuon")
         self.is_mc = bool(inputTree.GetBranch("GenJet_pt"))
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -55,17 +57,28 @@ class muonScaleResProducer(Module):
                     roccor.kScaleAndSmearMC,
                     mu.charge, mu.pt, mu.eta, mu.phi, mu.nTrackerLayers, u1, u2
                 ) for mu in muons)
-            # pt_err  = list(mu.pt * roccor.kScaleAndSmearMCerror(mu.charge, mu.pt, mu.eta, mu.phi, mu.nTrackerLayers, u1, u2) for mu in muons)
+            if self.is_2017:
+                pt_err = list(
+                    mu.pt * mk_safe(
+                        roccor.kScaleAndSmearMCerror,
+                        mu.charge, mu.pt, mu.eta, mu.phi, mu.nTrackerLayers, u1, u2
+                    ) for mu in muons)
         else:
             pt_corr = list(
                 mu.pt * mk_safe(
                     roccor.kScaleDT,
                     mu.charge, mu.pt, mu.eta, mu.phi
                 ) for mu in muons)
-            # pt_err  = list(mu.pt * roccor.kScaleDTerror(mu.charge, mu.pt, mu.eta, mu.phi) for mu in muons)
+            if self.is_2017:
+                pt_err = list(
+                    mu.pt * mk_safe(
+                        roccor.kScaleDTerror,
+                        mu.charge, mu.pt, mu.eta, mu.phi
+                    ) for mu in muons)
 
         self.out.fillBranch("Muon_pt_corrected", pt_corr)
-        # self.out.fillBranch("Muon_pt_err",  pt_corr)
+        if self.is_2017:
+            self.out.fillBranch("Muon_pt_sys_uncert",  pt_err)
 
         return True
 
