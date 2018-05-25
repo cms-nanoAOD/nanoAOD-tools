@@ -88,7 +88,7 @@ class FullOutput(OutputTree):
             outputTree = inputTree.CopyTree('1')
         else:            
             outputTree = inputTree.CloneTree(0)
-        if(outputTree.GetName() == "Events"): outputTree.SetName("tree")
+        #if(outputTree.GetName() == "Events"): outputTree.SetName("tree")
             
         # enable back all branches in inputTree, then disable for computation
         # the branches as requested in branchSelection
