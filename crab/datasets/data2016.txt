@@ -1,4 +1,4 @@
-#SingleMuon 2016
+#SingleMuon
 /SingleMuon/Run2016B-05Feb2018_ver1-v1/NANOAOD
 /SingleMuon/Run2016B-05Feb2018_ver2-v1/NANOAOD
 /SingleMuon/Run2016C-05Feb2018-v1/NANOAOD
@@ -9,18 +9,11 @@
 /SingleMuon/Run2016H-05Feb2018_ver2-v1/NANOAOD
 /SingleMuon/Run2016H-05Feb2018_ver3-v1/NANOAOD
 
-#SingleMuon 2017
-/SingleMuon/Run2017B-31Mar2018-v1/NANOAOD
-/SingleMuon/Run2017C-31Mar2018-v1/NANOAOD
-/SingleMuon/Run2017D-31Mar2018-v1/NANOAOD
-/SingleMuon/Run2017E-31Mar2018-v1/NANOAOD
-/SingleMuon/Run2017F-31Mar2018-v1/NANOAOD
-
 #SingleMuon 2018
 #/SingleMuon/Run2018A-PromptReco-v1/MINIAOD
 #/SingleMuon/Run2018A-PromptReco-v2/MINIAOD
 
-#SingleElectron 2016
+#SingleElectron
 /SingleElectron/Run2016B-05Feb2018_ver1-v2/NANOAOD
 /SingleElectron/Run2016B-05Feb2018_ver2-v2/NANOAOD
 /SingleElectron/Run2016C-05Feb2018-v2/NANOAOD
@@ -31,18 +24,10 @@
 /SingleElectron/Run2016H-05Feb2018_ver2-v2/NANOAOD
 /SingleElectron/Run2016H-05Feb2018_ver3-v2/NANOAOD
 
-#SingleElectron 2017
-/SingleElectron/Run2017B-31Mar2018-v1/NANOAOD
-/SingleElectron/Run2017C-31Mar2018-v1/NANOAOD
-/SingleElectron/Run2017D-31Mar2018-v1/NANOAOD
-/SingleElectron/Run2017E-31Mar2018-v1/NANOAOD
-###/SingleElectron/Run2017F-31Mar2018-v1/NANOAOD
-
-
 #/EGamma/Run2018A-PromptReco-v1/MINIAOD
 #/EGamma/Run2018A-PromptReco-v2/MINIAOD
 
-#MuonEG 2016
+#MuonEG
 /MuonEG/Run2016B-05Feb2018_ver1-v1/NANOAOD
 /MuonEG/Run2016B-05Feb2018_ver2-v1/NANOAOD
 /MuonEG/Run2016C-05Feb2018-v1/NANOAOD
@@ -53,18 +38,11 @@
 /MuonEG/Run2016H-05Feb2018_ver2-v1/NANOAOD
 /MuonEG/Run2016H-05Feb2018_ver3-v1/NANOAOD
 
-#MuonEG 2017
-/MuonEG/Run2017B-31Mar2018-v1/NANOAOD
-/MuonEG/Run2017C-31Mar2018-v1/NANOAOD
-/MuonEG/Run2017D-31Mar2018-v1/NANOAOD
-/MuonEG/Run2017E-31Mar2018-v1/NANOAOD
-/MuonEG/Run2017F-31Mar2018-v1/NANOAOD
-
 #MuonEG 2018
 #/MuonEG/Run2018A-PromptReco-v1/MINIAOD
 #/MuonEG/Run2018A-PromptReco-v2/MINIAOD
 
-#DoubleMuon 2016
+#DoubleMuon
 /DoubleMuon/Run2016B-05Feb2018_ver1-v1/NANOAOD
 /DoubleMuon/Run2016B-05Feb2018_ver2-v1/NANOAOD
 /DoubleMuon/Run2016C-05Feb2018-v1/NANOAOD
@@ -75,18 +53,11 @@
 /DoubleMuon/Run2016H-05Feb2018_ver2-v1/NANOAOD
 /DoubleMuon/Run2016H-05Feb2018_ver3-v1/NANOAOD
 
-#DoubleMuon 2017
-/DoubleMuon/Run2017B-31Mar2018-v1/NANOAOD
-/DoubleMuon/Run2017C-31Mar2018-v1/NANOAOD
-/DoubleMuon/Run2017D-31Mar2018-v1/NANOAOD
-###/DoubleMuon/Run2017E-31Mar2018-v1/NANOAOD
-/DoubleMuon/Run2017F-31Mar2018-v1/NANOAOD
-
 #DoubleMuon 2018
 #/DoubleMuon/Run2018A-PromptReco-v1/MINIAOD
 #/DoubleMuon/Run2018A-PromptReco-v2/MINIAOD
 
-#DoubleElectron 2016
+#DoubleElectron
 /DoubleEG/Run2016B-05Feb2018_ver1-v1/NANOAOD
 /DoubleEG/Run2016B-05Feb2018_ver2-v1/NANOAOD
 /DoubleEG/Run2016C-05Feb2018-v1/NANOAOD
@@ -96,10 +67,3 @@
 /DoubleEG/Run2016G-05Feb2018-v1/NANOAOD
 /DoubleEG/Run2016H-05Feb2018_ver2-v1/NANOAOD
 /DoubleEG/Run2016H-05Feb2018_ver3-v1/NANOAOD
-
-#DoubleElectron 2017
-/DoubleEG/Run2017B-31Mar2018-v1/NANOAOD
-/DoubleEG/Run2017C-31Mar2018-v1/NANOAOD
-/DoubleEG/Run2017D-31Mar2018-v1/NANOAOD
-/DoubleEG/Run2017E-31Mar2018-v1/NANOAOD
-/DoubleEG/Run2017F-31Mar2018-v1/NANOAOD
