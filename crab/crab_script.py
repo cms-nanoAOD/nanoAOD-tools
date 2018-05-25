@@ -6,7 +6,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import *
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
 
 ### SKIM 
-cut = 'Jet_pt > 200 && (nElectron + nMuon) >= 2 && nGenDressedLepton >= 2'
+#cut = 'Jet_pt > 200 && (nElectron + nMuon) >= 2 && nGenDressedLepton >= 2'
+cut = '(nElectron + nMuon) >= 2'
 
 ### SLIM FILE
 slimfile = "SlimFile.txt"
@@ -18,3 +19,6 @@ mod = [puAutoWeight(),jetmetUncertainties2017All(), skimRecoLeps()] # countHisto
 
 p=PostProcessor(".",inputFiles(),cut,slimfile,mod,provenance=True,fwkJobReport=True,jsonInput=runsAndLumis())
 p.run()
+
+print "DONE"
+os.system("ls -lR")
