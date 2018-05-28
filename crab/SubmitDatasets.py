@@ -169,7 +169,7 @@ if narg == 0:
 else:
   # SET ARGUMENTS AND OPTIONS
   i = 0
-  if not arguments[1].startswith('--'): datasetName = arguments[1]
+  if not arguments[0].startswith('--'): datasetName = arguments[0]
   for arg in arguments:
     i+=1
     if arg.startswith('--'):
