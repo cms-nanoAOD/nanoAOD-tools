@@ -125,6 +125,7 @@ def SubmitDatasets(path, isTest = False, prodName = 'prodTest', doPretend = Fals
     if line == '': continue
     if line[0] == '#': continue
     if line.find('#') > 0: line = line[:line.find('#')]
+    if len(line) <= 1: continue
     cfgName = GetName_cfg(line, isData)
     if verbose: print 'Creating cfg file for dataset: ', line
     CrateCrab_cfg(line, isData, isTest, prodName, year)
