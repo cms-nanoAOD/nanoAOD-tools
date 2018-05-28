@@ -123,6 +123,7 @@ def SubmitDatasets(path, isTest = False, prodName = 'prodTest', doPretend = Fals
     line = line.replace(' ', '')
     line = line.replace('\t', '')
     line = line.replace('\n', '')
+    line = line.replace('\r', '')
     if line == '': continue
     if line[0] == '#': continue
     if line.find('#') > 0: line = line[:line.find('#')]
