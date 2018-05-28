@@ -133,7 +133,9 @@ def SubmitDatasets(path, isTest = False, prodName = 'prodTest', doPretend = Fals
     CrateCrab_cfg(line, isData, isTest, prodName, year)
     if not doPretend:
       os.system('crab submit -c ' + cfgName)
-      os.remove(cfgName)
+      if not os.path.isdir(prodName): os.mkdir(prodName)
+      os.rename(cfgName, prodname + '/' + cfgName)
+      #os.remove(cfgName)
 
 #SubmitDatasets('data2017')
 
@@ -194,7 +196,9 @@ else:
     CrateCrab_cfg(datasetName, doData, dotest, prodName, year)
     if not doPretend:
       os.system('crab submit -c ' + cfgName)
-      os.remove(cfgName)
+      if not os.path.isdir(prodName): os.mkdir(prodName)
+      os.rename(cfgName, prodname + '/' + cfgName)
+      #os.remove(cfgName)
 
   else:
     SubmitDatasets(datasetName, dotest, prodName, doPretend)
