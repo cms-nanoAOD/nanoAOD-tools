@@ -30,10 +30,18 @@ def GuessIsData(path):
   ''' Returns False if the dataset file seems to correspond to mc, True otherwise '''
   name = path.replace('datasets', '')
   if name.find('mc') >= 0 or name.find('MC') >= 0: return False
-  else: return True
+  elif name.find('data') >= 0 or name.find('Data') >= 0 or name.find('DATA') >= 0: return True
+  else: 
+    if 'NANOAOD' in path:
+      if 'NANOAODSIM' in path: return False
+      else: return True
 
+def GuessYear(path):
+  if   '2018' in path: return 18
+  elif '2017' in path: return 17
+  elif '2016' in path: return 16
 
-def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = 'prodTest'):
+def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = 'prodTest', year = 0):
   ''' Creates a cfg file to send crab jobs to analyze a given dataset '''
   # CONSTANTS
   tier = "T2_ES_IFCA"
@@ -48,9 +56,13 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
   basedir = '/store/user/' + username + '/nanoAODcrab'
 
   # Detect if it's MC or DATA and set parameters
-  isData = False
   strSplitting = "FileBased"; # MC
-  if(isData): strSplitting = "LumiBased";
+  lumiMask = ''
+  if(isData): 
+    strSplitting = "LumiBased";
+    if   year = 17: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'  # 41.29/fb
+    elif year = 18: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-316271_13TeV_PromptReco_Collisions18_JSON.txt' # 7.93/fb
+    #https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis#DATA
 
   # Set according to input parameters
   isTest = False
@@ -67,6 +79,7 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
   t_basedir      = "config.Data.outLFNDirBase = '" + basedir + "'\n"
   t_datasetTag = "config.Data.outputDatasetTag = '" + prodTag + "'\n" 
   t_tier = "config.Site.storageSite = '" + tier + "'\n"
+  t_lumiMask = "config.Data.lumiMask = '" + lumiMask + "'\n"
  
   text = "from WMCore.Configuration import Configuration\n"
   text += "config = Configuration()\nconfig.section_('General')\n"
@@ -78,6 +91,7 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
   text += t_inputdataset
   text += "config.Data.inputDBS = 'global'\n"
   text += t_splitting
+  if isData: text += t_lumiMask
   text += t_unitsperjob
   text += t_totalunits
   text += t_basedir
@@ -94,13 +108,13 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
 
 
 
-def SubmitDatasets(path, isTest = False, prodName = 'prodTest', forceData = False, doPretend = False):
+def SubmitDatasets(path, isTest = False, prodName = 'prodTest', doPretend = False):
   path = CheckPathDataset(path)
   if(path == ''):
     print 'ERROR: dataset not found'
     return
   isData = GuessIsData(path)
-  if forceData: isData = True
+  year   = GuessYear(path)
   if verbose: 
     if isData: print 'Opening path: ', path, '(DATA)'
     else: print  'Opening path: ', path, '(MC)'
@@ -114,7 +128,7 @@ def SubmitDatasets(path, isTest = False, prodName = 'prodTest', forceData = Fals
     if line.find('#') > 0: line = line[:line.find('#')]
     cfgName = GetName_cfg(line, isData)
     if verbose: print 'Creating cfg file for dataset: ', line
-    CrateCrab_cfg(line, isData, isTest, prodName)
+    CrateCrab_cfg(line, isData, isTest, prodName, year)
     if not doPretend:
       os.system('crab submit -c ' + cfgName)
       os.remove(cfgName)
@@ -127,7 +141,6 @@ narg = len(arguments)
 # Variables to set
 dotest    = False
 doPretend = False
-forceData = False
 doDataset = False
 prodName  = ''
 datasetName = ''
@@ -144,8 +157,6 @@ if narg == 0:
   print ' > --verbose (or -v)'
   print ' > --dataset /dataset/name/'
   print ' >   Runs on a given dataset'
-  print ' > --forceData'
-  print ' >   Force run as data'
   print ' > --pretend'
   print ' >   Only creates the cfg file; does not send jobs'
   print ' '
@@ -163,7 +174,6 @@ else:
     if arg.startswith('--'):
       a = arg[2:]
       if   a == 'test'       : dotest      = True
-      elif a == 'forceData'  : forceData   = True
       elif a == 'verbose'    : verbose     = True
       elif a == 'pretend'    : doPretend   = True
       elif a == 'dataset': 
@@ -176,11 +186,13 @@ else:
 
   if doDataset:
     if verbose: print 'Creating cfg file for dataset: ', datasetName
+    doData = GuessIsData(datasetName)
+    year   = GuessYear(datasetName)
     cfgName = GetName_cfg(datasetName, forceData)
-    CrateCrab_cfg(datasetName, forceData, dotest, prodName)
+    CrateCrab_cfg(datasetName, doData, dotest, prodName, year)
     if not doPretend:
       os.system('crab submit -c ' + cfgName)
       os.remove(cfgName)
 
   else:
-    SubmitDatasets(datasetName, dotest, prodName, forceData, doPretend)
+    SubmitDatasets(datasetName, dotest, prodName, doPretend)
