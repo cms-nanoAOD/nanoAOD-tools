@@ -10,6 +10,7 @@ def GetName_cfg(datasetName, isData = False):
   if datasetName[0] != '/': datasetName = '/' + datasetName
   tag = datasetName[1 : datasetName[1:].find('/')+1]
   genTag = datasetName[ datasetName[1:].find('/')+1 :]
+  genTag = genTag[:genTag[1:].find('/')+1]
   a = genTag.find('_ext')
   if a > 0: tag += genTag[a+1:a+5]
   if(isData): tag += genTag.replace('/','_')
