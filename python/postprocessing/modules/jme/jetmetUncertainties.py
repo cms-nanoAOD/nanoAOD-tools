@@ -24,7 +24,7 @@ class jetmetUncertaintiesProducer(Module):
 
         # smear jet pT to account for measured difference in JER between data and simulation.
         if self.era == "2016":
-            jer_prefix = "Spring16_25nsV10"
+            jer_prefix = "Summer16_25nsV1"
         elif self.era == "2017":
             jer_prefix = "Fall17_25nsV1"
         else:
