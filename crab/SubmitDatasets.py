@@ -38,9 +38,12 @@ def GuessIsData(path):
       else: return True
 
 def GuessYear(path):
-  if   '2018' in path: return 18
-  elif '2017' in path: return 17
-  elif '2016' in path: return 16
+  if   'Run2018' in path: return 18
+  elif 'Run2017' in path: return 17
+  elif 'Run2016' in path: return 16
+  elif '2018'    in path: return 18
+  elif '2017'    in path: return 17
+  elif '2016'    in path: return 16
 
 def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = 'prodTest', year = 0):
   ''' Creates a cfg file to send crab jobs to analyze a given dataset '''
@@ -59,8 +62,10 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
   # Detect if it's MC or DATA and set parameters
   strSplitting = "FileBased"; # MC
   lumiMask = ''
+  crabScript = 'crab_script.py'
   if(isData): 
     strSplitting = "LumiBased";
+    crabScript = 'crab_script_data.py'
     if   year == 17: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'  # 41.29/fb
     elif year == 18: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-316271_13TeV_PromptReco_Collisions18_JSON.txt' # 7.93/fb
     #https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis#DATA
@@ -71,7 +76,7 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
   prodTag = productionTag
 
   t_localdir     = "config.General.requestName = '"  + localdir + "'\n"
-  t_inputfiles   = "config.JobType.inputFiles = ['crab_script.py','../scripts/haddnano.py', '../python/postprocessing/SlimFile.txt']\n"
+  t_inputfiles   = "config.JobType.inputFiles = ['" + crabScript + "','../scripts/haddnano.py', '../python/postprocessing/SlimFile.txt']\n"
   t_inputdataset = "config.Data.inputDataset = '" + datasetName + "'\n" 
   t_totalunits   = "config.Data.totalUnits = " + str(totalUnits) + "\n"
   t_unitsperjob  = "config.Data.unitsPerJob = " + str(unitsperjob) + "\n"
