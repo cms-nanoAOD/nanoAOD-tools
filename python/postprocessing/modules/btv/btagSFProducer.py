@@ -271,7 +271,7 @@ class btagSFProducer(Module):
         else:
             raise ValueError("ERROR: Invalid algorithm '%s'! Please choose either 'csvv2' or 'cmva'." % self.algo)
 
-        preloaded_jets = [(jet.pt, jet.eta, self.getFlavorBTV(jet.partonFlavour), getattr(jet, discr)) for jet in jets]
+        preloaded_jets = [(jet.pt, jet.eta, self.getFlavorBTV(jet.hadronFlavour), getattr(jet, discr)) for jet in jets]
         reader = self.getReader('M', False)
         for central_or_syst in self.central_and_systs:
             central_or_syst = central_or_syst.lower()
