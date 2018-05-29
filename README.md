@@ -26,15 +26,14 @@ Move to the directory:
  
     cd PhysicsTools/NanoAODTools/crab
 
-Prepare the files: 
+Set the modules used in the analysis in crab_script.py and crab_script_data.py.
+Set the crab options in crab_cfg.py (only to run manually).
 
-    crab_cfg.py
-    crab_script.py
-    PSet.py
+To send jobs, run this script and follow the instructions:
 
-Send jobs:
+    python SubmitDatasets.py
 
-    crab submit -c crab_cfg.oy
+To run on several datasets, edit the txt files in the /datasets folder.
 
 ## Run in local:
 
@@ -55,10 +54,10 @@ This shoud run on a nanoAOD file and produce an output.
 - Produces Count / SumWeights histograms
 - Changes the name of the main tree 'Events' to 'tree'
 - Changes the output name and copies the output to a T2
+- Adds jet energy uncertianties (although too many branches are produced...)
 
 #### What am I missing?
-- Jet energy uncertianties (module is ready, but produces too many branches...)
-- Functions to perform more useful skims (e.g.: 2 tight leptons, etc...)
 - Some high-level variables: it would be nice to produce at this level some variables such as:
      lepton pt ratio, lepton pt rel, n ISR jets...
 - LHE weights: they exist in nanoAOD but the format may be different from what is expected
+- Functions to produce more skims??
