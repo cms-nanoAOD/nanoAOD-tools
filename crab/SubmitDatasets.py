@@ -5,6 +5,34 @@ import sys
 # Default option for the verbose
 verbose   = False
 
+##################### Get time
+import datetime
+def GetMonthName(n):
+  if   n == 1 : return 'Jan'
+  elif n == 2 : return 'Feb'
+  elif n == 3 : return 'Mar'
+  elif n == 4 : return 'Apr'
+  elif n == 5 : return 'May'
+  elif n == 6 : return 'Jun'
+  elif n == 7 : return 'Jul'
+  elif n == 8 : return 'Ago'
+  elif n == 9 : return 'Sep'
+  elif n == 10: return 'Oct'
+  elif n == 11: return 'Nov'
+  elif n == 12: return 'Dec'
+
+def GetToday():
+  now = datetime.datetime.now()
+  today = str(now.day) + GetMonthName(now.month) + str(now.year)[2:]
+  return today
+
+def GetTimeNow():
+  now = datetime.datetime.now()
+  time = str(now.hour) + 'h' + str(now.minute) + 'm' + str(now.second) + 's'
+  return time
+#################################################
+
+
 def GetName_cfg(datasetName, isData = False):
   ''' Returns the name of the cfg file for a given dataset '''
   if datasetName[0] != '/': datasetName = '/' + datasetName
@@ -151,7 +179,7 @@ narg = len(arguments)
 dotest    = False
 doPretend = False
 doDataset = False
-prodName  = ''
+prodName  = GetToday() + 'at' + GetTimeNow()
 datasetName = ''
 
 if narg == 0:
@@ -197,7 +225,7 @@ else:
     if verbose: print 'Creating cfg file for dataset: ', datasetName
     doData = GuessIsData(datasetName)
     year   = GuessYear(datasetName)
-    cfgName = GetName_cfg(datasetName, forceData)
+    cfgName = GetName_cfg(datasetName, doData)
     CrateCrab_cfg(datasetName, doData, dotest, prodName, year)
     if not doPretend:
       os.system('crab submit -c ' + cfgName)
