@@ -745,7 +745,7 @@ p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,modules
     PileupWeight(isData=args.isData),
     JetSelection(isData=args.isData,getLeptonCollection=lambda event: event.selectedMuons["tight"]),
     EventSkim(selection=lambda event: len(event.selectedJets["all"]["loose"])>=3),
-    JetTagging(isData=args.isData,getJetCollection=lambda event: event.selectedJets["central"]["loose"]),
+    #JetTagging(isData=args.isData,getJetCollection=lambda event: event.selectedJets["central"]["loose"]),
     METFilters(isData=args.isData)
 ],friend=True)
 p.run()
