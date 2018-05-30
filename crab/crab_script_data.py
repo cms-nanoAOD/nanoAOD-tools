@@ -15,7 +15,7 @@ slimfile = "SlimFile.txt"
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.skimNRecoLeps import *
-mod = [jetmetUncertainties2017All(), skimRecoLeps()] # countHistogramsProducer(), jetmetUncertainties2017All()
+mod = [skimRecoLeps()]
 
 p=PostProcessor(".",inputFiles(),cut,slimfile,mod,provenance=True,fwkJobReport=True,jsonInput=runsAndLumis())
 p.run()
