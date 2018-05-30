@@ -91,9 +91,10 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
   strSplitting = "FileBased"; # MC
   lumiMask = ''
   crabScript = 'crab_script.py'
+  crabScriptSH = 'crab_script.sh'
   if(isData): 
     strSplitting = "LumiBased";
-    crabScript = 'crab_script_data.py'
+    crabScriptSH = 'crab_script_data.sh'
     if   year == 17: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'  # 41.29/fb
     elif year == 18: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-316271_13TeV_PromptReco_Collisions18_JSON.txt' # 7.93/fb
     #https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis#DATA
@@ -118,7 +119,7 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
   text += "config = Configuration()\nconfig.section_('General')\n"
   text += t_localdir
   text += "config.General.transferLogs=True\nconfig.section_('JobType')\nconfig.JobType.pluginName = 'Analysis'\n"
-  text += "config.JobType.psetName = 'PSet.py'\nconfig.JobType.scriptExe = 'crab_script.sh'\nconfig.JobType.sendPythonFolder	 = True\n"
+  text += "config.JobType.psetName = 'PSet.py'\nconfig.JobType.scriptExe = '" + crabScriptSH + "'\nconfig.JobType.sendPythonFolder	 = True\n"
   text += t_inputfiles
   text += "config.section_('Data')\n"
   text += t_inputdataset
