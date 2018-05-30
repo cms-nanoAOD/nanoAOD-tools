@@ -2,8 +2,8 @@ sudo: required
 services:
   - docker
 script:
-  - docker pull hepsw/cvmfs-cms
-  - docker run -h dev --privileged -v $PWD:/scripts:ro hepsw/cvmfs-cms /bin/bash -c /scripts/test/runCMSSWTest.sh
+  - docker pull mattkomm/cvmfs-cms
+  - docker run -h dev --privileged -v $PWD:/scripts:ro mattkomm/cvmfs-cms /bin/bash -c /scripts/test/runCMSSWTest.sh
 notifications:
   email:
     recipients:

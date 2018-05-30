@@ -12,7 +12,7 @@ function run_test()
     git clone -b llp-analysis https://github.com/LLPDNNX/nanoAOD-tools.git PhysicsTools/NanoAODTools || return 1
     scram b || return 1
     
-    wget https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root || return 1
+    wget -nv https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root || return 1
     python PhysicsTools/NanoAODTools/test/LLP/processNANOX.py --isData --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root || return 1
 }
 
