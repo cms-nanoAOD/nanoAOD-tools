@@ -76,12 +76,15 @@ class JetPerformance(Module):
                 if ijet<len(jettags) and ijet<len(jetorigin) and jettags[ijet].isLLP>=0.:
                     
                     if jetorigin[ijet].fromLLP>0.5:
+                    #if jetorigin[ijet].isB>0.5 or jetorigin[ijet].isBB>0.5 or jetorigin[ijet].isGBB>0.5 or jetorigin[ijet].isLeptonic_B>0.5 or jetorigin[ijet].isLeptonic_C>0.5:
                         self.trueLLP.append(jettags[ijet].isLLP)
-                    else:
+                        #self.trueLLP.append(jettags[ijet].isB)
+                    elif jetorigin[ijet].isUD>0.5 or jetorigin[ijet].isS>0.5 or jetorigin[ijet].isG>0.5:
                         if not self.blockFake:
                             self.fakeLLP.append(jettags[ijet].isLLP)
+                            #self.fakeLLP.append(jettags[ijet].isB)
 
-        return True
+        return False
         
 
 files=[
@@ -102,8 +105,8 @@ files=[
 '''
 files=[
     [
-    "root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mkomm/LLP/NANOX_180425-v2/SingleMuon_Run2016B-03Feb2017_ver2-v2/SingleMuon/Run2016B-03Feb2017_ver2-v2_NANOX_180425-v2/180425_185224/0000/nano_100.root",
-    "/vols/cms/mkomm/LLP/NANOX_180425-v2_eval/SingleMuon_Run2016B-03Feb2017_ver2-v2/nano_100.root"
+    "root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mkomm/LLP/NANOX_180425-v2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen/NANOX_180425-v2/180425_183639/0000/nano_20.root",
+    "/vols/cms/mkomm/LLP/NANOX_180425-v2_eval/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen/nano_20.root.friend",
     ]
 ]
 '''

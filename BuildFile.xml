@@ -2,6 +2,7 @@
 <use name="hepmc"/>
 <use name="CondFormats/JetMETObjects"/>
 <use name="JetMETCorrections/Modules"/>
+<use name="tensorflow-cc" />
 <export>
   <lib   name="1"/>
 </export>

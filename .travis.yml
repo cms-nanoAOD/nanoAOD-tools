@@ -1,0 +1,14 @@
+sudo: required
+services:
+  - docker
+script:
+  - docker pull hepsw/cvmfs-cms
+  - docker run -h dev --privileged -v $PWD:/scripts:ro hepsw/cvmfs-cms /bin/bash -c /scripts/test/runCMSSWTest.sh
+notifications:
+  email:
+    recipients:
+      - mkomm@cern.ch
+    on_success: changet
+    on_failure: always
+
+

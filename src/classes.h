@@ -4,9 +4,11 @@
 #include "PhysicsTools/NanoAODTools/interface/WeightCalculatorFromHistogram.h"
 
 #include "PhysicsTools/NanoAODTools/interface/EventShapes.h"
+#include "PhysicsTools/NanoAODTools/interface/TFEval.h"
 
 PyJetResolutionWrapper jetRes;
 PyJetResolutionScaleFactorWrapper jetResScaleFactor;
 PyJetParametersWrapper jetParams;
 WeightCalculatorFromHistogram wcalc;
 EventShapes evShapes;
+TFEval tfEval;
