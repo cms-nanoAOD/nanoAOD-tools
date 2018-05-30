@@ -337,7 +337,7 @@ class JetSelection(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         jets = Collection(event, "Jet")
-        jettags = Collection(event, "llpdnnx")
+        #jettags = Collection(event, "llpdnnx")
         if not self.isData:
             jetorigin = Collection(event, "jetorigin")
         
@@ -376,12 +376,12 @@ class JetSelection(Module):
                             continue
                     
                     #put tag info into jets         
-                    if ijet<len(jettags):
-                        for flav in ["isB","isC","isUDS","isG","isLLP"]:
-                            setattr(jet,"llpdnnx_"+flav,getattr(jettags[ijet],flav))   
-                    else:
-                        for flav in ["isB","isC","isUDS","isG","isLLP"]:
-                            setattr(jet,"llpdnnx_"+flav,-1) 
+                    #if ijet<len(jettags):
+                    #    for flav in ["isB","isC","isUDS","isG","isLLP"]:
+                    #        setattr(jet,"llpdnnx_"+flav,getattr(jettags[ijet],flav))   
+                    #else:
+                    #    for flav in ["isB","isC","isUDS","isG","isLLP"]:
+                    #        setattr(jet,"llpdnnx_"+flav,-1) 
                         
                     if not self.isData:
                         if ijet<len(jetorigin) and jetorigin[ijet].fromLLP:
