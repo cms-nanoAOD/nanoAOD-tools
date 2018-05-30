@@ -9,7 +9,8 @@ function run_test()
     scramv1 project CMSSW CMSSW_10_2_0_pre2 || return 1
     cd CMSSW_10_2_0_pre2/src || return 1
     eval `scramv1 runtime -sh` || return 1
-    rsync -r --stats /scripts/ . || return 1
+    mkdir -p PhysicsTools/NanoAODTools
+    rsync -r --stats /scripts/ PhysicsTools/NanoAODTools/. || return 1
     scram b || return 1
     
     wget -nv https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root || return 1
