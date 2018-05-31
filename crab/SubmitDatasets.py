@@ -168,7 +168,7 @@ def SubmitDatasets(path, isTest = False, prodName = 'prodTest', doPretend = Fals
     if not doPretend:
       os.system('crab submit -c ' + cfgName)
       if not os.path.isdir(prodName): os.mkdir(prodName)
-      os.rename(cfgName, prodname + '/' + cfgName)
+      os.rename(cfgName, prodName + '/' + cfgName)
       #os.remove(cfgName)
 
 #SubmitDatasets('data2017')
@@ -231,7 +231,7 @@ else:
     if not doPretend:
       os.system('crab submit -c ' + cfgName)
       if not os.path.isdir(prodName): os.mkdir(prodName)
-      os.rename(cfgName, prodname + '/' + cfgName)
+      os.rename(cfgName, prodName + '/' + cfgName)
       #os.remove(cfgName)
 
   else:
