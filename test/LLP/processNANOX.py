@@ -477,15 +477,15 @@ class JetTagging(Module):
             "mediumDeepCSV":lambda jet: jet.btagCSVV2>0.6324,
             "tightDeepCSV":lambda jet: jet.btagCSVV2>0.8958,
         
-            "looseLLP":lambda jet: jet.llpdnnx_isLLP>0.0400, #eff: 86% @ 1/10 bkg
-            "mediumLLP":lambda jet: jet.llpdnnx_isLLP>0.1483, #eff: 71% @ 1/100 bkg
-            "tightLLP":lambda jet: jet.llpdnnx_isLLP>0.5123, #eff: 60% @ 1/1000 bkg
-            "ultraLLP":lambda jet: jet.llpdnnx_isLLP>0.8043, #eff: 52% @ 1/10000 bkg
+            #"looseLLP":lambda jet: jet.llpdnnx_isLLP>0.0400, #eff: 86% @ 1/10 bkg
+            #"mediumLLP":lambda jet: jet.llpdnnx_isLLP>0.1483, #eff: 71% @ 1/100 bkg
+            #"tightLLP":lambda jet: jet.llpdnnx_isLLP>0.5123, #eff: 60% @ 1/1000 bkg
+            #"ultraLLP":lambda jet: jet.llpdnnx_isLLP>0.8043, #eff: 52% @ 1/10000 bkg
             
-            "looseB":lambda jet: jet.llpdnnx_isB>0.0381, #eff: 88% @ 1/10 bkg
-            "mediumB":lambda jet: jet.llpdnnx_isB>0.1499, #eff: 73% @ 1/100 bkg
-            "tightB":lambda jet: jet.llpdnnx_isB>0.3741, #eff: 52% @ 1/1000 bkg
-            "ultraB":lambda jet: jet.llpdnnx_isB>0.6858, #eff: 31% @ 1/10000 bkg
+            #"looseB":lambda jet: jet.llpdnnx_isB>0.0381, #eff: 88% @ 1/10 bkg
+            #"mediumB":lambda jet: jet.llpdnnx_isB>0.1499, #eff: 73% @ 1/100 bkg
+            #"tightB":lambda jet: jet.llpdnnx_isB>0.3741, #eff: 52% @ 1/1000 bkg
+            #"ultraB":lambda jet: jet.llpdnnx_isB>0.6858, #eff: 31% @ 1/10000 bkg
         }
         
     def beginJob(self):
