@@ -447,7 +447,7 @@ class JetSelection(Module):
                 minPhiL = min(minPhiL,math.fabs(self.deltaPhi(negSum.Phi(),jet.phi)))
             event.selectedJets[group]["minPhiL"] = minPhiL
             self.out.fillBranch("minPhiL_"+group,minPhiL)
-            
+            '''
             if group.find("central")>=0:
                 jetsByLLP = sorted(map(lambda j:j.llpdnnx_isLLP,event.selectedJets[group]["loose"]),reverse=True)
                 jetsByB = sorted(map(lambda j:j.llpdnnx_isB,event.selectedJets[group]["loose"]),reverse=True)
@@ -462,7 +462,7 @@ class JetSelection(Module):
                         self.out.fillBranch("max_llp"+str(nmax+1)+"_"+group,-1)
                         self.out.fillBranch("max_b"+str(nmax+1)+"_"+group,-1)
                         self.out.fillBranch("max_deepCSV"+str(nmax+1)+"_"+group,-1)
-            
+            '''
             self.out.fillBranch("nSelectedJets_"+group,len(event.selectedJets[group]["loose"]))
             self.out.fillBranch("ht_"+group,event.selectedJets[group]["ht"])
             self.out.fillBranch("mht_"+group,event.selectedJets[group]["mht"])

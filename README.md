@@ -3,7 +3,7 @@ Tools for working with NanoAOD (requiring only python + root, not CMSSW)
 
 ## Checkout instructions: LLP-specific
 
-Using recent CMSSW release which is shipped with all the required software.
+Using recent CMSSW release which is shipped with all the required software (especially tensorflow C++ API v1.6).
 ```
 cmsrel CMSSW_10_2_0_pre2
 cd CMSSW_10_2_0_pre2/src
