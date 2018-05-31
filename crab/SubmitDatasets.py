@@ -180,7 +180,7 @@ narg = len(arguments)
 dotest    = False
 doPretend = False
 doDataset = False
-prodName  = GetToday() + 'at' + GetTimeNow()
+prodName  = 'Prod_' + GetToday() + '_' + GetTimeNow()
 datasetName = ''
 
 if narg == 0:
