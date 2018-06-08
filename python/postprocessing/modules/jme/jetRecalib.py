@@ -89,3 +89,18 @@ jetRecalib2017C = lambda : jetRecalib("Fall17_17Nov2017C_V6_DATA")
 jetRecalib2017D = lambda : jetRecalib("Fall17_17Nov2017D_V6_DATA")
 jetRecalib2017E = lambda : jetRecalib("Fall17_17Nov2017E_V6_DATA")
 jetRecalib2017F = lambda : jetRecalib("Fall17_17Nov2017F_V6_DATA")
+
+jetRecalib2016BCD = lambda : jetRecalib("Summer16_07Aug2017BCD_V10_DATA")
+jetRecalib2016EF  = lambda : jetRecalib("Summer16_07Aug2017EF_V10_DATA")
+jetRecalib2016GH  = lambda : jetRecalib("Summer16_07Aug2017GH_V10_DATA")
+
+
+jetRecalibAK8Puppi2017B = lambda : jetRecalib("Fall17_17Nov2017B_V6_DATA", jetType="AK8PFPuppi")
+jetRecalibAK8Puppi2017C = lambda : jetRecalib("Fall17_17Nov2017C_V6_DATA", jetType="AK8PFPuppi")
+jetRecalibAK8Puppi2017D = lambda : jetRecalib("Fall17_17Nov2017D_V6_DATA", jetType="AK8PFPuppi")
+jetRecalibAK8Puppi2017E = lambda : jetRecalib("Fall17_17Nov2017E_V6_DATA", jetType="AK8PFPuppi")
+jetRecalibAK8Puppi2017F = lambda : jetRecalib("Fall17_17Nov2017F_V6_DATA", jetType="AK8PFPuppi")
+
+jetRecalibAK8Puppi2016BCD = lambda : jetRecalib("Summer16_07Aug2017BCD_V10_DATA", jetType="AK8PFPuppi")
+jetRecalibAK8Puppi2016EF  = lambda : jetRecalib("Summer16_07Aug2017EF_V10_DATA", jetType="AK8PFPuppi")
+jetRecalibAK8Puppi2016GH  = lambda : jetRecalib("Summer16_07Aug2017GH_V10_DATA", jetType="AK8PFPuppi")
