@@ -93,7 +93,7 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
   crabScript = 'crab_script.py'
   crabScriptSH = 'crab_script.sh'
   if(isData): 
-    strSplitting ="Automatic" # "LumiBased";
+    strSplitting = "LumiBased"#"Automatic" # "LumiBased";
     crabScriptSH = 'crab_script_data.sh'
     if   year == 17: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'  # 41.29/fb
     elif year == 18: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-316271_13TeV_PromptReco_Collisions18_JSON.txt' # 7.93/fb
@@ -101,6 +101,7 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
 
   # Set according to input parameters
   totalUnits = 10000 # test
+  if isData: totalUnits = 100
   if isTest: totalUnits = 3
   prodTag = productionTag
 
@@ -126,9 +127,9 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
   text += "config.Data.inputDBS = 'global'\n"
   text += t_splitting
   if isData: text += t_lumiMask
-  else: 
-    text += t_unitsperjob
-    text += t_totalunits
+  #else: 
+  text += t_unitsperjob
+  text += t_totalunits
   text += t_basedir
   text += "config.Data.publication = False\n"
   text += t_datasetTag
