@@ -1,3 +1,5 @@
+#dasgoclient --query="dataset dataset=/*/*Run2018*/NANOAOD"
+
 #SingleMuon
 #/SingleMuon/Run2018A-PromptReco-v1/MINIAOD
 #/SingleMuon/Run2018A-PromptReco-v2/MINIAOD
@@ -9,6 +11,8 @@
 #MuonEG
 #/MuonEG/Run2018A-PromptReco-v1/MINIAOD
 #/MuonEG/Run2018A-PromptReco-v2/MINIAOD
+#/MuonEG/Run2018A-PromptReco-v3/MINIAOD
+#/MuonEG/Run2018B-PromptReco-v1/MINIAOD
 
 #DoubleMuon
 #/DoubleMuon/Run2018A-PromptReco-v1/MINIAOD
