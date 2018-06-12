@@ -12,3 +12,5 @@ PyJetParametersWrapper jetParams;
 WeightCalculatorFromHistogram wcalc;
 EventShapes evShapes;
 TFEval tfEval;
+TFEval::ArrayFeatureGroup arrayFeatureGroup("blub",10,10);
+TFEval::ValueFeatureGroup valueFeatureGroup("blub",10);

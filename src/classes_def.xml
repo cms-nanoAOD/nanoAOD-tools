@@ -6,5 +6,7 @@
   <class name="WeightCalculatorFromHistogram"/>
   <class name="EventShapes"/>
   <class name="TFEval"/>
+  <class name="TFEval::ArrayFeatureGroup"/>
+  <class name="TFEval::ValueFeatureGroup"/>
 </selection>
 </lcgdict>

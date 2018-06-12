@@ -18,18 +18,26 @@ class exampleProducer(Module):
         pass
         
     def beginJob(self):
-        self.tfEval = ROOT.TFEval()
+        pass
         
     def endJob(self):
         pass
         
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.intree = inputTree
-        #self.tfEval.loadTree(inputTree)
+
+        self.setupEval(inputTree)
         
-        self.blub = self.intree.arrayReader("global_pt")
-        self.tfEval.addBranch(self.blub)
+        
+    def setupEval(self,tree):
+        self.tfEval = ROOT.TFEval()
+        globalFeatures = ROOT.TFEval.ValueFeatureGroup("globalvars",2)
+        globalFeatures.addFeature(tree.arrayReader("global_pt"))
+        globalFeatures.addFeature(tree.arrayReader("global_eta"))
+        print globalFeatures
+        self.tfEval.addFeatureGroup(globalFeatures)
+        
+        self._ttreereaderversion = tree._ttreereaderversion
         
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -37,18 +45,23 @@ class exampleProducer(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         
-        jets = Collection(event, "Jet")
+        jets = Collection(event, "global")
+        
+        if event._tree._ttreereaderversion > self._ttreereaderversion:
+            self.setupEval(event._tree)
         
         for ijet,jet in enumerate(jets):
 
             result = self.tfEval.evaluate(ijet)
-            
+            print ijet,jet.eta,result[0]
+            '''
+            #print self.blub
             print len(result),"=",
             for i in range(len(result)):
                 print result[i],
             #print "/",event.global_pt[ijet]
             print
-            
+            '''
         return True
         
 files=[
