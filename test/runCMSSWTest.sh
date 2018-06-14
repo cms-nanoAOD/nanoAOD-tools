@@ -14,7 +14,7 @@ function run_test()
     scram b || return 1
      
     echo "--- Test analyzer chain ---"
-    wget -nv https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root || return 1
+    #wget -nv https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root || return 1
     python PhysicsTools/NanoAODTools/test/LLP/processNANOX.py --isData --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
     
     echo "--- Test evaluation script ---"

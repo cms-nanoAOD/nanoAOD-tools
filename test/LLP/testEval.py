@@ -81,7 +81,6 @@ class exampleProducer(Module):
         for ijet,jet in enumerate(jets):
 
             result = self.tfEval.evaluate(ijet)
-            #print ijet,jet.eta,result[0]
             prediction = result.get("prediction")
             '''
             #print self.blub
@@ -117,7 +116,7 @@ for inputFile in args.inputFiles:
     
 print "output directory:",args.output[0]
 
-p=PostProcessor('.',args.inputFiles,cut=None,branchsel=None,modules=[
+p=PostProcessor('.',[args.inputFiles],cut=None,branchsel=None,modules=[
     exampleProducer()
 ],friend=True)
 p.run()
