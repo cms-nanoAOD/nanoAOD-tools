@@ -117,7 +117,7 @@ for inputFile in args.inputFiles:
     
 print "output directory:",args.output[0]
 
-p=PostProcessor('.',files,cut=None,branchsel=None,modules=[
+p=PostProcessor('.',args.inputFiles,cut=None,branchsel=None,modules=[
     exampleProducer()
 ],friend=True)
 p.run()
