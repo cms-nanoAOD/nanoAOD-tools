@@ -12,11 +12,11 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
     print "Cannot load 'libPhysicsToolsNanoAODTools'"
     sys.exit(1)
-    
 
 
 #load dynamically from file
 featureDict = import_module('feature_dict').featureDict
+
 
 class exampleProducer(Module):
     def __init__(self):
@@ -30,7 +30,6 @@ class exampleProducer(Module):
         
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-
         self.setupEval(inputTree)
         
         
@@ -74,6 +73,7 @@ class exampleProducer(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         
+
         jets = Collection(event, "global")
         if event._tree._ttreereaderversion > self._ttreereaderversion:
             self.setupEval(event._tree)
@@ -92,9 +92,7 @@ class exampleProducer(Module):
             print
             '''
         return True
-        
-
-
+     
 import argparse
 
 parser = argparse.ArgumentParser()

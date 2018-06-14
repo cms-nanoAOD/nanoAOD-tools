@@ -1,6 +1,8 @@
 # nanoAOD-tools
 Tools for working with NanoAOD (requiring only python + root, not CMSSW)
 
+![build tests](https://travis-ci.org/LLPDNNX/nanoAOD-tools.svg?branch=llp-analysis)
+
 ## Checkout instructions: LLP-specific
 
 Using recent CMSSW release which is shipped with all the required software (especially tensorflow C++ API v1.6).
