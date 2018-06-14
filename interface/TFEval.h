@@ -13,11 +13,13 @@
 #include "TTreeReaderValue.h"
 #include "TTreeReaderArray.h"
 
+#include<iostream>
 
 
 class TFEval
 {
     public:
+    
         class FeatureGroup
         {
             protected:
@@ -35,9 +37,13 @@ class TFEval
                     return _name;
                 }
                 
-                virtual std::unique_ptr<tensorflow::Tensor> createTensor() const = 0; 
+                virtual std::vector<int64_t> getShape() const = 0;
                 
-                virtual void fillTensor(std::unique_ptr<tensorflow::Tensor>& tensor, int jetIndex) const = 0;
+                virtual void addFeature(TTreeReaderArray<float>* branch) = 0;
+                
+                virtual tensorflow::Tensor createTensor() const = 0; 
+                
+                virtual void fillTensor(tensorflow::Tensor& tensor, int64_t jetIndex) const = 0;
                 
                 virtual ~FeatureGroup()
                 {
@@ -69,32 +75,35 @@ class TFEval
                     return *this;
                 }
                 
-                virtual std::unique_ptr<tensorflow::Tensor> createTensor() const
+                virtual std::vector<int64_t> getShape() const
                 {
-                     return std::unique_ptr<tensorflow::Tensor>(
-                        new tensorflow::Tensor(tensorflow::DT_FLOAT, {1,_size})
-                    );
+                    return std::vector<int64_t>({1,_size});
                 }
                 
-                void addFeature(TTreeReaderArray<float>* branch)
+                virtual tensorflow::Tensor createTensor() const
+                {
+                    return tensorflow::Tensor(tensorflow::DT_FLOAT, {1,_size});
+                }
+                
+                virtual void addFeature(TTreeReaderArray<float>* branch)
                 {
                     _branches.push_back(branch);
                 }
                 
-                virtual void fillTensor(std::unique_ptr<tensorflow::Tensor>& tensor, int jetIndex) const
+                virtual void fillTensor(tensorflow::Tensor& tensor, int64_t jetIndex) const
                 {
                     if ((int64_t)_branches.size()!=_size)
                     {
                         throw std::runtime_error("Mismatch in group '"+_name+"' between provided number of branches ("+std::to_string(_branches.size())+") and configured ones ("+std::to_string(_size)+")");
                     }
-                    auto features = tensor->tensor<float,2>();
-                    for (int64_t i = 0; i < _size; ++i)
+                    auto features = tensor.tensor<float,2>();
+                    for (int64_t ifeature = 0; ifeature < _size; ++ifeature)
                     {
-                        if ((int)_branches[i]->GetSize()<jetIndex)
+                        if ((int)_branches[ifeature]->GetSize()<jetIndex)
                         {
                             throw std::runtime_error("Trying to access non-existing element ("+std::to_string(jetIndex)+") for group '"+_name+"'");
                         }
-                        features(0,i) = _branches[i]->At(jetIndex);
+                        features(0,ifeature) = _branches[ifeature]->At(jetIndex);
                     }
                 }
                 
@@ -111,24 +120,57 @@ class TFEval
                 std::vector<TTreeReaderArray<float>*> _branches;
                 TTreeReaderArray<float>* _lengthBranch;
             public:
-                ArrayFeatureGroup(const std::string& name, int64_t size, int64_t max):
+                ArrayFeatureGroup(const std::string& name, int64_t size, int64_t max, TTreeReaderArray<float>* lengthBranch):
                     FeatureGroup(name,size),
-                    _max(max)
+                    _max(max),
+                    _lengthBranch(lengthBranch)
                 {
                 }
                 
-                virtual std::unique_ptr<tensorflow::Tensor> createTensor() const
+                virtual void addFeature(TTreeReaderArray<float>* branch)
                 {
-                    return std::unique_ptr<tensorflow::Tensor>(
-                        new tensorflow::Tensor(tensorflow::DT_FLOAT, {1,_size,_max})
-                    );
+                    _branches.push_back(branch);
                 }
                 
-                virtual void fillTensor(std::unique_ptr<tensorflow::Tensor>& tensor, int jetIndex) const
+                virtual std::vector<int64_t> getShape() const
+                {
+                    return std::vector<int64_t>({1,_max,_size});
+                }
+                
+                virtual tensorflow::Tensor createTensor() const
+                {
+                    return tensorflow::Tensor(tensorflow::DT_FLOAT, {1,_max,_size});
+                }
+                
+                virtual void fillTensor(tensorflow::Tensor& tensor, int64_t jetIndex) const
                 {
                     if ((int64_t)_branches.size()!=_size)
                     {
                         throw std::runtime_error("Mismatch in group '"+_name+"' between provided number of branches ("+std::to_string(_branches.size())+") and configured ones ("+std::to_string(_size)+")");
+                    }
+                    auto features = tensor.tensor<float,3>();
+                    int offset = 0;
+                    for (int64_t i = 0; i < jetIndex; ++i)
+                    {
+                        offset+=_lengthBranch->At(i);
+                    }
+                    for (int64_t icandidate = 0; icandidate < std::min<int64_t>(_max,_lengthBranch->At(jetIndex)); ++icandidate)
+                    {
+                        for (int64_t ifeature = 0; ifeature < _size; ++ifeature)
+                        {
+                            if ((int)_branches[ifeature]->GetSize()<(offset+icandidate))
+                            {
+                                throw std::runtime_error("Trying to access non-existing element ("+std::to_string(jetIndex)+") for group '"+_name+"'");
+                            }
+                            features(0,icandidate,ifeature) = _branches[ifeature]->At(offset+icandidate);
+                        }
+                    }
+                    for (int64_t icandidate = _lengthBranch->At(jetIndex); icandidate < _max; ++icandidate)
+                    {
+                        for (int64_t ifeature = 0; ifeature < _size; ++ifeature)
+                        {
+                            features(0,icandidate,ifeature) = 0.;
+                        }
                     }
                 }
                 
@@ -138,10 +180,64 @@ class TFEval
         };
         
         
+        class Result
+        {
+            private:
+                std::unordered_map<std::string,std::vector<float>> _result;
+            public:
+                Result()
+                {
+                }
+                
+                static Result fill(
+                    std::vector<std::string> names, 
+                    std::vector<tensorflow::Tensor>& tensorList
+                )
+                {
+                    Result result;
+                    if (names.size()!=tensorList.size())
+                    {
+                        throw std::runtime_error("Number of names and values do not match");
+                    }
+                    
+                    for (size_t i = 0; i < names.size(); ++i)
+                    {
+                        auto values = tensorList[i].flat<float>();
+                        std::vector<float> data;//(values.size());
+                        data.assign(values.data(),values.data()+values.size());
+                        result._result[names[i]] = data;
+                    }
+                    return result;
+                }
+                
+                
+                std::vector<float> get(const char* s)
+                {
+                    auto it = _result.find(std::string(s));
+                    if (it==_result.end())
+                    {
+                        return std::vector<float>();
+                    }
+                    return it->second;
+                }
+        };
+        
+        
     private:
         std::vector<FeatureGroup*> _featureGroups;
+        std::unique_ptr<tensorflow::Session> _session;
+        tensorflow::GraphDef _graphDef;
+        std::vector<std::string> _outputNodeNames;
+        bool _doReallocation;
+        std::string _graphFilePath;
+        
+        std::vector<std::pair<std::string, tensorflow::Tensor>> _inputs;
+        
     public:
-        TFEval()
+        TFEval():
+            _session(nullptr),
+            _doReallocation(true),
+            _graphFilePath("")
         {
         }
         /*
@@ -151,47 +247,135 @@ class TFEval
             std::cout<<"copy"<<std::endl;
         }
         */
-        bool loadGraph(const char* filePath, const char* predictionNode)
+        
+        void addOutputNodeName(const char* nodeName)
         {
+            _outputNodeNames.push_back(nodeName);
+        }
+        
+        bool loadGraph(const char* filePath)
+        {
+            tensorflow::Status status;
+            
+            // load it
+            status = ReadBinaryProto(
+                tensorflow::Env::Default(), 
+                std::string(filePath), 
+                &_graphDef
+            );
+            tensorflow::graph::SetDefaultDevice("/cpu:0", &_graphDef);
+            
+            // check for success
+            if (!status.ok())
+            {
+                std::cerr<<"Error while loading graph def: "+status.ToString()<<std::endl;
+                return false;
+            }
+            tensorflow::SessionOptions opts;
+            opts.config.set_intra_op_parallelism_threads(1);
+            opts.config.set_inter_op_parallelism_threads(1);
+            tensorflow::Session* session;
+            status = tensorflow::NewSession(opts, &session);
+            if (!status.ok())
+            {
+                std::cerr<<"Error while creating a new session: "+status.ToString()<<std::endl;
+                return false;
+            }
+            _session.reset(session);
+            status = _session->Create(_graphDef);
+            if (!status.ok())
+            {
+                std::cerr<<"Error while loading graph into session: "+status.ToString()<<std::endl;
+                return false;
+            }
+            _graphFilePath = std::string(filePath);
             return true;
         }
         
         void addFeatureGroup(FeatureGroup* featureGroup)
         {
+            _doReallocation = true;
             _featureGroups.push_back(featureGroup);
         }
         
-        std::vector<float> evaluate(int jetIndex)
+        void allocateInputs()
         {
-            //std::cout<<"evaluate on jet "<<jetIndex<<std::endl;
-            //std::cout<<"got "<<_featureGroups.size()<<" feature groups"<<std::endl;
-            
-            std::unordered_map<std::string,std::unique_ptr<tensorflow::Tensor>> inputs;
-            for (auto featureGroup: _featureGroups)
+            if (_doReallocation)
             {
-                auto tensor = featureGroup->createTensor();
-                featureGroup->fillTensor(tensor,jetIndex);
-                inputs[featureGroup->name()] = std::move(tensor);
+                _inputs.clear();
+                for (auto featureGroup: _featureGroups)
+                {
+                    auto tensor = featureGroup->createTensor();
+                    _inputs.emplace_back(featureGroup->name(),tensor);
+                    
+                    //check input shapes
+                    bool foundNode = false;
+                    for (int inode = 0; inode < _graphDef.node_size(); inode++)
+                    {
+                        if (_graphDef.node(inode).name()==featureGroup->name())
+                        {
+                            foundNode = true;
+                            auto tensor_shape = _graphDef.node(inode).attr().at("shape").shape();
+                            auto group_shape = featureGroup->getShape();
+                            //check rank
+                            if (tensor_shape.dim_size()!=(int64_t)group_shape.size())
+                            {
+                                throw std::runtime_error("Mismatching input rank (config: "+std::to_string(group_shape.size())+"; pb: "+std::to_string(tensor_shape.dim_size())+") for feature group '"+featureGroup->name()+"'");
+                            }
+                            //check shape - ignore batch dim
+                            for (size_t idim = 1; idim < group_shape.size(); ++idim)
+                            {
+                                if ((int64_t)tensor_shape.dim(idim).size()!=group_shape[idim])
+                                {
+                                    throw std::runtime_error("Mismatching input shapes in dimension '"+std::to_string(idim+1)+"' (config: "+std::to_string(group_shape[idim])+"; pb: "+std::to_string(tensor_shape.dim(idim).size())+") for feature group '"+featureGroup->name()+"'");
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    if (not foundNode)
+                    {
+                        throw std::runtime_error("Cannot find input node '"+featureGroup->name()+"' in pb file '"+_graphFilePath+"'");
+                    }
+                }
+                _doReallocation = false;
+            }
+        }
+        
+        void fillInputs(int64_t jetIndex)
+        {
+            if (_featureGroups.size()!=_inputs.size())
+            {
+                throw std::runtime_error("Logic error occured: input tensors should have been reallocated");
+            }
+            for (size_t i = 0; i < _inputs.size(); ++i)
+            {
+                _featureGroups[i]->fillTensor(_inputs[i].second,jetIndex);
+            }
+        }
+        
+        Result evaluate(int64_t jetIndex)
+        {
+            allocateInputs();
+            fillInputs(jetIndex);
+            
+            std::vector<tensorflow::Tensor> outputs;
+            
+            if (not _session)
+            {
+                throw std::runtime_error("No graph/session loaded");
             }
             
-            std::vector<float> result(2,0);
-            
-            for (const auto& it: inputs)
+            tensorflow::Status status = _session->Run(_inputs,_outputNodeNames,{},&outputs);
+            if (!status.ok())
             {
-                //std::cout<<it.first<<std::endl;
-                //std::cout<<it.second->tensor<float,2>()(0,1)<<std::endl;
-                
-                result[0]=it.second->tensor<float,2>()(0,1);
+                throw std::runtime_error("Error while loading graph into session: "+status.ToString());
             }
-           
-            
 
- 
-            return result;
+            return Result::fill(_outputNodeNames,outputs);
         }
         
         ~TFEval()
         {
         }
-        
 };

@@ -6,11 +6,15 @@
 #include "PhysicsTools/NanoAODTools/interface/EventShapes.h"
 #include "PhysicsTools/NanoAODTools/interface/TFEval.h"
 
-PyJetResolutionWrapper jetRes;
-PyJetResolutionScaleFactorWrapper jetResScaleFactor;
-PyJetParametersWrapper jetParams;
-WeightCalculatorFromHistogram wcalc;
-EventShapes evShapes;
-TFEval tfEval;
-TFEval::ArrayFeatureGroup arrayFeatureGroup("blub",10,10);
-TFEval::ValueFeatureGroup valueFeatureGroup("blub",10);
+namespace {
+    PyJetResolutionWrapper jetRes;
+    PyJetResolutionScaleFactorWrapper jetResScaleFactor;
+    PyJetParametersWrapper jetParams;
+    WeightCalculatorFromHistogram wcalc;
+    EventShapes evShapes;
+    TFEval tfEval;
+    TTreeReaderArray<float>* lengthBranch;
+    TFEval::ArrayFeatureGroup arrayFeatureGroup("blub",10,10,lengthBranch);
+    TFEval::ValueFeatureGroup valueFeatureGroup("blub",10);
+    TFEval::Result result;
+}
