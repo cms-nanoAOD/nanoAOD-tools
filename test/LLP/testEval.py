@@ -17,6 +17,8 @@ if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
 #load dynamically from file
 featureDict = import_module('feature_dict').featureDict
 
+testPy = ROOT.TFEval.PyAccessor(lambda x: x*2+1)
+print testPy.value(2)
 
 class exampleProducer(Module):
     def __init__(self):
@@ -43,7 +45,7 @@ class exampleProducer(Module):
         for groupName,featureCfg in featureDict.iteritems():
             if featureCfg.has_key("max"):
                 print "building group ... %s, shape=[%i,%i]"%(groupName,featureCfg["max"],len(featureCfg["branches"]))
-                lengthBranch = tree.arrayReader(featureCfg["length"])
+                lengthBranch = ROOT.TFEval.BranchAccessor(tree.arrayReader(featureCfg["length"]))
                 featureGroup = ROOT.TFEval.ArrayFeatureGroup(
                     groupName,
                     len(featureCfg["branches"]),
@@ -52,7 +54,7 @@ class exampleProducer(Module):
                 )
                 for branchName in featureCfg["branches"]:
                     print " + add feature: ",branchName
-                    featureGroup.addFeature(tree.arrayReader(branchName))
+                    featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
                 self.tfEval.addFeatureGroup(featureGroup)
             else:
                 print "building group ... %s, shape=[%i]"%(groupName,len(featureCfg["branches"]))
@@ -62,7 +64,7 @@ class exampleProducer(Module):
                 )
                 for branchName in featureCfg["branches"]:
                     print " + add feature: ",branchName
-                    featureGroup.addFeature(tree.arrayReader(branchName))
+                    featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
                 self.tfEval.addFeatureGroup(featureGroup)
         
         self._ttreereaderversion = tree._ttreereaderversion
@@ -82,14 +84,14 @@ class exampleProducer(Module):
 
             result = self.tfEval.evaluate(ijet)
             prediction = result.get("prediction")
-            '''
+            
             #print self.blub
             print ijet,"=",
             for i in range(len(prediction)):
                 print prediction[i],
             #print "/",event.global_pt[ijet]
             print
-            '''
+            
         return True
      
 import argparse
