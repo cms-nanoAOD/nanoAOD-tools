@@ -63,22 +63,30 @@ class TFEval
             public Accessor
         {
             protected:
-                PyObject* _fct;
+                PyObject* _lengthFct;
+                PyObject* _valueFct;
             public:
-                PyAccessor(PyObject* fct):  
-                    _fct(fct)
+                PyAccessor(PyObject* lengthFct, PyObject* valueFct):  
+                    _lengthFct(lengthFct),
+                    _valueFct(valueFct)
                 {
                 }
                 virtual float value(int64_t index) const
                 {
                     PyObject* args = PyTuple_Pack(1,PyInt_FromLong(index));
-                    PyObject* result = PyObject_CallObject(_fct,args);
+                    PyObject* result = PyObject_CallObject(_valueFct,args);
                     float value = PyFloat_AsDouble(result);
                     return value;
                 }
                 virtual int64_t size() const
                 {
-                    return 0;
+                    return 100;
+                    /*
+                    PyObject* args = PyTuple_Pack(0);
+                    PyObject* result = PyObject_CallObject(_lengthFct,args);
+                    int64_t value = PyInt_AsLong(result);
+                    return value;
+                    */
                 }
                 virtual ~PyAccessor()
                 {

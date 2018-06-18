@@ -17,5 +17,5 @@ namespace {
     TFEval::ArrayFeatureGroup arrayFeatureGroup("blub",10,10,&branchAccessor);
     TFEval::ValueFeatureGroup valueFeatureGroup("blub",10);
     TFEval::Result result;
-    TFEval::PyAccessor pyAccessor(nullptr);
+    TFEval::PyAccessor pyAccessor(nullptr,nullptr);
 }
