@@ -17,9 +17,6 @@ if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
 #load dynamically from file
 featureDict = import_module('feature_dict').featureDict
 
-testPy = ROOT.TFEval.PyAccessor(lambda x: x*2+1)
-print testPy.value(2)
-
 class exampleProducer(Module):
     def __init__(self):
         pass
@@ -66,6 +63,10 @@ class exampleProducer(Module):
                     print " + add feature: ",branchName
                     featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
                 self.tfEval.addFeatureGroup(featureGroup)
+                
+        genFeatureGroup = ROOT.TFEval.ValueFeatureGroup("gen",1)
+        genFeatureGroup.addFeature(ROOT.TFEval.PyAccessor(lambda: 100,lambda x: 0))
+        self.tfEval.addFeatureGroup(genFeatureGroup)
         
         self._ttreereaderversion = tree._ttreereaderversion
         
