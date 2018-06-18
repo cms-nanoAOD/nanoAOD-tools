@@ -13,12 +13,77 @@
 #include "TTreeReaderValue.h"
 #include "TTreeReaderArray.h"
 
+#include "Python.h"
+
 #include<iostream>
 
 
 class TFEval
 {
     public:
+
+        
+        class Accessor
+        {
+            public:
+                virtual float value(int64_t index) const = 0; 
+                virtual int64_t size() const = 0; 
+                virtual ~Accessor()
+                {
+                }
+        };
+        
+        class BranchAccessor:
+            public Accessor
+        {
+            protected:
+                TTreeReaderArray<float>* _branch;
+            public:
+                BranchAccessor(TTreeReaderArray<float>* branch):
+                    _branch(branch)
+                {
+                }
+                
+                virtual int64_t size() const
+                {
+                    return _branch->GetSize();
+                }
+                
+                virtual float value(int64_t index) const
+                {
+                    return _branch->At(index);
+                }
+                
+                virtual ~BranchAccessor()
+                {
+                }
+        };
+        
+        class PyAccessor:
+            public Accessor
+        {
+            protected:
+                PyObject* _fct;
+            public:
+                PyAccessor(PyObject* fct):  
+                    _fct(fct)
+                {
+                }
+                virtual float value(int64_t index) const
+                {
+                    PyObject* args = PyTuple_Pack(1,PyInt_FromLong(index));
+                    PyObject* result = PyObject_CallObject(_fct,args);
+                    float value = PyFloat_AsDouble(result);
+                    return value;
+                }
+                virtual int64_t size() const
+                {
+                    return 0;
+                }
+                virtual ~PyAccessor()
+                {
+                }
+        };
     
         class FeatureGroup
         {
@@ -39,7 +104,7 @@ class TFEval
                 
                 virtual std::vector<int64_t> getShape() const = 0;
                 
-                virtual void addFeature(TTreeReaderArray<float>* branch) = 0;
+                virtual void addFeature(Accessor* accessor) = 0;//TTreeReaderArray<float>* branch) = 0;
                 
                 virtual tensorflow::Tensor createTensor() const = 0; 
                 
@@ -54,7 +119,7 @@ class TFEval
             public FeatureGroup
         {
             protected:
-                std::vector<TTreeReaderArray<float>*> _branches;
+                std::vector<Accessor*> _branches;
             public:
                 ValueFeatureGroup(const std::string& name, int64_t size):
                     FeatureGroup(name,size)
@@ -85,9 +150,9 @@ class TFEval
                     return tensorflow::Tensor(tensorflow::DT_FLOAT, {1,_size});
                 }
                 
-                virtual void addFeature(TTreeReaderArray<float>* branch)
+                virtual void addFeature(Accessor* accessor) //TTreeReaderArray<float>* branch)
                 {
-                    _branches.push_back(branch);
+                    _branches.push_back(accessor);
                 }
                 
                 virtual void fillTensor(tensorflow::Tensor& tensor, int64_t jetIndex) const
@@ -99,11 +164,11 @@ class TFEval
                     auto features = tensor.tensor<float,2>();
                     for (int64_t ifeature = 0; ifeature < _size; ++ifeature)
                     {
-                        if ((int)_branches[ifeature]->GetSize()<jetIndex)
+                        if ((int)_branches[ifeature]->size()<jetIndex)
                         {
                             throw std::runtime_error("Trying to access non-existing element ("+std::to_string(jetIndex)+") for group '"+_name+"'");
                         }
-                        features(0,ifeature) = _branches[ifeature]->At(jetIndex);
+                        features(0,ifeature) = _branches[ifeature]->value(jetIndex);
                     }
                 }
                 
@@ -117,19 +182,19 @@ class TFEval
         {
             protected:
                 int64_t _max;
-                std::vector<TTreeReaderArray<float>*> _branches;
-                TTreeReaderArray<float>* _lengthBranch;
+                std::vector<Accessor*> _branches;
+                Accessor* _lengthBranch;
             public:
-                ArrayFeatureGroup(const std::string& name, int64_t size, int64_t max, TTreeReaderArray<float>* lengthBranch):
+                ArrayFeatureGroup(const std::string& name, int64_t size, int64_t max, Accessor* lengthBranch):
                     FeatureGroup(name,size),
                     _max(max),
                     _lengthBranch(lengthBranch)
                 {
                 }
                 
-                virtual void addFeature(TTreeReaderArray<float>* branch)
+                virtual void addFeature(Accessor* accessor)//TTreeReaderArray<float>* branch)
                 {
-                    _branches.push_back(branch);
+                    _branches.push_back(accessor);
                 }
                 
                 virtual std::vector<int64_t> getShape() const
@@ -152,20 +217,20 @@ class TFEval
                     int offset = 0;
                     for (int64_t i = 0; i < jetIndex; ++i)
                     {
-                        offset+=_lengthBranch->At(i);
+                        offset+=_lengthBranch->value(i);
                     }
-                    for (int64_t icandidate = 0; icandidate < std::min<int64_t>(_max,_lengthBranch->At(jetIndex)); ++icandidate)
+                    for (int64_t icandidate = 0; icandidate < std::min<int64_t>(_max,_lengthBranch->value(jetIndex)); ++icandidate)
                     {
                         for (int64_t ifeature = 0; ifeature < _size; ++ifeature)
                         {
-                            if ((int)_branches[ifeature]->GetSize()<(offset+icandidate))
+                            if ((int)_branches[ifeature]->size()<(offset+icandidate))
                             {
                                 throw std::runtime_error("Trying to access non-existing element ("+std::to_string(jetIndex)+") for group '"+_name+"'");
                             }
-                            features(0,icandidate,ifeature) = _branches[ifeature]->At(offset+icandidate);
+                            features(0,icandidate,ifeature) = _branches[ifeature]->value(offset+icandidate);
                         }
                     }
-                    for (int64_t icandidate = _lengthBranch->At(jetIndex); icandidate < _max; ++icandidate)
+                    for (int64_t icandidate = _lengthBranch->value(jetIndex); icandidate < _max; ++icandidate)
                     {
                         for (int64_t ifeature = 0; ifeature < _size; ++ifeature)
                         {

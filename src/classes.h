@@ -13,8 +13,9 @@ namespace {
     WeightCalculatorFromHistogram wcalc;
     EventShapes evShapes;
     TFEval tfEval;
-    TTreeReaderArray<float>* lengthBranch;
-    TFEval::ArrayFeatureGroup arrayFeatureGroup("blub",10,10,lengthBranch);
+    TFEval::BranchAccessor branchAccessor(nullptr);
+    TFEval::ArrayFeatureGroup arrayFeatureGroup("blub",10,10,&branchAccessor);
     TFEval::ValueFeatureGroup valueFeatureGroup("blub",10);
     TFEval::Result result;
+    TFEval::PyAccessor pyAccessor(nullptr);
 }

@@ -9,5 +9,7 @@
   <class name="TFEval::ArrayFeatureGroup"/>
   <class name="TFEval::ValueFeatureGroup"/>
   <class name="TFEval::Result"/>
+  <class name="TFEval::BranchAccessor"/>
+  <class name="TFEval::PyAccessor"/>
 </selection>
 </lcgdict>
