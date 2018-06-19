@@ -70,26 +70,44 @@ class TFEval
                     _lengthFct(lengthFct),
                     _valueFct(valueFct)
                 {
+                    Py_XINCREF(_lengthFct);
+                    Py_XINCREF(_valueFct);
                 }
+                
                 virtual float value(int64_t index) const
                 {
                     PyObject* args = PyTuple_Pack(1,PyInt_FromLong(index));
+                    if (not _valueFct) throw std::runtime_error("Value function is NULL"); 
                     PyObject* result = PyObject_CallObject(_valueFct,args);
+                    if (not result) throw std::runtime_error("Failed to call value function"); 
                     float value = PyFloat_AsDouble(result);
+                    if (value==-1.f and  PyErr_Occurred()!=NULL)
+                    {
+                        throw std::runtime_error("Error while converting result of value function");
+                    }
+                    Py_DECREF(args);
+                    Py_DECREF(result);
                     return value;
                 }
+                
                 virtual int64_t size() const
                 {
-                    return 100;
-                    /*
-                    PyObject* args = PyTuple_Pack(0);
-                    PyObject* result = PyObject_CallObject(_lengthFct,args);
+                    if (not _lengthFct) throw std::runtime_error("Size function is NULL");
+                    PyObject* result = PyObject_CallObject(_lengthFct,NULL);
+                    if (not result) throw std::runtime_error("Failed to call size function"); 
                     int64_t value = PyInt_AsLong(result);
+                    if (value==-1 and  PyErr_Occurred()!=NULL)
+                    {
+                        throw std::runtime_error("Error while converting result of size function");
+                    }
+                    Py_DECREF(result);
                     return value;
-                    */
                 }
+                
                 virtual ~PyAccessor()
                 {
+                    Py_XDECREF(_lengthFct);
+                    Py_XDECREF(_valueFct);
                 }
         };
     
@@ -174,7 +192,7 @@ class TFEval
                     {
                         if ((int)_branches[ifeature]->size()<jetIndex)
                         {
-                            throw std::runtime_error("Trying to access non-existing element ("+std::to_string(jetIndex)+") for group '"+_name+"'");
+                                throw std::runtime_error("Trying to access non-existing element ("+std::to_string(jetIndex)+") for group '"+_name+"' which has only "+std::to_string((int)_branches[ifeature]->size())+" elements");
                         }
                         features(0,ifeature) = _branches[ifeature]->value(jetIndex);
                     }
@@ -233,7 +251,7 @@ class TFEval
                         {
                             if ((int)_branches[ifeature]->size()<(offset+icandidate))
                             {
-                                throw std::runtime_error("Trying to access non-existing element ("+std::to_string(jetIndex)+") for group '"+_name+"'");
+                                throw std::runtime_error("Trying to access non-existing element ("+std::to_string(offset+icandidate)+") for group '"+_name+"' which has only "+std::to_string((int)_branches[ifeature]->size())+" elements");
                             }
                             features(0,icandidate,ifeature) = _branches[ifeature]->value(offset+icandidate);
                         }

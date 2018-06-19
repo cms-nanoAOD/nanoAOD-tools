@@ -17,9 +17,10 @@ if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
 #load dynamically from file
 featureDict = import_module('feature_dict').featureDict
 
+
 class exampleProducer(Module):
     def __init__(self):
-        pass
+        self.nEvents = 0
         
     def beginJob(self):
         pass
@@ -65,7 +66,9 @@ class exampleProducer(Module):
                 self.tfEval.addFeatureGroup(featureGroup)
                 
         genFeatureGroup = ROOT.TFEval.ValueFeatureGroup("gen",1)
-        genFeatureGroup.addFeature(ROOT.TFEval.PyAccessor(lambda: 100,lambda x: 0))
+        self.nJets = 0
+        self.logctau = 0
+        genFeatureGroup.addFeature(ROOT.TFEval.PyAccessor(lambda: self.nJets, lambda x: self.logctau))
         self.tfEval.addFeatureGroup(genFeatureGroup)
         
         self._ttreereaderversion = tree._ttreereaderversion
@@ -81,19 +84,22 @@ class exampleProducer(Module):
         if event._tree._ttreereaderversion > self._ttreereaderversion:
             self.setupEval(event._tree)
         
+        self.nJets = len(jets)
+        
         for ijet,jet in enumerate(jets):
-
-            result = self.tfEval.evaluate(ijet)
-            prediction = result.get("prediction")
-            
-            #print self.blub
-            print ijet,"=",
-            for i in range(len(prediction)):
-                print prediction[i],
-            #print "/",event.global_pt[ijet]
-            print
-            
+            for ctau_value in [-3,0,3]:
+                self.logctau = ctau_value
+                result = self.tfEval.evaluate(ijet)
+                prediction = result.get("prediction")
+                #print prediction[4] #index 4 is LLP class
+                
+        self.nEvents +=1
+        
+        if self.nEvents >10:
+            sys.exit(1)
+                
         return True
+        
      
 import argparse
 
