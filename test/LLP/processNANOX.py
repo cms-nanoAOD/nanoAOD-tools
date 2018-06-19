@@ -568,10 +568,11 @@ class JetTagging(Module):
         return True
      
 class PileupWeight(Module):
-    def __init__(self,isData=True):
+    def __init__(self,isData=True,processName=None):
         self.mcFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/pileup.root")
         self.dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU69000.root")
         self.isData= isData
+        self.processName = processName
         
     def beginJob(self):
         if not self.isData:
@@ -616,8 +617,12 @@ class PileupWeight(Module):
         
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         if not self.isData:
+            self.mcHist = None
             for process in self.mcHistPerProcess.keys():
-                if inputFile.GetName().find(process)>=0:
+                processName = inputFile.GetName()
+                if self.processName!=None:
+                    processName = self.processName
+                if processName.find(process)>=0:
                     self.mcHist = self.mcHistPerProcess[process]
                     break
             if self.mcHist==None:
@@ -742,7 +747,7 @@ p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,modules
     #EventSkim(selection=lambda event: event.HLT_IsoMu24 or event.HLT_IsoTkMu24),
     MuonSelection(isData=args.isData),
     EventSkim(selection=lambda event: len(event.selectedMuons["tight"])>0),
-    PileupWeight(isData=args.isData),
+    PileupWeight(isData=args.isData,processName="SMS-T1qqqq_ctau-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
     JetSelection(isData=args.isData,getLeptonCollection=lambda event: event.selectedMuons["tight"]),
     EventSkim(selection=lambda event: len(event.selectedJets["all"]["loose"])>=3),
     #JetTagging(isData=args.isData,getJetCollection=lambda event: event.selectedJets["central"]["loose"]),
