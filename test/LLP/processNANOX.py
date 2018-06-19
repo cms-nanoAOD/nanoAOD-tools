@@ -569,8 +569,8 @@ class JetTagging(Module):
      
 class PileupWeight(Module):
     def __init__(self,isData=True):
-        self.mcFile = "/vols/build/cms/mkomm/LLP/CMSSW_10_2_0_pre2/src/data/pileup.root"
-        self.dataFile = "/vols/build/cms/mkomm/LLP/CMSSW_10_2_0_pre2/src/data/PU69000.root"
+        self.mcFile = os.path.expandvars("$CMSSW_BASE/src/data/pileup.root")
+        self.dataFile = os.path.expandvars("$CMSSW_BASE/src/data/PU69000.root")
         self.isData= isData
         
     def beginJob(self):
