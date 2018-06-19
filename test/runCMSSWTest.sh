@@ -14,11 +14,11 @@ function run_test()
     scram b || return 1
      
     echo "--- Test analyzer chain ---"
-    #wget -nv https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root || return 1
-    python PhysicsTools/NanoAODTools/test/LLP/processNANOX.py --isData --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
+    python PhysicsTools/NanoAODTools/test/LLP/processNANOX.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
     
     echo "--- Test evaluation script ---"
-    wget -nv https://github.com/LLPDNNX/test-files/raw/master/pbmodel/model_epoch.pb || return 1
+    wget -nv https://github.com/LLPDNNX/test-files/raw/master/pbmodel/model_ctau1.pb || return 1
+    wget -nv https://github.com/LLPDNNX/test-files/raw/master/pbmodel/model_parametric.pb || return 1
     wget -nv https://github.com/LLPDNNX/test-files/raw/master/pbmodel/feature_dict.py || return 1
     mv feature_dict.py PhysicsTools/NanoAODTools/test/LLP/.
     python PhysicsTools/NanoAODTools/test/LLP/testEval.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
