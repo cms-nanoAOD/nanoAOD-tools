@@ -3,6 +3,7 @@ import sys
 import math
 import ROOT
 import random
+import numpy
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 from importlib import import_module
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
@@ -20,13 +21,19 @@ featureDict = import_module('feature_dict').featureDict
 
 class exampleProducer(Module):
     def __init__(self):
-        self.nEvents = 0
+        pass
         
     def beginJob(self):
-        pass
+        self.nEvents = 0
+        self.nLLP = {
+            -3:[0,0],
+            0:[0,0],
+            3:[0,0],
+        }
         
     def endJob(self):
-        pass
+        for ctau_value in self.nLLP.keys(): 
+            print ctau_value,100.*self.nLLP[ctau_value][0]/(self.nLLP[ctau_value][0]+self.nLLP[ctau_value][1])
         
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
@@ -79,25 +86,32 @@ class exampleProducer(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         
-
-        jets = Collection(event, "global")
-        if event._tree._ttreereaderversion > self._ttreereaderversion:
-            self.setupEval(event._tree)
+        jets = Collection(event, "Jet")
+        jetorigin = Collection(event, "jetorigin")
         
-        self.nJets = len(jets)
-        
-        for ijet,jet in enumerate(jets):
-            for ctau_value in [-3,0,3]:
-                self.logctau = ctau_value
-                result = self.tfEval.evaluate(ijet)
-                prediction = result.get("prediction")
-                #print prediction[4] #index 4 is LLP class
+        for ijet in range(len(jetorigin)):
+            if jetorigin[ijet].fromLLP>0.5 and jets[ijet].pt>20 and math.fabs(jets[ijet].eta)<2.4:
                 
-        self.nEvents +=1
-        
-        if self.nEvents >10:
-            sys.exit(1)
                 
+                #NOTE: one cannot access any other branches between setup & call to evaluate
+                if event._tree._ttreereaderversion > self._ttreereaderversion:
+                    self.setupEval(event._tree)
+                    
+                self.nJets = len(jets)
+                #print ijet,":",
+                for ctau_value in self.nLLP.keys():
+                    
+                    self.logctau = 1.*ctau_value
+                    result = self.tfEval.evaluate(ijet)
+                    prediction = result.get("prediction")
+                    predicted_class = numpy.argmax(prediction)
+                    if predicted_class==4:
+                        self.nLLP[ctau_value][0]+=1
+                    else:
+                        self.nLLP[ctau_value][1]+=1
+                    #print predicted_class, #index 4 is LLP class
+                #print
+        
         return True
         
      
