@@ -46,11 +46,13 @@ class TFEval
                 
                 virtual int64_t size() const
                 {
+                    //if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
                     return _branch->GetSize();
                 }
                 
                 virtual float value(int64_t index) const
                 {
+                    //if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
                     return _branch->At(index);
                 }
                 
