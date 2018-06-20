@@ -36,8 +36,8 @@ class exampleProducer(Module):
         print "--- ctau1 ---"
         print "  acc=%5.2f%%"%(100.*self.nLLPctau1/(self.nLLPTruth))
         print "--- Parametric ---"
-        for ctau_value in self.nLLP.keys(): 
-            print "ctau=%3.1f, acc=%5.2f%%"%(ctau_value,100.*self.nLLP[ctau_value]/(self.nLLPTruth))
+        for ctau_value in self.nLLPParam.keys(): 
+            print "ctau=%3.1f, acc=%5.2f%%"%(ctau_value,100.*self.nLLPParam[ctau_value]/(self.nLLPTruth))
         
         
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
