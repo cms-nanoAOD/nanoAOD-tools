@@ -1,6 +1,7 @@
 import os
 import sys
 import math
+import numpy as np
 import ROOT
 import random
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -8,13 +9,161 @@ from importlib import import_module
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
+class_dict = {0:'b', 1:'c', 2:'ud', 3:'g', 4:'llp'}
 
 if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
     print "Cannot load 'libPhysicsToolsNanoAODTools'"
     sys.exit(1)
 
+class XTagProducer(Module):
+    def __init__(self, isData=False):
+        pass
+        
+    def beginJob(self):
+        self.nEvents = 0
+        self.nLLPParam = {
+            -3:0,
+            0:0,
+            3:0,
+        }
+        self.nLLPctau1 = 0
+        self.nLLPTruth = 0
+        
+    def endJob(self):
+        if self.nLLPTruth > 0:
+            print "--- ctau1 ---"
+            print "accuracy = %5.2f%%"%(100.*self.nLLPctau1/(self.nLLPTruth))
+            #print "--- Parametric ---"
+            #for ctau_value in self.nLLPParam.keys(): 
+                #print "ctau=%3.1f, acc=%5.2f%%"%(ctau_value,100.*self.nLLPParam[ctau_value]/(self.nLLPTruth))
+        
+    def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        self.out = wrappedOutputTree
+        self.setup(inputTree)
+        
+    def setupTFEval(self,tree,modelFile,featureDict):
+        tfEval = ROOT.TFEval()
+        if (not tfEval.loadGraph(modelFile)):
+            sys.exit(1)
+            
+        tfEval.addOutputNodeName("prediction")
+        print "--- Model: ",modelFile," ---"
+        for groupName,featureCfg in featureDict.iteritems():
+            if featureCfg.has_key("max"):
+                print "building group ... %s, shape=[%i,%i]"%(groupName,featureCfg["max"],len(featureCfg["branches"]))
+                lengthBranch = ROOT.TFEval.BranchAccessor(tree.arrayReader(featureCfg["length"]))
+                featureGroup = ROOT.TFEval.ArrayFeatureGroup(
+                    groupName,
+                    len(featureCfg["branches"]),
+                    featureCfg["max"],
+                    lengthBranch
+                )
+                for branchName in featureCfg["branches"]:
+                    print " + add feature: ",branchName
+                    featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
+                tfEval.addFeatureGroup(featureGroup)
+            else:
+                print "building group ... %s, shape=[%i]"%(groupName,len(featureCfg["branches"]))
+                featureGroup = ROOT.TFEval.ValueFeatureGroup(
+                    groupName,
+                    len(featureCfg["branches"])
+                )
+                for branchName in featureCfg["branches"]:
+                    print " + add feature: ",branchName
+                    featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
+                tfEval.addFeatureGroup(featureGroup)
+                
+        return tfEval
+        
+    def setup(self,tree):
+        #load dynamically from file
+        featureDict = import_module('feature_dict').featureDict
+        self.tfEvalctau1 = self.setupTFEval(tree,"model2_ctau1.pb",featureDict)
+        #self.tfEvalParametric = self.setupTFEval(tree,"model_parametric.pb",featureDict)
+        
+        genFeatureGroup = ROOT.TFEval.ValueFeatureGroup("gen",1)
+        self.nJets = 0
+        self.logctau = 0
+        genFeatureGroup.addFeature(ROOT.TFEval.PyAccessor(lambda: self.nJets, lambda x: self.logctau))
+        #self.tfEvalParametric.addFeatureGroup(genFeatureGroup)
+        
+        self._ttreereaderversion = tree._ttreereaderversion
+        
+        
+    def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        pass
+        
+    def analyze(self, event):
+        """process event, return True (go to next module) or False (fail, go to next event)"""
+        
+        jets = Collection(event, "Jet")
+        jetorigin = Collection(event, "jetorigin")
+        nTaggedJet = {0:0, 1:0, 2:0, 3:0, 4:0}
+
+        threshold = 0.8
+        threshold_b = 0.75
+
+        scores = [0, 0, 0, 0, 0]
+        
+        for ijet in range(len(jetorigin)):
+
+            if jetorigin[ijet].fromLLP > 0.5:  
+                self.nLLPTruth+=1
+                
+            #NOTE: one cannot access any other branches between setup & call to evaluate
+            if event._tree._ttreereaderversion > self._ttreereaderversion:
+                self.setup(event._tree)
+                    
+            self.nJets = len(jets)
+                
+            resultCtau1 = self.tfEvalctau1.evaluate(ijet)
+            predictedCtau1_class = np.argmax(resultCtau1.get("prediction"))
+            predictedCtau1_score = resultCtau1.get("prediction")[predictedCtau1_class]
+
+            #print resultCtau1.get("prediction")[0],resultCtau1.get("prediction")[1],resultCtau1.get("prediction")[2],resultCtau1.get("prediction")[3],resultCtau1.get("prediction")[4]
+            
+            #print predictedCtau1_class, predictedCtau1_score
+            
+            if (resultCtau1.get("prediction")[0] > threshold_b):
+                nTaggedJet[0] += 1
+             
+            if (resultCtau1.get("prediction")[4] > threshold):
+                nTaggedJet[4] += 1
+    
+            if predictedCtau1_class==4 and jetorigin[ijet].fromLLP > 0.5:
+                self.nLLPctau1 +=1
+
+            scores[0] = max(scores[0], resultCtau1.get("prediction")[0])
+            scores[1] = max(scores[1], resultCtau1.get("prediction")[1])
+            scores[2] = max(scores[2], resultCtau1.get("prediction")[2] + resultCtau1.get("prediction")[3])
+            scores[3] = max(scores[3], resultCtau1.get("prediction")[4])
+
+            #for ctau_value in self.nLLPParam.keys():
+                #self.logctau = 1.*ctau_value
+                #result = self.tfEvalParametric.evaluate(ijet)
+                #prediction = result.gent("prediction")
+                #predicted_class = np.argmax(prediction)
+                #if predicted_class==4:
+                    #self.nLLPParam[ctau_value]+=1
+            #print "\n predicted class:", class_dict[predictedCtau1_class], "\n" #index 4 is LLP class
+            
+        #print nTaggedJet
+        
+        self.out.fillBranch("nbJets", nTaggedJet[0])
+        #self.out.fillBranch("ncJets", nTaggedJet[1])
+        #self.out.fillBranch("nudsgJets", nTaggedJet[2]+nTaggedJet[3])        
+        self.out.fillBranch("nLLPJets", nTaggedJet[4])
+        self.out.fillBranch("probLLP", scores[3])
+        self.out.fillBranch("disc1LLP", 1./(1.-scores[3]+1e-5))
+        self.out.fillBranch("disc2LLP", -math.log(1.-scores[3]+1e-5))
+        self.out.fillBranch("probB", scores[0])
+        self.out.fillBranch("probC", scores[1])
+        self.out.fillBranch("probLight", scores[2])
+
+        return True
+ 
 class MuonSelection(Module):
-    def __init__(self,isData=True):
+    def __init__(self,isData=False):
         self.isData = isData
         
         self.tightPt = 26.
@@ -23,12 +172,9 @@ class MuonSelection(Module):
         self.loosePt = 10.
         self.looseEta = 2.5
         
-        
         if not self.isData:
             trackSFFile = ROOT.TFile("PhysicsTools/NanoAODTools/data/muon/track_EfficienciesAndSF_RunBtoH.root")
             self.trackSF = trackSFFile.Get("ratio_eff_aeta_dr030e030_corr")
-            
-
             
             triggerSFBToF = self.getHist(
                 "PhysicsTools/NanoAODTools/data/muon/trigger_EfficienciesAndSF_RunBtoF.root",
@@ -126,6 +272,7 @@ class MuonSelection(Module):
     def endJob(self):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+
         self.out = wrappedOutputTree
         self.out.branch("nTightMuons","I")
         self.out.branch("nLooseMuons","I")
@@ -139,19 +286,15 @@ class MuonSelection(Module):
         
         self.out.branch("dimuon_mass","F")
         
-        self.out.branch("met","F")
-        
         self.out.branch("IsoMu24","I")
         self.out.branch("IsoTkMu24","I")
         self.out.branch("Mu24_eta2p1","I")
         self.out.branch("TkMu24_eta2p1","I")
+
+        self.out.branch("muon_trigger", "I")
         
-        
-        self.out.branch("trigger","I")
         if not self.isData:
             self.out.branch("genweight","F")
-        
-        #self.out.branch("nsv","I")
         
         if not self.isData:
             self.out.branch("muon_track_weight", "F")
@@ -181,7 +324,6 @@ class MuonSelection(Module):
             }
         }
         
-        
         #https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Tight_Muon
         for muon in muons:
             if muon.pt>self.tightPt and math.fabs(muon.eta)<self.tightEta and muon.tightId==1 and muon.pfRelIso04_all<0.15:
@@ -193,7 +335,6 @@ class MuonSelection(Module):
                     event.selectedMuons["weights"]["id"]*=weight_id
                     event.selectedMuons["weights"]["iso"]*=weight_iso
                     event.selectedMuons["weights"]["track"]*=self.trackSF.Eval(math.fabs(muon.eta))
-                
             
             #all muons in nanoaod are at least loose muons
             elif muon.pt>self.loosePt and math.fabs(muon.eta)<self.looseEta and muon.pfRelIso04_all<0.25:
@@ -201,10 +342,6 @@ class MuonSelection(Module):
             
         self.out.fillBranch("nTightMuons",len(event.selectedMuons["tight"]))
         self.out.fillBranch("nLooseMuons",len(event.selectedMuons["loose"]))
-        
-        self.out.fillBranch("met",event.MET_pt)
-        
-
         
         if not self.isData and ((event.HLT_IsoMu24>0.5) or (event.HLT_IsoTkMu24>0.5)):
             #Note: for now assume hardest tight muon fired the trigger (may not be always correct)
@@ -218,14 +355,6 @@ class MuonSelection(Module):
             self.out.fillBranch("muon_trigger_weight",event.selectedMuons["weights"]["trigger"])
             self.out.fillBranch("muon_id_weight",event.selectedMuons["weights"]["id"])
             self.out.fillBranch("muon_iso_weight",event.selectedMuons["weights"]["iso"])
-
-                
-        #TODO: make separate module for electron selection
-        event.selectedElectrons = {"loose":[]}
-        for electron in electrons:
-            if electron.pt>15 and math.fabs(electron.eta)<2.5 and electron.cutBased>0:
-                event.selectedElectrons["loose"].append(electron)
-        self.out.fillBranch("nLooseElectrons",len(event.selectedElectrons["loose"]))
                 
         muonsForKinematics = [] 
         if len(event.selectedMuons["tight"])>0:
@@ -236,9 +365,9 @@ class MuonSelection(Module):
         if len(muonsForKinematics)>0:
             self.out.fillBranch("muon1_pt",muonsForKinematics[0].pt)
             self.out.fillBranch("muon1_eta",muonsForKinematics[0].eta)
-        else:
-            self.out.fillBranch("muon1_pt",0)
-            self.out.fillBranch("muon1_eta",0)
+        #else:
+            #self.out.fillBranch("muon1_pt",0)
+            #self.out.fillBranch("muon1_eta",0)
         
         if len(muonsForKinematics)>1:
             self.out.fillBranch("muon2_pt",muonsForKinematics[1].pt)
@@ -249,19 +378,17 @@ class MuonSelection(Module):
             vec+=muonsForKinematics[1].p4()
             self.out.fillBranch("dimuon_mass",vec.M())
             
-        else:
-            self.out.fillBranch("muon2_pt",0)
-            self.out.fillBranch("muon2_eta",0)
+        #else:
+            #self.out.fillBranch("muon2_pt",0)
+            #self.out.fillBranch("muon2_eta",0)
             
-            self.out.fillBranch("dimuon_mass",0)
-            
-        self.out.fillBranch("met",event.MET_pt)
+            #self.out.fillBranch("dimuon_mass",0)
             
              
         if ((event.HLT_IsoMu24+event.HLT_IsoTkMu24)>0.5):
-            self.out.fillBranch("trigger",1)
+            self.out.fillBranch("muon_trigger",1)
         else:
-            self.out.fillBranch("trigger",0)
+            self.out.fillBranch("muon_trigger",0)
             
         self.out.fillBranch("IsoMu24",event.HLT_IsoMu24)
         self.out.fillBranch("IsoTkMu24",event.HLT_IsoTkMu24)
@@ -269,16 +396,54 @@ class MuonSelection(Module):
         self.out.fillBranch("TkMu24_eta2p1",event.HLT_TkMu24_eta2p1)
                    
         return True
+
+class ElectronSelection(Module):
+    def __init__(self,isData=False):
+        self.isData = isData
         
+        self.loosePt = 15.
+        self.looseEta = 2.5
+    
+    def beginJob(self):
+        pass
+
+
+    def endJob(self):
+        pass
+
+
+    def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        self.out = wrappedOutputTree
+        self.out.branch("nLooseElectrons","I")
+
+    def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        pass
+
+    def analyze(self, event):
+        """process event, return True (go to next module) or False (fail, go to next event)"""
+        electrons = Collection(event, "Electron")
         
+        #TODO: make separate module for electron selection
+        event.selectedElectrons = {"loose":[]}
+        for electron in electrons:
+            if electron.pt>self.loosePt and math.fabs(electron.eta)<self.looseEta and electron.cutBased>0:
+                event.selectedElectrons["loose"].append(electron)
+
+    	self.out.fillBranch("nLooseElectrons",len(event.selectedElectrons["loose"]))
+        self.out.fillBranch("genweight",event.genWeight)
+
+        return True
+
 class JetSelection(Module):
-    def __init__(self,isData=True,getLeptonCollection=lambda x:None):
+
+    def __init__(self,isData=False,getLeptonCollection=lambda x:None):
         self.isData=isData
         self.getLeptonCollection = getLeptonCollection
         self.jetGroups = {
             "central":lambda jet: jet.jetId>0 and jet.pt>30. and math.fabs(jet.eta)<2.4,
             "all":lambda jet: jet.jetId>0 and ((jet.pt>30. and math.fabs(jet.eta)<2.4) or (jet.pt>50. and math.fabs(jet.eta)<5.0)),
         }
+
         
     def deltaPhi(self,phi1,phi2):
         res = phi1-phi2
@@ -301,11 +466,33 @@ class JetSelection(Module):
         
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
+        self.out.branch("trigger", "I")
+        self.out.branch("nsv", "I")
+        self.out.branch("MET_phi", "F")
+        self.out.branch("MET_pt", "F")
         
         for group in self.jetGroups.keys():
+
+            self.out.branch("chEmEF_"+group, "F")
+            self.out.branch("chHEF_"+group, "F")
+            self.out.branch("neEmEF_"+group, "F")
+            self.out.branch("neHEF_"+group, "F")
+            self.out.branch("jetId_"+group, "I")
+            self.out.branch("CHM_"+group,"I")
+            self.out.branch("nConstituents_"+group, "I")
             self.out.branch("nSelectedJets_"+group,"I")
+            self.out.branch("nLLPJets","I")
+            self.out.branch("nbJets","I")
+            self.out.branch("probLLP","F")
+            self.out.branch("disc1LLP", "F")
+            self.out.branch("disc2LLP", "F")
+            self.out.branch("probB","F")
+            self.out.branch("probC","F")
+            self.out.branch("probLight","F")
             self.out.branch("ht_"+group,"F")
             self.out.branch("mht_"+group,"F")
+            self.out.branch("mhtovermet_"+group,"F")
+            self.out.branch("averagem_"+group,"F")
             self.out.branch("minPhi_"+group,"F")
             self.out.branch("minPhiL_"+group,"F")
             
@@ -318,18 +505,26 @@ class JetSelection(Module):
             
             self.out.branch("jet1_pt_"+group,"F")
             self.out.branch("jet1_eta_"+group,"F")
+            self.out.branch("jet1_delta_phi_mht_"+group, "F")
             self.out.branch("jet2_pt_"+group,"F")
             self.out.branch("jet2_eta_"+group,"F")
+            self.out.branch("jet2_delta_phi_mht_"+group, "F")
+            self.out.branch("jet3_pt_"+group,"F")
+            self.out.branch("jet3_eta_"+group,"F")
+            self.out.branch("jet3_delta_phi_mht_"+group, "F")
             
             if not self.isData:
                 self.out.branch("jet1_type_"+group,"I")
                 self.out.branch("jet2_type_"+group,"I")
+                self.out.branch("jet3_type_"+group,"I")
             
+            '''
             if group.find("central")>=0:
                 for nmax in range(0,4):
                     self.out.branch("max_llp"+str(nmax+1)+"_"+group,"F")
                     self.out.branch("max_b"+str(nmax+1)+"_"+group,"F")
                     self.out.branch("max_deepCSV"+str(nmax+1)+"_"+group,"F")
+                    '''
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -337,18 +532,38 @@ class JetSelection(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         jets = Collection(event, "Jet")
-        #jettags = Collection(event, "llpdnnx")
+        if not self.isData:
+            
+            if not self.isData:
+                self.out.branch("jet1_type_"+group,"I")
+                self.out.branch("jet2_type_"+group,"I")
+            
+            '''
+            if group.find("central")>=0:
+                for nmax in range(0,4):
+                    self.out.branch("max_llp"+str(nmax+1)+"_"+group,"F")
+                    self.out.branch("max_b"+str(nmax+1)+"_"+group,"F")
+                    self.out.branch("max_deepCSV"+str(nmax+1)+"_"+group,"F")
+                    '''
+        
+    def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        pass
+        
+    def analyze(self, event):
+        """process event, return True (go to next module) or False (fail, go to next event)"""
+        jets = Collection(event, "Jet")
         if not self.isData:
             jetorigin = Collection(event, "jetorigin")
         
         event.selectedJets = {}
-        
         
         for group,groupSelector in self.jetGroups.iteritems():
             event.selectedJets[group] = {
                 "loose":[],
                 "ht":0.0,
                 "mht":0.0,
+                "mhtovermet":0.0,
+                "averagem":0.0,
                 "minPhi":0.0,
                 "minPhiL":0.0,
                 
@@ -362,62 +577,77 @@ class JetSelection(Module):
             vecsum = ROOT.TLorentzVector()
             eventShapes = ROOT.EventShapes()
             eventShapesL = ROOT.EventShapes()
-            
-            for muon in event.selectedMuons["tight"]:
-                eventShapesL.addObject(muon.pt, muon.eta, muon.phi, muon.mass)
-            
+
             for ijet,jet in enumerate(jets):
+
                 if groupSelector(jet):
+
                     #jet cleaning
                     leptons = self.getLeptonCollection(event)
                     if leptons!=None and len(leptons)>0:
                         mindr = min(map(lambda lepton: self.deltaR(lepton,jet),leptons))
                         if mindr<0.4:
                             continue
-                    
-                    #put tag info into jets         
-                    #if ijet<len(jettags):
-                    #    for flav in ["isB","isC","isUDS","isG","isLLP"]:
-                    #        setattr(jet,"llpdnnx_"+flav,getattr(jettags[ijet],flav))   
-                    #else:
-                    #    for flav in ["isB","isC","isUDS","isG","isLLP"]:
-                    #        setattr(jet,"llpdnnx_"+flav,-1) 
-                        
+
+                    self.out.fillBranch("chEmEF_"+group, jet.chEmEF)
+                    self.out.fillBranch("chHEF_"+group, jet.chHEF)
+                    self.out.fillBranch("neEmEF_"+group, jet.neEmEF)
+                    self.out.fillBranch("neHEF_"+group, jet.neHEF)
+                    self.out.fillBranch("jetId_"+group, jet.jetId)
+                    self.out.fillBranch("CHM_"+group, jet.CHM)
+                    self.out.fillBranch("nConstituents_"+group, jet.nConstituents)
+           
                     if not self.isData:
                         if ijet<len(jetorigin) and jetorigin[ijet].fromLLP:
                             jet.partonFlavour = 9 #override to indicate LLP jet
-                       
-                   
-                            
                                    
                     event.selectedJets[group]["loose"].append(jet)
                     eventShapes.addObject(jet.pt, jet.eta, jet.phi, jet.mass)
                     eventShapesL.addObject(jet.pt, jet.eta, jet.phi, jet.mass)
                     event.selectedJets[group]["ht"]+=jet.pt
                     vecsum += jet.p4()
-            event.selectedJets[group]["mht"] = vecsum.Pt()
-            
+                    event.selectedJets[group]["mht"] = vecsum.Pt()
+                    event.selectedJets[group]["averagem"] = vecsum.Mag()/len(event.selectedJets[group]["loose"])
+                    event.selectedJets[group]["mhtovermet"] = vecsum.Pt()/event.MET_pt
+
             if len(event.selectedJets[group]["loose"])>0:
                 self.out.fillBranch("jet1_pt_"+group,event.selectedJets[group]["loose"][0].pt)
                 self.out.fillBranch("jet1_eta_"+group,event.selectedJets[group]["loose"][0].eta)
+                self.out.fillBranch("jet1_delta_phi_mht_"+group, abs(event.selectedJets[group]["loose"][0].p4().DeltaPhi(vecsum)))
                 if not self.isData:
                     self.out.fillBranch("jet1_type_"+group,-1 if event.selectedJets[group]["loose"][0].genJetIdx<0 else abs(event.selectedJets[group]["loose"][0].partonFlavour))
             else:
-                self.out.fillBranch("jet1_pt_"+group,0)
-                self.out.fillBranch("jet1_eta_"+group,0)
+                #self.out.fillBranch("jet1_pt_"+group,0)
+                #self.out.fillBranch("jet1_eta_"+group,0)
+                #self.out.fillBranch("jet1_delta_phi_mht_"+group, 0)
                 if not self.isData:
                     self.out.fillBranch("jet1_type_"+group,0)
                     
             if len(event.selectedJets[group]["loose"])>1:
                 self.out.fillBranch("jet2_pt_"+group,event.selectedJets[group]["loose"][1].pt)
                 self.out.fillBranch("jet2_eta_"+group,event.selectedJets[group]["loose"][1].eta)
+                self.out.fillBranch("jet2_delta_phi_mht_"+group, abs(event.selectedJets[group]["loose"][1].p4().DeltaPhi(vecsum)))
                 if not self.isData:
                     self.out.fillBranch("jet2_type_"+group,-1 if event.selectedJets[group]["loose"][1].genJetIdx<0 else abs(event.selectedJets[group]["loose"][1].partonFlavour))
             else:
-                self.out.fillBranch("jet2_pt_"+group,0)
-                self.out.fillBranch("jet2_eta_"+group,0)
+                #self.out.fillBranch("jet2_pt_"+group,0)
+                #self.out.fillBranch("jet2_eta_"+group,0)
+                #self.out.fillBranch("jet2_delta_phi_mht_"+group, 0)
                 if not self.isData:
                     self.out.fillBranch("jet2_type_"+group,0)
+                     
+            if len(event.selectedJets[group]["loose"])>2:
+                self.out.fillBranch("jet3_pt_"+group,event.selectedJets[group]["loose"][2].pt)
+                self.out.fillBranch("jet3_eta_"+group,event.selectedJets[group]["loose"][2].eta)
+                self.out.fillBranch("jet3_delta_phi_mht_"+group, abs(event.selectedJets[group]["loose"][2].p4().DeltaPhi(vecsum)))
+                if not self.isData:
+                    self.out.fillBranch("jet3_type_"+group,-1 if event.selectedJets[group]["loose"][2].genJetIdx<0 else abs(event.selectedJets[group]["loose"][2].partonFlavour))
+            else:
+                #self.out.fillBranch("jet3_pt_"+group,0)
+                #self.out.fillBranch("jet3_eta_"+group,0)
+                #self.out.fillBranch("jet3_delta_phi_mht_"+group, 0)
+                if not self.isData:
+                    self.out.fillBranch("jet3_type_"+group,0)
             
             if len(event.selectedJets[group]["loose"])>1:
                 event.selectedJets[group]["alphaT"] = eventShapes.alphaT()
@@ -440,135 +670,69 @@ class JetSelection(Module):
                 minPhi = min(minPhi,math.fabs(self.deltaPhi(negSum.Phi(),jet.phi)))
             event.selectedJets[group]["minPhi"] = minPhi
             self.out.fillBranch("minPhi_"+group,minPhi)
-            
-            minPhiL = math.pi
-            for jet in event.selectedJets[group]["loose"]+event.selectedMuons["tight"]:
-                negSum = -(vecsum-jet.p4())
-                minPhiL = min(minPhiL,math.fabs(self.deltaPhi(negSum.Phi(),jet.phi)))
-            event.selectedJets[group]["minPhiL"] = minPhiL
-            self.out.fillBranch("minPhiL_"+group,minPhiL)
-            '''
-            if group.find("central")>=0:
-                jetsByLLP = sorted(map(lambda j:j.llpdnnx_isLLP,event.selectedJets[group]["loose"]),reverse=True)
-                jetsByB = sorted(map(lambda j:j.llpdnnx_isB,event.selectedJets[group]["loose"]),reverse=True)
-                jetsByDeepCSV = sorted(map(lambda j:j.btagCSVV2 if j.btagCSVV2>0 else -1,event.selectedJets[group]["loose"]),reverse=True)
-                
-                for nmax in range(0,4):
-                    if len(event.selectedJets[group]["loose"])>=(nmax+1):
-                        self.out.fillBranch("max_llp"+str(nmax+1)+"_"+group,jetsByLLP[nmax])
-                        self.out.fillBranch("max_b"+str(nmax+1)+"_"+group,jetsByB[nmax])
-                        self.out.fillBranch("max_deepCSV"+str(nmax+1)+"_"+group,jetsByDeepCSV[nmax])
-                    else:
-                        self.out.fillBranch("max_llp"+str(nmax+1)+"_"+group,-1)
-                        self.out.fillBranch("max_b"+str(nmax+1)+"_"+group,-1)
-                        self.out.fillBranch("max_deepCSV"+str(nmax+1)+"_"+group,-1)
-            '''
+
             self.out.fillBranch("nSelectedJets_"+group,len(event.selectedJets[group]["loose"]))
             self.out.fillBranch("ht_"+group,event.selectedJets[group]["ht"])
             self.out.fillBranch("mht_"+group,event.selectedJets[group]["mht"])
-        return True
-        
-class JetTagging(Module):
-    def __init__(self,isData=True,getJetCollection=lambda x:None):
-        self.isData=isData
-        self.getJetCollection = getJetCollection
-        self.tagGroups = {
-            "looseDeepCSV":lambda jet: jet.btagCSVV2>0.2219,
-            "mediumDeepCSV":lambda jet: jet.btagCSVV2>0.6324,
-            "tightDeepCSV":lambda jet: jet.btagCSVV2>0.8958,
-        
-            #"looseLLP":lambda jet: jet.llpdnnx_isLLP>0.0400, #eff: 86% @ 1/10 bkg
-            #"mediumLLP":lambda jet: jet.llpdnnx_isLLP>0.1483, #eff: 71% @ 1/100 bkg
-            #"tightLLP":lambda jet: jet.llpdnnx_isLLP>0.5123, #eff: 60% @ 1/1000 bkg
-            #"ultraLLP":lambda jet: jet.llpdnnx_isLLP>0.8043, #eff: 52% @ 1/10000 bkg
+            self.out.fillBranch("averagem_"+group,event.selectedJets[group]["averagem"])
+            self.out.fillBranch("mhtovermet_"+group,event.selectedJets[group]["mhtovermet"])
+
+        if event.HLT_PFMET120_PFMHT120_IDTight > 0.5:
+            self.out.fillBranch("trigger", 1)
+        else:
+            self.out.fillBranch("trigger", 0)
+
+        self.out.fillBranch("MET_pt", event.MET_pt)
+        self.out.fillBranch("MET_phi", event.MET_phi)
             
-            #"looseB":lambda jet: jet.llpdnnx_isB>0.0381, #eff: 88% @ 1/10 bkg
-            #"mediumB":lambda jet: jet.llpdnnx_isB>0.1499, #eff: 73% @ 1/100 bkg
-            #"tightB":lambda jet: jet.llpdnnx_isB>0.3741, #eff: 52% @ 1/1000 bkg
-            #"ultraB":lambda jet: jet.llpdnnx_isB>0.6858, #eff: 31% @ 1/10000 bkg
-        }
-        
+        self.out.fillBranch("nsv", event.nSV)
+
+        return True
+ 
+                             
+class EventSkim(Module):
+    def __init__(self,selection=lambda event: True):
+        self.selection = selection
     def beginJob(self):
         pass
     def endJob(self):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        
-        for tagGroup in self.tagGroups.keys():
-            self.out.branch("n"+tagGroup,"I")
-        
-        if not self.isData:
-            self.out.branch("nTruePU","I")
-            self.out.branch("nTrueB","I")
-            self.out.branch("nTrueC","I")
-            self.out.branch("nTrueUDS","I")
-            self.out.branch("nTrueG","I")
-            self.out.branch("nTrueLLP","I")
-        
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
-        
     def analyze(self, event):
-        """process event, return True (go to next module) or False (fail, go to next event)"""
-        jets = self.getJetCollection(event)
-        if jets==None:
-            return True
-            
-        event.jetTag = {}
+        return self.selection(event)
         
-        if not self.isData:
-            event.jetTagTruth = {
-                "nTruePU":0,
-                "nTrueB":0,
-                "nTrueC":0,
-                "nTrueUDS":0,
-                "nTrueG":0,
-                "nTrueLLP":0,
-            }
-            
-        for tagGroup in self.tagGroups.keys():
-            event.jetTag[tagGroup] = 0
-            
-        for jet in jets:
-            for tagGroup,groupSelector in self.tagGroups.iteritems():
-                if groupSelector(jet):
-                    event.jetTag[tagGroup] += 1
-            if not self.isData:
-                if jet.genJetIdx<0:
-                    event.jetTagTruth["nTruePU"]+=1 
-                if abs(jet.partonFlavour)==9:
-                    event.jetTagTruth["nTrueLLP"]+=1 
-                elif abs(jet.hadronFlavour)==5:
-                    event.jetTagTruth["nTrueB"]+=1
-                elif abs(jet.hadronFlavour)==4:
-                    event.jetTagTruth["nTrueC"]+=1
-                elif abs(jet.partonFlavour)>0 and abs(jet.partonFlavour)<4:
-                    event.jetTagTruth["nTrueUDS"]+=1
-                elif abs(jet.partonFlavour)==0 or abs(jet.partonFlavour)==21:
-                    event.jetTagTruth["nTrueG"]+=1
-                        
-        for tagGroup in self.tagGroups.keys():
-            self.out.fillBranch("n"+tagGroup,event.jetTag[tagGroup])
-        
-                  
-        if not self.isData:               
-            self.out.fillBranch("nTruePU",event.jetTagTruth["nTruePU"])
-            self.out.fillBranch("nTrueB",event.jetTagTruth["nTrueB"])
-            self.out.fillBranch("nTrueC",event.jetTagTruth["nTrueC"])
-            self.out.fillBranch("nTrueUDS",event.jetTagTruth["nTrueUDS"])
-            self.out.fillBranch("nTrueG",event.jetTagTruth["nTrueG"])
-            self.out.fillBranch("nTrueLLP",event.jetTagTruth["nTrueLLP"])
-                
-            
-            
-        
-                    
-        #self.out.fillBranch("nSelectedJets",len(event.selectedJets["loose"]))
+class METFilters(Module):
+    def __init__(self,isData=False):
+        self.isData=isData
+    def beginJob(self):
+        pass
+    def endJob(self):
+        pass
+    def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        self.out = wrappedOutputTree
+    def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        pass
+    def analyze(self, event):
+        #https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2#Moriond_2017
+        if event.Flag_goodVertices==0:
+            return False
+        if event.Flag_globalTightHalo2016Filter==0:
+            return False
+        if event.Flag_HBHENoiseFilter==0:
+            return False
+        if event.Flag_HBHENoiseIsoFilter==0:
+            return False
+        if event.Flag_EcalDeadCellTriggerPrimitiveFilter==0:
+            return False
+        if self.isData and event.Flag_eeBadScFilter==0: #not suggested on MC
+            return False
         return True
-     
+      
 class PileupWeight(Module):
-    def __init__(self,isData=True,processName=None):
+    def __init__(self,isData=False,processName=None):
         self.mcFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/pileup.root")
         self.dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU69000.root")
         self.isData= isData
@@ -650,109 +814,69 @@ class PileupWeight(Module):
         self.sum2+=event.puWeight**2
         self.out.fillBranch("puweight",event.puWeight)
         return True
-        
-
-class EventSkim(Module):
-    def __init__(self,selection=lambda event: True):
-        self.selection = selection
-    def beginJob(self):
-        pass
-    def endJob(self):
-        pass
-    def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        self.out = wrappedOutputTree
-    def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        pass
-    def analyze(self, event):
-        return self.selection(event)
-        
-class METFilters(Module):
-    def __init__(self,isData=True):
-        self.isData=isData
-    def beginJob(self):
-        pass
-    def endJob(self):
-        pass
-    def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        self.out = wrappedOutputTree
-    def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        pass
-    def analyze(self, event):
-        #https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2#Moriond_2017
-        if event.Flag_goodVertices==0:
-            return False
-        if event.Flag_globalTightHalo2016Filter==0:
-            return False
-        if event.Flag_HBHENoiseFilter==0:
-            return False
-        if event.Flag_HBHENoiseIsoFilter==0:
-            return False
-        if event.Flag_EcalDeadCellTriggerPrimitiveFilter==0:
-            return False
-        if self.isData and event.Flag_eeBadScFilter==0: #not suggested on MC
-            return False
-        return True
-      
-        
-'''
-files=[
-    [
-    "root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mkomm/LLP/NANOX_180425-v2/SMS-T1qqqq_ctau-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/SMS-T1qqqq_ctau-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/NANOX_180425-v2/180425_183459/0000/nano_6.root",
-    "/vols/cms/mkomm/LLP/NANOX_180425-v2_eval/SMS-T1qqqq_ctau-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/nano_6.root.friend",
-    ]
-]
-'''
-'''
-files=[
-    [
-    "root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mkomm/LLP/NANOX_180425-v2/SingleMuon_Run2016B-03Feb2017_ver2-v2/SingleMuon/Run2016B-03Feb2017_ver2-v2_NANOX_180425-v2/180425_185224/0000/nano_100.root",
-    "/vols/cms/mkomm/LLP/NANOX_180425-v2_eval/SingleMuon_Run2016B-03Feb2017_ver2-v2/nano_100.root.friend"
-    ]
-]
-'''
-'''
-files = [
-    [
-        "root://gfe02.grid.hep.ph.ic.ac.uk/pnfs/hep.ph.ic.ac.uk/data/cms/store/user/mkomm/LLP/NANOX_180425-v2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/NANOX_180425-v2/180425_182750/0000/nano_100.root",
-        "/vols/cms/mkomm/LLP/NANOX_180425-v2_eval/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/nano_100.root.friend",
-    ]
-]
-'''
 
 import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--isData', dest='isData', action='store_true',default=False)
-parser.add_argument('--input', dest='inputFiles', action='append',default=[])
-parser.add_argument('output', nargs=1)
+#parser.add_argument('--input', dest='inputFiles', action='append',default=[])
+#parser.add_argument('output', nargs=1)
+parser.add_argument('--job_id', dest='jobId', type=int)
+parser.add_argument('--file_id', dest='fileId', type=int)
 
 args = parser.parse_args()
 
-print "isData:",args.isData
-print "inputs:",len(args.inputFiles)
-for inputFile in args.inputFiles:
-    rootFile = ROOT.TFile.Open(inputFile)
-    if not rootFile:
-        print "CRITICAL - file '"+inputFile+"' not found!"
-        sys.exit(1)
-    tree = rootFile.Get("Events")
-    if not tree:
-        print "CRITICAL - 'Events' tree not found in file '"+inputFile+"'!"
-        sys.exit(1)
-    print " - ",inputFile,", events=",tree.GetEntries()
-    
-print "output directory:",args.output[0]
+txtFiles = sorted(os.listdir("/vols/build/cms/vc1117/CMSSW_10_2_0_pre6/src/samples"))
+processDict = {}
+pileupHists = {}
 
-p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,modules=[
-    #EventSkim(selection=lambda event: event.HLT_IsoMu24 or event.HLT_IsoTkMu24),
+job_id = args.jobId
+file_id = args.fileId
+
+txtFile = txtFiles[job_id]
+process = txtFile.split(".")[0]
+print "-"*100
+print "The process is:", process
+print "-"*100
+
+files = []
+
+f = open ("/vols/build/cms/vc1117/CMSSW_10_2_0_pre6/src/samples/"+txtFile)
+print "reading ",txtFile, "..."
+for i, l in enumerate(f):
+    if i == file_id:
+        fileName = l.replace("\n","").replace("\r","")
+        print "opening",fileName
+        rootFile=None
+        while (rootFile==None):
+            rootFile = ROOT.TFile.Open(fileName)
+        if not rootFile:
+            print "Cannot found file: ",rootFile, "-> retry"
+            continue
+        else:
+            files.append(fileName)
+
+print files
+
+print "isData:",args.isData
+
+outputDir = os.path.join("/vols/cms/vc1117/LLP/SR", process)
+
+print "output directory:", outputDir
+
+
+p=PostProcessor(outputDir,[files],cut=None,branchsel=None,modules=[
+#p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,modules=[
     MuonSelection(isData=args.isData),
-    EventSkim(selection=lambda event: len(event.selectedMuons["tight"])>0),
-    PileupWeight(isData=args.isData,processName="SMS-T1qqqq_ctau-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
-    JetSelection(isData=args.isData,getLeptonCollection=lambda event: event.selectedMuons["tight"]),
-    EventSkim(selection=lambda event: len(event.selectedJets["all"]["loose"])>=3),
-    #JetTagging(isData=args.isData,getJetCollection=lambda event: event.selectedJets["central"]["loose"]),
-    METFilters(isData=args.isData)
+    ElectronSelection(isData=args.isData),
+    JetSelection(isData=args.isData),
+    EventSkim(selection=lambda event: event.trigger > 0.5 or event.muon_trigger > 0.5),
+    EventSkim(selection=lambda event: len(event.selectedJets["central"]["loose"])>0),
+	METFilters(isData=args.isData),
+    EventSkim(selection=lambda event: len(event.selectedElectrons["loose"])==0),
+    EventSkim(selection=lambda event: len(event.selectedMuons["loose"])==0),
+    EventSkim(selection=lambda event: len(event.selectedMuons["tight"])==1 or len(event.selectedMuons["tight"]) == 2 or len(event.selectedMuons["tight"]) == 0),
+    XTagProducer(isData=args.isData),
+    PileupWeight(isData=args.isData,processName=process),
 ],friend=True)
 p.run()
-
-
