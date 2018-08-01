@@ -26,7 +26,7 @@ class TFEval
         class Accessor
         {
             public:
-                virtual float value(int64_t index) const = 0; 
+                virtual float value(int64_t jetIndex, int64_t batchIndex=0) const = 0; 
                 virtual int64_t size() const = 0; 
                 virtual ~Accessor()
                 {
@@ -50,10 +50,10 @@ class TFEval
                     return _branch->GetSize();
                 }
                 
-                virtual float value(int64_t index) const
+                virtual float value(int64_t jetIndex, int64_t batchIndex) const
                 {
                     //if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
-                    return _branch->At(index);
+                    return _branch->At(jetIndex);
                 }
                 
                 virtual ~BranchAccessor()
@@ -76,9 +76,9 @@ class TFEval
                     Py_XINCREF(_valueFct);
                 }
                 
-                virtual float value(int64_t index) const
+                virtual float value(int64_t jetIndex, int64_t batchIndex) const
                 {
-                    PyObject* args = PyTuple_Pack(1,PyInt_FromLong(index));
+                    PyObject* args = PyTuple_Pack(2,PyInt_FromLong(jetIndex),PyInt_FromLong(batchIndex));
                     if (not _valueFct) throw std::runtime_error("Value function is NULL"); 
                     PyObject* result = PyObject_CallObject(_valueFct,args);
                     if (not result) throw std::runtime_error("Failed to call value function"); 
@@ -134,9 +134,9 @@ class TFEval
                 
                 virtual void addFeature(Accessor* accessor) = 0;//TTreeReaderArray<float>* branch) = 0;
                 
-                virtual tensorflow::Tensor createTensor() const = 0; 
+                virtual tensorflow::Tensor createTensor(int64_t batchSize=1) const = 0; 
                 
-                virtual void fillTensor(tensorflow::Tensor& tensor, int64_t jetIndex) const = 0;
+                virtual void fillTensor(tensorflow::Tensor& tensor, int64_t jetIndex, int64_t batchIndex=0) const = 0;
                 
                 virtual ~FeatureGroup()
                 {
@@ -173,9 +173,9 @@ class TFEval
                     return std::vector<int64_t>({1,_size});
                 }
                 
-                virtual tensorflow::Tensor createTensor() const
+                virtual tensorflow::Tensor createTensor(int64_t batchSize=1) const
                 {
-                    return tensorflow::Tensor(tensorflow::DT_FLOAT, {1,_size});
+                    return tensorflow::Tensor(tensorflow::DT_FLOAT, {batchSize,_size});
                 }
                 
                 virtual void addFeature(Accessor* accessor) //TTreeReaderArray<float>* branch)
@@ -183,7 +183,7 @@ class TFEval
                     _branches.push_back(accessor);
                 }
                 
-                virtual void fillTensor(tensorflow::Tensor& tensor, int64_t jetIndex) const
+                virtual void fillTensor(tensorflow::Tensor& tensor, int64_t jetIndex, int64_t batchIndex=0) const
                 {
                     if ((int64_t)_branches.size()!=_size)
                     {
@@ -196,7 +196,7 @@ class TFEval
                         {
                                 throw std::runtime_error("Trying to access non-existing element ("+std::to_string(jetIndex)+") for group '"+_name+"' which has only "+std::to_string((int)_branches[ifeature]->size())+" elements");
                         }
-                        features(0,ifeature) = _branches[ifeature]->value(jetIndex);
+                        features(batchIndex,ifeature) = _branches[ifeature]->value(jetIndex,batchIndex);
                     }
                 }
                 
@@ -230,12 +230,12 @@ class TFEval
                     return std::vector<int64_t>({1,_max,_size});
                 }
                 
-                virtual tensorflow::Tensor createTensor() const
+                virtual tensorflow::Tensor createTensor(int64_t batchSize=1) const
                 {
-                    return tensorflow::Tensor(tensorflow::DT_FLOAT, {1,_max,_size});
+                    return tensorflow::Tensor(tensorflow::DT_FLOAT, {batchSize,_max,_size});
                 }
                 
-                virtual void fillTensor(tensorflow::Tensor& tensor, int64_t jetIndex) const
+                virtual void fillTensor(tensorflow::Tensor& tensor, int64_t jetIndex, int64_t batchIndex=0) const
                 {
                     if ((int64_t)_branches.size()!=_size)
                     {
@@ -245,9 +245,9 @@ class TFEval
                     int offset = 0;
                     for (int64_t i = 0; i < jetIndex; ++i)
                     {
-                        offset+=_lengthBranch->value(i);
+                        offset+=_lengthBranch->value(i,batchIndex);
                     }
-                    for (int64_t icandidate = 0; icandidate < std::min<int64_t>(_max,_lengthBranch->value(jetIndex)); ++icandidate)
+                    for (int64_t icandidate = 0; icandidate < std::min<int64_t>(_max,_lengthBranch->value(jetIndex,batchIndex)); ++icandidate)
                     {
                         for (int64_t ifeature = 0; ifeature < _size; ++ifeature)
                         {
@@ -255,14 +255,14 @@ class TFEval
                             {
                                 throw std::runtime_error("Trying to access non-existing element ("+std::to_string(offset+icandidate)+") for group '"+_name+"' which has only "+std::to_string((int)_branches[ifeature]->size())+" elements");
                             }
-                            features(0,icandidate,ifeature) = _branches[ifeature]->value(offset+icandidate);
+                            features(batchIndex,icandidate,ifeature) = _branches[ifeature]->value(offset+icandidate,batchIndex);
                         }
                     }
-                    for (int64_t icandidate = _lengthBranch->value(jetIndex); icandidate < _max; ++icandidate)
+                    for (int64_t icandidate = _lengthBranch->value(jetIndex,batchIndex); icandidate < _max; ++icandidate)
                     {
                         for (int64_t ifeature = 0; ifeature < _size; ++ifeature)
                         {
-                            features(0,icandidate,ifeature) = 0.;
+                            features(batchIndex,icandidate,ifeature) = 0.;
                         }
                     }
                 }
@@ -276,7 +276,7 @@ class TFEval
         class Result
         {
             private:
-                std::unordered_map<std::string,std::vector<float>> _result;
+                std::unordered_map<std::string,std::vector<std::vector<float>>> _result;
             public:
                 Result()
                 {
@@ -295,23 +295,35 @@ class TFEval
                     
                     for (size_t i = 0; i < names.size(); ++i)
                     {
-                        auto values = tensorList[i].flat<float>();
-                        std::vector<float> data;//(values.size());
-                        data.assign(values.data(),values.data()+values.size());
+                        auto values = tensorList[i].tensor<float,2>();
+                        std::vector<std::vector<float>> data(
+                            tensorList[i].dim_size(0),
+                            std::vector<float>(tensorList[i].dim_size(1))
+                        );
+                        for (int64_t b = 0; b < tensorList[i].dim_size(0); ++b)
+                        {
+                            for (int64_t j = 0; j < tensorList[i].dim_size(1); ++j)
+                            {
+                                data[b][j] = values(b,j);
+                            }
+                        }
+                        //data.assign(values.data(),values.data()+values.size());
+                        
+                        
                         result._result[names[i]] = data;
                     }
                     return result;
                 }
                 
                 
-                std::vector<float> get(const char* s)
+                std::vector<float> get(const char* s, size_t batch)
                 {
                     auto it = _result.find(std::string(s));
                     if (it==_result.end())
                     {
                         return std::vector<float>();
                     }
-                    return it->second;
+                    return it->second[batch];
                 }
         };
         
@@ -391,14 +403,14 @@ class TFEval
             _featureGroups.push_back(featureGroup);
         }
         
-        void allocateInputs()
+        void allocateInputs(int64_t batchSize=1)
         {
             if (_doReallocation)
             {
                 _inputs.clear();
                 for (auto featureGroup: _featureGroups)
                 {
-                    auto tensor = featureGroup->createTensor();
+                    auto tensor = featureGroup->createTensor(batchSize);
                     _inputs.emplace_back(featureGroup->name(),tensor);
                     
                     //check input shapes
@@ -435,7 +447,7 @@ class TFEval
             }
         }
         
-        void fillInputs(int64_t jetIndex)
+        void fillInputs(int64_t jetIndex, int64_t batchIndex=0)
         {
             if (_featureGroups.size()!=_inputs.size())
             {
@@ -443,15 +455,17 @@ class TFEval
             }
             for (size_t i = 0; i < _inputs.size(); ++i)
             {
-                _featureGroups[i]->fillTensor(_inputs[i].second,jetIndex);
+                _featureGroups[i]->fillTensor(_inputs[i].second,jetIndex,batchIndex);
             }
         }
         
-        Result evaluate(int64_t jetIndex)
+        Result evaluate(size_t size, int64_t* jetIndex)
         {
-            allocateInputs();
-            fillInputs(jetIndex);
-            
+            allocateInputs(size);
+            for (size_t i = 0; i < size; ++i)
+            {
+                fillInputs(jetIndex[i],i);
+            }
             std::vector<tensorflow::Tensor> outputs;
             
             if (not _session)
