@@ -86,8 +86,8 @@ class exampleProducer(Module):
         
         genFeatureGroup = ROOT.TFEval.ValueFeatureGroup("gen",1)
         self.nJets = 0
-        self.logctau = 0
-        genFeatureGroup.addFeature(ROOT.TFEval.PyAccessor(lambda: self.nJets, lambda x: self.logctau))
+        self.logctau = [0]*len(self.nLLPParam.keys())
+        genFeatureGroup.addFeature(ROOT.TFEval.PyAccessor(lambda: self.nJets, lambda jetIndex,batchIndex: self.logctau[batchIndex]))
         self.tfEvalParametric.addFeatureGroup(genFeatureGroup)
         
         self._ttreereaderversion = tree._ttreereaderversion
@@ -113,14 +113,21 @@ class exampleProducer(Module):
                 self.nJets = len(jets)
                 #print ijet,":",
                 
-                resultCtau1 = self.tfEvalctau1.evaluate(ijet)
-                predictedCtau1_class = numpy.argmax(resultCtau1.get("prediction"))
+                resultCtau1 = self.tfEvalctau1.evaluate(1,numpy.array([ijet],numpy.int64))
+                predictedCtau1_class = numpy.argmax(resultCtau1.get("prediction",0))
                 if predictedCtau1_class==4:
                     self.nLLPctau1 +=1
-                for ctau_value in self.nLLPParam.keys():
-                    self.logctau = 1.*ctau_value
-                    result = self.tfEvalParametric.evaluate(ijet)
-                    prediction = result.get("prediction")
+                for ictau,ctau_value in enumerate(self.nLLPParam.keys()):
+                    self.logctau[ictau] = 1.*ctau_value
+                    
+                    
+                result = self.tfEvalParametric.evaluate(
+                    len(self.nLLPParam.keys()),
+                    numpy.array([ijet]*len(self.nLLPParam.keys()),numpy.int64)
+                )
+                
+                for ictau,ctau_value in enumerate(self.nLLPParam.keys()):
+                    prediction = result.get("prediction",ictau)
                     predicted_class = numpy.argmax(prediction)
                     if predicted_class==4:
                         self.nLLPParam[ctau_value]+=1
