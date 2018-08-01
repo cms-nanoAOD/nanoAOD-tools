@@ -22,6 +22,9 @@ function run_test()
     wget -nv https://github.com/LLPDNNX/test-files/raw/master/pbmodel/feature_dict.py || return 1
     mv feature_dict.py PhysicsTools/NanoAODTools/test/LLP/.
     python PhysicsTools/NanoAODTools/test/LLP/testEval.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
+
+    echo "--- Test new module chain ---"
+    python PhysicsTools/NanoAODTools/test/LLP/testProcess.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
 }
 
 
