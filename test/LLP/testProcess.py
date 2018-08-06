@@ -55,5 +55,8 @@ p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,modules
         outputName="IsoMuTrigger",
         globalOptions=globalOptions
     ),
+    JetMetUncertainties(
+        globalTag="Summer16_23Sep2016V4"
+    )
 ],friend=True)
 p.run()
