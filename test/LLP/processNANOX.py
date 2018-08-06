@@ -46,36 +46,7 @@ class MuonSelection(Module):
             )
             
             
-            idTightSFBToF = self.getHist(
-                "PhysicsTools/NanoAODTools/data/muon/id_EfficienciesAndSF_RunBtoF.root",
-                "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio"
-            )
-            idTightSFGToH = self.getHist(
-                "PhysicsTools/NanoAODTools/data/muon/id_EfficienciesAndSF_RunGtoH.root",
-                "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio"
-            )
-            self.idTightSFHist = self.combineHist2D(
-                idTightSFBToF,
-                idTightSFGToH,
-                1.-16226.5/35916.4,
-                16226.5/35916.4
-            )
             
-            
-            isoTightSFBToF = self.getHist(
-                "PhysicsTools/NanoAODTools/data/muon/iso_EfficienciesAndSF_RunBtoF.root",
-                "TightISO_TightID_pt_eta/pt_abseta_ratio"
-            )
-            isoTightSFGToH = self.getHist(
-                "PhysicsTools/NanoAODTools/data/muon/iso_EfficienciesAndSF_RunGtoH.root",
-                "TightISO_TightID_pt_eta/pt_abseta_ratio"
-            )
-            self.isoTightSFHist = self.combineHist2D(
-                isoTightSFBToF,
-                isoTightSFGToH,
-                1.-16226.5/35916.4,
-                16226.5/35916.4
-            )
  
     def getHist(self,relFileName,histName):
         rootFile = ROOT.TFile(os.path.expandvars("$CMSSW_BASE/src/"+relFileName))

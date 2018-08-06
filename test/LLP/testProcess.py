@@ -50,5 +50,10 @@ p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,modules
         inputCollection=lambda event: event["tightMuons"],
         globalOptions=globalOptions
     ),
+    MuonTriggerSelection(
+        inputCollection=lambda event: event["tightMuons"],
+        outputName="IsoMuTrigger",
+        globalOptions=globalOptions
+    ),
 ],friend=True)
 p.run()
