@@ -15,13 +15,13 @@
 
 #include "Python.h"
 
-#include<iostream>
+#include <iostream>
+#include <mutex>
 
 
 class TFEval
 {
     public:
-
         
         class Accessor
         {
@@ -405,6 +405,10 @@ class TFEval
         
         void allocateInputs(int64_t batchSize=1)
         {
+            if (_inputs.size()>0)
+            {
+                _doReallocation = _inputs[0].second.dim_size(0)!=batchSize;
+            }
             if (_doReallocation)
             {
                 _inputs.clear();
@@ -459,10 +463,13 @@ class TFEval
             }
         }
         
-        Result evaluate(size_t size, int64_t* jetIndex)
+        Result evaluate(int64_t size, int64_t* jetIndex)
         {
+            //extra safety mutex but should be single threaded if called from python
+            static std::mutex mutex;
+            std::lock_guard<std::mutex> guard(mutex);
             allocateInputs(size);
-            for (size_t i = 0; i < size; ++i)
+            for (int64_t i = 0; i < size; ++i)
             {
                 fillInputs(jetIndex[i],i);
             }
@@ -486,3 +493,5 @@ class TFEval
         {
         }
 };
+
+

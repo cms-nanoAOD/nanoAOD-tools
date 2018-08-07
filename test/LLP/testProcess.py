@@ -55,12 +55,15 @@ muonSelection = [
         inputCollection=lambda event: event["tightMuons"],
         outputName="IsoMuTrigger",
         globalOptions=globalOptions
-    )
+    ),
+    EventSkim(selection=lambda event: len(event.tightMuons)==0)
 ]
 
 analyzerChain = []
 
 analyzerChain.extend(muonSelection)
+
+EventSkim(selection=lambda event: len(event.tightMuons)==0)
 
 if not args.isData:
     analyzerChain.append(
@@ -82,6 +85,24 @@ if not args.isData:
                 outputName="selectedJets_"+systName
             )
         )
+        
+    analyzerChain.append(
+        EventSkim(selection=lambda event: len(event.selectedJets_nominal)>1)
+    )
+
+    analyzerChain.append(
+        TaggerEvaluation(
+            modelPath="model_parametric.pb",
+            inputCollections=[
+                lambda event: event.selectedJets_nominal,
+                lambda event: event.selectedJets_jerUp,
+                lambda event: event.selectedJets_jerDown,
+                lambda event: event.selectedJets_jesUp,
+                lambda event: event.selectedJets_jesDown
+            ],
+            outputName="llpdnnx"
+        )
+    )
 
 
 p=PostProcessor(

@@ -7,6 +7,7 @@ import random
 class PhysicsObject(object):
     def __init__(self,obj,pt=0.,eta=0.,phi=0.,mass=0.,keys=[]):
         self._obj = obj
+        self._index = self._obj._index
         self.__dict__["pt"] = pt
         self.__dict__["eta"] = eta
         self.__dict__["phi"] = phi
@@ -21,9 +22,6 @@ class PhysicsObject(object):
         
     def originalP4(self):
         return self._obj.p4()
-
-    def index(self):
-        return self._obj._index
         
 
         

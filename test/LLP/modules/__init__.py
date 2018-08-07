@@ -3,3 +3,5 @@ from MuonVeto import MuonVeto
 from MuonTriggerSelection import MuonTriggerSelection
 from JetMetUncertainties import JetMetUncertainties
 from JetSelection import JetSelection
+from TaggerEvaluation import TaggerEvaluation
+from EventSkim import EventSkim
