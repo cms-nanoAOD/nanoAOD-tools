@@ -6,6 +6,7 @@ import random
 
 class PhysicsObject(object):
     def __init__(self,obj,pt=0.,eta=0.,phi=0.,mass=0.,keys=[]):
+        self._obj = obj
         self.__dict__["pt"] = pt
         self.__dict__["eta"] = eta
         self.__dict__["phi"] = phi
@@ -17,6 +18,12 @@ class PhysicsObject(object):
         ret = ROOT.TLorentzVector()
         ret.SetPtEtaPhiM(self.pt,self.eta,self.phi,self.mass)
         return ret
+        
+    def originalP4(self):
+        return self._obj.p4()
+
+    def index(self):
+        return self._obj._index
         
 
         
