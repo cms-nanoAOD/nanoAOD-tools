@@ -4,6 +4,37 @@ import math
 import ROOT
 import random
 
+class PhysicsObject(object):
+    def __init__(self,obj,pt=0.,eta=0.,phi=0.,mass=0.,keys=[]):
+        self.__dict__["pt"] = pt
+        self.__dict__["eta"] = eta
+        self.__dict__["phi"] = phi
+        self.__dict__["mass"] = mass
+        for k in keys:
+            self.__dict__[k] = getattr(obj,k)
+            
+    def p4(self):
+        ret = ROOT.TLorentzVector()
+        ret.SetPtEtaPhiM(self.pt,self.eta,self.phi,self.mass)
+        return ret
+        
+
+        
+def deltaPhi(phi1,phi2):
+    res = phi1-phi2
+    while (res>math.pi):
+        res -= 2*math.pi
+    while (res<=-math.pi):
+        res += 2*math.pi
+    return res
+    
+def deltaR(j1,j2):
+    return math.sqrt(
+        (j1.eta-j2.eta)**2+\
+        deltaPhi(j1.phi,j2.phi)**2
+    )
+
+
 def getHist(relFileName,histName):
     rootFile = ROOT.TFile(os.path.expandvars("$CMSSW_BASE/src/"+relFileName))
     hist = rootFile.Get(histName)

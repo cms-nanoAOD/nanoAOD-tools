@@ -10,19 +10,12 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class MuonVeto(Module):
 
-    def TightID(muon):
-        return (muon.tightId==1) and (muon.pfRelIso04_all<0.15)
-        
-    def LooseID(muon):
-        return (muon.pfRelIso04_all<0.25)
-
     def __init__(
         self,
         inputCollection = lambda event: Collection(event, "Muon"),
         outputName = "vetoMuons",
         muonMinPt = 10.,
         muonMaxEta = 2.5,
-        muonID = LooseID,
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
@@ -30,7 +23,6 @@ class MuonVeto(Module):
         self.outputName = outputName
         self.muonMinPt = muonMinPt
         self.muonMaxEta = muonMaxEta
-        self.muonID = muonID
  
     def beginJob(self):
         pass
@@ -54,7 +46,7 @@ class MuonVeto(Module):
         
         #https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Tight_Muon
         for muon in muons:
-            if muon.pt>self.muonMinPt and math.fabs(muon.eta)<self.muonMaxEta and self.muonID(muon):
+            if muon.pt>self.muonMinPt and math.fabs(muon.eta)<self.muonMaxEta and (muon.pfRelIso04_all<0.25):
                 selectedMuons.append(muon)
             else:
                 unselectedMuons.append(muon)

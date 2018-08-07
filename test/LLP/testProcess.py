@@ -38,10 +38,11 @@ for inputFile in args.inputFiles:
 print "output directory:",args.output[0]
 
 globalOptions = {
-    "isData":False
+    "isData":args.isData
 }
 
-p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,modules=[
+
+muonSelection = [
     MuonSelection(
         outputName="tightMuons",
         globalOptions=globalOptions
@@ -54,9 +55,41 @@ p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,modules
         inputCollection=lambda event: event["tightMuons"],
         outputName="IsoMuTrigger",
         globalOptions=globalOptions
-    ),
-    JetMetUncertainties(
-        globalTag="Summer16_23Sep2016V4"
     )
-],friend=True)
+]
+
+analyzerChain = []
+
+analyzerChain.extend(muonSelection)
+
+if not args.isData:
+    analyzerChain.append(
+        JetMetUncertainties(
+            era="2016",
+            globalTag="Summer16_23Sep2016V4_MC"
+        )
+    )
+    for systName,collection in [
+        ("nominal",lambda event: event.jets_nominal),
+        ("jerUp",lambda event: event.jets_jerUp),
+        ("jerDown",lambda event: event.jets_jerDown),
+        ("jesUp",lambda event: event.jets_jesUp["Total"]),
+        ("jesDown",lambda event: event.jets_jesDown["Total"]),
+    ]:
+        analyzerChain.append(
+            JetSelection(
+                inputCollection=collection,
+                outputName="selectedJets_"+systName
+            )
+        )
+
+
+p=PostProcessor(
+    args.output[0],
+    [args.inputFiles],
+    cut=None,
+    branchsel=None,
+    modules=analyzerChain,
+    friend=True
+)
 p.run()
