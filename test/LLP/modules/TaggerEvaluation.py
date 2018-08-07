@@ -23,7 +23,7 @@ class TaggerEvaluation(Module):
         inputCollections = [lambda event: Collection(event, "Jet")],
         outputName = "llpdnnx",
         predictionLabels = ["B","C","UDS","G","LLP"],
-        logctauValues = [0],
+        logctauValues = range(-3,5),#[0],
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
@@ -120,6 +120,7 @@ class TaggerEvaluation(Module):
                 jetIndexMap[ijet] = jet._index
             jetIndexMapPerCollection.append(jetIndexMap)
             
+        jetOriginIndices = list(jetOriginIndices)
         
         evaluationIndices = []
         for index in jetOriginIndices:
@@ -139,39 +140,20 @@ class TaggerEvaluation(Module):
             evaluationIndices.shape[0],
             evaluationIndices
         )
-        '''
-        for ijet in jetIndices:
-            jet = jets[ijet]
-        '''
-        '''
-        for ijet in jetIndices:
-            jet = jets[ijet]
-            jetOriginIndex = jet._index
-            
-            
-            #NOTE: one cannot access any other branches between setup & call to evaluate
-            if event._tree._ttreereaderversion > self._ttreereaderversion:
-                self.setup(event._tree)
+        
+        for icollection,jetMap in enumerate(jetIndexMapPerCollection):
+            for ijet,originJetIndex in jetMap.iteritems():
+                jet = self.inputCollections[icollection](event)[ijet]
                 
-            self.nJets = len(jetorigin)
-            
-                
-            result = self.tfEvalParametric.evaluate(
-                len(self.logctau),
-                numpy.array([jetOriginIndex]*len(self.logctau),numpy.int64)
-            )
-            
-            for ictau,ctauLabel in enumerate(self.ctauLabels):
-                prediction = result.get("prediction",ictau)
-                if len(prediction)!=len(self.predictionLabels):
-                    print "Error - given number of prediction labels does not agree with loaded TF model"
-                    sys.exit(1)
-                for iprediction,predictionLabel in enumerate(self.predictionLabels):
-                    setattr(
-                        jets[ijet],
-                        self.outputName+"_ctau"+ctauLabel+"_"+predictionLabel,
-                        prediction[iprediction]
-                    )
-        '''
+                for ictau in range(len(self.logctau)):
+                    outputPosition = jetOriginIndices.index(originJetIndex)*len(self.logctau)+ictau
+                    if outputPosition<0:
+                        print "Error - position should not be < 0"
+                        sys.exit(1)
+                    prediction = result.get("prediction",outputPosition)
+                    for iclass, classLabel in enumerate(self.predictionLabels):
+                        setattr(jet,self.ctauLabels[ictau]+"_"+classLabel,prediction[iclass])
+        
+       
         
         return True

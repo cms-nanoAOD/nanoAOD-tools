@@ -262,7 +262,7 @@ class JetMetUncertainties(jetmetUncertaintiesProducer):
         event.jets_jerUp = getJetsSyst("jer",1)
         event.met_jerUp = getMetSyst("jer",1)
         event.jets_jerDown = getJetsSyst("jer",-1)
-        event.met_jerUp = getMetSyst("jer",-1)
+        event.met_jerDown = getMetSyst("jer",-1)
         
         event.jets_jesUp = {}
         event.met_jesUp = {}
@@ -272,7 +272,7 @@ class JetMetUncertainties(jetmetUncertaintiesProducer):
             event.jets_jesUp[jesUncertainty] = getJetsSyst("jes:"+jesUncertainty,1)
             event.met_jesUp[jesUncertainty] = getMetSyst("jes:"+jesUncertainty,1)
             event.jets_jesDown[jesUncertainty] = getJetsSyst("jes:"+jesUncertainty,-1)
-            event.met_jesDown[jesUncertainty] = getMetSyst("jes:"+jesUncertainty,1)
+            event.met_jesDown[jesUncertainty] = getMetSyst("jes:"+jesUncertainty,-1)
             
         event.met_unclEnUp = getMetSyst("unclEn",1)
         event.met_unclEnDown = getMetSyst("unclEn",-1)

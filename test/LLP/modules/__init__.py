@@ -5,3 +5,4 @@ from JetMetUncertainties import JetMetUncertainties
 from JetSelection import JetSelection
 from TaggerEvaluation import TaggerEvaluation
 from EventSkim import EventSkim
+from EventObservables import EventObservables

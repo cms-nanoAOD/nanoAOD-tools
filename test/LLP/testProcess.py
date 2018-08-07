@@ -48,7 +48,7 @@ muonSelection = [
         globalOptions=globalOptions
     ),
     MuonVeto(
-        inputCollection=lambda event: event["tightMuons"],
+        inputCollection=lambda event: event["tightMuons_unselected"],
         globalOptions=globalOptions
     ),
     MuonTriggerSelection(
@@ -56,14 +56,13 @@ muonSelection = [
         outputName="IsoMuTrigger",
         globalOptions=globalOptions
     ),
-    EventSkim(selection=lambda event: len(event.tightMuons)==0)
+    EventSkim(selection=lambda event: len(event.tightMuons)==1)
 ]
 
 analyzerChain = []
 
 analyzerChain.extend(muonSelection)
 
-EventSkim(selection=lambda event: len(event.tightMuons)==0)
 
 if not args.isData:
     analyzerChain.append(
@@ -87,7 +86,36 @@ if not args.isData:
         )
         
     analyzerChain.append(
-        EventSkim(selection=lambda event: len(event.selectedJets_nominal)>1)
+        EventSkim(selection=lambda event: 
+            len(event.selectedJets_nominal)>=2 or \
+            len(event.selectedJets_jerUp)>=2 or \
+            len(event.selectedJets_jerDown)>=2 or \
+            len(event.selectedJets_jesUp)>=2 or \
+            len(event.selectedJets_jesDown)>=2
+        )
+    )
+    
+    for systName,jetCollection,metObject in [
+        ("nominal",lambda event: event.jets_nominal,lambda event: event.met_nominal),
+        ("jerUp",lambda event: event.jets_jerUp,lambda event: event.met_jerUp),
+        ("jerDown",lambda event: event.jets_jerDown,lambda event: event.met_jerDown),
+        ("jesUp",lambda event: event.jets_jesUp["Total"],lambda event: event.met_jesUp["Total"]),
+        ("jesDown",lambda event: event.jets_jesDown["Total"],lambda event: event.met_jesDown["Total"]),
+        ("unclEnUp",lambda event: event.jets_nominal,lambda event: event.met_unclEnUp),
+        ("unclEnDown",lambda event: event.jets_nominal,lambda event: event.met_unclEnDown),
+    ]:
+    
+        analyzerChain.append(
+            EventObservables(
+                jetInputCollection = jetCollection,
+                metInput = metObject,
+                outputName = systName,
+            )
+        )
+    
+    #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
+    analyzerChain.append(
+        EventSkim(selection=lambda event: event.met_nominal>100)#event.nominal_ht>800 or (event.nominal_ht>150 and event.nominal_met>150))
     )
 
     analyzerChain.append(
