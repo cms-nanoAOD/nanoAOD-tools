@@ -17,7 +17,8 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties im
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.skimNRecoLeps import *
 isData = sys.argv[-1] == 'data'
-mod = [puAutoWeight(),jetmetUncertainties2017All(), skimRecoLeps()]
+mod = [puAutoWeight(), skimRecoLeps()]
+#mod = [puAutoWeight(),jetmetUncertainties2017All(), skimRecoLeps()]
 if isData: mod = [skimRecoLeps()]
 
 p=PostProcessor(".",inputFiles(),cut,slimfile,mod,provenance=True,fwkJobReport=True,jsonInput=runsAndLumis())

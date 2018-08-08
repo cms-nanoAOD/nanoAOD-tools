@@ -88,6 +88,11 @@ class PostProcessor :
 	    #get input tree
 	    inTree = inFile.Get("Events")
 	    totEntriesRead+=inTree.GetEntries()
+	    self.hcount.SetBinContent(1, inTree.GetEntries())
+	    if inTree.GetBranchStatus("genWeight"):
+	      inTree.Project("SumWeightsTemp", "1.0", "genWeight")
+	      sow = ROOT.gROOT.FindObject("SumWeightsTemp").Integral()
+	      self.hsumofweights.SetBinContent(1, sow)
 	    # pre-skimming
 	    elist,jsonFilter = preSkim(inTree, self.json, self.cut)
 	    if self.justcount:

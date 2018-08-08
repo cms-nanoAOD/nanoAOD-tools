@@ -7,8 +7,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class skipNRecoLeps(Module):
     def __init__(self):
-        self.minelpt  = 18
-        self.minmupt  = 18
+        self.minelpt  = 27 # 18
+        self.minmupt  = 23 # 18
         self.maxeleta = 2.5
         self.maxmueta = 2.5
         pass
@@ -29,9 +29,10 @@ class skipNRecoLeps(Module):
         for mu in muon:
           if mu.pt > self.minmupt and abs(mu.eta) < self.maxmueta and (mu.tightId or mu.mediumId): nlepgood += 1
         for el in elec:
-          if el.pt > self.minelpt and abs(el.eta) < self.maxeleta and (el.cutBased >= 4): nlepgood += 1
+          if el.pt > self.minelpt and abs(el.eta) < self.maxeleta and (el.cutBased >= 3): nlepgood += 1
 
-        return nlepgood >= 2
+        #return nlepgood >= 2
+        return nlepgood == 1
 
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed

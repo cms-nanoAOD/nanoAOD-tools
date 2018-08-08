@@ -101,7 +101,9 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
 
   # Set according to input parameters
   totalUnits = 10000 # test
-  if isData: totalUnits = 100
+  if isData: 
+    totalUnits = 500000
+    unitsperjob = 500
   if isTest: totalUnits = 3
   prodTag = productionTag
 
@@ -112,7 +114,7 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
   t_unitsperjob  = "config.Data.unitsPerJob = " + str(unitsperjob) + "\n"
   t_splitting    = "config.Data.splitting = '" + strSplitting + "'\n"
   t_basedir      = "config.Data.outLFNDirBase = '" + basedir + "'\n"
-  t_datasetTag = "config.Data.outputDatasetTag = '" + prodTag + "'\n" 
+  t_datasetTag = "config.Data.outputDatasetTag = '" + prodTag + "_" + localdir + "'\n" 
   t_tier = "config.Site.storageSite = '" + tier + "'\n"
   t_lumiMask = "config.Data.lumiMask = '" + lumiMask + "'\n"
  
