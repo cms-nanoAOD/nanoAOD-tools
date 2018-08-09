@@ -20,6 +20,7 @@ class JetSelection(Module):
         jetMinPt = 30.,
         jetMaxEta = 2.4,
         dRCleaning = 0.4,
+        storeKinematics=['pt','eta'],
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
@@ -29,6 +30,7 @@ class JetSelection(Module):
         self.jetMinPt = jetMinPt
         self.jetMaxEta = jetMaxEta
         self.dRCleaning = dRCleaning
+        self.storeKinematics = storeKinematics
         
  
     def beginJob(self):
@@ -40,9 +42,9 @@ class JetSelection(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("n"+self.outputName,"I")
-
-        self.out.branch(self.outputName+"_pt","F",lenVar="n"+self.outputName)
-        self.out.branch(self.outputName+"_eta","F",lenVar="n"+self.outputName)
+        
+        for variable in self.storeKinematics:
+            self.out.branch(self.outputName+"_"+variable,"F",lenVar="n"+self.outputName)
 
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -53,6 +55,7 @@ class JetSelection(Module):
         jets = self.inputCollection(event)
         
         selectedJets = []
+        unselectedJets = []
         
         for jet in jets:
             if jet.pt>self.jetMinPt and math.fabs(jet.eta)<self.jetMaxEta and (jet.jetId>0):
@@ -60,13 +63,19 @@ class JetSelection(Module):
                 if leptons!=None and len(leptons)>0:
                     mindr = min(map(lambda lepton: deltaR(lepton,jet),leptons))
                     if mindr<self.dRCleaning:
+                        unselectedJets.append(jet)
                         continue
                 selectedJets.append(jet)
+            else:
+                unselectedJets.append(jet)
+                
   
         self.out.fillBranch("n"+self.outputName,len(selectedJets))
-        self.out.fillBranch(self.outputName+"_pt",map(lambda jet: jet.pt,selectedJets))
-        self.out.fillBranch(self.outputName+"_eta",map(lambda jet: jet.eta,selectedJets))
+        for variable in self.storeKinematics:
+            self.out.fillBranch(self.outputName+"_"+variable,map(lambda jet: getattr(jet,variable),selectedJets))
+            
         setattr(event,self.outputName,selectedJets)
-
+        setattr(event,self.outputName+"_unselected",unselectedJets)
+        
         return True
         

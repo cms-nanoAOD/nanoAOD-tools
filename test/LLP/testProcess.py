@@ -45,6 +45,8 @@ globalOptions = {
 muonSelection = [
     MuonSelection(
         outputName="tightMuons",
+        storeKinematics=['pt','eta'],
+        storeWeights=False,
         globalOptions=globalOptions
     ),
     MuonVeto(
@@ -60,6 +62,14 @@ muonSelection = [
 ]
 
 analyzerChain = []
+
+analyzerChain.append(
+    MetFilter(
+        globalOptions=globalOptions
+    )
+)
+
+
 
 analyzerChain.extend(muonSelection)
 
@@ -81,7 +91,8 @@ if not args.isData:
         analyzerChain.append(
             JetSelection(
                 inputCollection=collection,
-                outputName="selectedJets_"+systName
+                outputName="selectedJets_"+systName,
+                storeKinematics=['pt','eta'],
             )
         )
         
@@ -115,7 +126,15 @@ if not args.isData:
     
     #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
     analyzerChain.append(
-        EventSkim(selection=lambda event: event.met_nominal>100)#event.nominal_ht>800 or (event.nominal_ht>150 and event.nominal_met>150))
+        EventSkim(selection=lambda event: 
+            event.met_nominal>150 or \
+            event.met_jerUp>150 or \
+            event.met_jerDown>150 or \
+            event.met_jesUp>150 or \
+            event.met_jesDown>150 or \
+            event.met_unclEnUp>150 or \
+            event.met_unclEnDown>150
+        )
     )
 
     analyzerChain.append(

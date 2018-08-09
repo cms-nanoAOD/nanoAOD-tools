@@ -18,6 +18,8 @@ class MuonSelection(Module):
         outputName = "tightMuons",
         muonMinPt = 26.,
         muonMaxEta = 2.4,
+        storeKinematics=['pt','eta'],
+        storeWeights=False,
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
@@ -25,6 +27,8 @@ class MuonSelection(Module):
         self.outputName = outputName
         self.muonMinPt = muonMinPt
         self.muonMaxEta = muonMaxEta
+        self.storeKinematics = storeKinematics
+        self.storeWeights = storeWeights
         
         if not self.globalOptions["isData"]:
             #tracking efficiency
@@ -75,9 +79,10 @@ class MuonSelection(Module):
         self.out = wrappedOutputTree
         self.out.branch("n"+self.outputName,"I")
 
-        self.out.branch(self.outputName+"_pt","F",lenVar="n"+self.outputName)
-        self.out.branch(self.outputName+"_eta","F",lenVar="n"+self.outputName)
-        if not self.globalOptions["isData"]:
+        for variable in self.storeKinematics:
+            self.out.branch(self.outputName+"_"+variable,"F",lenVar="n"+self.outputName)
+            
+        if not self.globalOptions["isData"] and self.storeWeights:
             self.out.branch(self.outputName+"_weight_track_nominal","F")
         
             self.out.branch(self.outputName+"_weight_id_nominal","F")
@@ -112,7 +117,7 @@ class MuonSelection(Module):
         for muon in muons:
             if muon.pt>self.muonMinPt and math.fabs(muon.eta)<self.muonMaxEta and (muon.tightId==1) and (muon.pfRelIso04_all<0.15):
                 selectedMuons.append(muon)
-                if not self.globalOptions["isData"]:
+                if not self.globalOptions["isData"] and self.storeWeights:
                     weight_track_nominal*=self.trackSF.Eval(math.fabs(muon.eta))
                     
                     weight_id,weight_id_err = getSFPtEta(self.idTightSFHist,muon.pt,muon.eta)
@@ -128,10 +133,10 @@ class MuonSelection(Module):
                 unselectedMuons.append(muon)
   
         self.out.fillBranch("n"+self.outputName,len(selectedMuons))
-        self.out.fillBranch(self.outputName+"_pt",map(lambda muon: muon.pt,selectedMuons))
-        self.out.fillBranch(self.outputName+"_eta",map(lambda muon: muon.eta,selectedMuons))
+        for variable in self.storeKinematics:
+            self.out.fillBranch(self.outputName+"_"+variable,map(lambda muon: getattr(muon,variable),selectedMuons))
         
-        if not self.globalOptions["isData"]:
+        if not self.globalOptions["isData"] and self.storeWeights:
             self.out.fillBranch(self.outputName+"_weight_track_nominal",weight_track_nominal)
             
             self.out.fillBranch(self.outputName+"_weight_id_nominal",weight_id_nominal)
