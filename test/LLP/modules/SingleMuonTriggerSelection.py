@@ -10,16 +10,18 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 from utils import getHist,combineHist2D,getSFPtEta
 
-class MuonTriggerSelection(Module):
+class SingleMuonTriggerSelection(Module):
     def __init__(
         self,
         inputCollection = lambda event: getattr(event,"tightMuons"),
+        storeWeights=True,
         outputName = "IsoMuTrigger",
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
         self.inputCollection = inputCollection
         self.outputName = outputName
+        self.storeWeights = storeWeights
         
         if not self.globalOptions["isData"]:
             triggerSFBToF = getHist(
@@ -48,7 +50,7 @@ class MuonTriggerSelection(Module):
         
         self.out.branch(self.outputName+"_flag","I")
         
-        if not self.globalOptions["isData"]:
+        if not self.globalOptions["isData"] and self.storeWeights:
             self.out.branch(self.outputName+"_weight_trigger_nominal","F")
             self.out.branch(self.outputName+"_weight_trigger_up","F")
             self.out.branch(self.outputName+"_weight_trigger_down","F")
@@ -66,7 +68,7 @@ class MuonTriggerSelection(Module):
         weight_trigger_up = 1.
         weight_trigger_down = 1.
         
-        if (not self.globalOptions["isData"]) and len(muons)>0: 
+        if (not self.globalOptions["isData"]) and len(muons)>0 and self.storeWeights: 
             #take the leading muon here; note: technically correct would be to match to HLT obj
             weight_trigger,weight_trigger_err = getSFPtEta(self.triggerSFHist,muons[0].pt,muons[0].eta)
             weight_trigger_nominal*=weight_trigger
@@ -78,7 +80,7 @@ class MuonTriggerSelection(Module):
             event.HLT_IsoMu24>0 or event.HLT_IsoTkMu24>0
         )
             
-        if not self.globalOptions["isData"]:
+        if not self.globalOptions["isData"] and self.storeWeights:
             self.out.fillBranch(self.outputName+"_weight_trigger_nominal",weight_trigger_nominal)
             self.out.fillBranch(self.outputName+"_weight_trigger_up",weight_trigger_up)
             self.out.fillBranch(self.outputName+"_weight_trigger_down",weight_trigger_down)

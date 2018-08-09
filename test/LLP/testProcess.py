@@ -46,14 +46,14 @@ muonSelection = [
     MuonSelection(
         outputName="tightMuons",
         storeKinematics=['pt','eta'],
-        storeWeights=False,
+        storeWeights=True,
         globalOptions=globalOptions
     ),
     MuonVeto(
         inputCollection=lambda event: event["tightMuons_unselected"],
         globalOptions=globalOptions
     ),
-    MuonTriggerSelection(
+    SingleMuonTriggerSelection(
         inputCollection=lambda event: event["tightMuons"],
         outputName="IsoMuTrigger",
         globalOptions=globalOptions
@@ -136,7 +136,28 @@ if not args.isData:
             event.met_unclEnDown>150
         )
     )
-
+    
+    analyzerChain.extend([
+        PileupWeight(
+            dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU69000.root"),
+            outputName ="puweight",
+            processName = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen",
+            globalOptions=globalOptions
+        ),
+        PileupWeight(
+            dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU72500.root"),
+            outputName ="puweightUp",
+            processName = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen",
+            globalOptions=globalOptions
+        ),
+        PileupWeight(
+            dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU65500.root"),
+            outputName ="puweightDown",
+            processName = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen",
+            globalOptions=globalOptions
+        )   
+    ])
+    '''
     analyzerChain.append(
         TaggerEvaluation(
             modelPath="model_parametric.pb",
@@ -150,7 +171,7 @@ if not args.isData:
             outputName="llpdnnx"
         )
     )
-
+    '''
 
 p=PostProcessor(
     args.output[0],

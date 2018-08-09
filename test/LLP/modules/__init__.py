@@ -1,10 +1,11 @@
 from MuonSelection import MuonSelection
 from MuonVeto import MuonVeto
-from MuonTriggerSelection import MuonTriggerSelection
+from SingleMuonTriggerSelection import SingleMuonTriggerSelection
 from JetMetUncertainties import JetMetUncertainties
 from JetSelection import JetSelection
 from TaggerEvaluation import TaggerEvaluation
 from EventSkim import EventSkim
 from EventObservables import EventObservables
 from MetFilter import MetFilter
+from PileupWeight import PileupWeight
 
