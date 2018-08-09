@@ -157,7 +157,7 @@ if not args.isData:
             globalOptions=globalOptions
         )   
     ])
-    '''
+    
     analyzerChain.append(
         TaggerEvaluation(
             modelPath="model_parametric.pb",
@@ -168,10 +168,32 @@ if not args.isData:
                 lambda event: event.selectedJets_jesUp,
                 lambda event: event.selectedJets_jesDown
             ],
-            outputName="llpdnnx"
+            taggerName="llpdnnx",
+            logctauValues = range(-3,5)
         )
     )
-    '''
+    
+    analyzerChain.append(
+        TaggerWorkingpoints(
+            inputCollection = lambda event: event.selectedJets_nominal,
+            taggerName = "llpdnnx",
+            outputName = "llpdnnx_nominal",
+            logctauValues = range(-3,5),
+            globalOptions=globalOptions
+        )
+    ),
+    analyzerChain.append(
+        EventInfo(
+            storeVariables = [
+                [lambda tree: tree.branch("genweight","F"),lambda tree,event: tree.fillBranch("genweight",event.Generator_weight)],
+                [lambda tree: tree.branch("genHt","F"),lambda tree,event: tree.fillBranch("genHt",event.LHE_HTIncoming)],
+                [lambda tree: tree.branch("rho","F"),lambda tree,event: tree.fillBranch("rho",event.fixedGridRhoFastjetAll)], 
+                [lambda tree: tree.branch("nPV","I"),lambda tree,event: tree.fillBranch("nPV",event.PV_npvsGood)],
+                [lambda tree: tree.branch("nSV","I"),lambda tree,event: tree.fillBranch("nSV",event.nSV)],
+            ]
+        )
+    )
+    
 
 p=PostProcessor(
     args.output[0],

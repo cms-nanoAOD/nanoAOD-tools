@@ -11,6 +11,8 @@ from importlib import import_module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
+from utils import getCtauLabel
+
 if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
     print "Cannot load 'libPhysicsToolsNanoAODTools'"
     sys.exit(1)
@@ -21,26 +23,19 @@ class TaggerEvaluation(Module):
         self,
         modelPath,
         inputCollections = [lambda event: Collection(event, "Jet")],
-        outputName = "llpdnnx",
+        taggerName = "llpdnnx",
         predictionLabels = ["B","C","UDS","G","LLP"],
         logctauValues = range(-3,5),#[0],
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
         self.inputCollections = inputCollections
-        self.ctauLabels = []
         self.predictionLabels = predictionLabels
-        for ctauValue in logctauValues:
-            if ctauValue==0:
-                self.ctauLabels.append("0")
-            elif ctauValue>0:
-                self.ctauLabels.append("1"+(("0")*ctauValue))
-            elif ctauValue<0:
-                self.ctauLabels.append("0p"+(("0")*(ctauValue-1))+"1")
+        self.logctauValues = logctauValues
         self.logctau = numpy.array(logctauValues,dtype=numpy.float32)
         
         self.modelPath = modelPath
-        self.outputName = outputName
+        self.taggerName = taggerName
  
     def beginJob(self):
         pass
@@ -105,26 +100,23 @@ class TaggerEvaluation(Module):
     def analyze(self, event):
         jetorigin = Collection(event, "jetorigin")
         
-        jetIndexMapPerCollection = [] #maps indices back to jets in collections
         jetOriginIndices = set() #superset of all indices to evaluate
         
         
         for jetCollection in self.inputCollections:
             jets = jetCollection(event)
-            jetIndexMap = {}
             for ijet,jet in enumerate(jets):
                 if jet._index>=len(jetorigin):
                     #this is very strange - why has it not been filled?
                     continue
                 jetOriginIndices.add(jet._index)
-                jetIndexMap[ijet] = jet._index
-            jetIndexMapPerCollection.append(jetIndexMap)
+                
             
         jetOriginIndices = list(jetOriginIndices)
         
         evaluationIndices = []
         for index in jetOriginIndices:
-            evaluationIndices.extend([index]*len(self.logctau))
+            evaluationIndices.extend([index]*len(self.logctauValues))
                 
         if event._tree._ttreereaderversion > self._ttreereaderversion:
             self.setup(event._tree)
@@ -141,19 +133,27 @@ class TaggerEvaluation(Module):
             evaluationIndices
         )
         
-        for icollection,jetMap in enumerate(jetIndexMapPerCollection):
-            for ijet,originJetIndex in jetMap.iteritems():
-                jet = self.inputCollections[icollection](event)[ijet]
+        predictionsPerIndexAndCtau = {}
+        for ijet,jetIndex in enumerate(jetOriginIndices):
+            predictionsPerIndexAndCtau[jetIndex] = {}
+            for ictau,ctau in enumerate(self.logctauValues):
+                predictionIndex = ijet*len(self.logctauValues)+ictau
+                predictionsPerIndexAndCtau[jetIndex][ctau] = result.get("prediction",predictionIndex)
                 
-                for ictau in range(len(self.logctau)):
-                    outputPosition = jetOriginIndices.index(originJetIndex)*len(self.logctau)+ictau
-                    if outputPosition<0:
-                        print "Error - position should not be < 0"
-                        sys.exit(1)
-                    prediction = result.get("prediction",outputPosition)
-                    for iclass, classLabel in enumerate(self.predictionLabels):
-                        setattr(jet,self.ctauLabels[ictau]+"_"+classLabel,prediction[iclass])
-        
-       
-        
+                
+                
+        for jetCollection in self.inputCollections:
+            jets = jetCollection(event)
+            for ijet,jet in enumerate(jets):
+                taggerOutput = {}
+                for ictau,ctau in enumerate(self.logctauValues):
+                    taggerOutput[self.logctauValues[ictau]] = {}
+                    for iclass, classLabel in enumerate(self.predictionLabels):  
+                        if jet._index<len(jetorigin):
+                            taggerOutput[self.logctauValues[ictau]][classLabel] = \
+                                predictionsPerIndexAndCtau[jet._index][ctau][iclass]
+                        else:
+                            taggerOutput[self.logctauValues[ictau]][classLabel] = -1
+                setattr(jet,self.taggerName,taggerOutput)
+
         return True

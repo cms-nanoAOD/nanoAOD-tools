@@ -23,6 +23,9 @@ class PhysicsObject(object):
     def originalP4(self):
         return self._obj.p4()
         
+    def __str__(self):
+        return self._obj.__str__()
+        
 
         
 def deltaPhi(phi1,phi2):
@@ -38,6 +41,14 @@ def deltaR(j1,j2):
         (j1.eta-j2.eta)**2+\
         deltaPhi(j1.phi,j2.phi)**2
     )
+    
+def getCtauLabel(logctau):
+    if logctau==0:
+        return "0"
+    elif logctau>0:
+        return "1"+(("0")*logctau)
+    elif logctau<0:
+        return "0p"+(("0")*(abs(logctau)-1))+"1"
 
 
 def getHist(relFileName,histName):

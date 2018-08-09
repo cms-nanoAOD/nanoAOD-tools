@@ -8,4 +8,6 @@ from EventSkim import EventSkim
 from EventObservables import EventObservables
 from MetFilter import MetFilter
 from PileupWeight import PileupWeight
+from TaggerWorkingpoints import TaggerWorkingpoints
+from EventInfo import EventInfo
 
