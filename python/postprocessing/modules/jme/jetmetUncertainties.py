@@ -322,6 +322,13 @@ class jetmetUncertaintiesProducer(Module):
                 self.jesUncertainty[jesUncertainty].setJetPt(jet_pt_nom)
                 self.jesUncertainty[jesUncertainty].setJetEta(jet.eta)
                 delta = self.jesUncertainty[jesUncertainty].getUncertainty(True)
+                # print ""
+                # print "******"
+                # print ("Jet pt: %s" % (jet_pt_nom))
+                # print ("Jet eta: %s" % (jet.eta))
+                # print ("%s pt shift: %s" % (jesUncertainty,delta))
+                # print "******"
+                # print ""
                 jet_pt_jesUp[jesUncertainty]   = jet_pt_nom*(1. + delta)
                 jet_pt_jesDown[jesUncertainty] = jet_pt_nom*(1. - delta)
                 jets_pt_jesUp[jesUncertainty].append(jet_pt_jesUp[jesUncertainty])
@@ -378,9 +385,7 @@ class jetmetUncertaintiesProducer(Module):
             met_px_unclEnDown  = met_px_unclEnDown + (met_px_nom - met_px)
             met_py_unclEnDown  = met_py_unclEnDown + (met_py_nom - met_py)
 
-
-
-            
+           
         self.out.fillBranch("%s_pt_nom" % self.jetBranchName, jets_pt_nom)
         self.out.fillBranch("%s_corr_JEC" % self.jetBranchName, jets_corr_JEC)
         self.out.fillBranch("%s_corr_JER" % self.jetBranchName, jets_corr_JER)
