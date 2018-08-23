@@ -239,13 +239,17 @@ class jetmetUncertaintiesProducer(Module):
             ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
 	    
 	    jet_pt=jet.pt
-            jet_rawpt = jet.pt * (1 - jet.rawFactor)
+            if hasattr(jet, "rawFactor"):
+                jet_rawpt = jet.pt * (1 - jet.rawFactor)
+            else:
+                jet_rawpt = -1.0 * jet.pt #If factor not present factor will be saved as -1
+            
 	    if self.redoJEC :
 		jet_pt = self.jetReCalibrator.correct(jet,rho)
             jets_corr_JEC.append(jet_pt/jet_rawpt)
             jets_corr_JER.append(jet_pt_jerNomVal)
-            jet_pt_nom           = jet_pt_jerNomVal *jet_pt
             
+            jet_pt_nom           = jet_pt_jerNomVal *jet_pt
             if jet_pt_nom < 0.0:
                 jet_pt_nom *= -1.0
             jet_pt_jerUp         = jet_pt_jerUpVal  *jet_pt
