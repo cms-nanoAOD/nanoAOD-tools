@@ -246,20 +246,23 @@ class jetmetUncertaintiesProducer(Module):
                     groomedP4 = subJets[ jet.subJetIdx1 ].p4() + subJets[ jet.subJetIdx2].p4()
                 else :
                     groomedP4 = None
-                
+
+            #jet pt and mass corrections
+            jet_pt=jet.pt
+            jet_mass=jet.mass
+
+            #redo JECs if desired
+            if hasattr(jet, "rawFactor"):
+                jet_rawpt = jet_pt * (1 - jet.rawFactor)
+            else:
+                jet_rawpt = -1.0 * jet_pt #If factor not present factor will be saved as -1
+            if self.redoJEC :
+                (jet_pt, jet_mass) = self.jetReCalibrator.correct(jet,rho)
+            jets_corr_JEC.append(jet_pt/jet_rawpt)
+
             # evaluate JER scale factors and uncertainties
             # (cf. https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution )
             ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
-            
-            jet_pt=jet.pt
-            if hasattr(jet, "rawFactor"):
-                jet_rawpt = jet.pt * (1 - jet.rawFactor)
-            else:
-                jet_rawpt = -1.0 * jet.pt #If factor not present factor will be saved as -1
-            
-            if self.redoJEC :
-                jet_pt = self.jetReCalibrator.correct(jet,rho)
-            jets_corr_JEC.append(jet_pt/jet_rawpt)
             jets_corr_JER.append(jet_pt_jerNomVal)
             
             jet_pt_nom           = jet_pt_jerNomVal *jet_pt
@@ -284,16 +287,16 @@ class jetmetUncertaintiesProducer(Module):
             jmsDownVal = self.jmsVals[1]
             jmsUpVal = self.jmsVals[2]
             ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = self.jetSmearer.getSmearValsM(jet, genJet)
-            jet_mass_nom           = jet_pt_jerNomVal*jet_mass_jmrNomVal*jmsNomVal*jet.mass
+            jet_mass_nom           = jet_pt_jerNomVal*jet_mass_jmrNomVal*jmsNomVal*jet_mass
             if jet_mass_nom < 0.0:
                 jet_mass_nom *= -1.0
             jets_mass_nom    .append(jet_mass_nom)
-            jets_mass_jerUp  .append(jet_pt_jerUpVal  *jet_mass_jmrNomVal *jmsNomVal  *jet.mass)
-            jets_mass_jerDown.append(jet_pt_jerDownVal*jet_mass_jmrNomVal *jmsNomVal  *jet.mass)
-            jets_mass_jmrUp  .append(jet_pt_jerNomVal *jet_mass_jmrUpVal  *jmsNomVal  *jet.mass)
-            jets_mass_jmrDown.append(jet_pt_jerNomVal *jet_mass_jmrDownVal*jmsNomVal  *jet.mass)
-            jets_mass_jmsUp  .append(jet_pt_jerNomVal *jet_mass_jmrNomVal *jmsUpVal   *jet.mass)
-            jets_mass_jmsDown.append(jet_pt_jerNomVal *jet_mass_jmrNomVal *jmsDownVal *jet.mass)
+            jets_mass_jerUp  .append(jet_pt_jerUpVal  *jet_mass_jmrNomVal *jmsNomVal  *jet_mass)
+            jets_mass_jerDown.append(jet_pt_jerDownVal*jet_mass_jmrNomVal *jmsNomVal  *jet_mass)
+            jets_mass_jmrUp  .append(jet_pt_jerNomVal *jet_mass_jmrUpVal  *jmsNomVal  *jet_mass)
+            jets_mass_jmrDown.append(jet_pt_jerNomVal *jet_mass_jmrDownVal*jmsNomVal  *jet_mass)
+            jets_mass_jmsUp  .append(jet_pt_jerNomVal *jet_mass_jmrNomVal *jmsUpVal   *jet_mass)
+            jets_mass_jmsDown.append(jet_pt_jerNomVal *jet_mass_jmrNomVal *jmsDownVal *jet_mass)
 
 
             if self.doGroomed :

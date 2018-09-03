@@ -44,6 +44,7 @@ class jetRecalib(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("%s_pt_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
+        self.out.branch("%s_mass_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("MET_pt_nom" , "F")
         self.out.branch("MET_phi_nom", "F")
             
@@ -57,6 +58,7 @@ class jetRecalib(Module):
         met = Object(event, "MET") 
 
         jets_pt_nom = []
+        jets_mass_nom = []
         ( met_px,         met_py         ) = ( met.pt*math.cos(met.phi), met.pt*math.sin(met.phi) )
         ( met_px_nom, met_py_nom ) = ( met_px, met_py )
         met_px_nom = met_px
@@ -66,17 +68,21 @@ class jetRecalib(Module):
         
         for jet in jets:
 	    jet_pt=jet.pt
-	    jet_pt = self.jetReCalibrator.correct(jet,rho)
+            corr = self.jetReCalibrator.correct(jet,rho)
+            jet_pt =  corr[0]
+            jet_mass =  corr[1]
             jet_pt_nom           = jet_pt # don't smear resolution in data
             if jet_pt_nom < 0.0:
                 jet_pt_nom *= -1.0
             jets_pt_nom    .append(jet_pt_nom)
+            jets_mass_nom    .append(jet_mass)
             if jet_pt_nom > 15.:
                 jet_cosPhi = math.cos(jet.phi)
                 jet_sinPhi = math.sin(jet.phi)
                 met_px_nom = met_px_nom - (jet_pt_nom - jet.pt)*jet_cosPhi
                 met_py_nom = met_py_nom - (jet_pt_nom - jet.pt)*jet_sinPhi
         self.out.fillBranch("%s_pt_nom" % self.jetBranchName, jets_pt_nom)
+        self.out.fillBranch("%s_mass_nom" % self.jetBranchName, jets_mass_nom)
         self.out.fillBranch("MET_pt_nom", math.sqrt(met_px_nom**2 + met_py_nom**2))
         self.out.fillBranch("MET_phi_nom", math.atan2(met_py_nom, met_px_nom))        
 
