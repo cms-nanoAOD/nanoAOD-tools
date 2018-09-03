@@ -100,4 +100,3 @@ class JetReCalibrator:
         newpt = jet.pt*raw*corr
         newmass = jet.mass*raw*corr
         return (newpt, newmass)
-
