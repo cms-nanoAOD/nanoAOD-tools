@@ -20,6 +20,8 @@ class JetSelection(Module):
         jetMinPt = 30.,
         jetMaxEta = 2.4,
         dRCleaning = 0.4,
+        flagDA = False,
+        addSize = True,
         storeKinematics=['pt','eta'],
         globalOptions={"isData":False}
     ):
@@ -30,6 +32,8 @@ class JetSelection(Module):
         self.jetMinPt = jetMinPt
         self.jetMaxEta = jetMaxEta
         self.dRCleaning = dRCleaning
+        self.flagDA = flagDA
+        self.addSize = addSize
         self.storeKinematics = storeKinematics
         
  
@@ -41,7 +45,10 @@ class JetSelection(Module):
         
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.out.branch("n"+self.outputName,"I")
+        if self.addSize:
+            self.out.branch("n"+self.outputName,"I")
+        if self.flagDA:
+            self.out.branch(self.outputName+"_forDA","F",lenVar="nJet")
         
         for variable in self.storeKinematics:
             self.out.branch(self.outputName+"_"+variable,"F",lenVar="n"+self.outputName)
@@ -57,6 +64,10 @@ class JetSelection(Module):
         selectedJets = []
         unselectedJets = []
         
+        if self.flagDA:
+            flagsDA = [0.]*event.nJet
+            
+        
         for jet in jets:
             if jet.pt>self.jetMinPt and math.fabs(jet.eta)<self.jetMaxEta and (jet.jetId>0):
                 leptons = self.leptonCollection(event)
@@ -65,12 +76,15 @@ class JetSelection(Module):
                     if mindr<self.dRCleaning:
                         unselectedJets.append(jet)
                         continue
+                if self.flagDA:
+                    flagsDA[jet._index]=1.
                 selectedJets.append(jet)
             else:
                 unselectedJets.append(jet)
-                
-  
-        self.out.fillBranch("n"+self.outputName,len(selectedJets))
+        if self.addSize:
+            self.out.fillBranch("n"+self.outputName,len(selectedJets))
+        if self.flagDA:
+            self.out.fillBranch(self.outputName+"_forDA",flagsDA)
         for variable in self.storeKinematics:
             self.out.fillBranch(self.outputName+"_"+variable,map(lambda jet: getattr(jet,variable),selectedJets))
             

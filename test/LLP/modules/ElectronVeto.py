@@ -8,21 +8,21 @@ import random
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
-class MuonVeto(Module):
+class ElectronVeto(Module):
 
     def __init__(
         self,
-        inputCollection = lambda event: Collection(event, "Muon"),
-        outputName = "vetoMuons",
-        muonMinPt = 10.,
-        muonMaxEta = 2.5,
+        inputCollection = lambda event: Collection(event, "Electron"),
+        outputName = "vetoElectrons",
+        electronMinPt = 15.,
+        electronMaxEta = 2.5,
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
         self.inputCollection = inputCollection
         self.outputName = outputName
-        self.muonMinPt = muonMinPt
-        self.muonMaxEta = muonMaxEta
+        self.electronMinPt = electronMinPt
+        self.electronMaxEta = electronMaxEta
  
     def beginJob(self):
         pass
@@ -39,22 +39,21 @@ class MuonVeto(Module):
         
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
-        muons = self.inputCollection(event)
+        electrons = self.inputCollection(event)
         
-        selectedMuons = []
-        unselectedMuons = []
+        selectedElectrons = []
+        unselectedElectrons = []
         
-        #https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Tight_Muon
-        for muon in muons:
-            if muon.pt>self.muonMinPt and math.fabs(muon.eta)<self.muonMaxEta and muon.isPFcand==1 and (muon.pfRelIso04_all<0.25):
-                selectedMuons.append(muon)
+        for electron in electrons:
+            if electron.pt>self.electronMinPt and math.fabs(electron.eta)<self.electronMaxEta and (electron.cutBased>0):
+                selectedElectrons.append(electron)
             else:
-                unselectedMuons.append(muon)
+                unselectedElectrons.append(electron)
   
-        self.out.fillBranch("n"+self.outputName,len(selectedMuons))
+        self.out.fillBranch("n"+self.outputName,len(selectedElectrons))
         
-        setattr(event,self.outputName,selectedMuons)
-        setattr(event,self.outputName+"_unselected",unselectedMuons)
+        setattr(event,self.outputName,selectedElectrons)
+        setattr(event,self.outputName+"_unselected",unselectedElectrons)
 
         return True
         

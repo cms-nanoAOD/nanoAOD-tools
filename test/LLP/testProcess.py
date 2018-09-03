@@ -7,7 +7,7 @@ import random
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 from importlib import import_module
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
+from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 from modules import *
@@ -47,18 +47,37 @@ muonSelection = [
         outputName="tightMuons",
         storeKinematics=['pt','eta'],
         storeWeights=True,
+        muonMinPt = [26.,15.],
+        muonID = MuonSelection.MEDIUM,
+        muonIso = MuonSelection.LOOSE,
         globalOptions=globalOptions
     ),
     MuonVeto(
-        inputCollection=lambda event: event["tightMuons_unselected"],
+        inputCollection=lambda event: event.tightMuons_unselected,
+        globalOptions=globalOptions
+    ),
+    ElectronVeto(
+        inputCollection=lambda event: Collection(event,"Electron"),
         globalOptions=globalOptions
     ),
     SingleMuonTriggerSelection(
         inputCollection=lambda event: event["tightMuons"],
         outputName="IsoMuTrigger",
+        storeWeights=True,
         globalOptions=globalOptions
     ),
-    EventSkim(selection=lambda event: len(event.tightMuons)==1)
+    DataFlag(
+        globalOptions=globalOptions
+    ),
+    EventSkim(selection=lambda event: event.ntightMuons==2),
+    EventSkim(selection=lambda event: event.nvetoMuons==0),
+    EventSkim(selection=lambda event: event.nvetoElectrons==0),
+    EventSkim(selection=lambda event: event.IsoMuTrigger_flag==1),
+    
+    InvariantSystem(
+        inputCollection = lambda event: event.tightMuons,
+        outputName = "dimuon",
+    )
 ]
 
 analyzerChain = []
@@ -83,10 +102,10 @@ if not args.isData:
     )
     for systName,collection in [
         ("nominal",lambda event: event.jets_nominal),
-        ("jerUp",lambda event: event.jets_jerUp),
-        ("jerDown",lambda event: event.jets_jerDown),
-        ("jesUp",lambda event: event.jets_jesUp["Total"]),
-        ("jesDown",lambda event: event.jets_jesDown["Total"]),
+        #("jerUp",lambda event: event.jets_jerUp),
+        #("jerDown",lambda event: event.jets_jerDown),
+        #("jesTotalUp",lambda event: event.jets_jesUp["Total"]),
+        #("jesTotalDown",lambda event: event.jets_jesDown["Total"]),
     ]:
         analyzerChain.append(
             JetSelection(
@@ -97,23 +116,33 @@ if not args.isData:
         )
         
     analyzerChain.append(
+        JetSelection(
+            inputCollection=lambda event: Collection(event,"Jet"),
+            outputName="Jet",
+            addSize=False,
+            flagDA=True,
+            storeKinematics=[]#['pt','eta'],
+        )
+    )
+    
+    analyzerChain.append(
         EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=2 or \
-            len(event.selectedJets_jerUp)>=2 or \
-            len(event.selectedJets_jerDown)>=2 or \
-            len(event.selectedJets_jesUp)>=2 or \
-            len(event.selectedJets_jesDown)>=2
+            len(event.selectedJets_nominal)>=2 #or \
+            #len(event.selectedJets_jerUp)>=2 or \
+            #len(event.selectedJets_jerDown)>=2 or \
+            #len(event.selectedJets_jesTotalUp)>=2 or \
+            #len(event.selectedJets_jesTotalDown)>=2
         )
     )
     
     for systName,jetCollection,metObject in [
-        ("nominal",lambda event: event.jets_nominal,lambda event: event.met_nominal),
-        ("jerUp",lambda event: event.jets_jerUp,lambda event: event.met_jerUp),
-        ("jerDown",lambda event: event.jets_jerDown,lambda event: event.met_jerDown),
-        ("jesUp",lambda event: event.jets_jesUp["Total"],lambda event: event.met_jesUp["Total"]),
-        ("jesDown",lambda event: event.jets_jesDown["Total"],lambda event: event.met_jesDown["Total"]),
-        ("unclEnUp",lambda event: event.jets_nominal,lambda event: event.met_unclEnUp),
-        ("unclEnDown",lambda event: event.jets_nominal,lambda event: event.met_unclEnDown),
+        ("nominal",lambda event: event.selectedJets_nominal,lambda event: event.met_nominal),
+        #("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
+        #("jerDown",lambda event: event.selectedJets_jerDown,lambda event: event.met_jerDown),
+        #("jesUp",lambda event: event.selectedJets_jesTotalUp,lambda event: event.met_jesUp["Total"]),
+        #("jesDown",lambda event: event.selectedJets_jesTotalDown,lambda event: event.met_jesDown["Total"]),
+        #("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
+        #("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
     ]:
     
         analyzerChain.append(
@@ -123,20 +152,20 @@ if not args.isData:
                 outputName = systName,
             )
         )
-    
+    '''
     #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.met_nominal>150 or \
-            event.met_jerUp>150 or \
-            event.met_jerDown>150 or \
-            event.met_jesUp>150 or \
-            event.met_jesDown>150 or \
-            event.met_unclEnUp>150 or \
-            event.met_unclEnDown>150
+            event.nominal_met>150.# or \
+            #event.jerUp_met>150. or \
+            #event.jerDown_met>150. or \
+            #event.jesUp_met>150. or \
+            #event.jesDown_met>150. or \
+            #event.unclEnUp_met>150. or \
+            #event.unclEnDown_met>150.
         )
     )
-    
+    '''
     analyzerChain.extend([
         PileupWeight(
             dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU69000.root"),
@@ -163,10 +192,10 @@ if not args.isData:
             modelPath="model_parametric.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal,
-                lambda event: event.selectedJets_jerUp,
-                lambda event: event.selectedJets_jerDown,
-                lambda event: event.selectedJets_jesUp,
-                lambda event: event.selectedJets_jesDown
+                #lambda event: event.selectedJets_jerUp,
+                #lambda event: event.selectedJets_jerDown,
+                #lambda event: event.selectedJets_jesTotalUp,
+                #lambda event: event.selectedJets_jesTotalDown
             ],
             taggerName="llpdnnx",
             logctauValues = range(-3,5)
@@ -181,25 +210,116 @@ if not args.isData:
             logctauValues = range(-3,5),
             globalOptions=globalOptions
         )
-    ),
+    )
+    
+    storeVariables = [
+        [lambda tree: tree.branch("genweight","F"),lambda tree,event: tree.fillBranch("genweight",event.Generator_weight)],
+        [lambda tree: tree.branch("rho","F"),lambda tree,event: tree.fillBranch("rho",event.fixedGridRhoFastjetAll)], 
+        [lambda tree: tree.branch("nPV","I"),lambda tree,event: tree.fillBranch("nPV",event.PV_npvsGood)],
+        [lambda tree: tree.branch("nSV","I"),lambda tree,event: tree.fillBranch("nSV",event.nSV)],
+    ]
+    
+    if args.inputFiles[0].find("SMS-T1qqqq_ctau")>=0:
+        analyzerChain.append(
+            EventSkim(selection=lambda event: 
+                event.nllpinfo>0
+            )
+        )
+        storeVariables.extend([
+            [lambda tree: tree.branch("llp","I"),lambda tree,event: tree.fillBranch("llp",int(round(Collection(event,"llpinfo")[0].llp_mass/100.))*100)],
+            [lambda tree: tree.branch("lsp","I"),lambda tree,event: tree.fillBranch("lsp",int(round(Collection(event,"llpinfo")[0].lsp_mass/100.))*100)],
+        ])
+    else:
+        storeVariables.append([lambda tree: tree.branch("genHt","F"),lambda tree,event: tree.fillBranch("genHt",event.LHE_HTIncoming)])
+    
+    
     analyzerChain.append(
         EventInfo(
-            storeVariables = [
-                [lambda tree: tree.branch("genweight","F"),lambda tree,event: tree.fillBranch("genweight",event.Generator_weight)],
-                [lambda tree: tree.branch("genHt","F"),lambda tree,event: tree.fillBranch("genHt",event.LHE_HTIncoming)],
-                [lambda tree: tree.branch("rho","F"),lambda tree,event: tree.fillBranch("rho",event.fixedGridRhoFastjetAll)], 
-                [lambda tree: tree.branch("nPV","I"),lambda tree,event: tree.fillBranch("nPV",event.PV_npvsGood)],
-                [lambda tree: tree.branch("nSV","I"),lambda tree,event: tree.fillBranch("nSV",event.nSV)],
-            ]
+            storeVariables=storeVariables
         )
     )
     
+else:
+    analyzerChain.append(
+        JetSelection(
+            inputCollection=lambda event: Collection(event,"Jet"),
+            outputName="selectedJets_nominal",
+            storeKinematics=['pt','eta'],
+        )
+    )
+    
+    analyzerChain.append(
+        JetSelection(
+            inputCollection=lambda event: Collection(event,"Jet"),
+            outputName="Jet",
+            addSize=False,
+            flagDA=True,
+            storeKinematics=[]#['pt','eta'],
+        )
+    )
+        
+    analyzerChain.append(
+        EventSkim(selection=lambda event: 
+            len(event.selectedJets_nominal)>=2
+        )
+    )
+    
+    analyzerChain.append(
+        EventObservables(
+            jetInputCollection = lambda event: event.selectedJets_nominal,
+            metInput = lambda event: Object(event,"MET"),
+            outputName = "nominal",
+        )
+    )
+    '''
+    #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
+    analyzerChain.append(
+        EventSkim(selection=lambda event: 
+            event.nominal_met>150.
+        )
+    )
+    '''
+    
+    
+    analyzerChain.append(
+        TaggerEvaluation(
+            modelPath="model_parametric.pb",
+            inputCollections=[
+                lambda event: event.selectedJets_nominal
+            ],
+            taggerName="llpdnnx",
+            logctauValues = range(-3,5)
+        )
+    )
+    
+    analyzerChain.append(
+        TaggerWorkingpoints(
+            inputCollection = lambda event: event.selectedJets_nominal,
+            taggerName = "llpdnnx",
+            outputName = "llpdnnx_nominal",
+            logctauValues = range(-3,5),
+            globalOptions=globalOptions
+        )
+    )
+    
+    
+'''
+analyzerChain.append(
+    EventDump(inputCollections = [
+            [lambda event: Collection(event, "Muon"),["pt","eta","phi"]],
+            [lambda event: Collection(event, "Jet"),["pt","eta","phi"]]
+        ],
+        compareTo = "ref.json"
+    )
+)
+'''
 
 p=PostProcessor(
     args.output[0],
     [args.inputFiles],
     cut=None,
     branchsel=None,
+    maxEvents=-1,
     modules=analyzerChain,
     friend=True
 )

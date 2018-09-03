@@ -53,7 +53,7 @@ class JetMetUncertainties(jetmetUncertaintiesProducer):
             met.px = met.pt*math.cos(met.phi)
             met.py = met.pt*math.sin(met.phi)
             
-                
+            met.px_jerNominal,met.py_jerNominal = met.px,met.py
             met.px_jerUp,met.py_jerUp = met.px,met.py
             met.px_jerDown,met.py_jerDown = met.px,met.py
             
@@ -94,7 +94,6 @@ class JetMetUncertainties(jetmetUncertaintiesProducer):
             
             jet.pt_jesUp   = {}
             jet.pt_jesDown = {}
-
         
             for jesUncertainty in self.jesUncertainties:
                 # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties )
@@ -104,6 +103,7 @@ class JetMetUncertainties(jetmetUncertaintiesProducer):
                 jet.pt_jesUp[jesUncertainty]   = jet.pt_jerNominal*(1. + delta)
                 jet.pt_jesDown[jesUncertainty] = jet.pt_jerNominal*(1. - delta)
                 
+            
             # progate JER and JES corrections and uncertainties to MET
             if self.corrMET and jet.pt_jerNominal > self.unclEnThreshold:
                 jet_cosPhi = math.cos(jet.phi)
@@ -257,8 +257,13 @@ class JetMetUncertainties(jetmetUncertaintiesProducer):
 
         
         event.jets_nominal = getJetsSyst("nominal",0)
+        
+        
         event.met_nominal = getMetSyst("nominal",0)
         
+        #print map(lambda j: j.pt, jets),met.pt
+        #print map(lambda j: j.pt, event.jets_nominal),event.met_nominal.pt
+        #print
         event.jets_jerUp = getJetsSyst("jer",1)
         event.met_jerUp = getMetSyst("jer",1)
         event.jets_jerDown = getJetsSyst("jer",-1)

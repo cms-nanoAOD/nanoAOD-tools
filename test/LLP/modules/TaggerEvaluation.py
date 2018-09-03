@@ -98,7 +98,7 @@ class TaggerEvaluation(Module):
         pass
         
     def analyze(self, event):
-        jetorigin = Collection(event, "jetorigin")
+        jetglobal = Collection(event, "global")
         
         jetOriginIndices = set() #superset of all indices to evaluate
         
@@ -106,7 +106,7 @@ class TaggerEvaluation(Module):
         for jetCollection in self.inputCollections:
             jets = jetCollection(event)
             for ijet,jet in enumerate(jets):
-                if jet._index>=len(jetorigin):
+                if jet._index>=len(jetglobal):
                     #this is very strange - why has it not been filled?
                     continue
                 jetOriginIndices.add(jet._index)
@@ -121,7 +121,7 @@ class TaggerEvaluation(Module):
         if event._tree._ttreereaderversion > self._ttreereaderversion:
             self.setup(event._tree)
             
-        self.nJets = len(jetorigin)
+        self.nJets = len(jetglobal)
         if len(jetOriginIndices)==0:
             return True
             
@@ -149,7 +149,7 @@ class TaggerEvaluation(Module):
                 for ictau,ctau in enumerate(self.logctauValues):
                     taggerOutput[self.logctauValues[ictau]] = {}
                     for iclass, classLabel in enumerate(self.predictionLabels):  
-                        if jet._index<len(jetorigin):
+                        if jet._index<len(jetglobal):
                             taggerOutput[self.logctauValues[ictau]][classLabel] = \
                                 predictionsPerIndexAndCtau[jet._index][ctau][iclass]
                         else:

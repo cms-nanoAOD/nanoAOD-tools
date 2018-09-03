@@ -15,7 +15,7 @@ class EventObservables(Module):
     def __init__(
         self,
         jetInputCollection = lambda event: Collection(event, "Jet"),
-        metInput = lambda event: Object(event, "Met"),
+        metInput = lambda event: Object(event, "MET"),
         outputName = "centralJets",
         globalOptions={"isData":False}
     ):
@@ -34,6 +34,7 @@ class EventObservables(Module):
         self.out = wrappedOutputTree
         self.out.branch(self.outputName+"_ht","F")
         self.out.branch(self.outputName+"_mht","F")
+        self.out.branch(self.outputName+"_mass","F")
         self.out.branch(self.outputName+"_met","F")
         self.out.branch(self.outputName+"_minPhi","F")
         
@@ -49,15 +50,21 @@ class EventObservables(Module):
         for jet in jets:
             jetVectorSum+=jet.p4()
             jetScalarPtSum+=jet.pt
+            
         self.out.fillBranch(self.outputName+"_ht",jetScalarPtSum)
+        setattr(event,self.outputName+"_ht",jetScalarPtSum)
         self.out.fillBranch(self.outputName+"_mht",jetVectorSum.Pt())
+        setattr(event,self.outputName+"_mht",jetVectorSum.Pt())
+        self.out.fillBranch(self.outputName+"_mass",jetVectorSum.M())
+        setattr(event,self.outputName+"_mass",jetVectorSum.M())
         self.out.fillBranch(self.outputName+"_met",met.pt)
+        setattr(event,self.outputName+"_met",met.pt)
         
         minPhi = math.pi
         for jet in jets:
             negSum = -(jetVectorSum-jet.p4())
             minPhi = min(minPhi,math.fabs(deltaPhi(negSum.Phi(),jet.phi)))
         self.out.fillBranch(self.outputName+"_minPhi",minPhi)
-        
+        setattr(event,self.outputName+"_minPhi",minPhi)
         return True
         

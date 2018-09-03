@@ -10,4 +10,8 @@ from MetFilter import MetFilter
 from PileupWeight import PileupWeight
 from TaggerWorkingpoints import TaggerWorkingpoints
 from EventInfo import EventInfo
+from ElectronVeto import ElectronVeto
+from DataFlag import DataFlag
+from EventDump import EventDump
+from InvariantSystem import InvariantSystem
 
