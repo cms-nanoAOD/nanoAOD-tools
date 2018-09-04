@@ -77,7 +77,9 @@ muonSelection = [
     InvariantSystem(
         inputCollection = lambda event: event.tightMuons,
         outputName = "dimuon",
-    )
+    ),
+    
+    EventSkim(selection=lambda event: math.fabs(event.dimuon_mass-90.)<10.),
 ]
 
 analyzerChain = []
@@ -127,7 +129,7 @@ if not args.isData:
     
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=1 #or \
+            len(event.selectedJets_nominal)>=1 and len(event.selectedJets_nominal)<5 #or \
             #len(event.selectedJets_jerUp)>=2 or \
             #len(event.selectedJets_jerDown)>=2 or \
             #len(event.selectedJets_jesTotalUp)>=2 or \
@@ -152,11 +154,11 @@ if not args.isData:
                 outputName = systName,
             )
         )
-    '''
+   
     #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.nominal_met>150.# or \
+            event.nominal_met<50.# or \
             #event.jerUp_met>150. or \
             #event.jerDown_met>150. or \
             #event.jesUp_met>150. or \
@@ -165,7 +167,7 @@ if not args.isData:
             #event.unclEnDown_met>150.
         )
     )
-    '''
+    
     analyzerChain.extend([
         PileupWeight(
             dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU69000.root"),
@@ -187,51 +189,6 @@ if not args.isData:
         )   
     ])
     
-    analyzerChain.append(
-        TaggerEvaluation(
-            modelPath="model_parametric.pb",
-            inputCollections=[
-                lambda event: event.selectedJets_nominal,
-                #lambda event: event.selectedJets_jerUp,
-                #lambda event: event.selectedJets_jerDown,
-                #lambda event: event.selectedJets_jesTotalUp,
-                #lambda event: event.selectedJets_jesTotalDown
-            ],
-            taggerName="llpdnnx",
-            logctauValues = range(-3,5)
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx",
-            outputName = "llpdnnx_nominal",
-            logctauValues = range(-3,5),
-            globalOptions=globalOptions
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerEvaluation(
-            modelPath="model_exp_da.pb",
-            inputCollections=[
-                lambda event: event.selectedJets_nominal
-            ],
-            taggerName="llpdnnx_da",
-            logctauValues = range(-3,5)
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx_da",
-            outputName = "llpdnnx_da_nominal",
-            logctauValues = range(-3,5),
-            globalOptions=globalOptions
-        )
-    )
     
     storeVariables = [
         [lambda tree: tree.branch("genweight","F"),lambda tree,event: tree.fillBranch("genweight",event.Generator_weight)],
@@ -281,7 +238,7 @@ else:
         
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=1
+            len(event.selectedJets_nominal)>=1 and len(event.selectedJets_nominal)<5
         )
     )
     
@@ -292,57 +249,14 @@ else:
             outputName = "nominal",
         )
     )
-    '''
+    
     #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.nominal_met>150.
-        )
-    )
-    '''
-    
-    
-    analyzerChain.append(
-        TaggerEvaluation(
-            modelPath="model_parametric.pb",
-            inputCollections=[
-                lambda event: event.selectedJets_nominal
-            ],
-            taggerName="llpdnnx",
-            logctauValues = range(-3,5)
+            event.nominal_met<50.
         )
     )
     
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx",
-            outputName = "llpdnnx_nominal",
-            logctauValues = range(-3,5),
-            globalOptions=globalOptions
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerEvaluation(
-            modelPath="model_exp_da.pb",
-            inputCollections=[
-                lambda event: event.selectedJets_nominal
-            ],
-            taggerName="llpdnnx_da",
-            logctauValues = range(-3,5)
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx_da",
-            outputName = "llpdnnx_da_nominal",
-            logctauValues = range(-3,5),
-            globalOptions=globalOptions
-        )
-    )
     
     
 '''
@@ -363,6 +277,6 @@ p=PostProcessor(
     branchsel=None,
     maxEvents=-1,
     modules=analyzerChain,
-    friend=True
+    friend=False
 )
 p.run()

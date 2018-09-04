@@ -30,8 +30,8 @@ class DataFlag(Module):
             "DYJetsToLL_M-50_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8":0.6304,
             "DYJetsToLL_M-50_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8":0.1514,
             "DYJetsToLL_M-50_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8":0.003565,
-            # "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8":18610,
-            # "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8":1921.8*3,
+            "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8":18610,
+            "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8":1921.8*3,
             
             # QCD (multijet)
             # LO
@@ -122,7 +122,7 @@ class DataFlag(Module):
             "ZZ_TuneCUETP8M1_13TeV-pythia8": 16.523,
         }
         
-        self.xsecweight = 1.
+        self.xsecweight = 0.
         
     def beginJob(self):
         pass
@@ -135,7 +135,7 @@ class DataFlag(Module):
         self.out.branch("isData","F")
         self.out.branch("xsecweight","F")
         
-        self.xsecweight = 1.
+        self.xsecweight = 0.
         for name in self.xsecs.keys():
             if inputFile.GetName().find(name)>=0:
                 self.xsecweight = self.xsecs[name]/self.genweights[name]
@@ -147,7 +147,7 @@ class DataFlag(Module):
     def analyze(self, event):
         self.out.fillBranch("isData",1. if self.globalOptions["isData"] else 0.)
         if not self.globalOptions["isData"]:
-            self.out.fillBranch("xsecweight",self.xsecweight*event.Generator_weight)
+            self.out.fillBranch("xsecweight",self.xsecweight*event.Generator_weight*35.8*1000.)
         else:
             self.out.fillBranch("xsecweight",1.0)
         return True
