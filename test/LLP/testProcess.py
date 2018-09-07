@@ -214,7 +214,7 @@ if not args.isData:
     
     analyzerChain.append(
         TaggerEvaluation(
-            modelPath="model_exp_da.pb",
+            modelPath="model_exp_da_bothmuon.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal
             ],
@@ -325,7 +325,7 @@ else:
     
     analyzerChain.append(
         TaggerEvaluation(
-            modelPath="model_exp_da.pb",
+            modelPath="model_exp_da_bothmuon.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal
             ],

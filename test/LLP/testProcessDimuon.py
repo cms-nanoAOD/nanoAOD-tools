@@ -78,7 +78,6 @@ muonSelection = [
         inputCollection = lambda event: event.tightMuons,
         outputName = "dimuon",
     ),
-    
     EventSkim(selection=lambda event: math.fabs(event.dimuon_mass-90.)<10.),
 ]
 
@@ -117,23 +116,25 @@ if not args.isData:
             )
         )
         
-    analyzerChain.append(
-        JetSelection(
-            inputCollection=lambda event: Collection(event,"Jet"),
-            outputName="Jet",
-            addSize=False,
-            flagDA=True,
-            storeKinematics=[]#['pt','eta'],
-        )
-    )
+   
     
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=1 and len(event.selectedJets_nominal)<5 #or \
+            len(event.selectedJets_nominal)>=1 and len(event.selectedJets_nominal)<5#or \
             #len(event.selectedJets_jerUp)>=2 or \
             #len(event.selectedJets_jerDown)>=2 or \
             #len(event.selectedJets_jesTotalUp)>=2 or \
             #len(event.selectedJets_jesTotalDown)>=2
+        )
+    )
+    
+    analyzerChain.append(
+        JetSelection(
+            inputCollection=lambda event: event.selectedJets_nominal,
+            outputName="Jet",
+            addSize=False,
+            flagDA=True,
+            storeKinematics=[]#['pt','eta'],
         )
     )
     
@@ -154,7 +155,7 @@ if not args.isData:
                 outputName = systName,
             )
         )
-   
+    
     #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
     analyzerChain.append(
         EventSkim(selection=lambda event: 
@@ -188,7 +189,7 @@ if not args.isData:
             globalOptions=globalOptions
         )   
     ])
-    
+
     
     storeVariables = [
         [lambda tree: tree.branch("genweight","F"),lambda tree,event: tree.fillBranch("genweight",event.Generator_weight)],
@@ -225,20 +226,20 @@ else:
             storeKinematics=['pt','eta'],
         )
     )
+
+    analyzerChain.append(
+        EventSkim(selection=lambda event: 
+            len(event.selectedJets_nominal)>=1 and len(event.selectedJets_nominal)<5
+        )
+    )
     
     analyzerChain.append(
         JetSelection(
-            inputCollection=lambda event: Collection(event,"Jet"),
+            inputCollection=lambda event: event.selectedJets_nominal,
             outputName="Jet",
             addSize=False,
             flagDA=True,
             storeKinematics=[]#['pt','eta'],
-        )
-    )
-        
-    analyzerChain.append(
-        EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=1 and len(event.selectedJets_nominal)<5
         )
     )
     
@@ -250,25 +251,14 @@ else:
         )
     )
     
-    #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
     analyzerChain.append(
         EventSkim(selection=lambda event: 
             event.nominal_met<50.
         )
     )
+
     
-    
-    
-'''
-analyzerChain.append(
-    EventDump(inputCollections = [
-            [lambda event: Collection(event, "Muon"),["pt","eta","phi"]],
-            [lambda event: Collection(event, "Jet"),["pt","eta","phi"]]
-        ],
-        compareTo = "ref.json"
-    )
-)
-'''
+
 
 p=PostProcessor(
     args.output[0],

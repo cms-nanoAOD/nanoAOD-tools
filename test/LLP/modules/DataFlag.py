@@ -134,11 +134,14 @@ class DataFlag(Module):
         self.out = wrappedOutputTree
         self.out.branch("isData","F")
         self.out.branch("xsecweight","F")
+        self.out.branch("processId","F")
         
+        self.processId = 0. #=0 is Data; >0 MC in alphabetical order
         self.xsecweight = 0.
-        for name in self.xsecs.keys():
+        for processId,name in enumerate(sorted(self.xsecs.keys())):
             if inputFile.GetName().find(name)>=0:
                 self.xsecweight = self.xsecs[name]/self.genweights[name]
+                self.processId = processId+1.
                 break
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -146,6 +149,7 @@ class DataFlag(Module):
         
     def analyze(self, event):
         self.out.fillBranch("isData",1. if self.globalOptions["isData"] else 0.)
+        self.out.fillBranch("processId",self.processId)
         if not self.globalOptions["isData"]:
             self.out.fillBranch("xsecweight",self.xsecweight*event.Generator_weight*35.8*1000.)
         else:
