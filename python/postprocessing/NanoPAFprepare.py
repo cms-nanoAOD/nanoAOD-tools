@@ -23,7 +23,8 @@ slimfile = "SlimFile.txt"
 from modules.jme.jetmetUncertainties import *
 from modules.common.puWeightProducer import *
 from modules.skimNRecoLeps import *
-mod = [puAutoWeight(), skimRecoLeps()] # countHistogramsProducer(), jetmetUncertainties2017All()
+from modules.addSUSYvar import *
+mod = [puAutoWeight(), skimRecoLeps(), addSUSYvarsMC()] # countHistogramsProducer(), jetmetUncertainties2017All()
 
 p=PostProcessor(outdir,filepath,cut,slimfile,mod,provenance=True,outputbranchsel=slimfile)
 p.run()

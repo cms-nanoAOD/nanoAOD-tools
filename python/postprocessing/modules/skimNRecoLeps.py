@@ -31,8 +31,8 @@ class skipNRecoLeps(Module):
         for el in elec:
           if el.pt > self.minelpt and abs(el.eta) < self.maxeleta and (el.cutBased >= 3): nlepgood += 1
 
-        #return nlepgood >= 2
-        return nlepgood == 1
+        return nlepgood >= 2
+        #return nlepgood == 1
 
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed

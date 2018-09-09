@@ -1,0 +1,12 @@
+3. calculate the lumi
+http://cms-service-lumi.web.cern.ch/cms-service-lumi/brilwsdoc.html
+  bash
+  export PATH=$HOME/.local/bin:/afs/cern.ch/cms/lumi/brilconda-1.0.3/bin:$PATH
+  brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i ./JSONAnalyzer/MuonEG_Run2016B_ReReco_v3/lumiSummary.json 
+  brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i ./JSONAnalyzer/MuonEG_Run2016C_ReReco_v1/lumiSummary.json 
+  brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i ./JSONAnalyzer/MuonEG_Run2016D_ReReco_v1/lumiSummary.json 
+  brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i ./JSONAnalyzer/MuonEG_Run2016E_ReReco_v1/lumiSummary.json 
+  brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i ./JSONAnalyzer/MuonEG_Run2016F_ReReco_v1/lumiSummary.json 
+  brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i ./JSONAnalyzer/MuonEG_Run2016G_ReReco_v1/lumiSummary.json 
+  brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i ./JSONAnalyzer/MuonEG_Run2016H_PromptReco_v2/lumiSummary.json 
+  brilcalc lumi --normtag /afs/cern.ch/user/l/lumipro/public/normtag_file/normtag_DATACERT.json -i ./JSONAnalyzer/MuonEG_Run2016H_PromptReco_v3/lumiSummary.json 
