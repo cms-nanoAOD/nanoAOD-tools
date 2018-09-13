@@ -33,6 +33,7 @@ Here is a summary of its features:
 * the `-J`,`--json` option is used to pass the name of a JSON file that will be used to select events. It cannot be used in friend mode.
 * if run with the `--full` option (default), the output will be a full nanoAOD file. If run with the `--friend` option, instead, the output will be a friend tree that can be attached to the input tree. In the latter case, it is not possible to apply any kind of event selection, as the number of entries in the parent and friend tree must be the same.
 * the `-b`,`--branch-selection` option is used to pass the name of a file containing directives to keep or drop branches from the output tree. The file should contain one directive among `keep`/`drop` (wildcards allowed as in TTree::SetBranchStatus) or `keepmatch`/`dropmatch` (python regexp matching the branch name) per line, as shown in the [this](python/postprocessing/examples/keep_and_drop.txt) example file.
+  * `--bi` and `--bo` allows to specify the keep/drop file separately for input and output trees.  
 * the `--justcount` option will cause the script to printout the number of selected events, without actually writing the output file.
 
 Please run with `--help` for a complete list of options.
@@ -67,3 +68,15 @@ The event interface, defined in `PhysicsTools.NanoAODTools.postprocessing.framew
 and this will access the elements of the `Electron_someVar`, `Electron_pt` branch arrays. Event variables can be accessed simply by `event.someVar`, for instance `event.rho`.
 
 The output branches should be filled calling the `fillBranch(branchname, value)` method of `wrappedOutputTree`. `value` should be the desired value for single-value branches, an iterable with the correct length for array branches. It is not necessary to fill the `lenVar` branch explicitly, as this is done automatically using the length of the passed iterable.
+
+## Keep/drop branches
+See the effect of keep/drop instructions by running:
+```
+python scripts/nano_postproc.py outDir /eos/user/a/andrey/f.root -I PhysicsTools.NanoAODTools.postprocessing.examples.exampleModule exampleModule -s _exaModu_keepdrop --bi scripts/keep_and_drop_input.txt --bo scripts/keep_and_drop_output.txt
+```
+comparing to:
+```
+python scripts/nano_postproc.py outDir /eos/user/a/andrey/f.root -I PhysicsTools.NanoAODTools.postprocessing.examples.exampleModule exampleModule -s _exaModu
+```
+The output branch created by exampleModule produces the same result in both cases. But thefirst one drops all other branches when creating output tree. It also runs faster.
+
