@@ -42,6 +42,6 @@ if __name__ == "__main__":
     if options.noOut:
         if len(modules) == 0: 
             raise RuntimeError("Running with --noout and no modules does nothing!")
-    p=PostProcessor(outdir,args,options.cut,options.branchsel,modules,options.compression,options.friend,options.postfix,options.json,options.noOut,options.justcount)
+    p=PostProcessor(outdir,args,options.cut,options.branchsel,modules,options.compression,options.friend,options.postfix,options.json,options.noOut,options.justcount,outputbranchsel= options.branchsel)
     p.run()
 
