@@ -15,6 +15,7 @@ class jetmetUncertaintiesProducer(Module):
         self.era = era
         self.redoJEC = redoJEC
         self.noGroom = noGroom
+        self.jetType = jetType
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used in the jet smearer, as there is no consistent set of 
         #     txt files for JES uncertainties and JER scale factors and uncertainties yet
@@ -32,13 +33,13 @@ class jetmetUncertaintiesProducer(Module):
 
         self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName)
 
-        if "AK4" in jetType : 
+        if "AK4" in self.jetType : 
             self.jetBranchName = "Jet"
             self.genJetBranchName = "GenJet"
             self.genSubJetBranchName = None
             self.doGroomed = False
             self.corrMET = True
-        elif "AK8" in jetType :
+        elif "AK8" in self.jetType :
             self.jetBranchName = "FatJet"
             self.subJetBranchName = "SubJet"
             self.genJetBranchName = "GenJetAK8"
@@ -49,7 +50,7 @@ class jetmetUncertaintiesProducer(Module):
                 self.doGroomed = False
             self.corrMET = False
         else:
-            raise ValueError("ERROR: Invalid jet type = '%s'!" % jetType)
+            raise ValueError("ERROR: Invalid jet type = '%s'!" % self.jetType)
         self.metBranchName = "MET"
         self.rhoBranchName = "fixedGridRhoFastjetAll"
         self.lenVar = "n" + self.jetBranchName

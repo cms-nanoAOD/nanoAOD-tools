@@ -13,11 +13,11 @@ class jetRecalib(Module):
 
       if "AK4" in jetType : 
             self.jetBranchName = "Jet"
-        elif "AK8" in jetType :
+        elif "AK8" in self.jetType :
             self.jetBranchName = "FatJet"
             self.subJetBranchName = "SubJet"
         else:
-            raise ValueError("ERROR: Invalid jet type = '%s'!" % jetType)
+            raise ValueError("ERROR: Invalid jet type = '%s'!" % self.jetType)
         self.rhoBranchName = "fixedGridRhoFastjetAll"
         self.lenVar = "n" + self.jetBranchName        
 
@@ -27,7 +27,7 @@ class jetRecalib(Module):
         self.jesInputFilePath = tempfile.mkdtemp()
         self.jesArchive.extractall(self.jesInputFilePath)
 
-        self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
+        self.jetReCalibrator = JetReCalibrator(globalTag, self.jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
 	
         # load libraries for accessing JES scale factors and uncertainties from txt files
         for library in [ "libCondFormatsJetMETObjects", "libPhysicsToolsNanoAODTools" ]:
