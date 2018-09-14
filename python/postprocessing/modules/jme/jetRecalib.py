@@ -11,13 +11,15 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import
 class jetRecalib(Module):
     def __init__(self,  globalTag, archive, jetType = "AK4PFchs"):
 
-        if "AK4" in jetType : 
+        self.jetType = jetType
+
+        if "AK4" in self.jetType : 
             self.jetBranchName = "Jet"
-        elif "AK8" in jetType :
+        elif "AK8" in self.jetType :
             self.jetBranchName = "FatJet"
             self.subJetBranchName = "SubJet"
         else:
-            raise ValueError("ERROR: Invalid jet type = '%s'!" % jetType)
+            raise ValueError("ERROR: Invalid jet type = '%s'!" % self.jetType)
         self.rhoBranchName = "fixedGridRhoFastjetAll"
         self.lenVar = "n" + self.jetBranchName        
 
@@ -27,7 +29,7 @@ class jetRecalib(Module):
         self.jesInputFilePath = tempfile.mkdtemp()
         self.jesArchive.extractall(self.jesInputFilePath)
 
-        self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
+        self.jetReCalibrator = JetReCalibrator(globalTag, self.jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
 	
         # load libraries for accessing JES scale factors and uncertainties from txt files
         for library in [ "libCondFormatsJetMETObjects", "libPhysicsToolsNanoAODTools" ]:
@@ -43,7 +45,9 @@ class jetRecalib(Module):
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
+        self.out.branch("%s_pt_raw" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_pt_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
+        self.out.branch("%s_mass_raw" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_mass_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("MET_pt_nom" , "F")
         self.out.branch("MET_phi_nom", "F")
@@ -57,7 +61,9 @@ class jetRecalib(Module):
         jets = Collection(event, self.jetBranchName )
         met = Object(event, "MET") 
 
+        jets_pt_raw = []
         jets_pt_nom = []
+        jets_mass_raw = []
         jets_mass_nom = []
         ( met_px,         met_py         ) = ( met.pt*math.cos(met.phi), met.pt*math.sin(met.phi) )
         ( met_px_nom, met_py_nom ) = ( met_px, met_py )
@@ -67,6 +73,12 @@ class jetRecalib(Module):
         rho = getattr(event, self.rhoBranchName)
         
         for jet in jets:
+            jet_pt_raw = jet.pt*(1.-jet.rawFactor) #save raw jet pt
+            jets_pt_raw.append(jet_pt_raw)
+
+            jet_mass_raw = jet.mass*(1.-jet.rawFactor) #save raw jet mass
+            jets_mass_raw.append(jet_mass_raw)
+
 	    jet_pt=jet.pt
             corr = self.jetReCalibrator.correct(jet,rho)
             jet_pt =  corr[0]
@@ -81,7 +93,9 @@ class jetRecalib(Module):
                 jet_sinPhi = math.sin(jet.phi)
                 met_px_nom = met_px_nom - (jet_pt_nom - jet.pt)*jet_cosPhi
                 met_py_nom = met_py_nom - (jet_pt_nom - jet.pt)*jet_sinPhi
+        self.out.fillBranch("%s_pt_raw" % self.jetBranchName, jets_pt_raw)
         self.out.fillBranch("%s_pt_nom" % self.jetBranchName, jets_pt_nom)
+        self.out.fillBranch("%s_mass_raw" % self.jetBranchName, jets_mass_raw)
         self.out.fillBranch("%s_mass_nom" % self.jetBranchName, jets_mass_nom)
         self.out.fillBranch("MET_pt_nom", math.sqrt(met_px_nom**2 + met_py_nom**2))
         self.out.fillBranch("MET_phi_nom", math.atan2(met_py_nom, met_px_nom))        

@@ -15,6 +15,7 @@ class jetmetUncertaintiesProducer(Module):
         self.era = era
         self.redoJEC = redoJEC
         self.noGroom = noGroom
+        self.jetType = jetType
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used, as there is no consistent set of txt files for
         #     JES uncertainties and JER scale factors and uncertainties yet
@@ -32,13 +33,13 @@ class jetmetUncertaintiesProducer(Module):
 
         self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName)
 
-        if "AK4" in jetType : 
+        if "AK4" in self.jetType : 
             self.jetBranchName = "Jet"
             self.genJetBranchName = "GenJet"
             self.genSubJetBranchName = None
             self.doGroomed = False
             self.corrMET = True
-        elif "AK8" in jetType :
+        elif "AK8" in self.jetType :
             self.jetBranchName = "FatJet"
             self.subJetBranchName = "SubJet"
             self.genJetBranchName = "GenJetAK8"
@@ -49,7 +50,7 @@ class jetmetUncertaintiesProducer(Module):
                 self.doGroomed = False
             self.corrMET = False
         else:
-            raise ValueError("ERROR: Invalid jet type = '%s'!" % jetType)
+            raise ValueError("ERROR: Invalid jet type = '%s'!" % self.jetType)
         self.metBranchName = "MET"
         self.rhoBranchName = "fixedGridRhoFastjetAll"
         self.lenVar = "n" + self.jetBranchName
@@ -129,10 +130,12 @@ class jetmetUncertaintiesProducer(Module):
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
+        self.out.branch("%s_pt_raw" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_pt_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
+        self.out.branch("%s_mass_raw" % self.jetBranchName, "F", lenVar=self.lenVar)
+        self.out.branch("%s_mass_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_corr_JEC" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_corr_JER" % self.jetBranchName, "F", lenVar=self.lenVar)
-        self.out.branch("%s_mass_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
         if self.doGroomed:
             self.out.branch("%s_msoftdrop_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
             
@@ -180,6 +183,7 @@ class jetmetUncertaintiesProducer(Module):
             genSubJetMatcher = matchObjectCollectionMultiple( genJets, genSubJets, dRmax=0.8 )
             
 
+        jets_pt_raw = []
         jets_pt_nom = []
         jets_corr_JEC = []
         jets_corr_JER = []
@@ -187,6 +191,7 @@ class jetmetUncertaintiesProducer(Module):
         jets_pt_jerDown = []
         jets_pt_jesUp   = {}
         jets_pt_jesDown = {}
+        jets_mass_raw = []
         jets_mass_nom = []
         jets_mass_jerUp   = []
         jets_mass_jerDown = []
@@ -254,10 +259,14 @@ class jetmetUncertaintiesProducer(Module):
             #redo JECs if desired
             if hasattr(jet, "rawFactor"):
                 jet_rawpt = jet_pt * (1 - jet.rawFactor)
+                jet_rawmass = jet_mass * (1 - jet.rawFactor)
             else:
                 jet_rawpt = -1.0 * jet_pt #If factor not present factor will be saved as -1
+                jet_rawmass = -1.0 * jet_mass #If factor not present factor will be saved as -1
             if self.redoJEC :
                 (jet_pt, jet_mass) = self.jetReCalibrator.correct(jet,rho)
+            jets_pt_raw.append(jet_rawpt)
+            jets_mass_raw.append(jet_rawmass)
             jets_corr_JEC.append(jet_pt/jet_rawpt)
 
             # evaluate JER scale factors and uncertainties
@@ -389,11 +398,13 @@ class jetmetUncertaintiesProducer(Module):
             met_py_unclEnDown  = met_py_unclEnDown + (met_py_nom - met_py)
 
            
+        self.out.fillBranch("%s_pt_raw" % self.jetBranchName, jets_pt_raw)
         self.out.fillBranch("%s_pt_nom" % self.jetBranchName, jets_pt_nom)
         self.out.fillBranch("%s_corr_JEC" % self.jetBranchName, jets_corr_JEC)
         self.out.fillBranch("%s_corr_JER" % self.jetBranchName, jets_corr_JER)
         self.out.fillBranch("%s_pt_jerUp" % self.jetBranchName, jets_pt_jerUp)
         self.out.fillBranch("%s_pt_jerDown" % self.jetBranchName, jets_pt_jerDown)
+        self.out.fillBranch("%s_mass_raw" % self.jetBranchName, jets_mass_raw)
         self.out.fillBranch("%s_mass_nom" % self.jetBranchName, jets_mass_nom)
         self.out.fillBranch("%s_mass_jerUp" % self.jetBranchName, jets_mass_jerUp)
         self.out.fillBranch("%s_mass_jerDown" % self.jetBranchName, jets_mass_jerDown)
