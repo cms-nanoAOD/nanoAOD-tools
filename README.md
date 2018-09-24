@@ -46,9 +46,9 @@ Please run with `--help` for a complete list of options.
 It is possible to import modules that will be run on each entry passing the event selection, and can be used to calculate new variables that will be included in the output tree (both in friend and full mode) or to apply event filter decisions.
 
 We will use `python/postprocessing/examples/exampleModule.py` as an example. The module definition [file](python/postprocessing/examples/exampleModule.py), containing a simple constructor
-
+```
    exampleModuleConstr = lambda : exampleProducer(jetSelection= lambda j : j.pt > 30)
-
+```
 should be imported using the following syntax:
 
 ```
