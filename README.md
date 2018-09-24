@@ -83,8 +83,8 @@ The output branches should be filled calling the `fillBranch(branchname, value)`
 Now, let's have a look at another example, `python/postprocessing/examples/mhtjuProducerCpp.py`, [file](python/postprocessing/examples/mhtjuProducerCpp.py). Similarly, it should be imported using the following syntax:
 
 ```
-python scripts/nano_postproc.py -I PhysicsTools.NanoAODTools.postprocessing.examples.mhtjuProducerCpp mhtju
+python scripts/nano_postproc.py outDir /eos/cms/store/user/andrey/f.root -I PhysicsTools.NanoAODTools.postprocessing.examples.mhtjuProducerCpp mhtju
 ```
-This module has the same structure of its producer as `exampleProducer`. However, in addition it utilizes a C++ code to calculate the mht variable, `src/mhtjuProducerCppWorker.cc`. This code is loaded in the `__init__` method of the producer.
+This module has the same structure of its producer as `exampleProducer`, but in addition it utilizes a C++ code to calculate the mht variable, `src/mhtjuProducerCppWorker.cc`. This code is loaded in the `__init__` method of the producer.
 
 
