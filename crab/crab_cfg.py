@@ -4,7 +4,7 @@ from CRABClient.UserUtilities import config, getUsernameFromSiteDB
 config = Configuration()
 
 config.section_("General")
-config.General.requestName = 'NanoTestDesy'
+config.General.requestName = 'NanoPost1'
 config.General.transferLogs=True
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
@@ -21,9 +21,9 @@ config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 2
 config.Data.totalUnits = 10
 
-config.Data.outLFNDirBase = '/store/user/%s/NanoTestDesy' % (getUsernameFromSiteDB())
+config.Data.outLFNDirBase = '/store/user/%s/NanoPost' % (getUsernameFromSiteDB())
 config.Data.publication = False
-config.Data.outputDatasetTag = 'NanoTestDesy'
+config.Data.outputDatasetTag = 'NanoTestPost'
 config.section_("Site")
 config.Site.storageSite = "T2_DE_DESY"
 
