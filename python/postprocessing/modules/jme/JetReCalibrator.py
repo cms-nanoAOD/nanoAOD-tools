@@ -98,7 +98,7 @@ class JetReCalibrator:
         if corr <= 0:
             return jet.pt, jet.mass
         newpt = jet.pt*raw*corr
-        newmass = jet.mass*corr
+        newmass = jet.mass*raw*corr
         return (newpt, newmass)
 
 
