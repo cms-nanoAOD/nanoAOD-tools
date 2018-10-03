@@ -1,3 +1,6 @@
+To be uodated with dasgoclient --query="dataset dataset=/*/RunIISummer16NanoAODv3*/NANOAODSIM"
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD#2016_MC_legacy_re_miniAOD_RunIIS
+
 /TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16NanoAOD-PUMoriond17_05Feb2018_94X_mcRun2_asymptotic_v2-v1/NANOAODSIM
 /TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16NanoAOD-PUMoriond17_05Feb2018_backup_94X_mcRun2_asymptotic_v2-v1/NANOAODSIM
 /TT_TuneCUETP8M2T4_13TeV-powheg-fsrdown-pythia8/RunIISummer16NanoAOD-PUMoriond17_05Feb2018_94X_mcRun2_asymptotic_v2-v1/NANOAODSIM
