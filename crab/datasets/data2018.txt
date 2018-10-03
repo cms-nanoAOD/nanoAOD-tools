@@ -1,4 +1,5 @@
-#dasgoclient --query="dataset dataset=/*/Run2018*/NANOAOD"
+#dasgoclient --query="dataset dataset=/*/Run2018*14Sep2018*/NANOAOD"
+#dasgoclient --query="dataset dataset=/*/Run2018*17Sep2018*/MINIAOD"
 #https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD#2017_MC_re_miniAOD_12Apr2018_94X
 
 /DoubleMuon/Run2018A-14Sep2018_ver1-v1/NANOAOD
