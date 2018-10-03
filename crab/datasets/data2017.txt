@@ -1,4 +1,5 @@
 # dasgoclient --query="dataset dataset=/*/Run2017*-31Mar2018-*/NANOAOD"
+# dasgoclient --query="dataset dataset=/*/Run2017*-17Nov2017-*/MINIAOD"
 https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD#2017_Data_re_miniAOD_31Mar2018_9
 
 #SingleMuon
