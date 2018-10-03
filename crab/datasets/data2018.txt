@@ -1,21 +1,42 @@
 #dasgoclient --query="dataset dataset=/*/*Run2018*/NANOAOD"
 
-#SingleMuon
-#/SingleMuon/Run2018A-06Jun2018-v1/MINIAOD
-#/SingleMuon/Run2018A-PromptReco-v3/MINIAOD
-#/SingleMuon/Run2018B-PromptReco-v1/MINIAOD
+# Egamma
+/EGamma/Run2018A-14Sep2018_ver2-v1/NANOAOD
+/EGamma/Run2018B-14Sep2018_ver2-v1/NANOAOD
+/EGamma/Run2018C-14Sep2018_ver3-v1/NANOAOD
 
-#Egamma
-#/EGamma/Run2018A-06Jun2018-v1/MINIAOD
-#/EGamma/Run2018A-PromptReco-v3/MINIAOD
-#/EGamma/Run2018B-PromptReco-v1/MINIAOD
+# DoubleMuon
+/DoubleMuon/Run2018A-14Sep2018_ver1-v1/NANOAOD
+/DoubleMuon/Run2018A-14Sep2018_ver2-v1/NANOAOD
+/DoubleMuon/Run2018B-14Sep2018_ver1-v1/NANOAOD
+/DoubleMuon/Run2018B-14Sep2018_ver2-v1/NANOAOD
+/DoubleMuon/Run2018C-14Sep2018_ver1-v1/NANOAOD
+/DoubleMuon/Run2018C-14Sep2018_ver2-v1/NANOAOD
+/DoubleMuon/Run2018C-14Sep2018_ver3-v1/NANOAOD
 
-#MuonEG
-#/MuonEG/Run2018A-06Jun2018-v1/MINIAOD
-#/MuonEG/Run2018A-PromptReco-v3/MINIAOD
-#/MuonEG/Run2018B-PromptReco-v1/MINIAOD
+# MET
+#/MET/Run2018A-14Sep2018_ver1-v1/NANOAOD
+#/MET/Run2018A-14Sep2018_ver2-v1/NANOAOD
+#/MET/Run2018A-14Sep2018_ver3-v1/NANOAOD
+#/MET/Run2018B-14Sep2018_ver2-v1/NANOAOD
+#/MET/Run2018C-14Sep2018_ver1-v1/NANOAOD
+#/MET/Run2018C-14Sep2018_ver3-v1/NANOAOD
 
-#DoubleMuon
-#/DoubleMuon/Run2018A-06Jun2018-v1/MINIAOD
-#/DoubleMuon/Run2018A-PromptReco-v3/MINIAOD
-#/DoubleMuon/Run2018B-PromptReco-v1/MINIAOD
+# MuonEG
+/MuonEG/Run2018A-14Sep2018_ver1-v1/NANOAOD
+/MuonEG/Run2018A-14Sep2018_ver2-v1/NANOAOD
+/MuonEG/Run2018A-14Sep2018_ver3-v1/NANOAOD
+/MuonEG/Run2018B-14Sep2018_ver1-v1/NANOAOD
+/MuonEG/Run2018B-14Sep2018_ver2-v1/NANOAOD
+/MuonEG/Run2018C-14Sep2018_ver1-v1/NANOAOD
+/MuonEG/Run2018C-14Sep2018_ver2-v1/NANOAOD
+/MuonEG/Run2018C-14Sep2018_ver3-v1/NANOAOD
+
+# SingleMuon
+/SingleMuon/Run2018A-14Sep2018_ver2-v1/NANOAOD
+/SingleMuon/Run2018A-14Sep2018_ver3-v1/NANOAOD
+/SingleMuon/Run2018B-14Sep2018_ver1-v1/NANOAOD
+/SingleMuon/Run2018B-14Sep2018_ver2-v1/NANOAOD
+/SingleMuon/Run2018C-14Sep2018_ver2-v1/NANOAOD
+/SingleMuon/Run2018C-14Sep2018_ver3-v1/NANOAOD
+
