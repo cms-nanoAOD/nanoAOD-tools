@@ -96,7 +96,7 @@ def CrateCrab_cfg(datasetName, isData = False, isTest = False, productionTag = '
     strSplitting = "LumiBased"#"Automatic" # "LumiBased";
     crabScriptSH = 'crab_script_data.sh'
     if   year == 17: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'  # 41.29/fb
-    elif year == 18: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-316271_13TeV_PromptReco_Collisions18_JSON.txt' # 7.93/fb
+    elif year == 18: lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-322057_13TeV_PromptReco_Collisions18_JSON.txt'
     #https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis#DATA
 
   # Set according to input parameters
