@@ -7,7 +7,10 @@ def InputTree(tree,entrylist=None):
     if hasattr(tree, '_ttreereader'): return tree # don't initialize twice
     tree.entry = -1
     tree._entrylist = entrylist
-    tree._ttreereader = ROOT.TTreeReader(tree,tree._entrylist)
+    if tree._entrylist == None:
+        tree._ttreereader = ROOT.TTreeReader(tree)
+    else:
+        tree._ttreereader = ROOT.TTreeReader(tree,tree._entrylist)
     tree._ttreereader._isClean = True
     tree._ttrvs = {}
     tree._ttras = {}
