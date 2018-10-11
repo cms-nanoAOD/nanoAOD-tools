@@ -203,7 +203,6 @@ if not args.isData:
             logctauValues = range(-3,5),
             globalOptions=globalOptions
         )
-    )
     
     storeVariables = [
         [lambda tree: tree.branch("genweight","F"),lambda tree,event: tree.fillBranch("genweight",event.Generator_weight)],
