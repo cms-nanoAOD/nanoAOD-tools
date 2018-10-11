@@ -190,7 +190,7 @@ if not args.isData:
             inputCollections=[
                 lambda event: event.selectedJets_nominal
             ],
-            taggerName="llpdnnx",
+            taggerName="llpdnnx_default",
             logctauValues = range(-3,5)
         )
     )
@@ -198,72 +198,8 @@ if not args.isData:
     analyzerChain.append(
         TaggerWorkingpoints(
             inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx",
-            outputName = "llpdnnx_nominal",
-            logctauValues = range(-3,5),
-            globalOptions=globalOptions
-        )
-    )
-    
-    
-    analyzerChain.append(
-        TaggerEvaluation(
-            modelPath="model_singlemuon_ref.pb",
-            inputCollections=[
-                lambda event: event.selectedJets_nominal
-            ],
-            taggerName="llpdnnx_singlemuon_ref",
-            logctauValues = range(-3,5)
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx_singlemuon_ref",
-            outputName = "llpdnnx_singlemuon_ref_nominal",
-            logctauValues = range(-3,5),
-            globalOptions=globalOptions
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerEvaluation(
-            modelPath="model_dimuon_ref.pb",
-            inputCollections=[
-                lambda event: event.selectedJets_nominal
-            ],
-            taggerName="llpdnnx_dimuon_ref",
-            logctauValues = range(-3,5)
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx_dimuon_ref",
-            outputName = "llpdnnx_dimuon_ref_nominal",
-            logctauValues = range(-3,5),
-            globalOptions=globalOptions
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerEvaluation(
-            modelPath="model_bothmuon_ref.pb",
-            inputCollections=[
-                lambda event: event.selectedJets_nominal
-            ],
-            taggerName="llpdnnx_bothmuon_ref",
-            logctauValues = range(-3,5)
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx_bothmuon_ref",
-            outputName = "llpdnnx_bothmuon_ref_nominal",
+            taggerName = "llpdnnx_default",
+            outputName = "llpdnnx_default_nominal",
             logctauValues = range(-3,5),
             globalOptions=globalOptions
         )
@@ -338,13 +274,15 @@ else:
     '''
     
     
+ 
+    
     analyzerChain.append(
         TaggerEvaluation(
             modelPath="model_parametric.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal
             ],
-            taggerName="llpdnnx",
+            taggerName="llpdnnx_default",
             logctauValues = range(-3,5)
         )
     )
@@ -352,76 +290,13 @@ else:
     analyzerChain.append(
         TaggerWorkingpoints(
             inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx",
-            outputName = "llpdnnx_nominal",
+            taggerName = "llpdnnx_default",
+            outputName = "llpdnnx_default_nominal",
             logctauValues = range(-3,5),
             globalOptions=globalOptions
         )
     )
     
-    
-    analyzerChain.append(
-        TaggerEvaluation(
-            modelPath="model_singlemuon_ref.pb",
-            inputCollections=[
-                lambda event: event.selectedJets_nominal
-            ],
-            taggerName="llpdnnx_singlemuon_ref",
-            logctauValues = range(-3,5)
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx_singlemuon_ref",
-            outputName = "llpdnnx_singlemuon_ref_nominal",
-            logctauValues = range(-3,5),
-            globalOptions=globalOptions
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerEvaluation(
-            modelPath="model_dimuon_ref.pb",
-            inputCollections=[
-                lambda event: event.selectedJets_nominal
-            ],
-            taggerName="llpdnnx_dimuon_ref",
-            logctauValues = range(-3,5)
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx_dimuon_ref",
-            outputName = "llpdnnx_dimuon_ref_nominal",
-            logctauValues = range(-3,5),
-            globalOptions=globalOptions
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerEvaluation(
-            modelPath="model_bothmuon_ref.pb",
-            inputCollections=[
-                lambda event: event.selectedJets_nominal
-            ],
-            taggerName="llpdnnx_bothmuon_ref",
-            logctauValues = range(-3,5)
-        )
-    )
-    
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx_bothmuon_ref",
-            outputName = "llpdnnx_bothmuon_ref_nominal",
-            logctauValues = range(-3,5),
-            globalOptions=globalOptions
-        )
-    )
     
 '''
 analyzerChain.append(
