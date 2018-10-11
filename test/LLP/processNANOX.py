@@ -8,10 +8,12 @@ from importlib import import_module
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-
+'''
 if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
     print "Cannot load 'libPhysicsToolsNanoAODTools'"
     sys.exit(1)
+'''
+from modules import *
 
 class MuonSelection(Module):
     def __init__(self,isData=True):
@@ -46,36 +48,7 @@ class MuonSelection(Module):
             )
             
             
-            idTightSFBToF = self.getHist(
-                "PhysicsTools/NanoAODTools/data/muon/id_EfficienciesAndSF_RunBtoF.root",
-                "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio"
-            )
-            idTightSFGToH = self.getHist(
-                "PhysicsTools/NanoAODTools/data/muon/id_EfficienciesAndSF_RunGtoH.root",
-                "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio"
-            )
-            self.idTightSFHist = self.combineHist2D(
-                idTightSFBToF,
-                idTightSFGToH,
-                1.-16226.5/35916.4,
-                16226.5/35916.4
-            )
             
-            
-            isoTightSFBToF = self.getHist(
-                "PhysicsTools/NanoAODTools/data/muon/iso_EfficienciesAndSF_RunBtoF.root",
-                "TightISO_TightID_pt_eta/pt_abseta_ratio"
-            )
-            isoTightSFGToH = self.getHist(
-                "PhysicsTools/NanoAODTools/data/muon/iso_EfficienciesAndSF_RunGtoH.root",
-                "TightISO_TightID_pt_eta/pt_abseta_ratio"
-            )
-            self.isoTightSFHist = self.combineHist2D(
-                isoTightSFBToF,
-                isoTightSFGToH,
-                1.-16226.5/35916.4,
-                16226.5/35916.4
-            )
  
     def getHist(self,relFileName,histName):
         rootFile = ROOT.TFile(os.path.expandvars("$CMSSW_BASE/src/"+relFileName))
@@ -188,10 +161,10 @@ class MuonSelection(Module):
                 event.selectedMuons["tight"].append(muon)
                 
                 if not self.isData:
-                    weight_id,weight_id_err = self.getSFPtEta(self.idTightSFHist,muon.pt,muon.eta)
-                    weight_iso,weight_iso_err = self.getSFPtEta(self.isoTightSFHist,muon.pt,muon.eta)
-                    event.selectedMuons["weights"]["id"]*=weight_id
-                    event.selectedMuons["weights"]["iso"]*=weight_iso
+                    #weight_id,weight_id_err = self.getSFPtEta(self.idTightSFHist,muon.pt,muon.eta)
+                    #weight_iso,weight_iso_err = self.getSFPtEta(self.isoTightSFHist,muon.pt,muon.eta)
+                    #event.selectedMuons["weights"]["id"]*=weight_id
+                    #event.selectedMuons["weights"]["iso"]*=weight_iso
                     event.selectedMuons["weights"]["track"]*=self.trackSF.Eval(math.fabs(muon.eta))
                 
             
@@ -743,15 +716,22 @@ for inputFile in args.inputFiles:
     
 print "output directory:",args.output[0]
 
-p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,modules=[
-    #EventSkim(selection=lambda event: event.HLT_IsoMu24 or event.HLT_IsoTkMu24),
+p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,maxEvents=1000,modules=[
+    EventSkim(selection=lambda event: event.HLT_IsoMu24 or event.HLT_IsoTkMu24),
     MuonSelection(isData=args.isData),
     EventSkim(selection=lambda event: len(event.selectedMuons["tight"])>0),
     PileupWeight(isData=args.isData,processName="SMS-T1qqqq_ctau-1_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"),
     JetSelection(isData=args.isData,getLeptonCollection=lambda event: event.selectedMuons["tight"]),
-    EventSkim(selection=lambda event: len(event.selectedJets["all"]["loose"])>=3),
+    EventSkim(selection=lambda event: len(event.selectedJets["all"]["loose"])>=2),
     #JetTagging(isData=args.isData,getJetCollection=lambda event: event.selectedJets["central"]["loose"]),
-    METFilters(isData=args.isData)
+    METFilters(isData=args.isData),
+    EventDump(inputCollections = [
+            [lambda event: Collection(event, "Muon"),["pt","eta","phi"]],
+            [lambda event: Collection(event, "Jet"),["pt","eta","phi"]]
+        ],
+        saveAs="ref.json"
+    )
+    
 ],friend=True)
 p.run()
 
