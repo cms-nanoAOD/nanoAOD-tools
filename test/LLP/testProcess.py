@@ -66,9 +66,6 @@ muonSelection = [
         storeWeights=True,
         globalOptions=globalOptions
     ),
-    DataFlag(
-        globalOptions=globalOptions
-    ),
     EventSkim(selection=lambda event: event.ntightMuons==2),
     EventSkim(selection=lambda event: event.nvetoMuons==0),
     EventSkim(selection=lambda event: event.nvetoElectrons==0),
