@@ -48,8 +48,8 @@ muonSelection = [
         storeKinematics=['pt','eta'],
         storeWeights=True,
         muonMinPt = 26.,
-        muonID = MuonSelection.MEDIUM,
-        muonIso = MuonSelection.LOOSE,
+        muonID = MuonSelection.TIGHT,
+        muonIso = MuonSelection.TIGHT,
         globalOptions=globalOptions
     ),
     MuonVeto(
