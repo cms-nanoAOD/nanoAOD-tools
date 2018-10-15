@@ -28,6 +28,8 @@ class PostProcessor :
 	self.haddFileName=haddFileName
 	self.histFile = None
 	self.histDirName = None
+	self.hcount = ROOT.TH1F("Count", "Count", 1, 0, 1)
+	self.hsumofweights = ROOT.TH1F("SumWeights", "SumWeights", 1, 0, 1)
 	if self.jobReport and not self.haddFileName :
 		print "Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root"
 		self.haddFileName="tree.root"
@@ -86,6 +88,11 @@ class PostProcessor :
 	    #get input tree
 	    inTree = inFile.Get("Events")
 	    totEntriesRead+=inTree.GetEntries()
+	    self.hcount.SetBinContent(1, inTree.GetEntries())
+	    if inTree.GetBranchStatus("genWeight"):
+	      inTree.Project("SumWeightsTemp", "1.0", "genWeight")
+	      sow = ROOT.gROOT.FindObject("SumWeightsTemp").Integral()
+	      self.hsumofweights.SetBinContent(1, sow)
 	    # pre-skimming
 	    elist,jsonFilter = preSkim(inTree, self.json, self.cut)
 	    if self.justcount:
@@ -135,6 +142,8 @@ class PostProcessor :
 
 	    # now write the output
             if not self.noOut: 
+                self.hcount.Write()
+                self.hsumofweights.Write()
                 outTree.write()
                 outFile.Close()
                 print "Done %s" % outFileName
