@@ -7,22 +7,25 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import *
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
 
 ### SKIM 
-cut = '(nElectron + nMuon) >= 2'
+cut = ''
 
 ### SLIM FILE
 slimfile = "SlimFile.txt"
 
-from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import *
-from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
-from PhysicsTools.NanoAODTools.postprocessing.modules.skimNRecoLeps import *
-isData = sys.argv[-1] == 'data'
-mod = [puAutoWeight(), skimRecoLeps()]
-#mod = [puAutoWeight(),jetmetUncertainties2017All(), skimRecoLeps()]
-if isData: mod = [skimRecoLeps()]
+from optparse import OptionParser
+import imp 
 
-p=PostProcessor(".",inputFiles(),cut,slimfile,mod,provenance=True,fwkJobReport=True,jsonInput=runsAndLumis())
+parser = OptionParser(usage='%prog [options]')
+parser.add_option('--cfg_file', type="string", dest='cfg_file', help='Config file containing PostProcessor instance')
 
-p.run()
+(options, args) = parser.parse_args()
+
+
+handle = open(options.cfg_file,'r')
+print 'here1 '
+cfo = imp.load_source(options.cfg_file.rstrip('py'), options.cfg_file, handle)
+print 'here2'
+cfo.POSTPROCESSOR.run()
 
 print "DONE"
 os.system("ls -lR")
