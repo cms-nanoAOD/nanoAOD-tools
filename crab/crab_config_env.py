@@ -30,6 +30,9 @@ config.Data.outLFNDirBase += '/' + os.environ["STAGEOUTREMDIR"] + '/' + os.envir
 
 config.Data.inputDataset=os.environ["DATASET"]
 
+try: config.Data.lumiMask = os.environ["LUMIJSON"]
+except KeyError: pass
+
 config.Site.storageSite = os.environ["OUTSITE"]
 
 try: config.Site.whitelist = os.environ["WHITESITES"].split(',')

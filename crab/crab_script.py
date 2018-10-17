@@ -6,11 +6,14 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import *
 #this takes care of converting the input files from CRAB
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
 
-### SKIM 
-cut = ''
 
-### SLIM FILE
-slimfile = "SlimFile.txt"
+# get options from the json
+from PhysicsTools.NanoAODTools.python.postprocessing.framework.crabhelper import _crabGlobalOptions
+jfile = open ('options.json', 'r')
+opts=json.loads(jfile.readline())
+for k,v in opts.iteritems():
+    _crabGlobalOptions[k]=v
+jfile.close()
 
 from optparse import OptionParser
 import imp 
@@ -22,10 +25,7 @@ parser.add_option('--cfg_file', type="string", dest='cfg_file', help='Config fil
 
 
 handle = open(options.cfg_file,'r')
-print 'here1 '
 cfo = imp.load_source(options.cfg_file.rstrip('py'), options.cfg_file, handle)
-print 'here2'
 cfo.POSTPROCESSOR.run()
 
-print "DONE"
-os.system("ls -lR")
+
