@@ -64,3 +64,10 @@ def runsAndLumis():
     return None
 
 
+def getCrabOption(name, default=None):
+   global _crabGlobalOptions
+   return _crabGlobalOptions[name] if name in _crabGlobalOptions else default
+
+def setCrabOption(name, value=True):
+   global _crabGlobalOptions
+   _crabGlobalOptions[name] = value
