@@ -304,7 +304,14 @@ class TFEval
                         {
                             for (int64_t j = 0; j < tensorList[i].dim_size(1); ++j)
                             {
-                                data[b][j] = values(b,j);
+                                if (std::isnan(values(b,j)) or std::isinf(values(b,j)))
+                                {
+                                    data[b][j] = 0;
+                                }
+                                else
+                                {
+                                    data[b][j] = values(b,j);
+                                }
                             }
                         }
                         //data.assign(values.data(),values.data()+values.size());

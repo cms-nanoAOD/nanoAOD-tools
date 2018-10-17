@@ -19,6 +19,7 @@ class TaggerWorkingpoints(Module):
         outputName = "llpdnnx",
         predictionLabels = ["B","C","UDS","G","LLP"],
         logctauValues = range(-3,5),
+        multiplicities = range(0,5),
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
@@ -26,8 +27,10 @@ class TaggerWorkingpoints(Module):
         self.outputName = outputName
         self.predictionLabels = predictionLabels
         self.logctauValues = logctauValues
+        self.multiplicities = multiplicities
         self.logctauLabels = map(lambda ctau: getCtauLabel(ctau),logctauValues)
         self.taggerName = taggerName
+        
  
     def beginJob(self):
         pass
@@ -40,7 +43,8 @@ class TaggerWorkingpoints(Module):
         
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
-                self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_max","F")
+                for m in self.multiplicities:
+                    self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),"F")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -49,7 +53,7 @@ class TaggerWorkingpoints(Module):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         jets = self.inputCollection(event)
         
-        maxPredictions = {ctau: {className: 0. for className in self.predictionLabels} for ctau in self.logctauValues}
+        predictionsPerCtauAndClass = {ctau: {className: [] for className in self.predictionLabels} for ctau in self.logctauValues}
         for jet in jets:
             if not hasattr(jet,self.taggerName):
                 print "WARNING - jet ",jet," has no ",self.taggerName," result stored -> skip"
@@ -57,10 +61,14 @@ class TaggerWorkingpoints(Module):
             predictions = getattr(jet,self.taggerName)
             for ctau in self.logctauValues:
                 for label in self.predictionLabels:
-                    maxPredictions[ctau][label]=max(maxPredictions[ctau][label],predictions[ctau][label])
+                    predictionsPerCtauAndClass[ctau][label].append(predictions[ctau][label])
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
-                self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_max",maxPredictions[ctau][label])
-        
+                predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
+                for m in self.multiplicities:
+                    if m<len(predictionsPerCtauAndClass[ctau][label]):
+                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),predictionsPerCtauAndClass[ctau][label][m])
+                    else:
+                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
         return True
         

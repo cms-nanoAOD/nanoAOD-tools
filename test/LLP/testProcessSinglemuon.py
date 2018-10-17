@@ -122,7 +122,7 @@ analyzerChain.append(
 analyzerChain.append(
     JetSelection(
         inputCollection=lambda event: event.selectedJets_nominal,
-        leptonCollection=lambda event: [],
+        leptonCollection=lambda event: event.tightMuons,
         jetMinPt = 30.,
         jetMaxEta = 2.4,
         dRCleaning = 0.4,
