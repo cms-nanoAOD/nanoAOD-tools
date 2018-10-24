@@ -48,8 +48,8 @@ muonSelection = [
         storeKinematics=['pt','eta'],
         storeWeights=True,
         muonMinPt = [26.,15.],
-        muonID = MuonSelection.MEDIUM,
-        muonIso = MuonSelection.LOOSE,
+        muonID = MuonSelection.TIGHT,
+        muonIso = MuonSelection.TIGHT,
         globalOptions=globalOptions
     ),
     MuonVeto(
@@ -79,7 +79,7 @@ muonSelection = [
         outputName = "dimuon",
     ),
     
-    EventSkim(selection=lambda event: event.dimuon_mass>=10.),
+    EventSkim(selection=lambda event: event.dimuon_mass>=50.),
     
 ]
 
@@ -108,8 +108,19 @@ analyzerChain.append(
 )
 
 analyzerChain.append(
+    JetSelection(
+        inputCollection=lambda event: getattr(event,"selectedJets_nominal_unselected"),
+        leptonCollection=lambda event: event.tightMuons,
+        outputName="vetoFwdJets_nominal",
+        jetMinPt = 50.,
+        jetMaxEta = 5.0,
+        storeKinematics=[],
+    )
+)
+
+analyzerChain.append(
     EventSkim(selection=lambda event: 
-        len(event.selectedJets_nominal)>=2 and len(event.selectedJets_nominal)<6
+        len(event.selectedJets_nominal)>=2 and len(event.selectedJets_nominal)<=6 and len(event.vetoFwdJets_nominal)==0
     )
 )
 
@@ -130,7 +141,7 @@ analyzerChain.append(
 analyzerChain.append(
     JetSelection(
         inputCollection=lambda event: event.selectedJets_nominal,
-        leptonCollection=lambda event: [],
+        leptonCollection=lambda event: event.tightMuons,
         jetMinPt = 30.,
         jetMaxEta = 2.4,
         dRCleaning = 0.4,
@@ -140,9 +151,6 @@ analyzerChain.append(
         storeKinematics=[]#['pt','eta'],
     )
 )
-
-    
-
 
 p=PostProcessor(
     args.output[0],
