@@ -8,10 +8,6 @@ import itertools
 
 class skipNRecoLeps(Module):
     def __init__(self):
-        self.minelpt  = 10
-        self.minmupt  = 10
-        self.maxeleta = 2.5
-        self.maxmueta = 2.5
         self.prescaleIdx = -1
         self.prescaleFromSkim = 5
 
@@ -27,19 +23,13 @@ class skipNRecoLeps(Module):
         pass
     def analyze(self, event):
         self.prescaleIdx += 1 
-        #jets = Collection(event, 'Jet')
-        elec = Collection(event, 'Electron')
-        muon = Collection(event, 'Muon')
-
-        goodElec = filter( lambda x : x.pt > self.minelpt and abs(x.eta) < self.maxeleta and x.mvaFall17noIso_WPL and x.sip3d < 8 , elec)
-        goodMuon = filter( lambda x : x.pt > self.minmupt and abs(x.eta) < self.maxmueta and x.sip3d < 8, muon)
-
-        nlepgood = len(goodElec+goodMuon)
+        leps = Collection(event, 'LepGood')
+        nlepgood = len(leps)
 
         if nlepgood < 2: return False
 
         hasSS = False
-        for l1,l2 in itertools.product(goodElec+goodMuon, goodElec+goodMuon):
+        for l1,l2 in itertools.product(leps,leps):
             if l1==l2: continue
             if l1.charge*l2.charge > 0 : 
                 hasSS=True; break

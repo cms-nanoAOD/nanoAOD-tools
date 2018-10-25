@@ -1,0 +1,4 @@
+drop * 
+keep Muon*
+keep Electron*
+keep Pileup_nTrueInt*

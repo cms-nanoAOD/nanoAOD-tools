@@ -63,6 +63,7 @@ def runsAndLumis():
          return runsAndLumis 
     return None
 
+_crabGlobalOptions = {}
 
 def getCrabOption(name, default=None):
    global _crabGlobalOptions

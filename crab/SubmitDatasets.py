@@ -25,7 +25,7 @@ parser.add_option("-N", dest="maxevents", default=-1, help="maximum number of ev
 
 (options,args) = parser.parse_args()
 
-from PhysicsTools.NanoAODTools.python.postprocessing.framework.crabhelper import _crabGlobalOptions
+from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import _crabGlobalOptions
 
 for opt in options.extraOptions:
     if "=" in opt:
@@ -51,8 +51,8 @@ os.environ["ONLYUNPACKED"] = str(options.only_unpacked)
 handle = open(options.cfg_file,'r')
 cfo = imp.load_source(options.cfg_file.rstrip('py'), options.cfg_file, handle)
 
-if jsonFile: 
-    os.environ["LUMIJSON"] = jsonFile
+if cfo.jsonFile: 
+    os.environ["LUMIJSON"] = cfo.jsonFile
 
 for dataset in cfo.selectedSamples:
     os.environ["DATASET"] = str(dataset)

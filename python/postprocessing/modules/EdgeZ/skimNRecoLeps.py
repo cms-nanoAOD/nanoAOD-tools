@@ -26,17 +26,9 @@ class skipNRecoLeps(Module):
         pass
     def analyze(self, event):
 
-        elec = Collection(event, 'Electron')
-        muon = Collection(event, 'Muon')
-
-        isoAndIDCuts = lambda  x : x.miniPFRelIso_all < 0.1  and x.dxy < 0.05 and x.dz < 0.1 and x.sip3d < 8 
-
-        goodElec = filter( lambda x : x.pt > self.minelpt and abs(x.eta) < self.maxeleta and x.mvaFall17noIso_WPL and isoAndIDCuts(x) , elec)
-        goodMuon = filter( lambda x : x.pt > self.minmupt and abs(x.eta) < self.maxmueta  and x.tightId and isoAndIDCuts(x), muon)
-
-        nlepgood = len(goodElec+goodMuon)
-
-        return nlepgood >1 
+        lep = Collection(event, 'LepGood')
+        print lep
+        return len(lep) >1 
             
             
 

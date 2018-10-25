@@ -8,7 +8,9 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputF
 
 
 # get options from the json
-from PhysicsTools.NanoAODTools.python.postprocessing.framework.crabhelper import _crabGlobalOptions
+from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import _crabGlobalOptions
+import json 
+
 jfile = open ('options.json', 'r')
 opts=json.loads(jfile.readline())
 for k,v in opts.iteritems():
@@ -25,6 +27,7 @@ parser.add_option('--cfg_file', type="string", dest='cfg_file', help='Config fil
 
 
 handle = open(options.cfg_file,'r')
+os.environ['IS_CRAB']="true"
 cfo = imp.load_source(options.cfg_file.rstrip('py'), options.cfg_file, handle)
 cfo.POSTPROCESSOR.run()
 
