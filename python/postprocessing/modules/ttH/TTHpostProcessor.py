@@ -47,7 +47,7 @@ def BuildJsonForTesting():
 
  
     sampOpt = { 'isData' : True,
-                'triggers' : triggers_ee + triggers_3e,
+                'triggers' : triggers_ee + triggers_3e+triggers_ee_noniso,
                 'vetotriggers' : triggers_mumu_iso + triggers_3mu,
                 'json': '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
                 }
@@ -80,7 +80,7 @@ def LoadCfgForSubmission():
 
         DatasetsAndTriggersMap = {}; DatasetsAndVetosMap = {} 
         DatasetsAndTriggersMap["DoubleMuon"     ] = triggers_mumu_iso + triggers_3mu
-        DatasetsAndTriggersMap["DoubleEG"       ] = triggers_ee + triggers_3e
+        DatasetsAndTriggersMap["DoubleEG"       ] = triggers_ee + triggers_3e + triggers_ee_noniso
         DatasetsAndTriggersMap["MuonEG"         ] = triggers_mue + triggers_2mu1e + triggers_2e1mu
         DatasetsAndTriggersMap["SingleMuon"     ] = triggers_1mu_iso
         DatasetsAndTriggersMap["SingleElectron" ] = triggers_1e_iso

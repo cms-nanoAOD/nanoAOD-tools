@@ -31,7 +31,7 @@ triggers_mue_ht = [ "HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_DZ" ]
 triggers_3e = [ "HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL" ] 
 triggers_3mu = [ "HLT_TripleMu_10_5_5_DZ", 
                  "HLT_TripleMu_12_10_5", 
-                 "HLT_TripleMu_5_3_3_Mass3p8to60_DCA", # 5_3_3 only in late part of the data (esp. DCA one)
+                 #"HLT_TripleMu_5_3_3_Mass3p8to60_DCA", # 5_3_3 only in late part of the data (esp. DCA one)
                  "HLT_TripleMu_5_3_3_Mass3p8to60_DZ" ]
 
 triggers_3mu_alt=["HLT_TrkMu12_DoubleTrkMu5NoFiltersNoVtx"]
