@@ -93,7 +93,9 @@ def LoadCfgForSubmission():
 
 
         for sample in selectedSamples:
-            sample.options['json'] = jsonFile
+            jsn = open( jsonFile ,'r')
+            sample.options['json'] = json.loads ( jsn.read())
+            jsn.close()
             for smp, trig in DatasetsAndTriggersMap.iteritems():
                 if smp in sample.name:
                     sample.options['triggers']     = trig
