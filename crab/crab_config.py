@@ -14,7 +14,7 @@ config.JobType.psetName = 'PSet.py'
 config.JobType.scriptExe = 'crab_script.sh'
 
 config.JobType.inputFiles = ['crab_script.py','../scripts/haddnano.py','../python/postprocessing/SlimFile.txt',
-                             'options.json'] 
+                             'options.json', 'options_sample.json'] 
 config.JobType.sendPythonFolder=True
 
 config.section_("Data")
@@ -23,6 +23,7 @@ config.Data.splitting = 'FileBased'
 #config.Data.splitting = 'LumiBased' #for data
 
 config.Data.outLFNDirBase = '/store/user/' + os.environ["USER"]
+#config.Data.outLFNDirBase = '/store/group/phys_muon/sesanche/oct25' + os.environ["USER"]
 config.Data.publication = False
 
 config.section_("Site")

@@ -14,7 +14,7 @@ g1.add_option("-o", "--option", dest="extraOptions", type="string", action="appe
 g2 = OptionGroup(parser,"Stageout options")
 g2.add_option("-s", "--storage-site", dest="storageSite", help="site where the output should be staged out (T2_XX_YYYY)")
 g2.add_option("-d", "--output-dir", dest="outputDir", help="name of the directory where files will be staged out", default="nanoAOD")
-g2.add_option("-l", "--production-label", dest="production_label", help="production label", default="myHeppyCrabProdDummy")
+g2.add_option("-l", "--production-label", dest="production_label", help="production label", default="myNanoAODSkim")
 
 parser.add_option_group(g2)
 g2.add_option("--only-unpacked", dest="only_unpacked", default=False, action="store_true", help="Only return the unpacked files, not the whole compressed output directory")
@@ -25,6 +25,8 @@ parser.add_option("-N", dest="maxevents", default=-1, help="maximum number of ev
 
 (options,args) = parser.parse_args()
 
+
+# global options 
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import _crabGlobalOptions
 
 for opt in options.extraOptions:
@@ -51,11 +53,18 @@ os.environ["ONLYUNPACKED"] = str(options.only_unpacked)
 handle = open(options.cfg_file,'r')
 cfo = imp.load_source(options.cfg_file.rstrip('py'), options.cfg_file, handle)
 
-if cfo.jsonFile: 
-    os.environ["LUMIJSON"] = cfo.jsonFile
+#if cfo.jsonFile: 
+#    os.environ["LUMIJSON"] = cfo.jsonFile
 
 for dataset in cfo.selectedSamples:
-    os.environ["DATASET"] = str(dataset)
-    #os.environ["NJOBS"] = str(len(split([comp])))
+    print dataset
+    os.environ["DATASET_NAME"] = str(dataset.name)
+    os.environ["DATASET"] = str(dataset.dataset)
+    
+    # sample options
+    sampoptjson = open('options_sample.json','w')
+    sampoptjson.write(json.dumps( dataset.options))
+    sampoptjson.close()
+
     os.system("crab submit %s -c crab_config_env.py"%("--dryrun" if options.dryrun else ""))
 

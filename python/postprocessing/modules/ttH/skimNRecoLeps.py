@@ -28,6 +28,8 @@ class skipNRecoLeps(Module):
 
         if nlepgood < 2: return False
 
+        return True
+
         hasSS = False
         for l1,l2 in itertools.product(leps,leps):
             if l1==l2: continue

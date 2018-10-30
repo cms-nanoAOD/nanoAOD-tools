@@ -10,9 +10,9 @@ config = cfg.config
 
 print "Will send dataset", os.environ["DATASET"]
 
-config.General.requestName = os.environ["DATASET"].split('/')[1] + "_" + os.environ["PROD_LABEL"] # task name
+config.General.requestName = os.environ["DATASET_NAME"] + "_" + os.environ["PROD_LABEL"] # task name
 
-config.General.workArea = 'crab_' + os.environ["DATASET"].split('/')[1] + "_" + os.environ["PROD_LABEL"] # crab dir name
+config.General.workArea = 'crab_' + os.environ["DATASET_NAME"] + "_" + os.environ["PROD_LABEL"] # crab dir name
 
 # this will divide task in *exactly* NJOBS jobs (for this we need JobType.pluginName = 'PrivateMC' and Data.splitting = 'EventBased')
 config.Data.unitsPerJob = 1
@@ -30,8 +30,8 @@ config.Data.outLFNDirBase += '/' + os.environ["STAGEOUTREMDIR"] + '/' + os.envir
 
 config.Data.inputDataset=os.environ["DATASET"]
 
-try: config.Data.lumiMask = os.environ["LUMIJSON"]
-except KeyError: pass
+#try: config.Data.lumiMask = os.environ["LUMIJSON"]
+#except KeyError: pass
 
 config.Site.storageSite = os.environ["OUTSITE"]
 
