@@ -22,7 +22,8 @@ class TriggerBitFilter(Module):
         passesTrigger = False; passesVeto = True
 
         for trig in self.triggers:
-#            if not hasattr(event, trig):
+            if not hasattr(event, trig):
+                continue
 #                raise RuntimeError('[%s] Event does not have flag for %s'%(__name__,trig))
             
             if getattr(event,trig):
@@ -32,7 +33,8 @@ class TriggerBitFilter(Module):
             return False
 
         for trig in self.vetotriggers:
-#            if not hasattr(event, trig):
+            if not hasattr(event, trig):
+                continue
 #                raise RuntimeError('[%s] Event does not have flag for %s'%(__name__,trig))
             
             if getattr(event,trig): 
