@@ -12,7 +12,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.jobreport import JobRepo
 
 class PostProcessor :
     def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,
-		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None):
+		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,
+		 maxEvents=-1,treeName="Events"):
 	self.outputDir=outputDir
 	self.inputFiles=inputFiles
 	self.cut=cut
@@ -28,6 +29,8 @@ class PostProcessor :
 	self.haddFileName=haddFileName
 	self.histFile = None
 	self.histDirName = None
+	self.maxEvents = maxEvents
+	self.treeName = treeName
 	if self.jobReport and not self.haddFileName :
 		print "Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root"
 		self.haddFileName="tree.root"
@@ -85,9 +88,9 @@ class PostProcessor :
 	    inFile = ROOT.TFile.Open(fname)
 
 	    #get input tree
-	    inTree = inFile.Get("Events")
+	    inTree = inFile.Get(self.treeName)
 	    for friend in friendList[1:]:
-	        inTree.AddFriend("Events",friend)
+	        inTree.AddFriend(self.treeName,friend)
 	    totEntriesRead+=inTree.GetEntries()
 	    # pre-skimming
 	    elist,jsonFilter = preSkim(inTree, self.json, self.cut)
@@ -130,9 +133,10 @@ class PostProcessor :
 
 	    # process events, if needed
 	    if not fullClone:
-		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree)
+		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree,maxEvents=self.maxEvents)
 		print 'Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, inTree.GetEntries(), npass)
 	    else:
+                nall = inTree.GetEntries()
 		print 'Selected %d entries from %s' % (outTree.tree().GetEntries(), fname)
 
 	    # now write the output
