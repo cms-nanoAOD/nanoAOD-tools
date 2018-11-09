@@ -47,11 +47,16 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
     for m in modules: 
         m.beginFile(inputFile, outputFile, inputTree, wrappedOutputTree)
 
+    h_nevents = ROOT.TH1F('nEvents',   'nEvents',   2, 0, 2)
+    h_nevents.GetXaxis().SetBinLabel(1,"total")
+    h_nevents.GetXaxis().SetBinLabel(2,"pass")
+
     t0 = time.clock(); tlast = t0; doneEvents = 0; acceptedEvents = 0
     entries = inputTree.entries
 
     for i in xrange(entries) if eventRange == None else eventRange:
         if maxEvents > 0 and i >= maxEvents-1: break
+        h_nevents.Fill(0.5)
         e = Event(inputTree,i)
         clearExtraBranches(inputTree)
         doneEvents += 1
@@ -62,6 +67,7 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
         if ret:
             acceptedEvents += 1
         if (ret or not filterOutput) and wrappedOutputTree != None: 
+            h_nevents.Fill(1.5)
             wrappedOutputTree.fill()
         if progress:
             if i > 0 and i % progress[0] == 0:
@@ -71,5 +77,10 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
                 tlast = t1
     for m in modules: 
         m.endFile(inputFile, outputFile, inputTree, wrappedOutputTree)
+
+    prevdir = ROOT.gDirectory
+    outputFile.cd()
+    h_nevents.Write()
+    prevdir.cd()     
 
     return (doneEvents, acceptedEvents, time.clock() - t0)
