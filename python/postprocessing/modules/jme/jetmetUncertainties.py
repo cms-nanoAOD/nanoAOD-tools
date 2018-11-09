@@ -105,6 +105,8 @@ class jetmetUncertaintiesProducer(Module):
             jesUncertainty_label = jesUncertainty
             if self.era == "2016" and jesUncertainty == 'Total' and len(self.jesUncertainties) == 1:
                 jesUncertainty_label = ''
+            if self.era == "2017" and jesUncertainty == 'Total' and len(self.jesUncertainties) == 1:
+                jesUncertainty_label = ''
             pars = ROOT.JetCorrectorParameters(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName),jesUncertainty_label)
             self.jesUncertainty[jesUncertainty] = ROOT.JetCorrectionUncertainty(pars)    
 
