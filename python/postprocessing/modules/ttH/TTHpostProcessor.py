@@ -26,7 +26,7 @@ minmupt  = 10
 maxeleta = 2.5
 maxmueta = 2.5
 
-isoAndIPCuts = lambda  x : x.miniPFRelIso_all < 0.1  and x.dxy < 0.05 and x.dz < 0.1 and x.sip3d < 8 
+isoAndIPCuts = lambda  x : x.miniPFRelIso_all < 0.1  and abs(x.dxy) < 0.05 and abs(x.dz) < 0.1 and x.sip3d < 8 
 
 goodElec = lambda x : x.pt > minelpt and abs(x.eta) < maxeleta and x.mvaFall17noIso_WPL and isoAndIPCuts(x)
 goodMuon = lambda x : x.pt > minmupt and abs(x.eta) < maxmueta  and isoAndIPCuts(x)
