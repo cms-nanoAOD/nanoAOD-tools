@@ -1,7 +1,6 @@
 drop LHE*
 
 drop CaloMET*
-drop FatJet*
 drop GenJetAK8*
 drop GenVisTau*
 drop Photon*
