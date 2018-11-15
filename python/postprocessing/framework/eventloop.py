@@ -47,17 +47,27 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
     for m in modules: 
         m.beginFile(inputFile, outputFile, inputTree, wrappedOutputTree)
 
-    h_nevents = ROOT.TH1F('nEvents',   'nEvents',   2, 0, 2)
+    h_nevents = ROOT.TH1F('nEvents',   'nEvents',   4, 0, 4)  
+    h_nevents.Sumw2()
     h_nevents.GetXaxis().SetBinLabel(1,"total")
-    h_nevents.GetXaxis().SetBinLabel(2,"pass")
+    h_nevents.GetXaxis().SetBinLabel(2,"pos")
+    h_nevents.GetXaxis().SetBinLabel(3,"neg")
+    h_nevents.GetXaxis().SetBinLabel(4,"pass")
 
     t0 = time.clock(); tlast = t0; doneEvents = 0; acceptedEvents = 0
     entries = inputTree.entries
 
     for i in xrange(entries) if eventRange == None else eventRange:
         if maxEvents > 0 and i >= maxEvents-1: break
-        h_nevents.Fill(0.5)
         e = Event(inputTree,i)
+        weight = 1.
+        genWeight = getattr(e, "genWeight",None)
+        if genWeight:
+            weight = genWeight
+        h_nevents.Fill(0.5,weight)
+        if weight>=0: h_nevents.Fill(1.5,weight)
+        else: h_nevents.Fill(2.5,weight)
+
         clearExtraBranches(inputTree)
         doneEvents += 1
         ret = True
@@ -67,7 +77,7 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
         if ret:
             acceptedEvents += 1
         if (ret or not filterOutput) and wrappedOutputTree != None: 
-            h_nevents.Fill(1.5)
+            h_nevents.Fill(3.5,weight)
             wrappedOutputTree.fill()
         if progress:
             if i > 0 and i % progress[0] == 0:
