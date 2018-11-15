@@ -47,7 +47,7 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
     for m in modules: 
         m.beginFile(inputFile, outputFile, inputTree, wrappedOutputTree)
 
-   h_nevents = ROOT.TH1F('nEvents',   'nEvents',   4, 0, 4)  
+    h_nevents = ROOT.TH1F('nEvents',   'nEvents',   4, 0, 4)  
     h_nevents.Sumw2()
     h_nevents.GetXaxis().SetBinLabel(1,"total")
     h_nevents.GetXaxis().SetBinLabel(2,"pos")
