@@ -1,7 +1,11 @@
 import ROOT
 import os
+from math import fabs
+from array import array
+
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
+from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class mhtjuProducerCpp(Module): # MHT producer, unclean jets only (no lepton overlap cleaning, no jet selection)
@@ -28,6 +32,14 @@ class mhtjuProducerCpp(Module): # MHT producer, unclean jets only (no lepton ove
         self.out.branch("MHTju_pt",  "F");
         self.out.branch("MHTju_phi", "F");
         self.out.branch("ZPtCorr","F");
+
+        #CleanObjectCollection
+        self.out.branch("ncleanedJet",  "I");
+        self.out.branch("cleanedJetIndex" ,"I", 25,"ncleanedJet");
+        self.out.branch("ncleanedMuon",  "I");
+        self.out.branch("cleanedMuonIndex",  "I", 25,"ncleanedMuon");
+        self.out.branch("ncleanedElectron",  "I");
+        self.out.branch("cleanedElectronIndex",  "I", 25,"ncleanedElectron");
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -96,11 +108,41 @@ class mhtjuProducerCpp(Module): # MHT producer, unclean jets only (no lepton ove
         #print "GenPart_pt= ",self.GenPart_pt[0]
         output = self.worker.getHT()
         ptcorrection = self.worker.ptZCorr(self.Genpart)
+
+        electrons = Collection(event, "Electron")
+        muons = Collection(event, "Muon")
+        jets = Collection(event, "Jet")
+        #CleanJet
+        #cleanjet=array('i')
+        cleanjet=[]
+        Ncleanjet=0
+        jetcounter=0
+        for jet in jets :
+            if jet.puId>4 and jet.pt>30 and fabs(jet.eta)<2.5:
+                #Cleaning from muon
+                if jet.nMuons>0:
+                    for lep in muons:
+                        if lep.jetIdx!=-1: #Looking at Muon that ssociated with jet
+                            if lep.mediumId==0 and lep.pt<5:
+                                continue #Only good muon make it to next OR
+                            #pass requirement not good muons with pT> (5) GeV
+                            elif lep.mediumId==1:
+                                if jet.chHEF>0.1 or jet.neHEF>0.2:
+                                    #THIS IS CLEAN JET
+                                    Ncleanjet+=1
+                                    cleanjet.append(jetcounter) #store cleanjet index to jet collection
+                                    
+            jetcounter+=1
+            
+        #for lep in muons :
+        #    print "lep.softId= ",lep.softId
         #self.worker.reportHT()
 
         self.out.fillBranch("MHTju_pt", output[0]);
         self.out.fillBranch("MHTju_phi", -output[1]); # note the minus
         self.out.fillBranch("ZPtCorr", ptcorrection);
+        self.out.fillBranch("ncleanedJet",Ncleanjet);
+        self.out.fillBranch("cleanedJetIndex", cleanjet);
         return True
         
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
