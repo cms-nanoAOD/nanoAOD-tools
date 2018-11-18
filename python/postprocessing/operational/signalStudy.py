@@ -1,5 +1,7 @@
+import ROOT as r
 import ROOT
 import os
+from ROOT import TTree, TFile, TLorentzVector, AddressOf, gROOT
 from math import fabs
 from array import array
 
@@ -8,8 +10,8 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.tools import deltaPhi, deltaR, closest
-
-class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap cleaning, no jet selection)
+        
+class signalStudy(Module): # MHT producer, unclean jets only (no lepton overlap cleaning, no jet selection)
     def __init__(self):
         #if "/mhtjuProducerCppWorker_cc.so" not in ROOT.gSystem.GetLibraries():
         #    print "Load C++ mhtjuProducerCppWorker worker module"
@@ -40,6 +42,29 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
         self.out.branch("MHTju_pt",  "F");
         self.out.branch("MHTju_phi", "F");
         self.out.branch("ZPtCorr","F");
+
+        #Signal kinematics
+        #basic kinematics
+        self.out.branch("W0pt",  "F");
+        self.out.branch("W1pt",  "F");
+        self.out.branch("W2pt",  "F");
+        self.out.branch("W3pt",  "F");
+        self.out.branch("Hpt",  "F");
+        self.out.branch("q1pt",  "F");
+        self.out.branch("q2pt",  "F");
+        self.out.branch("lep1pt",  "F");
+        self.out.branch("lep2pt",  "F");
+        self.out.branch("lep3pt",  "F");
+        #composite kinematics
+        self.out.branch("W1W2dPhi",  "F");
+        self.out.branch("W1W3dPhi",  "F");
+        self.out.branch("W2W3dPhi",  "F");
+        self.out.branch("HW3dPhi",  "F");
+        self.out.branch("lep1lep2dPhi",  "F");
+        self.out.branch("lep1lep3Phi",  "F");
+        self.out.branch("lep2lep3dPhi",  "F");
+        self.out.branch("q1q2dPhi",  "F");
+        
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -173,7 +198,9 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
                 if Zpt>40 and Zpt<50: Zweight=0.65
                 if Zpt>50 and Zpt<200: Zweight=0.65-0.00034*Zpt
                 if Zpt>200: Zweight=0.6
-                
+
+        # find the reconstructed muon and genpart
+        
             
         self.out.fillBranch("cleanedJet", Jet_Clean);
         self.out.fillBranch("cleanedMuon", Muon_Clean);
@@ -187,4 +214,4 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
         
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-cleaning = lambda : objCleaning()
+signal = lambda : signalStudy()
