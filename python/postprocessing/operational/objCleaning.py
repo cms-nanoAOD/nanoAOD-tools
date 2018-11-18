@@ -31,9 +31,9 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
         self.initReaders(inputTree) # initReaders must be called in beginFile
         self.out = wrappedOutputTree
         #CleanObjectCollection
-        self.out.branch("cleanedJet" ,"I", 30);
-        self.out.branch("cleanedMuon",  "I", 30);
-        self.out.branch("cleanedElectron",  "I", 30);
+        self.out.branch("cleanedJet" ,"I", 100);
+        self.out.branch("cleanedMuon",  "I", 100);
+        self.out.branch("cleanedElectron",  "I", 100);
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -52,9 +52,10 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
         jets = Collection(event, "Jet")
+        genparts = Collection(event, "GenPart")
         
         # Cleaning Jet
-        Jet_Clean=[0]*30
+        Jet_Clean=[0]*100
         for num,jet in enumerate(jets) :
             Jet_Clean[num]=1
             if jet.puId<4: continue;
@@ -87,9 +88,50 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
                 Jet_Clean[num]=0
                 if jet.chHEF>0.1: Jet_Clean[num]=1
                 if jet.neHEF>0.2: Jet_Clean[num]=1
-        
-                
+
+        # Cleaning on lepton
+        Muon_Clean=[0]*100
+        Muon_DRjet=[0.]*100
+        DRMuJet=999.
+        Electron_Clean=[0]*100
+        Electron_DRjet=[0.]*100
+        DRElJet=999.
+        for numMu,lep in enumerate(muons):
+            #find the nearest cleanjet
+            for numjet, jet in enumerate(jets):
+                if (Jet_Clean[numjet]==0): continue;
+                dr = deltaR(lep,jet)
+                if dr < DRMuJet:
+                    DRMuJet = dr
+            Muon_DRjet[numMu]= DRMuJet #distance between muon-jet
+            
+            # match gen stable and final muon
+            valuepair=closest(lep,genparts, lambda x,y: True if y.status==1 and y.pdgId==x.pdgId else False) #stable genpart; same flavor
+            if valuepair[1]>0.04: continue; #within DR<0.04
+            Muon_Clean[numMu]=1
+            #momID=valuepair[0].genPartIdxMother # mother of gen muon
+            #print "Mother of gen-muon status : ", genparts[momID].status, " and pdgId : ", genparts[momID].pdgId
+            #grandmomID=genparts[momID].genPartIdxMother # grandmother of mother of gen muon
+            #print "Grandmother of gen-muon status : ", genparts[grandmomID].status, " and pdgId : ", genparts[grandmomID].pdgId
+
+        for numEl,lep in enumerate(electrons):
+            #find the nearest cleanjet
+            for numjet, jet in enumerate(jets):
+                if (Jet_Clean[numjet]==0): continue;
+                dr = deltaR(lep,jet)
+                if dr < DRElJet:
+                    DRElJet = dr
+            Electron_DRjet[numEl]= DRElJet #distance between electron-jet
+
+            # match gen stable and final electron
+            valuepair=closest(lep,genparts, lambda x,y: True if y.status==1 and y.pdgId==x.pdgId else False)
+            if valuepair[1]>0.04: continue;
+            Electron_Clean[numEl]=1
+            
+            
         self.out.fillBranch("cleanedJet", Jet_Clean);
+        self.out.fillBranch("cleanedMuon", Muon_Clean);
+        self.out.fillBranch("cleanedElectron", Electron_Clean);
         return True
         
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
