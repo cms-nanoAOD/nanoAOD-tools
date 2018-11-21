@@ -128,25 +128,37 @@ if not args.isData:
     
         analyzerChain.append(
             EventObservables(
-                jetInputCollection = jetCollection,
+                inputCollection = jetCollection,
                 metInput = metObject,
                 outputName = systName,
             )
         )
     
-    #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
+    #loose skim on mht/met
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.nominal_met>150. or \
-            event.jerUp_met>150. or \
-            event.jerDown_met>150. or \
-            event.jesTotalUp_met>150. or \
-            event.jesTotalDown_met>150. or \
-            event.unclEnUp_met>150. or \
-            event.unclEnDown_met>150.
+            event.nominal_mht>200. or \
+            event.jerUp_mht>200. or \
+            event.jerDown_mht>200. or \
+            event.jesTotalUp_mht>200. or \
+            event.jesTotalDown_mht>200. or \
+            event.unclEnUp_mht>200. or \
+            event.unclEnDown_mht>200.
         )
     )
-    
+    '''
+    analyzerChain.append(
+        EventSkim(selection=lambda event: 
+            event.nominal_mht/event.nominal_met<5. or \
+            event.jerUp_mht/event.jerUp_met<5. or \
+            event.jerDown_mht/event.jerDown_met<5. or \
+            event.jesTotalUp_mht/event.jesTotalUp_met<5. or \
+            event.jesTotalDown_mht/event.jesTotalDown_met<5. or \
+            event.unclEnUp_mht/event.unclEnUp_met<5. or \
+            event.unclEnDown_mht/event.unclEnDown_met<5.
+        )
+    )
+    '''
     analyzerChain.extend([
         PileupWeight(
             dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU69000.root"),
@@ -173,6 +185,19 @@ if not args.isData:
         [lambda tree: tree.branch("rho","F"),lambda tree,event: tree.fillBranch("rho",event.fixedGridRhoFastjetAll)], 
         [lambda tree: tree.branch("nPV","I"),lambda tree,event: tree.fillBranch("nPV",event.PV_npvsGood)],
         [lambda tree: tree.branch("nSV","I"),lambda tree,event: tree.fillBranch("nSV",event.nSV)],
+        
+        [
+            lambda tree: tree.branch("MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight","I"),
+            lambda tree,event: tree.fillBranch(
+                "MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight",
+                event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*1+\
+                event.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight*2
+            )
+        ],
+        [
+            lambda tree: tree.branch("PFHT900","I"),
+            lambda tree,event: tree.fillBranch("PFHT900",event.HLT_PFHT900)
+        ],
     ]
     
     if args.inputFiles[0].find("SMS-T1qqqq_ctau")>=0:
@@ -185,11 +210,50 @@ if not args.isData:
             [lambda tree: tree.branch("llp","I"),lambda tree,event: tree.fillBranch("llp",int(round(Collection(event,"llpinfo")[0].llp_mass/100.))*100)],
             [lambda tree: tree.branch("lsp","I"),lambda tree,event: tree.fillBranch("lsp",int(round(Collection(event,"llpinfo")[0].lsp_mass/100.))*100)],
         ])
+        
+    if args.inputFiles[0].find("madgraph")>=0 and \
+    (args.inputFiles[0].find("DYJetsToLL")>=0 or \
+    args.inputFiles[0].find("ZJetsToNuNu")>=0):
+        analyzerChain.append(
+            ZNLOWeights()
+        )
+
     if args.inputFiles[0].find("DYJetsToLL")>=0 or \
+    args.inputFiles[0].find("ZJetsToNuNu")>=0 or \
     args.inputFiles[0].find("TTJets")>=0 or \
-    args.inputFiles[0].find("QCD")>=0 or \
-    args.inputFiles[0].find("WToLNu")>=0:
+    args.inputFiles[0].find("TT_")>=0 or \
+    args.inputFiles[0].find("WToLNu")>=0 or \
+    args.inputFiles[0].find("WJetsToLNu")>=0:
         storeVariables.append([lambda tree: tree.branch("genHt","F"),lambda tree,event: tree.fillBranch("genHt",event.LHE_HTIncoming)])
+        storeVariables.append([lambda tree: tree.branch("genNb","F"),lambda tree,event: tree.fillBranch("genNb",event.LHE_Nb)])
+        storeVariables.append([lambda tree: tree.branch("genNc","F"),lambda tree,event: tree.fillBranch("genNc",event.LHE_Nc)])
+        storeVariables.append([lambda tree: tree.branch("genNuds","F"),lambda tree,event: tree.fillBranch("genNuds",event.LHE_Nuds)])
+        storeVariables.append([lambda tree: tree.branch("genNglu","F"),lambda tree,event: tree.fillBranch("genNglu",event.LHE_Nglu)])
+        
+    if args.inputFiles[0].find("DYJetsToLL")>=0 or \
+    args.inputFiles[0].find("WToLNu")>=0 or \
+    args.inputFiles[0].find("WJetsToLNu")>=0:
+        storeVariables.append([lambda tree: tree.branch("genVpt","F"),lambda tree,event: tree.fillBranch("genVpt",event.LHE_Vpt)])
+
+    if args.inputFiles[0].find("SMS-T1qqqq_ctau")<0 and args.inputFiles[0].find("QCD")<0:
+        for i in range(0,101):
+            storeVariables.append([lambda tree: tree.branch("lheweight_%i"%i,"F"),lambda tree,event: tree.fillBranch("lheweight_%i"%i,event.LHEPdfWeight[i])])
+        for i in range(0,9):
+            storeVariables.append([lambda tree: tree.branch("scaleweight_%i"%i,"F"),lambda tree,event: tree.fillBranch("scaleweight_%i"%i,event.LHEScaleWeight[i])])
+    else:
+        analyzerChain.append(
+            PDFWeights(
+                pdfset="NNPDF30_nlo_as_0118_nf_4.LHgrid",
+                members=101
+            )
+        )
+        
+    storeVariables.append([lambda tree: tree.branch("genx1","F"),lambda tree,event: tree.fillBranch("genx1",event.Generator_x1)])
+    storeVariables.append([lambda tree: tree.branch("genx2","F"),lambda tree,event: tree.fillBranch("genx2",event.Generator_x2)])
+    storeVariables.append([lambda tree: tree.branch("genid1","F"),lambda tree,event: tree.fillBranch("genid1",event.Generator_id1)])
+    storeVariables.append([lambda tree: tree.branch("genid2","F"),lambda tree,event: tree.fillBranch("genid2",event.Generator_id2)])
+    storeVariables.append([lambda tree: tree.branch("genpdfscale","F"),lambda tree,event: tree.fillBranch("genpdfscale",event.Generator_scalePDF)])
+
     
     
     analyzerChain.append(
@@ -222,7 +286,7 @@ if not args.isData:
 
     analyzerChain.append(
         TaggerEvaluation(
-            modelPath="PhysicsTools/NanoAODTools/data/nn/model_bothmuon_retrain.pb",
+            modelPath="PhysicsTools/NanoAODTools/data/nn/model_singlemuon_retrain.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal,
                 lambda event: event.selectedJets_jerUp,
@@ -284,19 +348,48 @@ else:
     
     analyzerChain.append(
         EventObservables(
-            jetInputCollection = lambda event: event.selectedJets_nominal,
+            inputCollection = lambda event: event.selectedJets_nominal,
             metInput = lambda event: Object(event,"MET"),
             outputName = "nominal",
         )
     )
     
-    #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
+    #loose skim on mht/met
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.nominal_met>150.
+            event.nominal_mht>200.
         )
     )
+    '''
+    analyzerChain.append(
+        EventSkim(selection=lambda event: 
+            event.nominal_mht/event.nominal_met<5.
+        )
+    )
+    '''
     
+    storeVariables = [
+        [lambda tree: tree.branch("rho","F"),lambda tree,event: tree.fillBranch("rho",event.fixedGridRhoFastjetAll)], 
+        [lambda tree: tree.branch("nPV","I"),lambda tree,event: tree.fillBranch("nPV",event.PV_npvsGood)],
+        [lambda tree: tree.branch("nSV","I"),lambda tree,event: tree.fillBranch("nSV",event.nSV)],
+        [
+            lambda tree: tree.branch("MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight","I"),
+            lambda tree,event: tree.fillBranch(
+                "MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight",
+                event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*1+\
+                event.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight*2
+            )
+        ],
+        [
+            lambda tree: tree.branch("PFHT900","I"),
+            lambda tree,event: tree.fillBranch("PFHT900",event.HLT_PFHT900)
+        ],
+    ]
+    analyzerChain.append(
+        EventInfo(
+            storeVariables=storeVariables
+        )
+    )
     
     analyzerChain.append(
         TaggerEvaluation(
@@ -322,7 +415,7 @@ else:
 
     analyzerChain.append(
         TaggerEvaluation(
-            modelPath="PhysicsTools/NanoAODTools/data/nn/model_bothmuon_retrain.pb",
+            modelPath="PhysicsTools/NanoAODTools/data/nn/model_singlemuon_retrain.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal
             ],
@@ -345,7 +438,7 @@ else:
 p=PostProcessor(
     args.output[0],
     [args.inputFiles],
-    cut=None,
+    cut="(nJet>0)",
     branchsel=None,
     maxEvents=-1,
     modules=analyzerChain,

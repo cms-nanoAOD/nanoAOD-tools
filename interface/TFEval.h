@@ -1,3 +1,6 @@
+#ifndef PhysicsTools_NanoAODTools_TFEval_h
+#define PhysicsTools_NanoAODTools_TFEval_h
+
 #include "tensorflow/core/framework/graph.pb.h"
 #include "tensorflow/core/framework/tensor.h"
 
@@ -500,5 +503,7 @@ class TFEval
         {
         }
 };
+
+#endif
 
 

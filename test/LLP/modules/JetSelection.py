@@ -47,6 +47,7 @@ class JetSelection(Module):
         self.out = wrappedOutputTree
         if self.addSize:
             self.out.branch("n"+self.outputName,"I")
+            self.out.branch("nfailedId"+self.outputName,"I")
         if self.flagDA:
             self.out.branch(self.outputName+"_forDA","F",lenVar="nJet")
         
@@ -67,11 +68,16 @@ class JetSelection(Module):
         if self.flagDA:
             flagsDA = [0.]*event.nJet
             
+        failedId = 0
         
         for jet in jets:
             #if self.flagDA:
             #    print "event=%i, index=%i, pt=%.4f, eta=%.4f, "%(event._entry,jet._index,origJets[jet._index].pt,origJets[jet._index].eta)
-            if jet.pt>self.jetMinPt and math.fabs(jet.eta)<self.jetMaxEta and (jet.jetId>0):
+            if jet.pt>self.jetMinPt and math.fabs(jet.eta)<self.jetMaxEta:
+                if (jet.jetId<1):
+                    unselectedJets.append(jet)
+                    failedId+=1
+                    continue
                 leptons = self.leptonCollection(event)
                 if self.dRCleaning>0. and leptons!=None and len(leptons)>0:
                     mindr = min(map(lambda lepton: deltaR(lepton,jet),leptons))
@@ -88,6 +94,7 @@ class JetSelection(Module):
         #    print
         if self.addSize:
             self.out.fillBranch("n"+self.outputName,len(selectedJets))
+            self.out.fillBranch("nfailedId"+self.outputName,failedId)
         if self.flagDA:
             self.out.fillBranch(self.outputName+"_forDA",flagsDA)
         for variable in self.storeKinematics:
