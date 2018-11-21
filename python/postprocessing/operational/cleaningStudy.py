@@ -7,9 +7,9 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-from PhysicsTools.NanoAODTools.postprocessing.tools import deltaPhi, deltaR, closest
+from PhysicsTools.NanoAODTools.postprocessing.tools import deltaPhi, deltaR, closest, matchObjectCollectionMultiple
 
-class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap cleaning, no jet selection)
+class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overlap cleaning, no jet selection)
     def __init__(self):
         #if "/mhtjuProducerCppWorker_cc.so" not in ROOT.gSystem.GetLibraries():
         #    print "Load C++ mhtjuProducerCppWorker worker module"
@@ -32,11 +32,12 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
         self.FilesName=inputFile
         self.out = wrappedOutputTree
         #CleanObjectCollection
-        self.out.branch("cleanedJet" ,"I", 100);
-        self.out.branch("cleanedMuon",  "I", 100);
-        self.out.branch("cleanedElectron",  "I", 100);
-        self.out.branch("JetMuon_MindR",  "F", 100);
-        self.out.branch("JetElectron_MindR",  "F", 100);
+        self.out.branch("cleanedJet" ,"I", 0, "nCleanedJet", "nCleanedJet", False);
+        self.out.branch("cleanedMuon",  "I", 0, "nCleanedMuon", "nCleanedMuon", False);
+        self.out.branch("cleanedElectron",  "I", 0, "nCleanedElectron", "nCleanedElectron", False);
+        self.out.branch("JetMuon_MindR",  "F");
+        self.out.branch("JetElectron_MindR",  "F");
+
         self.out.branch("MHTju_pt",  "F");
         self.out.branch("MHTju_phi", "F");
         self.out.branch("ZPtCorr","F");
@@ -67,40 +68,48 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
             genparts = Collection(event, "GenPart")
         
         # Cleaning Jet
-        Jet_Clean=[0]*100
+        Jet_Clean=[0]*len(jets)
+
         for num,jet in enumerate(jets) :
             Jet_Clean[num]=1
-            if jet.puId<4: continue;
-            if jet.pt<30: continue;
-            if fabs(jet.eta)>2.5: continue;
-            #Cleaning from muon
-            drMinMu = 999.
-            for lep in muons:
-                #if lep.jetIdx!=-1: continue;#Looking at Muon that associated with jet
-                if lep.mediumId==0: continue;
-                if lep.pt<5: continue;
-                dr = deltaR(lep,jet)
-                if dr < drMinMu:
-                    drMinMu = dr
+            if jet.puId<4 and jet.pt<30 and fabs(jet.eta)>2.5: continue
+            
+            for numm,lep in enumerate(muons):
+                if lep.pt<5 and lep.mediumId==0: continue
+                if deltaR(jet,lep) < 0.4:
+                    Jet_Clean[num]=0
+                    if jet.chHEF>0.1: Jet_Clean[num]=1
+                    if jet.neHEF>0.2: Jet_Clean[num]=1
 
-            if drMinMu<0.4:
-                Jet_Clean[num]=0
-                if jet.chHEF>0.1: Jet_Clean[num]=1
-                if jet.neHEF>0.2: Jet_Clean[num]=1
+            for nummm,lep in enumerate(electrons):
+                if lep.pt<15 and lep.cutBased<4: continue     
+                if deltaR(jet,lep) < 0.4:
+                    Jet_Clean[num]=0
+                    if jet.chHEF>0.1: Jet_Clean[num]=1
+                    if jet.neHEF>0.2: Jet_Clean[num]=1
 
-            drMinE = 999.
-            for lep in electrons:
-                if lep.cutBased<4: continue;
-                if lep.pt<15: continue;
-                dr = deltaR(lep,jet)
-                if dr < drMinE:
-                    drMinE = dr
-
-            if drMinE<0.4:
-                Jet_Clean[num]=0
-                if jet.chHEF>0.1: Jet_Clean[num]=1
-                if jet.neHEF>0.2: Jet_Clean[num]=1
-
+        # Cleaning leptons
+        Muon_Clean=[0]*len(muons)
+        Electron_Clean=[0]*len(electrons)
+        dRMuJet=999.
+        dRElJet=999.
+        for numm,lep in enumerate(muons):
+            Muon_Clean[numm]=1
+            for jet in jets :
+                dR=deltaR(lep,jet)
+                if dR < dRMuJet:
+                    dRMuJet = dR
+                if dR < 0.4:
+                    Muon_Clean[numm]=0
+        for nummm,lep in enumerate(electrons):
+            Electron_Clean[nummm]=1
+            for jet in jets :
+                dR=deltaR(lep,jet)
+                if dR < dRElJet:
+                    dRElJet = dR
+                if dR < 0.4:
+                    Electron_Clean[nummm]=0
+                
         # HT Computation
         HTpt=0.
         HTphi=0.
@@ -111,52 +120,7 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
             if Jet_Clean[num]==0: continue;
             HTpt+=jet.pt
             HTphi+=jet.phi
-
-        # Cleaning on lepton
-        Muon_Clean=[0]*100
-        Muon_DRjet=[0.]*100
-        DRMuJet=999.
-        Electron_Clean=[0]*100
-        Electron_DRjet=[0.]*100
-        DRElJet=999.
-        for numMu,lep in enumerate(muons):
-            #find the nearest cleanjet
-            for numjet, jet in enumerate(jets):
-                if (Jet_Clean[numjet]==0): continue;
-                dr = deltaR(lep,jet)
-                if dr < DRMuJet:
-                    DRMuJet = dr
-            Muon_DRjet[numMu]= DRMuJet #distance between muon-jet
-
-            if self.Genpart:
-                # match gen stable and final muon
-                valuepair=closest(lep,genparts, lambda x,y: True if y.status==1 and y.pdgId==x.pdgId else False) #stable genpart; same flavor
-                if valuepair[1]>0.4: continue; #veto within DR<0.04
-                Muon_Clean[numMu]=1
-            elif not self.Genpart:
-                Muon_Clean[numMu]=1 #Its data
-                #momID=valuepair[0].genPartIdxMother # mother of gen muon
-                #print "Mother of gen-muon status : ", genparts[momID].status, " and pdgId : ", genparts[momID].pdgId
-                #grandmomID=genparts[momID].genPartIdxMother # grandmother of mother of gen muon
-                #print "Grandmother of gen-muon status : ", genparts[grandmomID].status, " and pdgId : ", genparts[grandmomID].pdgId
-
-        for numEl,lep in enumerate(electrons):
-            #find the nearest cleanjet
-            for numjet, jet in enumerate(jets):
-                if (Jet_Clean[numjet]==0): continue;
-                dr = deltaR(lep,jet)
-                if dr < DRElJet:
-                    DRElJet = dr
-            Electron_DRjet[numEl]= DRElJet #distance between electron-jet
-
-            if self.Genpart:
-                # match gen stable and final electron
-                valuepair=closest(lep,genparts, lambda x,y: True if y.status==1 and y.pdgId==x.pdgId else False)
-                if valuepair[1]>0.4: continue; #veto within DR<0.04
-                Electron_Clean[numEl]=1
-            elif not self.Genpart:
-                Electron_Clean[numEl]=1 #Its data
-
+        
         # Perform PtZ correction computation
         Zweight = 1.
         NgenZ=0
@@ -173,13 +137,13 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
                 if Zpt>40 and Zpt<50: Zweight=0.65
                 if Zpt>50 and Zpt<200: Zweight=0.65-0.00034*Zpt
                 if Zpt>200: Zweight=0.6
-                
-            
+
         self.out.fillBranch("cleanedJet", Jet_Clean);
         self.out.fillBranch("cleanedMuon", Muon_Clean);
         self.out.fillBranch("cleanedElectron", Electron_Clean);
-        self.out.fillBranch("JetMuon_MindR", Muon_DRjet);
-        self.out.fillBranch("JetElectron_MindR", Electron_DRjet);
+        self.out.fillBranch("JetMuon_MindR", dRMuJet);
+        self.out.fillBranch("JetElectron_MindR", dRElJet);
+        
         self.out.fillBranch("MHTju_pt", HTpt)
         self.out.fillBranch("MHTju_phi", HTphi)
         self.out.fillBranch("ZPtCorr", Zweight);
@@ -187,4 +151,4 @@ class objCleaning(Module): # MHT producer, unclean jets only (no lepton overlap 
         
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-cleaning = lambda : objCleaning()
+cleaning = lambda : cleaningStudy()

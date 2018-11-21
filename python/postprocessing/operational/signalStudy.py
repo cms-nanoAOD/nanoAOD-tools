@@ -199,9 +199,68 @@ class signalStudy(Module): # MHT producer, unclean jets only (no lepton overlap 
                 if Zpt>50 and Zpt<200: Zweight=0.65-0.00034*Zpt
                 if Zpt>200: Zweight=0.6
 
+        '''
         # find the reconstructed muon and genpart
-        
+        #highest pt, look only at muon first
+        leadingPt=False
+        subleadingPt=False
+        subsubleadingPt=False
+        for nmu, lep in enumerate(muons):
+            if Muon_Clean[nmu]!=1: continue;
+            #find index of genpart passed muon
+            genMuonID=lep.genPartIdx
+            if genMuonID==-1: continue;
             
+            MotherID=genparts[genMuonID].genPartIdxMother
+            #check status and pdgid of mother
+            if genparts[MotherID].status==62 and abs(genparts[MotherID].pdgId)==24:
+                if not leadingPt and not subleadingPt and not subsubleadingPt:
+                    MotherIDW1=genparts[MotherID].genPartIdxMother
+                    if genparts[MotherIDW1].status==62 && genparts[MotherIDW1].pdgId==25:
+                        Lep1Pt=lep.pt
+                        W1Pt=genparts[MotherID].pt
+                        leadingPt=True
+                        HPt=genparts[MotherIDW1].pt
+                elif leadingPt and not subleadingPt and not subsubleadingPt:
+                    MotherIDW1=genparts[MotherID].genPartIdxMother
+                    if genparts[MotherIDW1].status==62 && genparts[MotherIDW1].pdgId==25:
+                        Lep2Pt=lep.pt
+                        W2Pt=genparts[MotherID].pt
+                        subleadingPt=True
+                        HPt=genparts[MotherIDW1].pt
+                elif leadingPt and subleadingPt and not subsubleadingPt:
+                    MotherIDW1=genparts[MotherID].genPartIdxMother
+                    if genparts[MotherIDW1].status==62 && genparts[MotherIDW1].pdgId==25:
+                        Lep3Pt=lep.pt
+                        W3Pt=genparts[MotherID].pt
+                        subsubleadingPt=True
+                        HPt=genparts[MotherIDW1].pt
+                elif  leadingPt and subleadingPt and subsubleadingPt:
+                    continue
+            elif genparts[MotherID].status==62 and genparts[MotherID].pdgId==25:
+        '''
+                
+        NWn=0
+        NWp=0
+        NHiggs=0
+        for num, gen in enumerate(genparts):
+            #W boson candidates
+            if abs(gen.pdgId)==24 and gen.status==62:
+                #Mother of W
+                MonId=gen.genPartIdxMother
+                #charge of W
+                if gen.pdgId==-24:
+                    NWn+=1
+                elif gen.pdgId==24:
+                    NWp+=1
+                #Find the Higgs Mother
+                if genparts[MonId].pdgId==25 and genparts[MonId].status==62:
+                    NHiggs+=1
+                    print "Found Higgs!"
+        #print "NWn = ", NWn
+        #print "NWp = ",	NWp
+        #print "NHiggs = ", NHiggs
+        
         self.out.fillBranch("cleanedJet", Jet_Clean);
         self.out.fillBranch("cleanedMuon", Muon_Clean);
         self.out.fillBranch("cleanedElectron", Electron_Clean);
