@@ -21,7 +21,7 @@ function run_test()
     python PhysicsTools/NanoAODTools/test/LLP/testEval.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
 
     echo "--- Test new module chain ---"
-    python PhysicsTools/NanoAODTools/test/LLP/processSR.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
+    python PhysicsTools/NanoAODTools/test/LLP/processSR.py --data --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
     python PhysicsTools/NanoAODTools/test/LLP/processMuonCR.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
 }
 
