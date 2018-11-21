@@ -13,9 +13,6 @@ function run_test()
     rsync -r --stats /scripts/ PhysicsTools/NanoAODTools/. || return 1
     scram b || return 1
      
-    echo "--- Test analyzer chain ---"
-    python PhysicsTools/NanoAODTools/test/LLP/processNANOX.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
-    
     echo "--- Test evaluation script ---"
     wget -nv https://github.com/LLPDNNX/test-files/raw/master/pbmodel/model_ctau1.pb || return 1
     wget -nv https://github.com/LLPDNNX/test-files/raw/master/pbmodel/model_parametric.pb || return 1
