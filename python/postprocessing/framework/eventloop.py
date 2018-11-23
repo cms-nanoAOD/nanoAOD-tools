@@ -61,9 +61,10 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
         if maxEvents > 0 and i >= maxEvents-1: break
         e = Event(inputTree,i)
         weight = 1.
-        genWeight = getattr(e, "genWeight",None)
-        if genWeight:
-            weight = genWeight
+        if hasattr(e, "genWeight"):
+            genWeight = getattr(e, "genWeight",None)
+            if genWeight:
+                weight = genWeight
         h_nevents.Fill(0.5,weight)
         if weight>=0: h_nevents.Fill(1.5,weight)
         else: h_nevents.Fill(2.5,weight)
