@@ -1,6 +1,6 @@
 import ROOT
 import os
-from math import fabs
+from math import fabs, cos, sin, tan, atan, exp, sqrt
 from array import array
 
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -32,15 +32,20 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
         self.FilesName=inputFile
         self.out = wrappedOutputTree
         #CleanObjectCollection
-        self.out.branch("cleanedJet" ,"I", 0, "nCleanedJet", "nCleanedJet", False);
-        self.out.branch("cleanedMuon",  "I", 0, "nCleanedMuon", "nCleanedMuon", False);
-        self.out.branch("cleanedElectron",  "I", 0, "nCleanedElectron", "nCleanedElectron", False);
-        self.out.branch("JetMuon_MindR",  "F");
-        self.out.branch("JetElectron_MindR",  "F");
+        self.out.branch("cleanedJet" ,"I", 0, "nCleanedJet", "nCleanedJet", False)
+        self.out.branch("cleanedMuon",  "I", 0, "nCleanedMuon", "nCleanedMuon", False)
+        self.out.branch("cleanedElectron",  "I", 0, "nCleanedElectron", "nCleanedElectron", False)
+        self.out.branch("JetE",  "F", 0, "nJetE", "nJetE", False) ###
+        self.out.branch("MuonJet_MindR",  "F", 0, "nMuonJet", "nMuonJet", False)
+        self.out.branch("ElecJet_MindR",  "F", 0, "nElecJet", "nElecJet", False)
 
-        self.out.branch("MHTju_pt",  "F");
-        self.out.branch("MHTju_phi", "F");
-        self.out.branch("ZPtCorr","F");
+        self.out.branch("nGoodJet", "I")
+        self.out.branch("nGoodMuon", "I")
+        self.out.branch("nGoodElectron", "I")
+
+        self.out.branch("MHTju_pt",  "F")
+        self.out.branch("MHTju_phi", "F")
+        self.out.branch("ZPtCorr","F")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -69,57 +74,111 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
         
         # Cleaning Jet
         Jet_Clean=[0]*len(jets)
-
+        Jetpx=[0.]*len(jets)
+        Jetpy=[0.]*len(jets)
+        Jetpz=[0.]*len(jets)
+        JetE=[0.]*len(jets)
+        nGoodJet=0
         for num,jet in enumerate(jets) :
-            Jet_Clean[num]=1
-            if jet.puId<4 and jet.pt<30 and fabs(jet.eta)>2.5: continue
+            Jet_Clean[num]=1 #by default its a good jet
+            #if jet.puId<4 and jet.pt<30 and fabs(jet.eta)>2.5: continue
+
+            #Jet kinematics
+            Jetpx[num] = jet.pt * cos( jet.phi )
+            Jetpy[num] = jet.pt * sin( jet.phi )
+            Jetpz[num] = jet.pt / tan( 2 * atan( exp( -jet.eta ) ) )
+            JetE[num]  = sqrt ( jet.pt* jet.pt + Jetpz[num]* Jetpz[num] )
             
+            if fabs(jet.eta)>2.5: continue
+
+            ##Cleaning each muon match within 0.4
             for numm,lep in enumerate(muons):
-                if lep.pt<5 and lep.mediumId==0: continue
+                if lep.pt<5.: continue
+                if lep.mediumId==0: continue
                 if deltaR(jet,lep) < 0.4:
                     Jet_Clean[num]=0
-                    if jet.chHEF>0.1: Jet_Clean[num]=1
-                    if jet.neHEF>0.2: Jet_Clean[num]=1
+                    #it could be B-jet; b->muon+nu_mu ; b->electron+nu_ele
+                    if jet.chHEF>0.15: Jet_Clean[num]=1
+                    if jet.neHEF>0.15: Jet_Clean[num]=1
+                    if jet.chHEF<0.1 and jet.neHEF>0.2: Jet_Clean[num]=1
+                    if jet.puId==4 : Jet_Clean[num]=0
+                    if jet.btagCMVA>0.8: Jet_Clean[num]=1
 
             for nummm,lep in enumerate(electrons):
-                if lep.pt<15 and lep.cutBased<4: continue     
+                if lep.pt<15.: continue
+                if lep.cutBased<4: continue     
                 if deltaR(jet,lep) < 0.4:
                     Jet_Clean[num]=0
                     if jet.chHEF>0.1: Jet_Clean[num]=1
-                    if jet.neHEF>0.2: Jet_Clean[num]=1
+                    if jet.chHEF<0.1 and jet.neHEF>0.2: Jet_Clean[num]=1
+            if Jet_Clean[num]==1: nGoodJet+=1
 
-        # Cleaning leptons
-        Muon_Clean=[0]*len(muons)
-        Electron_Clean=[0]*len(electrons)
-        dRMuJet=999.
-        dRElJet=999.
+        # Compute nearest distance between lepton and jets
+        #Muon_Clean=[0]*len(muons)
+        #Electron_Clean=[0]*len(electrons)
+        dRMuJet=[999.]*len(muons)
+        dRElJet=[999.]*len(electrons)
+        drm=999.
+        dre=999.
+        nGoodMuon=0
+        nGoodElectron=0
         for numm,lep in enumerate(muons):
-            Muon_Clean[numm]=1
-            for jet in jets :
+            if lep.mediumId==1: nGoodMuon+=1 #count good muon
+            for njet,jet in enumerate(jets) : #check against good jet
+                if Jet_Clean[njet]==0: continue
                 dR=deltaR(lep,jet)
                 if dR < dRMuJet:
-                    dRMuJet = dR
-                if dR < 0.4:
-                    Muon_Clean[numm]=0
+                   drm = dR
+            dRMuJet[numm]=drm
+            
         for nummm,lep in enumerate(electrons):
-            Electron_Clean[nummm]=1
-            for jet in jets :
+            if lep.cutBased> 3: nGoodElectron+=1 #count good electron
+            for njet,jet in enumerate(jets) :
+                if Jet_Clean[njet]==0: continue
                 dR=deltaR(lep,jet)
                 if dR < dRElJet:
-                    dRElJet = dR
-                if dR < 0.4:
-                    Electron_Clean[nummm]=0
+                    dre = dR
+            dRElJet[nummm]=dre
+        
                 
         # HT Computation
         HTpt=0.
         HTphi=0.
         for num, jet in enumerate(jets):
-            if jet.puId<4: continue;
-            if jet.pt<30: continue;
-            if fabs(jet.eta)>2.5: continue;
-            if Jet_Clean[num]==0: continue;
+            if jet.puId==4: continue
+            if Jet_Clean[num]==0: continue
+            if jet.pt<30.: continue # taken at 30 GeV
+            if fabs(jet.eta)>2.5: continue
             HTpt+=jet.pt
             HTphi+=jet.phi
+            
+        '''
+        #Link lepton to genpart
+        if self.Genpart: #only for MC
+            Muon_GenMotherIdx=[-1]*len(muons)
+            for num,lep in enumerate(muons):
+                Muon_GenMotherIdx[num]=-1
+                for gennum,gen in enumerate(genparts):
+                     if gen.status!=1: continue
+                     if gen.pdgId!=lep.pdgId: continue
+                     delR=deltaR(lep,gen)
+                     if delR>0.4: continue
+                     Muon_mom=gen.genPartIdxMother
+                     if genparts[Muon_mom].pdgId == lep.pdgId:
+                         Muon_GenMotherIdx[num]=gennum
+
+            Ele_GenMotherIdx=[-1]*len(electrons)
+            for num,lep in enumerate(electrons):
+                Ele_GenMotherIdx[num]=-1
+		for gennum,gen in enumerate(genparts):
+                    if gen.status!=1: continue
+                    if gen.pdgId!=lep.pdgId: continue
+                    delR=deltaR(lep,gen)
+                    if delR>0.4: continue
+                    Ele_mom=gen.genPartIdxMother
+                    if genparts[Ele_mom].pdgId == lep.pdgId:
+                        Ele_GenMotherIdx[num]=gennum
+        '''
         
         # Perform PtZ correction computation
         Zweight = 1.
@@ -138,15 +197,19 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
                 if Zpt>50 and Zpt<200: Zweight=0.65-0.00034*Zpt
                 if Zpt>200: Zweight=0.6
 
-        self.out.fillBranch("cleanedJet", Jet_Clean);
-        self.out.fillBranch("cleanedMuon", Muon_Clean);
-        self.out.fillBranch("cleanedElectron", Electron_Clean);
-        self.out.fillBranch("JetMuon_MindR", dRMuJet);
-        self.out.fillBranch("JetElectron_MindR", dRElJet);
+        self.out.fillBranch("cleanedJet", Jet_Clean)
+        #self.out.fillBranch("cleanedMuon", Muon_Clean)
+        #self.out.fillBranch("cleanedElectron", Electron_Clean)
+        self.out.fillBranch("MuonJet_MindR", dRMuJet)
+        self.out.fillBranch("ElecJet_MindR", dRElJet)
+
+        self.out.fillBranch("nGoodJet", nGoodJet)
+        self.out.fillBranch("nGoodMuon", nGoodMuon)
+        self.out.fillBranch("nGoodElectron", nGoodElectron)
         
         self.out.fillBranch("MHTju_pt", HTpt)
         self.out.fillBranch("MHTju_phi", HTphi)
-        self.out.fillBranch("ZPtCorr", Zweight);
+        self.out.fillBranch("ZPtCorr", Zweight)
         return True
         
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
