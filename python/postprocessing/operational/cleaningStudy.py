@@ -33,8 +33,8 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
         self.out = wrappedOutputTree
         #CleanObjectCollection
         self.out.branch("cleanedJet" ,"I", 0, "nCleanedJet", "nCleanedJet", False)
-        self.out.branch("cleanedMuon",  "I", 0, "nCleanedMuon", "nCleanedMuon", False)
-        self.out.branch("cleanedElectron",  "I", 0, "nCleanedElectron", "nCleanedElectron", False)
+        #self.out.branch("cleanedMuon",  "I", 0, "nCleanedMuon", "nCleanedMuon", False)
+        #self.out.branch("cleanedElectron",  "I", 0, "nCleanedElectron", "nCleanedElectron", False)
         self.out.branch("JetE",  "F", 0, "nJetE", "nJetE", False) ###
         self.out.branch("MuonJet_MindR",  "F", 0, "nMuonJet", "nMuonJet", False)
         self.out.branch("ElecJet_MindR",  "F", 0, "nElecJet", "nElecJet", False)
@@ -149,8 +149,8 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
             if Jet_Clean[num]==0: continue
             if jet.pt<30.: continue # taken at 30 GeV
             if fabs(jet.eta)>2.5: continue
-            HTpt+=jet.pt
-            HTphi+=jet.phi
+            HTpt = HTpt + jet.pt
+            HTphi = HTphi + jet.phi
             
         '''
         #Link lepton to genpart
@@ -188,7 +188,7 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
                 if gen.pdgId!=23: continue;
                 if gen.status!=62: continue;
                 NgenZ+=1
-                if NgenZ!=1: continue;
+                if NgenZ>1: continue;
                 Zpt=gen.pt
                 if Zpt<20: Zweight=1.2
                 if Zpt>20 and Zpt<30: Zweight=1.
@@ -202,6 +202,7 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
         #self.out.fillBranch("cleanedElectron", Electron_Clean)
         self.out.fillBranch("MuonJet_MindR", dRMuJet)
         self.out.fillBranch("ElecJet_MindR", dRElJet)
+        self.out.fillBranch("JetE", JetE)
 
         self.out.fillBranch("nGoodJet", nGoodJet)
         self.out.fillBranch("nGoodMuon", nGoodMuon)

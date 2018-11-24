@@ -30,6 +30,8 @@ if __name__ == "__main__":
 	 parser.print_help()
          sys.exit(1)
     outdir = args[0]; args = args[1:]
+    print "outdir = ", outdir
+    print "args = ", args
 
     modules = []
     for mod, names in options.imports: 
