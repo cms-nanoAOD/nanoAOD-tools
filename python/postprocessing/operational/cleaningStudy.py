@@ -71,7 +71,9 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
         jets = Collection(event, "Jet")
         if self.Genpart:
             genparts = Collection(event, "GenPart")
-        
+        taus = Collection(event, "Tau")
+        photons = Collection(event, "Photon")
+            
         # Cleaning Jet
         Jet_Clean=[0]*len(jets)
         Jetpx=[0.]*len(jets)
