@@ -65,7 +65,11 @@ analyzerChain.append(
     )
 )
 
-
+analyzerChain.append(
+    SignalTriggerSelection(
+        globalOptions=globalOptions
+        )
+    )
 
 analyzerChain.extend(muonSelection)
 
@@ -79,10 +83,10 @@ if not args.isData:
     )
     for systName,collection in [
         ("nominal",lambda event: event.jets_nominal),
-        ("jerUp",lambda event: event.jets_jerUp),
-        ("jerDown",lambda event: event.jets_jerDown),
-        ("jesTotalUp",lambda event: event.jets_jesUp["Total"]),
-        ("jesTotalDown",lambda event: event.jets_jesDown["Total"]),
+        #("jerUp",lambda event: event.jets_jerUp),
+        #("jerDown",lambda event: event.jets_jerDown),
+        #("jesTotalUp",lambda event: event.jets_jesUp["Total"]),
+        #("jesTotalDown",lambda event: event.jets_jesDown["Total"]),
     ]:
 
         analyzerChain.append(
@@ -108,22 +112,22 @@ if not args.isData:
     
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=2 or \
-            len(event.selectedJets_jerUp)>=2 or \
-            len(event.selectedJets_jerDown)>=2 or \
-            len(event.selectedJets_jesTotalUp)>=2 or \
-            len(event.selectedJets_jesTotalDown)>=2
+            len(event.selectedJets_nominal)>=2
+            #len(event.selectedJets_jerUp)>=2 or \
+            #len(event.selectedJets_jerDown)>=2 or \
+            #len(event.selectedJets_jesTotalUp)>=2 or \
+            #len(event.selectedJets_jesTotalDown)>=2
         )
     )
     
     for systName,jetCollection,metObject in [
         ("nominal",lambda event: event.selectedJets_nominal,lambda event: event.met_nominal),
-        ("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
-        ("jerDown",lambda event: event.selectedJets_jerDown,lambda event: event.met_jerDown),
-        ("jesTotalUp",lambda event: event.selectedJets_jesTotalUp,lambda event: event.met_jesUp["Total"]),
-        ("jesTotalDown",lambda event: event.selectedJets_jesTotalDown,lambda event: event.met_jesDown["Total"]),
-        ("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
-        ("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
+        #("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
+        #("jerDown",lambda event: event.selectedJets_jerDown,lambda event: event.met_jerDown),
+        #("jesTotalUp",lambda event: event.selectedJets_jesTotalUp,lambda event: event.met_jesUp["Total"]),
+        #("jesTotalDown",lambda event: event.selectedJets_jesTotalDown,lambda event: event.met_jesDown["Total"]),
+        #("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
+        #("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
     ]:
     
         analyzerChain.append(
@@ -137,6 +141,13 @@ if not args.isData:
     #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
     analyzerChain.append(
         EventSkim(selection=lambda event: 
+            event.nominal_mht>200. and
+            event.nominal_mht/event.nominal_met<2.
+        )
+    )
+    '''
+    analyzerChain.append(
+        EventSkim(selection=lambda event: 
             event.nominal_met>150. or \
             event.jerUp_met>150. or \
             event.jerDown_met>150. or \
@@ -146,6 +157,7 @@ if not args.isData:
             event.unclEnDown_met>150.
         )
     )
+    '''
     
     analyzerChain.extend([
         PileupWeight(
@@ -187,8 +199,9 @@ if not args.isData:
         ])
     if args.inputFiles[0].find("DYJetsToLL")>=0 or \
     args.inputFiles[0].find("TTJets")>=0 or \
-    args.inputFiles[0].find("QCD")>=0 or \
-    args.inputFiles[0].find("WToLNu")>=0:
+    args.inputFiles[0].find("QCD_HT")>=0 or \
+    args.inputFiles[0].find("WJetsToLNu")>=0 or \
+    args.inputFiles[0].find("ZJetsToNuNu")>=0:
         storeVariables.append([lambda tree: tree.branch("genHt","F"),lambda tree,event: tree.fillBranch("genHt",event.LHE_HTIncoming)])
     
     
@@ -225,10 +238,10 @@ if not args.isData:
             modelPath="PhysicsTools/NanoAODTools/data/nn/model_bothmuon_retrain.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal,
-                lambda event: event.selectedJets_jerUp,
-                lambda event: event.selectedJets_jerDown,
-                lambda event: event.selectedJets_jesTotalUp,
-                lambda event: event.selectedJets_jesTotalDown,
+                #lambda event: event.selectedJets_jerUp,
+                #lambda event: event.selectedJets_jerDown,
+                #lambda event: event.selectedJets_jesTotalUp,
+                #lambda event: event.selectedJets_jesTotalDown,
             ],
             taggerName="llpdnnx_da",
             logctauValues = range(-3,5)
@@ -236,12 +249,12 @@ if not args.isData:
     )
     for systName,jetCollection,metObject in [
         ("nominal",lambda event: event.selectedJets_nominal,lambda event: event.met_nominal),
-        ("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
-        ("jerDown",lambda event: event.selectedJets_jerDown,lambda event: event.met_jerDown),
-        ("jesUp",lambda event: event.selectedJets_jesTotalUp,lambda event: event.met_jesUp["Total"]),
-        ("jesDown",lambda event: event.selectedJets_jesTotalDown,lambda event: event.met_jesDown["Total"]),
-        ("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
-        ("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
+        #("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
+        #("jerDown",lambda event: event.selectedJets_jerDown,lambda event: event.met_jerDown),
+        #("jesUp",lambda event: event.selectedJets_jesTotalUp,lambda event: event.met_jesUp["Total"]),
+        #("jesDown",lambda event: event.selectedJets_jesTotalDown,lambda event: event.met_jesDown["Total"]),
+        #("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
+        #("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
     ]:
         analyzerChain.append(
             TaggerWorkingpoints(
@@ -291,12 +304,14 @@ else:
     )
     
     #loose skim on ht/met (limits might use ht>1000 or (ht>200 && met>200))
+    '''
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.nominal_met>150.
+            event.nominal_mht>200.
+            event.nominal_mht/event.nominal_met<2.
         )
     )
-    
+    '''
     
     analyzerChain.append(
         TaggerEvaluation(
