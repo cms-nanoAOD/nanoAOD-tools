@@ -1,6 +1,6 @@
 #!/bin/bash
 
-test1=5
+test1=4
 
 if [ "$test1" == "0" ];then
     echo "SKIMMING + SLIMMING"
