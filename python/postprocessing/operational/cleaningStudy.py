@@ -81,59 +81,71 @@ class cleaningStudy(Module):
         taus = Collection(event, "Tau")
         photons = Collection(event, "Photon")
             
-        # Cleaning Jet #preliminary cleaning
-        Jet_Clean=[0]*len(jets)
+        # Cleaning Jet wrt muon #preliminary cleaning
+        Jet_Clean=[1]*len(jets) #Jet is good by default
         Muon_Clean=[0]*len(muons)
         Electron_Clean=[0]*len(electrons)
-        Jetpx=[0.]*len(jets)
-        Jetpy=[0.]*len(jets)
-        Jetpz=[0.]*len(jets)
-        JetE=[0.]*len(jets)
-        for njet,jet in enumerate(jets) :
-            if jet.puId<4 and jet.pt<30 and fabs(jet.eta)>2.5: continue
-            if jet.jetId!=2: continue
-            Jet_Clean[njet]=1 #by default its a good jet
+        Tau_Clean=[0]*len(taus)
+        Photon_Clean=[0]*len(photons)
+        #Jetpx=[0.]*len(jets)
+        #Jetpy=[0.]*len(jets)
+        #Jetpz=[0.]*len(jets)
+        #JetE=[0.]*len(jets)
 
-            #Jet kinematics
-            #Jetpx[num] = jet.pt * cos( jet.phi )
-            #Jetpy[num] = jet.pt * sin( jet.phi )
-            #Jetpz[num] = jet.pt / tan( 2 * atan( exp( -jet.eta ) ) )
-            #JetE[num]  = sqrt ( jet.pt* jet.pt + Jetpz[num]* Jetpz[num] )
-            
-            #if fabs(jet.eta)>2.5: continue
-
-            ##Cleaning each muon match within 0.4
-            for nmu,lep in enumerate(muons):
-                if lep.pt<5.: continue
-                if lep.mediumId==0: continue
-                if deltaR(jet,lep) < 0.4:
-                    Jet_Clean[njet]=0
-                    Muon_Clean[nmu]=1
-                    #it could be B-jet; b->muon+nu_mu ; b->electron+nu_ele
-                    if jet.chHEF>0.1: Jet_Clean[njet]=1; Muon_Clean[nmu]=0 
-                    if jet.neHEF>0.2: Jet_Clean[njet]=1; Muon_Clean[nmu]=0
-                            
-                    #if jet.chHEF>0.15: Jet_Clean[njet]=1; Muon_Clean[nmu]=0
-                    #if jet.neHEF>0.15: Jet_Clean[njet]=1; Muon_Clean[nmu]=0
-                    #if jet.chHEF<0.1 and jet.neHEF>0.2: Jet_Clean[njet]=1; Muon_Clean[nmu]=0
-                    #if jet.puId==4 : Jet_Clean[njet]=0; Muon_Clean[nmu]=1
-                    #if jet.btagCMVA>0.8: Jet_Clean[njet]=1; Muon_Clean[nmu]=0
-
-            for nele,lep in enumerate(electrons):
-                if lep.pt<15.: continue
-                if lep.cutBased<4: continue     
-                if deltaR(jet,lep) < 0.4:
-                    Jet_Clean[njet]=0
-                    Electron_Clean[nele]=1
-                    if jet.chHEF>0.1: Jet_Clean[njet]=1; Electron_Clean[nele]=0
-                    if jet.neHEF>0.2: Jet_Clean[njet]=1; Electron_Clean[nele]=0
-                    #if jet.chHEF<0.1 and jet.neHEF>0.2: Jet_Clean[njet]=1; Electron_Clean[nele]=0
-
-        # Compute nearest distance between lepton and jets
         dRMuJet=[999.]*len(muons)
         dRElJet=[999.]*len(electrons)
         drm=999.
         dre=999.
+
+        for njet,jet in enumerate(jets):
+            #Jet_Clean[njet]=1 #by default its a good jet
+            if jet.puId<4 and jet.pt<30 and fabs(jet.eta)>2.5: continue
+            #if jet.jetId!=2: continue
+            assmuonid1=jet.muonIdx1
+            assmuonid2=jet.muonIdx2
+            asseleid1=jet.electronIdx1
+            asseleid2=jet.electronIdx2
+            
+            ##Checking on muon
+            for assmuonid in [ assmuonid1 , assmuonid2 ]:
+                #print "associated muon = ", assmuonid
+                if assmuonid==-1: continue
+                Mu=muons[assmuonid]
+                if Mu.pt<5: continue
+                if Mu.mediumId==0: continue
+                drm=deltaR(jet,Mu)
+                if drm < 0.4: #Jet is associated with Muon
+                    Muon_Clean[assmuonid]=1 
+                    Jet_Clean[njet]=0
+                    #Checking b-jet # i
+                    if jet.chHEF>0.1: Jet_Clean[njet]=1; Muon_Clean[assmuonid]=0
+                    if jet.neHEF>0.2: Jet_Clean[njet]=1; Muon_Clean[assmuonid]=0
+                    #if jet.chHEF>0.15: Jet_Clean[njet]=1; Muon_Clean[assmuonid]=0
+                    #if jet.neHEF>0.15: Jet_Clean[njet]=1; Muon_Clean[assmuonid]=0
+                    #if jet.chHEF<0.1 and jet.neHEF>0.2: Jet_Clean[njet]=1; Muon_Clean[assmuonid]=0
+                elif drm > 0.4: #Jet is cleaned
+                    Muon_Clean[assmuonid]=0
+                    Jet_Clean[njet]=1
+                    
+            #Checking in electron
+            for asseleid in [ asseleid1 , asseleid2 ]:
+                #print "associated electron = ", asseleid
+                if asseleid==-1: continue
+                Ele=electrons[asseleid]
+                if Ele.pt<15.: continue
+                if Ele.cutBased<4: continue
+                dre=deltaR(jet,Ele)
+                if dre < 0.4:
+                    Electron_Clean[asseleid]=1
+                    Jet_Clean[njet]=0
+                    #Checking b-jet
+                    if jet.chHEF>0.1: Jet_Clean[njet]=1; Electron_Clean[asseleid]=0
+                    if jet.neHEF>0.2: Jet_Clean[njet]=1; Electron_Clean[asseleid]=0
+                elif dre > 0.4:
+                    Electron_Clean[asseleid]=0
+                    Jet_Clean[njet]=1
+
+        # Compute nearest distance between lepton and jets
         for nmu,lep in enumerate(muons):
             #if lep.pt<5: continue
             #if lep.mediumId!=1: continue
@@ -156,39 +168,55 @@ class cleaningStudy(Module):
                     dre = dR
             dRElJet[nele]=dre
 
+        '''
         # tau cleaning
-        Tau_Clean=[0]*len(taus)
-        if len(taus)>0:
+        Tau_Clean=[1]*len(taus)
+        for ntau, tau in enumerate(taus):
+            if tau.idDecayMode!=1: continue
+            #clean agianst jet
+            assjetid=tau.jetIdx
+            if assjetid!=-1:
+                Je=jets[assjetid]
+                if Je.pt>30 and fabs(Je.eta)<2.5 and Je.puId>4:
+                    dR=deltaR(tau,Je)
+                    if dR < 0.4:
+                        Tau_Clean[ntau]=1
+                        Jet_Clean[assjetid]=0
+                    elif dR > 0.4:
+                        Jet_Clean[assjetid]=1
+                        Tau_Clean[ntau]=0
+                        
+            #clean against lep
             for nmu, lep in enumerate(muons):
                 if lep.pt<5: continue
                 if lep.mediumId!=1: continue
-                for ntau, tau in enumerate(taus):
+                dR=deltaR(lep,tau)
+                if dR<0.4:
+                    Muon_Clean[nmu]=1
+                    Tau_Clean[ntau]=0
+                elif dR>0.4:
+                    Muon_Clean[nmu]=0
                     Tau_Clean[ntau]=1
-                    if tau.Tau_idDecayMode!=1: continue
-                    dR=deltaR(lep,tau)
-                    if dR<0.4:
-                        Muon_Clean[nmu]=1
-                        Tau_Clean[ntau]=0
 
             for nele, lep in enumerate(electrons):
                 if lep.cutBased< 3: continue
                 if lep.pt<15: continue
-                for ntau, tau in enumerate(taus):
-                    if tau.Tau_idDecayMode!=1: continue
-                    dR=deltaR(lep,pho)
-                    if dR<0.4:
-		        Electron_Clean[nele]=1
-                        Tau_Clean[ntau]=0
-
+                dR=deltaR(lep,tau)
+                if dR<0.4:
+		    Electron_Clean[nele]=1
+                    Tau_Clean[ntau]=0
+                elif dR>0.4:
+                    Electron_Clean[nele]=0
+                    Tau_Clean[ntau]=1
+        
         # photon cleaning
-        Photon_Clean=[0]*len(photons)
+        Photon_Clean=[1]*len(photons)
         if len(photons)>0:
             for nmu, lep in enumerate(muons):
                 if lep.pt<5: continue
                 if lep.mediumId!=1: continue
                 for npho, pho in enumerate(photons):
-                    Photon_Clean[npho]=1
-                    #if tau.Tau_idDecayMode!=1: continue
+                    #if tau.idDecayMode!=1: continue
                     dR=deltaR(lep,pho)
                     if dR<0.4:
                         Muon_Clean[nmu]=1
@@ -198,11 +226,12 @@ class cleaningStudy(Module):
                 if lep.cutBased< 3: continue
                 if lep.pt<15: continue
                 for npho, pho in enumerate(photons):
-                    #if tau.Tau_idDecayMode!=1: continue
+                    #if tau.idDecayMode!=1: continue
                     dR=deltaR(lep,pho)
                     if dR<0.4:
                         Electron_Clean[nele]=1
                         Photon_Clean[npho]=0
+        '''
 
         ##count good physics objects
         nGoodJet=0
@@ -231,6 +260,7 @@ class cleaningStudy(Module):
             if fabs(jet.eta)>2.5: continue
             HTpt = HTpt + jet.pt
             HTphi = HTphi + jet.phi
+
             
         '''
         #Link lepton to genpart
@@ -284,7 +314,7 @@ class cleaningStudy(Module):
         self.out.fillBranch("cleanedPhoton", Photon_Clean)
         self.out.fillBranch("MuonJet_MindR", dRMuJet)
         self.out.fillBranch("ElecJet_MindR", dRElJet)
-        self.out.fillBranch("JetE", JetE)
+        #self.out.fillBranch("JetE", JetE)
 
         self.out.fillBranch("nGoodJet", nGoodJet)
         self.out.fillBranch("nGoodMuon", nGoodMuon)
