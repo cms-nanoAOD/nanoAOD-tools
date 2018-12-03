@@ -29,7 +29,7 @@ keep PV*
 
 #keep Photon*
 #keep PuppiMET*
-#keep Tau*
+keep Tau*
 #keep luminosityBlock
 keep MET*
 keep Muon*
