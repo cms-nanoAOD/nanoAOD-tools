@@ -9,7 +9,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.tools import deltaPhi, deltaR, closest, matchObjectCollectionMultiple
 
-class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overlap cleaning, no jet selection)
+class cleaningStudy(Module):
     def __init__(self):
         #if "/mhtjuProducerCppWorker_cc.so" not in ROOT.gSystem.GetLibraries():
         #    print "Load C++ mhtjuProducerCppWorker worker module"
@@ -22,6 +22,7 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
         #        ROOT.gROOT.ProcessLine(".L %s/interface/mhtjuProducerCppWorker.h"%base)
         #self.worker = ROOT.mhtjuProducerCppWorker()
         self.Genpart = False
+        self.Nevents = 0
         pass
     def beginJob(self):
         pass
@@ -50,6 +51,8 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
         self.out.branch("MHTju_pt",  "F")
         self.out.branch("MHTju_phi", "F")
         self.out.branch("ZPtCorr","F")
+
+        self.Nevents+=1
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -292,6 +295,8 @@ class cleaningStudy(Module): # MHT producer, unclean jets only (no lepton overla
         self.out.fillBranch("MHTju_pt", HTpt)
         self.out.fillBranch("MHTju_phi", HTphi)
         self.out.fillBranch("ZPtCorr", Zweight)
+
+        #if self.Nevents==100: 
         return True
         
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed

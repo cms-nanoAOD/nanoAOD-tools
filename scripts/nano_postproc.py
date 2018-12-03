@@ -20,6 +20,7 @@ if __name__ == "__main__":
     parser.add_option("--justcount",   dest="justcount", default=False, action="store_true",  help="Just report the number of selected events") 
     parser.add_option("-I", "--import", dest="imports",  type="string", default=[], action="append", nargs=2, help="Import modules (python package, comma-separated list of ");
     parser.add_option("-z", "--compression",  dest="compression", type="string", default=("LZMA:9"), help="Compression: none, or (algo):(level) ")
+    parser.add_option("-E", "--Nevent",dest="Nevent", type="int", default=-1, help="Number of event for processing")
 
     (options, args) = parser.parse_args()
 
@@ -34,7 +35,9 @@ if __name__ == "__main__":
     print "args = ", args
 
     modules = []
-    for mod, names in options.imports: 
+    for mod, names in options.imports:
+        print "mod = ", mod
+        print "names = ", names
         import_module(mod)
         obj = sys.modules[mod]
         selnames = names.split(",")
@@ -43,12 +46,13 @@ if __name__ == "__main__":
             if name in selnames:
                 print "Loading %s from %s " % (name, mod)
                 modules.append(getattr(obj,name)())
+    print "Imported modules list = ", modules
     if options.noOut:
         if len(modules) == 0: 
             raise RuntimeError("Running with --noout and no modules does nothing!")
     if options.branchsel!=None:
         options.branchsel_in = options.branchsel
         options.branchsel_out = options.branchsel
-    p=PostProcessor(outdir,args,options.cut,options.branchsel_in,modules,options.compression,options.friend,options.postfix,options.json,options.noOut,options.justcount,outputbranchsel= options.branchsel_out)
+    p=PostProcessor(outdir,args,options.cut,options.branchsel_in,modules,options.Nevent,options.compression,options.friend,options.postfix,options.json,options.noOut,options.justcount,outputbranchsel= options.branchsel_out)
     p.run()
 

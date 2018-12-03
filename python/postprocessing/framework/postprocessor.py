@@ -11,12 +11,13 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.preskimming import preSk
 from PhysicsTools.NanoAODTools.postprocessing.framework.jobreport import JobReport
 
 class PostProcessor :
-    def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,
+    def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],maxevent=-1,compression="LZMA:9",friend=False,postfix=None,
 		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None):
 	self.outputDir=outputDir
 	self.inputFiles=inputFiles
 	self.cut=cut
 	self.modules=modules
+        self.maxevent=maxevent
 	self.compression=compression
 	self.postfix=postfix
 	self.json=jsonInput
@@ -99,7 +100,8 @@ class PostProcessor :
 		if elist: inTree.SetEntryList(elist)
 	    else:
 		# initialize reader
-		inTree = InputTree(inTree, elist) 
+                print "Initialize reader"
+		inTree = InputTree(inTree, elist)
 
 	    # prepare output file
             if not self.noOut:
@@ -127,7 +129,8 @@ class PostProcessor :
 
 	    # process events, if needed
 	    if not fullClone:
-		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree)
+		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree, self.maxevent) ##
+                print 'self.maxevent = ', self.maxevent
 		print 'Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, inTree.GetEntries(), npass)
 	    else:
                 nall = inTree.GetEntries()
