@@ -284,7 +284,20 @@ class cleaningStudy(Module):
             if Tau_Clean[num]==1: nGoodTau+=1
         for num,obj in enumerate(photons):
             if Photon_Clean[num]==1: nGoodPhoton+=1
-            
+
+        ## ANALYSIS
+        isOSmumu=False
+        isOSemu=False
+        isSSmumu=False
+        ##Analysis OSmumu
+        if nGoodMuon>0:
+            if (muons[0].charge!=muons[1].charge):
+                isOSmumu=True
+            elif (muons[0].charge==muons[1].charge):
+                isSSmumu=True
+        elif nGoodMuon>0 and nGoodElectron>0:
+            if (electrons[0].charge!=muons[0].charge):
+                isOSemu=True
 
         self.out.fillBranch("cleanedJet", Jet_Clean)
         self.out.fillBranch("cleanedMuon", Muon_Medium)
