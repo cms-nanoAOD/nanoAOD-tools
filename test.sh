@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#muon Muon_tightId
+##ALPHA preselection
+#"
+#(Electron_pt[0]>10 && Electron_pt[1]>10 && Electron_cutBased[0]>0 && Electron_cutBased[1]>0) && 
+#(Muon_pt[0]>10 && Muon_pt[1]>10 && Muon_mediumId[0]>0 && Muon_mediumId[1]>0 && Muon_pfRelIso04_all[0]<0.25 && Muon_pfRelIso04_all[1]<0.25 ) &&
+#(Tau_pt[0]>18 && Tau_eta[0]<2.3 && Tau_idDecayMode==1 && DeltaBetaIso ??? && ) &&
+#(Photon_pt[0]>15 &&  Photon_cutBased[0]>0)"
+
 test1=4
 
 if [ "$test1" == "0" ];then
