@@ -33,14 +33,14 @@ class cleaningStudy(Module):
         self.FilesName=inputFile
         self.out = wrappedOutputTree
         #CleanObjectCollection
-        self.out.branch("cleanedJet" ,"I", 0, "nCleanedJet", "nCleanedJet", False)
-        self.out.branch("cleanedMuon",  "I", 0, "nCleanedMuon", "nCleanedMuon", False)
-        self.out.branch("cleanedElectron",  "I", 0, "nCleanedElectron", "nCleanedElectron", False)
-        self.out.branch("cleanedTau",  "I", 0, "nCleanedTau", "nCleanedTau", False)
-        self.out.branch("cleanedPhoton",  "I", 0, "nCleanedPhoton", "nCleanedPhoton", False)
+        self.out.branch("Jet_Clean" ,"I", 0, "nJet_Clean", "nJet_Clean", False)
+        self.out.branch("Muon_Medium",  "I", 0, "nMuon_Medium", "nMuon_Medium", False)
+        self.out.branch("Electron_Medium",  "I", 0, "nElectron_Medium", "nElectron_Medium", False)
+        self.out.branch("Tau_Clean",  "I", 0, "nTau_Clean", "nTau_Clean", False)
+        self.out.branch("Photon_Clean",  "I", 0, "nTau_Clean", "nTau_Clean", False)
         self.out.branch("JetE",  "F", 0, "nJetE", "nJetE", False) ###
-        self.out.branch("MuonJet_MindR",  "F", 0, "nMuonJet", "nMuonJet", False)
-        self.out.branch("ElecJet_MindR",  "F", 0, "nElecJet", "nElecJet", False)
+        self.out.branch("dRMuJet",  "F", 0, "ndRMuJet", "ndRMuJet", False)
+        self.out.branch("dRElJet",  "F", 0, "ndRElJet", "ndRElJet", False)
 
         self.out.branch("nGoodJet", "I")
         self.out.branch("nGoodMuon", "I")
@@ -48,9 +48,13 @@ class cleaningStudy(Module):
         self.out.branch("nGoodTau", "I")
         self.out.branch("nGoodPhoton", "I")
 
-        self.out.branch("MHTju_pt",  "F")
-        self.out.branch("MHTju_phi", "F")
-        self.out.branch("ZPtCorr","F")
+        self.out.branch("isOSmumu", "I")
+        self.out.branch("isOSemu", "I")
+        self.out.branch("isSSmumu", "I")
+
+        self.out.branch("HTpt",  "F")
+        self.out.branch("HTphi", "F")
+        self.out.branch("Zweight","F")
 
         self.Nevents+=1
 
@@ -288,26 +292,26 @@ class cleaningStudy(Module):
             if Photon_Clean[num]==1: nGoodPhoton+=1
 
         ## ANALYSIS
-        isOSmumu=False
-        isOSemu=False
-        isSSmumu=False
+        isOSmumu=0
+        isOSemu=0
+        isSSmumu=0
         ##Analysis OSmumu
-        if nGoodMuon>2:
+        if nGoodMuon==2 or nGoodMuon>2:
             if (muons[0].charge!=muons[1].charge):
-                isOSmumu=True
+                isOSmumu=1
             elif (muons[0].charge==muons[1].charge):
-                isSSmumu=True
+                isSSmumu=1
         elif nGoodMuon>0 and nGoodElectron>0:
             if (electrons[0].charge!=muons[0].charge):
-                isOSemu=True
+                isOSemu=1
 
-        self.out.fillBranch("cleanedJet", Jet_Clean)
-        self.out.fillBranch("cleanedMuon", Muon_Medium)
-        self.out.fillBranch("cleanedElectron", Electron_Medium)
-        self.out.fillBranch("cleanedTau", Tau_Clean)
-        self.out.fillBranch("cleanedPhoton", Photon_Clean)
-        self.out.fillBranch("MuonJet_MindR", dRMuJet)
-        self.out.fillBranch("ElecJet_MindR", dRElJet)
+        self.out.fillBranch("Jet_Clean", Jet_Clean)
+        self.out.fillBranch("Muon_Medium", Muon_Medium)
+        self.out.fillBranch("Electron_Medium", Electron_Medium)
+        self.out.fillBranch("Tau_Clean", Tau_Clean)
+        self.out.fillBranch("Photon_Clean", Photon_Clean)
+        self.out.fillBranch("dRMuJet", dRMuJet)
+        self.out.fillBranch("dRElJet", dRElJet)
         #self.out.fillBranch("JetE", JetE)
 
         self.out.fillBranch("nGoodJet", nGoodJet)
@@ -315,10 +319,14 @@ class cleaningStudy(Module):
         self.out.fillBranch("nGoodElectron", nGoodElectron)
         self.out.fillBranch("nGoodTau", nGoodTau)
         self.out.fillBranch("nGoodPhoton", nGoodPhoton)
+
+        self.out.fillBranch("isOSmumu", isOSmumu)
+        self.out.fillBranch("isOSemu", isOSemu)
+        self.out.fillBranch("isSSmumu", isSSmumu)
         
-        self.out.fillBranch("MHTju_pt", HTpt)
-        self.out.fillBranch("MHTju_phi", HTphi)
-        self.out.fillBranch("ZPtCorr", Zweight)
+        self.out.fillBranch("HTpt", HTpt)
+        self.out.fillBranch("HTphi", HTphi)
+        self.out.fillBranch("Zweight", Zweight)
 
         #if self.Nevents==100: 
         return True
