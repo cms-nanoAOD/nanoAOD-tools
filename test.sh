@@ -24,7 +24,7 @@ elif [ "$test1" == "3" ];then
     python python/postprocessing/examples/signalAnalysis.py
 elif [ "$test1" == "4" ];then
     echo "SKIMMING + SLIMMING + Object Cleaning Study"
-    python scripts/nano_postproc.py -b "keepdropIN.txt" -I PhysicsTools.NanoAODTools.postprocessing.operational.cleaningStudy cleaning -E 100001 . /Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root
+    python scripts/nano_postproc.py -b "keepdropIN.txt" -I PhysicsTools.NanoAODTools.postprocessing.operational.cleaningStudy cleaning . /Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root
 elif [ "$test1" == "5" ];then
     echo "SKIMMING + SLIMMING + PU"
     python scripts/nano_postproc.py -b "keepdropIN.txt" -I PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer puAutoWeight . /Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root

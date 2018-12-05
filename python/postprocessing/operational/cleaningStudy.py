@@ -124,15 +124,16 @@ class cleaningStudy(Module):
             if tau.pt<taupt: continue
             if fabs(tau.eta)>2.3: continue
             if tau.idDecayMode!=1: continue
+            #Clean from muons
             for nmu,lep in enumerate(muons):
-                if Muon_Tight[nmu]!=1: continue
+                if Muon_Medium[nmu]!=1: continue
                 if deltaR(tau,lep)<0.4:
                     Tau_Clean[ntau]=0
                 else:
                     Tau_Clean[ntau]=1
-                    
+            #Clean from electrons
             for nele,lep in enumerate(electrons):
-                if Electron_Tight[nele]!=1: continue
+                if Electron_Medium[nele]!=1: continue
                 if deltaR(tau,lep)<0.4:
                     Tau_Clean[ntau]=0
                 else:
@@ -145,15 +146,16 @@ class cleaningStudy(Module):
             if pho.pt<phopt: continue
             if fabs(pho.eta)>2.5: continue
             if pho.cutBased!=1: continue
+            #Clean from muons
             for nmu,lep in enumerate(muons):
-                if Muon_Tight[nmu]!=1: continue
+                if Muon_Medium[nmu]!=1: continue
                 if deltaR(pho,lep)<0.4:
                     Photon_Clean[npho]=0
                 else:
                     Photon_Clean[npho]=1
-                    
+            #Clean from electrons
             for nele,lep in enumerate(electrons):
-                if Electron_Tight[nele]!=1: continue
+                if Electron_Medium[nele]!=1: continue
                 if deltaR(pho,lep)<0.4:
                     Photon_Clean[npho]=0
                 else:
@@ -172,7 +174,7 @@ class cleaningStudy(Module):
             if jet.jetId==3: Jet_Tight[njet]=1
             if jet.puId<jetpuid: continue
             if jet.pt<jetpt: continue
-            #if jet.jetId==jetid: continue ##???
+            if jet.jetId==0: continue ##???
             if fabs(jet.eta)>jeteta: continue
             
             #assmuonid1=jet.muonIdx1
@@ -290,7 +292,7 @@ class cleaningStudy(Module):
         isOSemu=False
         isSSmumu=False
         ##Analysis OSmumu
-        if nGoodMuon>0:
+        if nGoodMuon>2:
             if (muons[0].charge!=muons[1].charge):
                 isOSmumu=True
             elif (muons[0].charge==muons[1].charge):
