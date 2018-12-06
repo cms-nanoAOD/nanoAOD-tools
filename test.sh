@@ -26,12 +26,15 @@ elif [ "$test1" == "4" ];then
     echo "SKIMMING + SLIMMING + Object Cleaning Study"
     python scripts/nano_postproc.py -b "keepdropIN.txt" -I PhysicsTools.NanoAODTools.postprocessing.operational.cleaningStudy cleaning -E 50001 . /Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root
 elif [ "$test1" == "5" ];then
+    echo "SKIMMING + SLIMMING + Object Cleaning Study (Friend Mode)"
+    python scripts/nano_postproc.py -b "keepdropIN.txt" -I PhysicsTools.NanoAODTools.postprocessing.operational.cleaningStudy cleaning -E 50001 --friend . /Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root
+elif [ "$test1" == "6" ];then
     echo "SKIMMING + SLIMMING + PU"
     python scripts/nano_postproc.py -b "keepdropIN.txt" -I PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer puAutoWeight . /Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root
-elif [ "$test1" == "6" ];then
+elif [ "$test1" == "7" ];then
     echo "SKIMMING + SLIMMING + Object Cleaning Study + PU"
     python scripts/nano_postproc.py -b "keepdropIN.txt" -I PhysicsTools.NanoAODTools.postprocessing.operational.cleaningStudy cleaning -I PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer puAutoWeight . /Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root
-elif [ "$test1" == "7" ];then
+elif [ "$test1" == "8" ];then
     echo "Bare Cleaning"
     python scripts/nano_postproc.py -b "keepdropIN.txt" -I PhysicsTools.NanoAODTools.postprocessing.operational.bareCleaning cleaning  -E 100001 . /Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root
 fi
