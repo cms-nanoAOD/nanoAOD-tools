@@ -50,6 +50,12 @@ class PDFWeights(Module):
         muRUp = self.lha.evalAlphas(2*q)**4
         muRDown = self.lha.evalAlphas(0.5*q)**4
         
+        
+        #override alphaS
+        muR = 1
+        muRUp = 1
+        muRDown = 1
+        
         '''
         LHE scale variation weights (w_var / w_nominal); 
         [0] is mur=0.5 muf=0.5 ; 

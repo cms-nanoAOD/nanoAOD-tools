@@ -128,7 +128,7 @@ if not args.isData:
     
         analyzerChain.append(
             EventObservables(
-                inputCollection = jetCollection,
+                jetCollection = jetCollection,
                 metInput = metObject,
                 outputName = systName,
             )
@@ -146,6 +146,7 @@ if not args.isData:
             event.unclEnDown_mht>200.
         )
     )
+    
     '''
     analyzerChain.append(
         EventSkim(selection=lambda event: 
@@ -159,6 +160,10 @@ if not args.isData:
         )
     )
     '''
+    
+    if args.inputFiles[0].find("WJetsToLNu_HT")>=0:
+        analyzerChain.append(WNLOWeights())
+   
     analyzerChain.extend([
         PileupWeight(
             dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU69000.root"),
@@ -237,9 +242,9 @@ if not args.isData:
 
     if args.inputFiles[0].find("SMS-T1qqqq_ctau")<0 and args.inputFiles[0].find("QCD")<0:
         for i in range(0,101):
-            storeVariables.append([lambda tree: tree.branch("lheweight_%i"%i,"F"),lambda tree,event: tree.fillBranch("lheweight_%i"%i,event.LHEPdfWeight[i])])
+            storeVariables.append([lambda tree,i=i: tree.branch("lheweight_%i"%i,"F"),lambda tree,event,i=i: tree.fillBranch("lheweight_%i"%i,event.LHEPdfWeight[i])])
         for i in range(0,9):
-            storeVariables.append([lambda tree: tree.branch("scaleweight_%i"%i,"F"),lambda tree,event: tree.fillBranch("scaleweight_%i"%i,event.LHEScaleWeight[i])])
+            storeVariables.append([lambda tree,i=i: tree.branch("scaleweight_%i"%i,"F"),lambda tree,event,i=i: tree.fillBranch("scaleweight_%i"%i,event.LHEScaleWeight[i])])
     else:
         analyzerChain.append(
             PDFWeights(
@@ -348,7 +353,7 @@ else:
     
     analyzerChain.append(
         EventObservables(
-            inputCollection = lambda event: event.selectedJets_nominal,
+            jetCollection = lambda event: event.selectedJets_nominal,
             metInput = lambda event: Object(event,"MET"),
             outputName = "nominal",
         )
@@ -438,7 +443,7 @@ else:
 p=PostProcessor(
     args.output[0],
     [args.inputFiles],
-    cut="(nJet>0)",
+    cut="(nJet>1)",
     branchsel=None,
     maxEvents=-1,
     modules=analyzerChain,

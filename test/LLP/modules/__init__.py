@@ -24,5 +24,6 @@ from InvariantSystem import InvariantSystem
 from JetTruthFlags import JetTruthFlags
 from JetTaggerResult import JetTaggerResult
 from PDFWeights import PDFWeights
-from ZNLOWeights import ZNLOWeights
+from WNLOWeights import WNLOWeights
+from JetFeatures import JetFeatures
 

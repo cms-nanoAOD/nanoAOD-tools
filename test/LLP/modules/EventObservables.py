@@ -14,13 +14,15 @@ class EventObservables(Module):
 
     def __init__(
         self,
-        inputCollection = lambda event: Collection(event, "Jet"),
+        jetCollection = lambda event: Collection(event, "Jet"),
+        leptonCollection = None,
         metInput = lambda event: Object(event, "MET"),
         outputName = "centralJets",
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
-        self.inputCollection = inputCollection
+        self.jetCollection = jetCollection
+        self.leptonCollection = leptonCollection
         self.metInput = metInput
         self.outputName = outputName
 
@@ -37,16 +39,17 @@ class EventObservables(Module):
         self.out.branch(self.outputName+"_mheta","F")
         self.out.branch(self.outputName+"_mass","F")
         self.out.branch(self.outputName+"_met","F")
-        #self.out.branch(self.outputName+"_xmetRatio","F")
-        #self.out.branch(self.outputName+"_xmetDphi","F")
         self.out.branch(self.outputName+"_minPhi","F")
+        
+        if self.leptonCollection!=None:
+            self.out.branch(self.outputName+"_met_lc","F")
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
         
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
-        objs = self.inputCollection(event)
+        objs = self.jetCollection(event)
         met = self.metInput(event)
         vectorSum = ROOT.TLorentzVector()
         scalarPtSum = 0.0
@@ -65,22 +68,20 @@ class EventObservables(Module):
         self.out.fillBranch(self.outputName+"_met",met.pt)
         setattr(event,self.outputName+"_met",met.pt)
         
-        '''
-        #MET=MHT+X => X = MET-MHT
-        met_px = met.pt*math.sin(met.phi)
-        met_py = met.pt*math.cos(met.phi)
-        missingX = met_px-vectorSum.Px()
-        missingY = met_py-vectorSum.Py()
-        missingPhi = math.atan2(missingY,missingX)
-        xmetRatio = math.sqrt(missingX**2+missingY**2)/max(1e-10,met.pt)
-        xmetDphi = math.fabs(deltaPhi(met.phi,missingPhi))
         
-        self.out.fillBranch(self.outputName+"_xmetRatio",xmetRatio)
-        setattr(event,self.outputName+"_xmetRatio",xmetRatio)
+        if self.leptonCollection!=None:
+            met_px_lc = met.pt*math.sin(met.phi)
+            met_py_lc = met.pt*math.cos(met.phi)
+            
+            for lepton in self.leptonCollection(event):
+                met_px_lc+=lepton.p4().Px()
+                met_py_lc+=lepton.p4().Py()
+                
+            met_lc = math.sqrt(met_px_lc**2+met_py_lc**2)
+            
+            self.out.fillBranch(self.outputName+"_met_lc",met_lc)
+            setattr(event,self.outputName+"_met_lc",met_lc)
         
-        self.out.fillBranch(self.outputName+"_xmetDphi",xmetDphi)
-        setattr(event,self.outputName+"_xmetDphi",xmetDphi)
-        '''
         minPhi = math.pi
         for obj in objs:
             negSum = -(vectorSum-obj.p4())

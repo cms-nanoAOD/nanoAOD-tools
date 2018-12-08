@@ -147,16 +147,10 @@ if not args.isData:
     
         analyzerChain.append(
             EventObservables(
-                inputCollection = jetCollection,
+                jetCollection = jetCollection,
+                leptonCollection = lambda event: event.tightMuons,
                 metInput = metObject,
                 outputName = systName,
-            )
-        )
-        analyzerChain.append(
-            EventObservables(
-                inputCollection = lambda event,jetCollection=jetCollection: jetCollection(event)+event.tightMuons,
-                metInput = metObject,
-                outputName = systName+"_lepton",
             )
         )
     '''
@@ -173,6 +167,10 @@ if not args.isData:
         )
     )
     '''
+    
+    if args.inputFiles[0].find("WJetsToLNu_HT")>=0:
+        analyzerChain.append(WNLOWeights())
+    
     analyzerChain.extend([
         PileupWeight(
             dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU69000.root"),
@@ -249,9 +247,9 @@ if not args.isData:
         
     '''
     for i in range(0,101):
-        storeVariables.append([lambda tree: tree.branch("lheweight_%i"%i,"F"),lambda tree,event: tree.fillBranch("lheweight_%i"%i,event.LHEPdfWeight[i])])
+        storeVariables.append([lambda tree,i=i: tree.branch("lheweight_%i"%i,"F"),lambda tree,event,i=i: tree.fillBranch("lheweight_%i"%i,event.LHEPdfWeight[i])])
     for i in range(0,9):
-        storeVariables.append([lambda tree: tree.branch("scaleweight_%i"%i,"F"),lambda tree,event: tree.fillBranch("scaleweight_%i"%i,event.LHEScaleWeight[i])])
+        storeVariables.append([lambda tree,i=i: tree.branch("scaleweight_%i"%i,"F"),lambda tree,event,i=i: tree.fillBranch("scaleweight_%i"%i,event.LHEScaleWeight[i])])
     '''
     
     storeVariables.append([lambda tree: tree.branch("genx1","F"),lambda tree,event: tree.fillBranch("genx1",event.Generator_x1)])
@@ -300,16 +298,10 @@ else:
     
     analyzerChain.append(
         EventObservables(
-            inputCollection = lambda event: event.selectedJets_nominal,
+            jetCollection = lambda event: event.selectedJets_nominal,
+            leptonCollection = lambda event: event.tightMuons,
             metInput = lambda event: Object(event,"MET"),
             outputName = "nominal",
-        )
-    )
-    analyzerChain.append(
-        EventObservables(
-            inputCollection = lambda event: event.selectedJets_nominal+event.tightMuons,
-            metInput = lambda event: Object(event,"MET"),
-            outputName = "nominal_lepton",
         )
     )
     '''
@@ -390,7 +382,7 @@ analyzerChain.append(
 p=PostProcessor(
     args.output[0],
     [args.inputFiles],
-    cut="(nJet>0)",
+    cut="(nJet>1)",
     branchsel=None,
     maxEvents=-1,
     modules=analyzerChain,
