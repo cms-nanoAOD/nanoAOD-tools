@@ -130,7 +130,7 @@ class PostProcessor :
 	    # process events, if needed
 	    if not fullClone:
 		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree, self.maxevent) ##
-                print 'self.maxevent = ', self.maxevent
+                print 'Max event processed = ', self.maxevent
 		print 'Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, inTree.GetEntries(), npass)
 	    else:
                 nall = inTree.GetEntries()

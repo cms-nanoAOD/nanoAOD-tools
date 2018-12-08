@@ -1,4 +1,4 @@
-from math import hypot, pi
+from math import hypot, pi, fabs
 
 #### ========= UTILITIES =======================
 def deltaPhi(phi1,phi2):
@@ -21,12 +21,12 @@ def deltaR(eta1,phi1,eta2=None,phi2=None):
     return hypot(eta1-eta2, deltaPhi(phi1,phi2))
 
 def closest(obj,collection,presel=lambda x,y: True):
-    ret = None; drMin = 999
+    ret = None; drMin = 999;
     for x in collection:
         if not presel(obj,x): continue
         dr = deltaR(obj,x)
         if dr < drMin: 
-            ret = x; drMin = dr
+            ret = x; drMin = dr; 
     return (ret,drMin)
 
 def matchObjectCollection(objs,collection,dRmax=0.4,presel=lambda x,y: True):

@@ -7,7 +7,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-from PhysicsTools.NanoAODTools.postprocessing.tools import deltaPhi, deltaR, closest, matchObjectCollectionMultiple
+from PhysicsTools.NanoAODTools.postprocessing.tools import deltaPhi, deltaR, closest, matchObjectCollection
 
 class cleaningStudy(Module):
     def __init__(self):
@@ -33,14 +33,14 @@ class cleaningStudy(Module):
         self.FilesName=inputFile
         self.out = wrappedOutputTree
         #CleanObjectCollection
-        self.out.branch("cleanedJet" ,"I", 0, "nCleanedJet", "nCleanedJet", False)
-        self.out.branch("cleanedMuon",  "I", 0, "nCleanedMuon", "nCleanedMuon", False)
-        self.out.branch("cleanedElectron",  "I", 0, "nCleanedElectron", "nCleanedElectron", False)
-        self.out.branch("cleanedTau",  "I", 0, "nCleanedTau", "nCleanedTau", False)
-        self.out.branch("cleanedPhoton",  "I", 0, "nCleanedPhoton", "nCleanedPhoton", False)
+        self.out.branch("Jet_Clean" ,"I", 0, "nJet_Clean", "nJet_Clean", False)
+        self.out.branch("Muon_Medium",  "I", 0, "nMuon_Medium", "nMuon_Medium", False)
+        self.out.branch("Electron_Medium",  "I", 0, "nElectron_Medium", "nElectron_Medium", False)
+        self.out.branch("Tau_Clean",  "I", 0, "nTau_Clean", "nTau_Clean", False)
+        self.out.branch("Photon_Clean",  "I", 0, "nTau_Clean", "nTau_Clean", False)
         self.out.branch("JetE",  "F", 0, "nJetE", "nJetE", False) ###
-        self.out.branch("MuonJet_MindR",  "F", 0, "nMuonJet", "nMuonJet", False)
-        self.out.branch("ElecJet_MindR",  "F", 0, "nElecJet", "nElecJet", False)
+        self.out.branch("dRMuJet",  "F", 0, "ndRMuJet", "ndRMuJet", False)
+        self.out.branch("dRElJet",  "F", 0, "ndRElJet", "ndRElJet", False)
 
         self.out.branch("nGoodJet", "I")
         self.out.branch("nGoodMuon", "I")
@@ -48,9 +48,13 @@ class cleaningStudy(Module):
         self.out.branch("nGoodTau", "I")
         self.out.branch("nGoodPhoton", "I")
 
-        self.out.branch("MHTju_pt",  "F")
-        self.out.branch("MHTju_phi", "F")
-        self.out.branch("ZPtCorr","F")
+        self.out.branch("isOSmumu", "I")
+        self.out.branch("isOSemu", "I")
+        self.out.branch("isSSmumu", "I")
+
+        self.out.branch("HTpt",  "F")
+        self.out.branch("HTphi", "F")
+        self.out.branch("Zweight","F")
 
         self.Nevents+=1
 
@@ -81,154 +85,146 @@ class cleaningStudy(Module):
         taus = Collection(event, "Tau")
         photons = Collection(event, "Photon")
             
-        # Cleaning Jet #preliminary cleaning
+        # Cleaning Jet wrt muon #preliminary cleaning
         Jet_Clean=[0]*len(jets)
-        Muon_Clean=[0]*len(muons)
-        Electron_Clean=[0]*len(electrons)
-        Jetpx=[0.]*len(jets)
-        Jetpy=[0.]*len(jets)
-        Jetpz=[0.]*len(jets)
-        JetE=[0.]*len(jets)
-        for njet,jet in enumerate(jets) :
-            if jet.puId<4 and jet.pt<30 and fabs(jet.eta)>2.5: continue
-            if jet.jetId!=2: continue
-            Jet_Clean[njet]=1 #by default its a good jet
+        Jet_Tight=[0]*len(jets)
+        Muon_Medium=[0]*len(muons)
+        Electron_Medium=[0]*len(electrons)
+        Muon_Tight=[0]*len(muons)
+        Electron_Tight=[0]*len(electrons)
+        Tau_Clean=[0]*len(taus)
+        Photon_Clean=[0]*len(photons)
+        #Jetpx=[0.]*len(jets)
+        #Jetpy=[0.]*len(jets)
+        #Jetpz=[0.]*len(jets)
+        #JetE=[0.]*len(jets)
 
-            #Jet kinematics
-            #Jetpx[num] = jet.pt * cos( jet.phi )
-            #Jetpy[num] = jet.pt * sin( jet.phi )
-            #Jetpz[num] = jet.pt / tan( 2 * atan( exp( -jet.eta ) ) )
-            #JetE[num]  = sqrt ( jet.pt* jet.pt + Jetpz[num]* Jetpz[num] )
-            
-            #if fabs(jet.eta)>2.5: continue
+        #Clean Lepton First, on specific kinematics
+        mupt=5
+        muiso=0.25 #iso03
+        for nmu,lep in enumerate(muons):
+            if lep.pt<mupt: continue
+            if lep.pfRelIso03_all>muiso: continue
+            if fabs(lep.eta)>2.4: continue #central muon
+            if lep.tightId:
+                Muon_Tight[nmu]=1
+            elif lep.mediumId:
+                Muon_Medium[nmu]=1
 
-            ##Cleaning each muon match within 0.4
+        elept=15
+        eleiso=0.25 #iso03
+        for nele,lep in enumerate(electrons):
+            if lep.pt<elept: continue
+            if lep.pfRelIso03_all>eleiso: continue
+            if fabs(lep.eta)>2.4: continue #central muon 
+            if lep.cutBased==4:
+                Electron_Tight[nele]=1
+            elif lep.cutBased>3:
+                Electron_Medium[nele]=1
+
+        #Clean Tau from muon and electron
+        taupt=18
+        for ntau,tau in enumerate(taus):
+            if tau.pt<taupt: continue
+            if fabs(tau.eta)>2.3: continue
+            if tau.idDecayMode!=1: continue
+            #Clean from muons
             for nmu,lep in enumerate(muons):
-                if lep.pt<5.: continue
-                if lep.mediumId==0: continue
-                if deltaR(jet,lep) < 0.4:
-                    Jet_Clean[njet]=0
-                    Muon_Clean[nmu]=1
-                    #it could be B-jet; b->muon+nu_mu ; b->electron+nu_ele
-                    if jet.chHEF>0.1: Jet_Clean[njet]=1; Muon_Clean[nmu]=0 
-                    if jet.neHEF>0.2: Jet_Clean[njet]=1; Muon_Clean[nmu]=0
-                            
-                    #if jet.chHEF>0.15: Jet_Clean[njet]=1; Muon_Clean[nmu]=0
-                    #if jet.neHEF>0.15: Jet_Clean[njet]=1; Muon_Clean[nmu]=0
-                    #if jet.chHEF<0.1 and jet.neHEF>0.2: Jet_Clean[njet]=1; Muon_Clean[nmu]=0
-                    #if jet.puId==4 : Jet_Clean[njet]=0; Muon_Clean[nmu]=1
-                    #if jet.btagCMVA>0.8: Jet_Clean[njet]=1; Muon_Clean[nmu]=0
-
+                if Muon_Medium[nmu]!=1: continue
+                if deltaR(tau,lep)<0.4:
+                    Tau_Clean[ntau]=0
+                else:
+                    Tau_Clean[ntau]=1
+            #Clean from electrons
             for nele,lep in enumerate(electrons):
-                if lep.pt<15.: continue
-                if lep.cutBased<4: continue     
-                if deltaR(jet,lep) < 0.4:
-                    Jet_Clean[njet]=0
-                    Electron_Clean[nele]=1
-                    if jet.chHEF>0.1: Jet_Clean[njet]=1; Electron_Clean[nele]=0
-                    if jet.neHEF>0.2: Jet_Clean[njet]=1; Electron_Clean[nele]=0
-                    #if jet.chHEF<0.1 and jet.neHEF>0.2: Jet_Clean[njet]=1; Electron_Clean[nele]=0
+                if Electron_Medium[nele]!=1: continue
+                if deltaR(tau,lep)<0.4:
+                    Tau_Clean[ntau]=0
+                else:
+                    Tau_Clean[ntau]=1
 
-        # Compute nearest distance between lepton and jets
-        dRMuJet=[999.]*len(muons)
-        dRElJet=[999.]*len(electrons)
+        #Clean photon from muon and electron
+        phopt=15
+        phoid=1 #cutBased 0:fail, 1::loose, 2:medium, 3:tight
+        for npho,pho in enumerate(photons):
+            if pho.pt<phopt: continue
+            if fabs(pho.eta)>2.5: continue
+            if pho.cutBased!=1: continue
+            #Clean from muons
+            for nmu,lep in enumerate(muons):
+                if Muon_Medium[nmu]!=1: continue
+                if deltaR(pho,lep)<0.4:
+                    Photon_Clean[npho]=0
+                else:
+                    Photon_Clean[npho]=1
+            #Clean from electrons
+            for nele,lep in enumerate(electrons):
+                if Electron_Medium[nele]!=1: continue
+                if deltaR(pho,lep)<0.4:
+                    Photon_Clean[npho]=0
+                else:
+                    Photon_Clean[npho]=1
+
+        #Clean jet from muon and electron
+        jetpt=30
+        jeteta=2.5
+        jetid=1
+        jetpuid=4
+        dRMuJet=[999.]*len(jets)
+        dRElJet=[999.]*len(jets) 
         drm=999.
         dre=999.
-        for nmu,lep in enumerate(muons):
-            #if lep.pt<5: continue
-            #if lep.mediumId!=1: continue
-            if Muon_Clean[nmu]==0: continue
-            for njet,jet in enumerate(jets) : #check against good jet
-                if Jet_Clean[njet]==0: continue
-                dR=deltaR(lep,jet)
-                if dR < dRMuJet:
-                   drm = dR
-            dRMuJet[nmu]=drm
+        for njet,jet in enumerate(jets):
+            if jet.jetId==3: Jet_Tight[njet]=1
+            if jet.puId<jetpuid: continue
+            if jet.pt<jetpt: continue
+            if jet.jetId==0: continue ##???
+            if fabs(jet.eta)>jeteta: continue
             
-        for nele,lep in enumerate(electrons):
-            #if lep.cutBased< 3: continue
-            #if lep.pt<15: continue
-            if Electron_Clean[nele]==0: continue
-            for njet,jet in enumerate(jets) :
-                if Jet_Clean[njet]==0: continue
-                dR=deltaR(lep,jet)
-                if dR < dRElJet:
-                    dre = dR
-            dRElJet[nele]=dre
+            #assmuonid1=jet.muonIdx1
+            #assmuonid2=jet.muonIdx2
+            #asseleid1=jet.electronIdx1
+            #asseleid2=jet.electronIdx2
 
-        # tau cleaning
-        Tau_Clean=[0]*len(taus)
-        if len(taus)>0:
-            for nmu, lep in enumerate(muons):
-                if lep.pt<5: continue
-                if lep.mediumId!=1: continue
-                for ntau, tau in enumerate(taus):
-                    Tau_Clean[ntau]=1
-                    if tau.Tau_idDecayMode!=1: continue
-                    dR=deltaR(lep,tau)
-                    if dR<0.4:
-                        Muon_Clean[nmu]=1
-                        Tau_Clean[ntau]=0
+            for nmu,lep in enumerate(muons):
+                if Muon_Medium[nmu]!=1: continue
+                dr = deltaR(jet,lep)
+                if dr<drm:
+                    drm=dr
+                    
+                if dr<0.4:
+                    Jet_Clean[njet]=0
+                    if jet.chHEF > 0.1: Jet_Clean[njet]=1
+                    if jet.neHEF > 0.2: Jet_Clean[njet]=1
+                else:
+                    Jet_Clean[njet]=1
+            dRMuJet[njet]=drm
+                        
+            for nele,lep in enumerate(electrons):
+                if Electron_Medium[nele]!=1: continue
+                dr = deltaR(jet,lep)
+                if dr<dre:
+                    dre=dr
+                    
+                if dr<0.4:
+                    Jet_Clean[njet]=0
+                    if jet.chHEF > 0.1: Jet_Clean[njet]=1
+                    if jet.neHEF > 0.2: Jet_Clean[njet]=1
+                else:
+                    Jet_Clean[njet]=1
+            dRElJet[njet]=dre
+            
+        ###############
 
-            for nele, lep in enumerate(electrons):
-                if lep.cutBased< 3: continue
-                if lep.pt<15: continue
-                for ntau, tau in enumerate(taus):
-                    if tau.Tau_idDecayMode!=1: continue
-                    dR=deltaR(lep,pho)
-                    if dR<0.4:
-		        Electron_Clean[nele]=1
-                        Tau_Clean[ntau]=0
-
-        # photon cleaning
-        Photon_Clean=[0]*len(photons)
-        if len(photons)>0:
-            for nmu, lep in enumerate(muons):
-                if lep.pt<5: continue
-                if lep.mediumId!=1: continue
-                for npho, pho in enumerate(photons):
-                    Photon_Clean[npho]=1
-                    #if tau.Tau_idDecayMode!=1: continue
-                    dR=deltaR(lep,pho)
-                    if dR<0.4:
-                        Muon_Clean[nmu]=1
-                        Photon_Clean[npho]=0
-		
-            for nele, lep in enumerate(electrons):
-                if lep.cutBased< 3: continue
-                if lep.pt<15: continue
-                for npho, pho in enumerate(photons):
-                    #if tau.Tau_idDecayMode!=1: continue
-                    dR=deltaR(lep,pho)
-                    if dR<0.4:
-                        Electron_Clean[nele]=1
-                        Photon_Clean[npho]=0
-
-        ##count good physics objects
-        nGoodJet=0
-        nGoodMuon=0
-        nGoodElectron=0
-        nGoodTau=0
-        nGoodPhoton=0
-        for num,obj in enumerate(jets):
-            if Jet_Clean[num]==1: nGoodJet+=1
-        for num,obj in enumerate(muons):
-            if Muon_Clean[num]==1: nGoodMuon+=1
-        for num,obj in enumerate(electrons):
-            if Electron_Clean[num]==1: nGoodElectron+=1
-        for num,obj in enumerate(taus):
-            if Tau_Clean[num]==1: nGoodTau+=1
-        for num,obj in enumerate(photons):
-            if Photon_Clean[num]==1: nGoodPhoton+=1
-                
         # HT Computation
         HTpt=0.
         HTphi=0.
         for num, jet in enumerate(jets):
-            if jet.puId<4: continue
+            if jet.puId==4: continue
             if Jet_Clean[num]==0: continue
             if jet.pt<30.: continue # taken at 30 GeV
             if fabs(jet.eta)>2.5: continue
+            
             HTpt = HTpt + jet.pt
             HTphi = HTphi + jet.phi
             
@@ -277,24 +273,60 @@ class cleaningStudy(Module):
                 if Zpt>50 and Zpt<200: Zweight=0.65-0.00034*Zpt
                 if Zpt>200: Zweight=0.6
 
-        self.out.fillBranch("cleanedJet", Jet_Clean)
-        self.out.fillBranch("cleanedMuon", Muon_Clean)
-        self.out.fillBranch("cleanedElectron", Electron_Clean)
-        self.out.fillBranch("cleanedTau", Tau_Clean)
-        self.out.fillBranch("cleanedPhoton", Photon_Clean)
-        self.out.fillBranch("MuonJet_MindR", dRMuJet)
-        self.out.fillBranch("ElecJet_MindR", dRElJet)
-        self.out.fillBranch("JetE", JetE)
+                
+        ##count good physics objects                                                                                                                  
+        nGoodJet=0
+        nGoodMuon=0
+        nGoodElectron=0
+        nGoodTau=0
+        nGoodPhoton=0
+        for num,obj in enumerate(jets):
+            if Jet_Clean[num]==1: nGoodJet+=1
+        for num,obj in enumerate(muons):
+            if Muon_Medium[num]==1: nGoodMuon+=1
+        for num,obj in enumerate(electrons):
+            if Electron_Medium[num]==1: nGoodElectron+=1
+        for num,obj in enumerate(taus):
+            if Tau_Clean[num]==1: nGoodTau+=1
+        for num,obj in enumerate(photons):
+            if Photon_Clean[num]==1: nGoodPhoton+=1
+
+        ## ANALYSIS
+        isOSmumu=0
+        isOSemu=0
+        isSSmumu=0
+        ##Analysis OSmumu
+        if nGoodMuon==2 or nGoodMuon>2:
+            if (muons[0].charge!=muons[1].charge):
+                isOSmumu=1
+            elif (muons[0].charge==muons[1].charge):
+                isSSmumu=1
+        elif nGoodMuon>0 and nGoodElectron>0:
+            if (electrons[0].charge!=muons[0].charge):
+                isOSemu=1
+
+        self.out.fillBranch("Jet_Clean", Jet_Clean)
+        self.out.fillBranch("Muon_Medium", Muon_Medium)
+        self.out.fillBranch("Electron_Medium", Electron_Medium)
+        self.out.fillBranch("Tau_Clean", Tau_Clean)
+        self.out.fillBranch("Photon_Clean", Photon_Clean)
+        self.out.fillBranch("dRMuJet", dRMuJet)
+        self.out.fillBranch("dRElJet", dRElJet)
+        #self.out.fillBranch("JetE", JetE)
 
         self.out.fillBranch("nGoodJet", nGoodJet)
         self.out.fillBranch("nGoodMuon", nGoodMuon)
         self.out.fillBranch("nGoodElectron", nGoodElectron)
         self.out.fillBranch("nGoodTau", nGoodTau)
         self.out.fillBranch("nGoodPhoton", nGoodPhoton)
+
+        self.out.fillBranch("isOSmumu", isOSmumu)
+        self.out.fillBranch("isOSemu", isOSemu)
+        self.out.fillBranch("isSSmumu", isSSmumu)
         
-        self.out.fillBranch("MHTju_pt", HTpt)
-        self.out.fillBranch("MHTju_phi", HTphi)
-        self.out.fillBranch("ZPtCorr", Zweight)
+        self.out.fillBranch("HTpt", HTpt)
+        self.out.fillBranch("HTphi", HTphi)
+        self.out.fillBranch("Zweight", Zweight)
 
         #if self.Nevents==100: 
         return True
