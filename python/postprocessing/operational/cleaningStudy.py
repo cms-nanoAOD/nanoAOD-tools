@@ -34,6 +34,7 @@ class cleaningStudy(Module):
         self.out = wrappedOutputTree
         #CleanObjectCollection
         self.out.branch("Jet_Clean" ,"I", 0, "nJet_Clean", "nJet_Clean", False)
+        self.out.branch("Jet_Tight" ,"I", 0, "nJet_Tight", "nJet_Tight", False)
         self.out.branch("Muon_Medium",  "I", 0, "nMuon_Medium", "nMuon_Medium", False)
         self.out.branch("Electron_Medium",  "I", 0, "nElectron_Medium", "nElectron_Medium", False)
         self.out.branch("Tau_Clean",  "I", 0, "nTau_Clean", "nTau_Clean", False)
@@ -99,7 +100,7 @@ class cleaningStudy(Module):
         #Jetpz=[0.]*len(jets)
         #JetE=[0.]*len(jets)
 
-        #Clean Lepton First, on specific kinematics
+        #Select good LEPTON, on specific kinematics
         mupt=5
         muiso=0.25 #iso03
         for nmu,lep in enumerate(muons):
@@ -175,11 +176,11 @@ class cleaningStudy(Module):
         drm=999.
         dre=999.
         for njet,jet in enumerate(jets):
-            if jet.jetId==3: Jet_Tight[njet]=1
             if jet.puId<jetpuid: continue
             if jet.pt<jetpt: continue
-            if jet.jetId==0: continue ##???
+            if jet.jetId<1: continue ##???
             if fabs(jet.eta)>jeteta: continue
+            if jet.jetId==3: Jet_Tight[njet]=1
             
             #assmuonid1=jet.muonIdx1
             #assmuonid2=jet.muonIdx2
@@ -220,7 +221,7 @@ class cleaningStudy(Module):
         HTpt=0.
         HTphi=0.
         for num, jet in enumerate(jets):
-            if jet.puId==4: continue
+            #if jet.puId==4: continue
             if Jet_Clean[num]==0: continue
             if jet.pt<30.: continue # taken at 30 GeV
             if fabs(jet.eta)>2.5: continue
@@ -306,6 +307,7 @@ class cleaningStudy(Module):
                 isOSemu=1
 
         self.out.fillBranch("Jet_Clean", Jet_Clean)
+        self.out.fillBranch("Jet_Tight", Jet_Tight)
         self.out.fillBranch("Muon_Medium", Muon_Medium)
         self.out.fillBranch("Electron_Medium", Electron_Medium)
         self.out.fillBranch("Tau_Clean", Tau_Clean)
