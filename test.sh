@@ -8,7 +8,7 @@
 #(Tau_pt[0]>18 && Tau_eta[0]<2.3 && Tau_idDecayMode==1 && DeltaBetaIso ??? && ) &&
 #(Photon_pt[0]>15 &&  Photon_cutBased[0]>0)"
 
-test1=4
+test1=3
 
 if [ "$test1" == "0" ];then
     echo "LOCAL: SKIMMING + SLIMMING"
@@ -21,7 +21,7 @@ elif [ "$test1" == "2" ];then
     python scripts/nano_postproc.py -c "Muon_pt[0]>20" -b "keep_and_drop_VH.txt" -I PhysicsTools.NanoAODTools.postprocessing.operational.objCleaning cleaning . /Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root
 elif [ "$test1" == "3" ];then
     echo "LOCAL: SKIMMING + SLIMMING + CLEANING + signal study"
-    python python/postprocessing/examples/signalAnalysis.py
+    python python/analysis/signal/vh/signalAnalysis.py
 elif [ "$test1" == "4" ];then
     echo "LOCAL: SKIMMING + SLIMMING + Object Cleaning Study"
     python scripts/nano_postproc.py -b "keep_and_drop_VH.txt" -I PhysicsTools.NanoAODTools.postprocessing.operational.cleaningStudy cleaning -E 100001 . /Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root
