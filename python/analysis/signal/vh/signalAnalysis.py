@@ -20,8 +20,12 @@ class signalAnalysis(Module):
 
     def beginJob(self,histFile=None,histDirName=None):
 	Module.beginJob(self,histFile,histDirName)
+        VAR=[]
+        self.h_nevent=ROOT.TH1D('nevent', 'nevent', 10, 0, 1000); VAR.append(self.h_vpt)
+	self.h_vpt=ROOT.TH1F('sumpt',   'sumpt',   100, 0, 1000); VAR.append(self.h_vpt)
         
-	self.h_vpt=ROOT.TH1F('sumpt',   'sumpt',   100, 0, 1000)
+        
+
         self.addObject(self.h_vpt )
         #self.h_Ncj=ROOT.TH1D('NcleanJet',   'NcleanJet',   10, 0, 10)
         #self.addObject(self.h_Ncj )
