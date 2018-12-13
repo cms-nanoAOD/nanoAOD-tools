@@ -32,6 +32,7 @@ lightquarks=[21,1,2,3,4,-1,-2,-3,-4]
 bquarks=[-5,5]
 Wboson=[24,-24]
 Hboson=[25]
+FinalState=[62,44,22]
 
 DEBUG=False
 
@@ -48,6 +49,9 @@ class signalAnalysis(Module):
         #Global Variable
         self.h_nevent = ROOT.TH1D('nevent', 'nevent', 2, 0.5, 1.5); VAR.append(self.h_nevent)
         self.h_whww    = ROOT.TH1F('whww',   'whww counter',   2, 0.5, 1.5); VAR.append(self.h_whww)
+        self.h_hww      = ROOT.TH1F('hww',   'hww counter',   2, 0.5, 1.5); VAR.append(self.h_hww)
+        self.h_hw    = ROOT.TH1F('hw',   'hw counter',   2, 0.5, 1.5); VAR.append(self.h_hw)
+        self.h_wh    = ROOT.TH1F('wh',   'hw counter',   2, 0.5, 1.5); VAR.append(self.h_wh)
         
         #Kinematics of Physics Objects
         #leading Pt of Muon
@@ -241,6 +245,9 @@ class signalAnalysis(Module):
         leptonic2=False
         nleptonic=0
         whww=0
+        hww=0
+        hw=0
+        wh=0
         Wsign=[]
         for num,gen in enumerate(genMuon):
             if DEBUG: print "With daughter ",num,"th gen with pdgId : ", gen.pdgId ,", status : ", gen.status,", mass : ", gen.mass,", statusFlags : ", gen.statusFlags
@@ -253,43 +260,47 @@ class signalAnalysis(Module):
                 if DEBUG: print WARNING,"Trigger W has status 62 --> 44 --> 22",ENDC
                 if DEBUG: print "With Mother pdgId : ", genparts[moId].pdgId,", status : ", genparts[moId].status,", mass : ", genparts[moId].mass,", statusFlags : ", genparts[moId].statusFlags
                 moId1=genparts[moId].genPartIdxMother
-                if genparts[moId1].pdgId in Wboson and genparts[moId1].status==44:
+                if genparts[moId1].pdgId in Wboson and genparts[moId1].status in FinalState:
                     if DEBUG: print "With 1st grandmother pdgId : ", genparts[moId1].pdgId,", status : ", genparts[moId1].status,", mass : ", genparts[moId1].mass,", statusFlags : ", genparts[moId1].statusFlags
                     moId2=genparts[moId1].genPartIdxMother
-                    if genparts[moId2].pdgId in Wboson:
+                    if genparts[moId2].pdgId in Wboson and genparts[moId1].status in FinalState:
                         if DEBUG: print "With 2nd grandmother pdgId : ", genparts[moId2].pdgId,", status : ", genparts[moId2].status,", mass : ", genparts[moId2].mass,", statusFlags : ", genparts[moId2].statusFlags
                         if DEBUG: print OKGREEN,"Jackpot",ENDC
                         triggered=True
                         whww+=1
+                        wh+=1
                         
             #W from Higgs has status 22 (W) --> 62 (H) --> 44 (H) --> 22 (H)
-            if genparts[moId].pdgId in Wboson and genparts[moId].status==22:
+            elif genparts[moId].pdgId in Wboson and genparts[moId].status==22:
                 if DEBUG: print	WARNING,"W from Higgs has status 22 (W) --> 62 (H) --> 44 (H) --> 22 (H)",ENDC
                 if DEBUG: print "With Mother pdgId : ", genparts[moId].pdgId,", status : ", genparts[moId].status,", mass : ", genparts[moId].mass,", status\
 Flags : ", genparts[moId].statusFlags
                 Wsign.append(genparts[moId].pdgId)
                 moId1=genparts[moId].genPartIdxMother
-                if genparts[moId1].pdgId in Hboson and genparts[moId1].status==62:
+                if genparts[moId1].pdgId in Hboson and genparts[moId1].status in FinalState:
                     if DEBUG: print "With 1st grandmother pdgId : ", genparts[moId1].pdgId,", status : ", genparts[moId1].status,", mass : ", genparts[moId1].mass,", statusFlags : ", genparts[moId1].statusFlags
                     moId2=genparts[moId1].genPartIdxMother
-                    if genparts[moId1].pdgId in Hboson and genparts[moId1].status==44:
+                    if genparts[moId1].pdgId in Hboson and genparts[moId1].status in FinalState:
                         if DEBUG: print "With 2nd grandmother pdgId : ", genparts[moId1].pdgId,", status : ", genparts[moId1].status,", mass : ", genparts[moId1].mass,", statusFlags : ", genparts[moId1].statusFlags
                         nleptonic+=1
                         if nleptonic==1:
                             leptonic1=True
                             whww+=1
+                            hww+=1
+                            hw+=1
                             if DEBUG: print OKBLUE,"Found 1 W leptonically decay from Higgs",ENDC
                         elif nleptonic==2:
                             if len(Wsign)==2 and Wsign[0]+Wsign[1]==0:
                                 leptonic2=True
                                 whww+=1
+                                hww+=1
                                 if DEBUG: print OKGREEN,"Jackpot! Found 2 W leptonically decay from Higgs",ENDC
                         elif nleptonic>2:
                             print FAIL,"something wrong, you have three W",ENDC
                             exit()
-            #else:
-            #    if DEBUG: print FAIL,"Uninterested Muon decay from :",ENDC
-            #    if DEBUG: print FAIL,"With Mother pdgId : ", genparts[moId].pdgId,", status : ", genparts[moId].status,", mass : ", genparts[moId].mass,", statusFlags : ", genparts[moId].statusFlags,ENDC
+            else:
+                if DEBUG: print FAIL,"Uninterested Muon decay from :",ENDC
+                if DEBUG: print FAIL,"With Mother pdgId : ", genparts[moId].pdgId,", status : ", genparts[moId].status,", mass : ", genparts[moId].mass,", statusFlags : ", genparts[moId].statusFlags,ENDC
             
             '''
             if triggered:
@@ -317,6 +328,12 @@ Flags : ", genparts[moId].statusFlags
             if DEBUG: print "WHWW = ", whww
             self.h_whww.Fill(1)
             #exit()
+        if wh==1:
+            self.h_wh.Fill(1)
+        if hww==2:
+            self.h_hww.Fill(1)
+        if hw==1:
+            self.h_hw.Fill(1)
         return True
 
 
