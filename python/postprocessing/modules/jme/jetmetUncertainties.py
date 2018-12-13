@@ -15,7 +15,6 @@ class jetmetUncertaintiesProducer(Module):
         self.era = era
         self.redoJEC = redoJEC
         self.noGroom = noGroom
-        self.jetType = jetType
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used in the jet smearer, as there is no consistent set of 
         #     txt files for JES uncertainties and JER scale factors and uncertainties yet
@@ -33,13 +32,13 @@ class jetmetUncertaintiesProducer(Module):
 
         self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName)
 
-        if "AK4" in self.jetType : 
+        if "AK4" in jetType : 
             self.jetBranchName = "Jet"
             self.genJetBranchName = "GenJet"
             self.genSubJetBranchName = None
             self.doGroomed = False
             self.corrMET = True
-        elif "AK8" in self.jetType :
+        elif "AK8" in jetType :
             self.jetBranchName = "FatJet"
             self.subJetBranchName = "SubJet"
             self.genJetBranchName = "GenJetAK8"
@@ -50,7 +49,7 @@ class jetmetUncertaintiesProducer(Module):
                 self.doGroomed = False
             self.corrMET = False
         else:
-            raise ValueError("ERROR: Invalid jet type = '%s'!" % self.jetType)
+            raise ValueError("ERROR: Invalid jet type = '%s'!" % jetType)
         self.metBranchName = "MET"
         self.rhoBranchName = "fixedGridRhoFastjetAll"
         self.lenVar = "n" + self.jetBranchName
@@ -148,16 +147,13 @@ class jetmetUncertaintiesProducer(Module):
         
         for shift in [ "Up", "Down" ]:
             self.out.branch("%s_pt_jer%s" % (self.jetBranchName, shift), "F", lenVar=self.lenVar)
-            self.out.branch("%s_pt_jer%sVal" % (self.jetBranchName, shift), "F", lenVar=self.lenVar)
             self.out.branch("%s_mass_jer%s" % (self.jetBranchName, shift), "F", lenVar=self.lenVar)
             self.out.branch("%s_mass_jmr%s" % (self.jetBranchName, shift), "F", lenVar=self.lenVar)
-            self.out.branch("%s_mass_jmr%sVal" % (self.jetBranchName, shift), "F", lenVar=self.lenVar)
             self.out.branch("%s_mass_jms%s" % (self.jetBranchName, shift), "F", lenVar=self.lenVar)
 
             if self.doGroomed: 
                 self.out.branch("%s_msoftdrop_jer%s" % (self.jetBranchName, shift), "F", lenVar=self.lenVar)
                 self.out.branch("%s_msoftdrop_jmr%s" % (self.jetBranchName, shift), "F", lenVar=self.lenVar)
-                self.out.branch("%s_msoftdrop_jmr%sVal" % (self.jetBranchName, shift), "F", lenVar=self.lenVar)
                 self.out.branch("%s_msoftdrop_jms%s" % (self.jetBranchName, shift), "F", lenVar=self.lenVar)
 
             if self.corrMET :
@@ -206,9 +202,6 @@ class jetmetUncertaintiesProducer(Module):
 
         jets_mass_jerUp   = []
         jets_mass_jerDown = []
-        jets_mass_jmrNomVal   = []
-        jets_mass_jmrUpVal   = []
-        jets_mass_jmrDownVal   = []
         jets_mass_jmrUp   = []
         jets_mass_jmrDown = []
         jets_mass_jesUp   = {}
@@ -242,9 +235,6 @@ class jetmetUncertaintiesProducer(Module):
             jets_msdcorr_corr_JMR   = []
             jets_msdcorr_jerUp   = []
             jets_msdcorr_jerDown = []
-            jets_msdcorr_jmrNomVal   = []
-            jets_msdcorr_jmrUpVal   = []
-            jets_msdcorr_jmrDownVal   = []
             jets_msdcorr_jmrUp   = []
             jets_msdcorr_jmrDown = []
             jets_msdcorr_jesUp   = {}
@@ -299,9 +289,6 @@ class jetmetUncertaintiesProducer(Module):
                 jet_pt_nom *= -1.0
             jet_pt_jerUp         = jet_pt_jerUpVal  *jet_pt
             jet_pt_jerDown       = jet_pt_jerDownVal*jet_pt
-            jets_pt_jerNomVal.append(jet_pt_jerNomVal)
-            jets_pt_jerUpVal.append(jet_pt_jerUpVal)
-            jets_pt_jerDownVal.append(jet_pt_jerDownVal)
             jets_pt_nom    .append(jet_pt_nom)
             jets_pt_jerUp  .append(jet_pt_jerUpVal*jet_pt)
             jets_pt_jerDown.append(jet_pt_jerDownVal*jet_pt)
@@ -434,9 +421,6 @@ class jetmetUncertaintiesProducer(Module):
         self.out.fillBranch("%s_corr_JMR" % self.jetBranchName, jets_corr_JMR)
         self.out.fillBranch("%s_mass_jerUp" % self.jetBranchName, jets_mass_jerUp)
         self.out.fillBranch("%s_mass_jerDown" % self.jetBranchName, jets_mass_jerDown)
-        self.out.fillBranch("%s_mass_jmrNomVal" % self.jetBranchName, jets_mass_jmrNomVal)
-        self.out.fillBranch("%s_mass_jmrUpVal" % self.jetBranchName, jets_mass_jmrUpVal)
-        self.out.fillBranch("%s_mass_jmrDownVal" % self.jetBranchName, jets_mass_jmrDownVal)
         self.out.fillBranch("%s_mass_jmrUp" % self.jetBranchName, jets_mass_jmrUp)
         self.out.fillBranch("%s_mass_jmrDown" % self.jetBranchName, jets_mass_jmrDown)
         self.out.fillBranch("%s_mass_jmsUp" % self.jetBranchName, jets_mass_jmsUp)
