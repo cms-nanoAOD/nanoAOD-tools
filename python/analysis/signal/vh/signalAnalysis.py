@@ -10,22 +10,11 @@ from PhysicsTools.NanoAODTools.postprocessing.operational.cleaningStudy import c
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-from PhysicsTools.NanoAODTools.postprocessing.tools import deltaPhi, deltaR
+from PhysicsTools.NanoAODTools.postprocessing.tools import deltaPhi, deltaR, matchObjectCollectionMultiple
 
 from GenScouting import *
 
-Mlep=[13,-13]
-Mneu=[14,-14]
-Elep=[11,-11]
-Eneu=[12,-12]
-Tlep=[15,-15]
-Tneu=[16,-16]
-lightquarks=[21,1,2,3,4,-1,-2,-3,-4]
-bquarks=[-5,5]
-Wboson=[24,-24]
-Hboson=[25]
-Zboson=[23]
-FinalState=[62,44,22]
+All=[1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16, 21, 23, 24, 25]
 
 DEBUG=False
 
@@ -46,6 +35,10 @@ class signalAnalysis(Module):
         self.h_hw    = ROOT.TH1F('hw',   'hw counter',   2, 0.5, 1.5); VAR.append(self.h_hw)
         self.h_wh    = ROOT.TH1F('wh',   'wh counter',   2, 0.5, 1.5); VAR.append(self.h_wh)
 
+        self.h_trigw      = ROOT.TH1F('trigw',   'trigw counter',   5, 0.5, 5.5); VAR.append(self.h_trigw)
+        self.h_whqq      = ROOT.TH1F('whqq',   'whqq counter',   5, 0.5, 5.5); VAR.append(self.h_whqq)
+        self.h_hwlnu      = ROOT.TH1F('hwlnu',   'hwlnu counter',   5, 0.5, 5.5); VAR.append(self.h_hwlnu)
+        
         self.h_zhzz    = ROOT.TH1F('zhzz',   'zhzz counter',   2, 0.5, 1.5); VAR.append(self.h_zhzz)
         self.h_hzz      = ROOT.TH1F('hzz',   'hzz counter',   2, 0.5, 1.5); VAR.append(self.h_hzz)
         self.h_hz    = ROOT.TH1F('hz',   'hz counter',   2, 0.5, 1.5); VAR.append(self.h_hz)
@@ -127,6 +120,7 @@ class signalAnalysis(Module):
         self.h_h1ch = ROOT.TH1D('h1ch', 'Higgs boson Charge', 3, -1.5, 1.5); VAR.append(self.h_h1ch)
         self.h_h1mass = ROOT.TH1D('h1mass', 'Higgs boson Mass', 25, 0, 500); VAR.append(self.h_h1mass)
 
+
         for obj in VAR:
             self.addObject(obj)
 
@@ -145,169 +139,60 @@ class signalAnalysis(Module):
         genjets      = Collection(event, "GenJet" )
         genjetak8s   = Collection(event, "GenJetAK8")
         
-        #genmets      = event.GenMET
+        #listing
+        #if DEBUG: Display(All,All,genparts)
 
-        #READ Vector
-        JetE= Object(event,"JetE")
-        dRMuJet= Object(event,"dRMuJet")
-        dRElJet= Object(event,"dRElJet")
-
-        #READ Scalar
-        nGoodJet= event.nGoodJet
-        nGoodMuon= event.nGoodMuon
-        nGoodElectron= event.nGoodElectron
-        nGoodTau= event.nGoodTau
-        nGoodPhoton= event.nGoodPhoton
-
-        isOSmumu= event.isOSmumu
-        isOSemu= event.isOSemu
-        isSSmumu= event.isSSmumu
-
-        HTpt= event.HTpt
-        HTphi= event.HTphi
-        Zweight= event.Zweight
-
-        ##
-        genMuon = []
-        genElectron = []
-        genJet = []
-        genBJet = []
-        genW = []
-        genH = []
-        genZ = []
-        genMneu = []
-        genEneu = []
-        for gen in genparts:
-            if gen.pdgId in Mlep and gen.status==1:
-                genMuon.append(gen)
-            if gen.pdgId in Elep and gen.status==1:
-                genElectron.append(gen)
-            if gen.pdgId in lightquarks and gen.status==1:
-                genJet.append(gen)
-            if gen.pdgId in bquarks and gen.status==1:
-                genBJet.append(gen)
-            if gen.pdgId in Zboson:
-                genZ.append(gen)
-            if gen.pdgId in Wboson: #and gen.status==62:
-                genW.append(gen)
-            if gen.pdgId in Hboson: #and gen.status==62:
-                genH.append(gen)
-            if gen.pdgId in Mneu and gen.status==1:
-                genMneu.append(gen)
-            if gen.pdgId in Eneu and gen.status==1:
-                genEneu.append(gen)
-
-        #Pt ordered at descending order 
-        genMuon.sort(key=getPt, reverse=True)
-        genElectron.sort(key=getPt, reverse=True)
-        genJet.sort(key=getPt, reverse=True)
-        genBJet.sort(key=getPt, reverse=True)
-        genW.sort(key=getPt, reverse=True)
-        genZ.sort(key=getPt, reverse=True)
-        genH.sort(key=getPt, reverse=True)
-        genMneu.sort(key=getPt, reverse=True)
-        genEneu.sort(key=getPt, reverse=True)
-
-        ##scouting
-        #DaughterList ; Motherlist
-        Display(Mlep+Mneu+Elep+Eneu,Wboson+Tlep+Tneu,genparts)
+        #preselect leptons
+        TightElectron=[]
+        for ele in electrons:
+            if ele.pt>10 and fabs(ele.eta)<2.5 and ele.cutBased>3:
+                TightElectron.append(ele)
+        nTightElectron=len(TightElectron)
         
-        #Muon final states
-        #Trigger W has status 62 --> 44 --> 22
-        #W from Higgs has status 22 (W) --> 62 (H) --> 44 (H) --> 22 (H)  
-        wtriggered=False
-        wleptonic1=False
-        wleptonic2=False
-        nwleptonic=0
+        TightMuon=[]
+        for mu in muons:
+            if mu.pt>5 and fabs(mu.eta)<2.5 and mu.tightId:
+                TightMuon.append(mu)
+        nTightMuon=len(TightMuon)
+
+        #Cleaning
+        cleanJet=cleanFromLepton(jets,TightMuon)
+        cleanJet=cleanFromLepton(cleanJet,TightElectron)
+        cleanJet=filter(lambda j : j.pt>25, cleanJet)
+        cleanJet=filter(lambda j : fabs(j.eta)<2.5, cleanJet)
+        nJets=len(cleanJet)
         
-        ztriggered=False
-        zleptonic1=False
-        zleptonic2=False
-        nzleptonic=0
+        #Gen List
+        subGenparts=filterGenParticle(All,genparts)
+        genWcands=daughterFinder(subGenparts,[24],genparts)
+        genHWcands=daughterFinder(subGenparts,[25],genparts)
+        allgen=genWcands[0]+genHWcands[0]
+     
+        #match to RECO-level
+        #muon
+        recoWMuon=recoFinder(muons,allgen)
+        recoWElectron=recoFinder(electrons,allgen)
+        #recoWjj=recoFinder(cleanJet,allgen,False)
+        recoWMuon.sort(key=getPt, reverse=True)
+        recoWElectron.sort(key=getPt, reverse=True)
+        #recoWjj.sort(key=getPt, reverse=True)
 
-        whww=0
-        hww=0
-        hw=0
-        wh=0
+        #if len(recoWMuon)==3:
+        #    print "SS MUON"
+        #    print "recoWMuon[0].pdgId = ", recoWMuon[0].pdgId
+        #    print "recoWMuon[1].pdgId = ", recoWMuon[1].pdgId
+        #    print "recoWMuon[2].pdgId = ", recoWMuon[2].pdgId
+        #if len(recoWElectron)==3:
+        #    print "SS Electron"
+        #    print "recoWElectron[0].pdgId = ", recoWElectron[0].pdgId
+        #    print "recoWElectron[1].pdgId = ", recoWElectron[1].pdgId
+        #    print "recoWElectron[2].pdgId = ", recoWElectron[2].pdgId
 
-        zhzz=0
-        hzz=0
-        hz=0
-        zh=0
-        
-        Wsign=[]
-        Zsign=[]
-        ZMuSign=[]
-
-        GenMuonIndex=[]
-        for num,gen in enumerate(genMuon):
-            if DEBUG: print "With daughter ",num,"th gen with pdgId : ", gen.pdgId ,", status : ", gen.status,", mass : ", gen.mass,", statusFlags : ", gen.statusFlags
-            #Trigger W has status 62 --> 44 --> 22
-            #62--> (outgoing subprocess particle with primordial kT included) particles produced by beam-remnant treatment
-            #44--> (outgoing shifted by a branching) particles produced by initial-state-showers
-            #22--> (outgoing) particles of the hardest subprocess
-            
-            ### WBOSON CANDIDATE
-            moId=gen.genPartIdxMother
-            if genparts[moId].pdgId in Wboson and genparts[moId].status==62:
-                if DEBUG: print WARNING,"Trigger W has status 62 --> 44 --> 22",ENDC
-                if DEBUG: print "With Mother pdgId : ", genparts[moId].pdgId,", status : ", genparts[moId].status,", mass : ", genparts[moId].mass,", statusFlags : ", genparts[moId].statusFlags
-                moId1=genparts[moId].genPartIdxMother
-                if genparts[moId1].pdgId in Wboson and genparts[moId1].status in FinalState:
-                    if DEBUG: print "With 1st grandmother pdgId : ", genparts[moId1].pdgId,", status : ", genparts[moId1].status,", mass : ", genparts[moId1].mass,", statusFlags : ", genparts[moId1].statusFlags
-                    moId2=genparts[moId1].genPartIdxMother
-                    if genparts[moId2].pdgId in Wboson and genparts[moId1].status in FinalState:
-                        if DEBUG: print "With 2nd grandmother pdgId : ", genparts[moId2].pdgId,", status : ", genparts[moId2].status,", mass : ", genparts[moId2].mass,", statusFlags : ", genparts[moId2].statusFlags
-                        if DEBUG: print OKGREEN,"Jackpot",ENDC
-                        wtriggered=True
-                        whww+=1
-                        wh+=1
-                        
-            #W from Higgs has status 22 (W) --> 62 (H) --> 44 (H) --> 22 (H)
-            elif genparts[moId].pdgId in Wboson and genparts[moId].status==22:
-                if DEBUG: print	WARNING,"W from Higgs has status 22 (W) --> 62 (H) --> 44 (H) --> 22 (H)",ENDC
-                if DEBUG: print "With Mother pdgId : ", genparts[moId].pdgId,", status : ", genparts[moId].status,", mass : ", genparts[moId].mass,", status\
-Flags : ", genparts[moId].statusFlags
-                Wsign.append(genparts[moId].pdgId)
-                moId1=genparts[moId].genPartIdxMother
-                if genparts[moId1].pdgId in Hboson and genparts[moId1].status in FinalState:
-                    if DEBUG: print "With 1st grandmother pdgId : ", genparts[moId1].pdgId,", status : ", genparts[moId1].status,", mass : ", genparts[moId1].mass,", statusFlags : ", genparts[moId1].statusFlags
-                    moId2=genparts[moId1].genPartIdxMother
-                    if genparts[moId1].pdgId in Hboson and genparts[moId1].status in FinalState:
-                        if DEBUG: print "With 2nd grandmother pdgId : ", genparts[moId1].pdgId,", status : ", genparts[moId1].status,", mass : ", genparts[moId1].mass,", statusFlags : ", genparts[moId1].statusFlags
-                        nwleptonic+=1
-                        if nwleptonic==1:
-                            wleptonic1=True
-                            whww+=1
-                            hww+=1
-                            hw+=1
-                            if DEBUG: print OKBLUE,"Found 1 W leptonically decay from Higgs",ENDC
-                        elif nwleptonic==2:
-                            if len(Wsign)==2 and Wsign[0]+Wsign[1]==0:
-                                wleptonic2=True
-                                whww+=1
-                                hww+=1
-                                if DEBUG: print OKGREEN,"Jackpot! Found 2 W leptonically decay from Higgs",ENDC
-                        elif nleptonic>2:
-                            print FAIL,"something wrong, you have three W",ENDC
-                            exit()
-            else:
-                if DEBUG: print FAIL,"Uninterested Muon decay from :",ENDC
-                if DEBUG: print FAIL,"With Mother pdgId : ", genparts[moId].pdgId,", status : ", genparts[moId].status,", mass : ", genparts[moId].mass,", statusFlags : ", genparts[moId].statusFlags,ENDC
-                        
-        self.h_nevent.Fill(1)
-        if DEBUG: print "End Events ======"
-        if whww==3:
-            if DEBUG: print "WHWW = ", whww
-            self.h_whww.Fill(1)
-            #exit()
-        if wh==1:
-            self.h_wh.Fill(1)
-        if hww==2:
-            self.h_hww.Fill(1)
-        if hw==1:
-            self.h_hw.Fill(1)
-
+        #if len(recoWMuon)==1 and len(recoWElectron)==1:
+        #    if recoWMuon[0].pdgId==13 and recoWElectron[0].pdgId==11:
+        #        print "OS Muon and Electron"
+        #        print "recoWMuon[0].pdgId = ", recoWMuon[0].pdgId
+        #        print "recoWElectron[0].pdgId = ", recoWElectron[0].pdgId
             
         return True
 
@@ -315,13 +200,14 @@ Flags : ", genparts[moId].statusFlags
 preselection=""
 skimmed_files=[]
 
-files=["/Users/shoh/Projects/CMS/PhD/Analysis/SSl/NANOAOD/HWplusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root",
-       "/Users/shoh/Projects/CMS/PhD/Analysis/SSl/NANOAOD/HWminusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root"]
+#skimmed_files=["/Users/shoh/Projects/CMS/PhD/Analysis/SSl/NANOAOD/HWplusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root",
+#       "/Users/shoh/Projects/CMS/PhD/Analysis/SSl/NANOAOD/HWminusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root"]
+skimmed_files=["/Users/shoh/Projects/CMS/PhD/Analysis/SSl/NANOAOD/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root"]
 
 #files=["/Users/shoh/Projects/CMS/PhD/Analysis/SSl/NANOAOD/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root"]
 
-for f in files:
-    skimmed_files.append(f.split("/")[-1].split(".")[0]+"_Skim.root")
+#for f in files:
+#    skimmed_files.append(f.split("/")[-1].split(".")[0]+"_Skim.root")
 
 print skimmed_files
 
