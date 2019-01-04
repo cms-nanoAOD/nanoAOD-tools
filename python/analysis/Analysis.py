@@ -38,6 +38,6 @@ class Analysis(Module):
         return True
 
 preselection="Jet_pt[0] > 250"
-files=[" root://cms-xrd-global.cern.ch//store/mc/RunIISummer16NanoAOD/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/NANOAODSIM/PUMoriond17_05Feb2018_94X_mcRun2_asymptotic_v2-v1/40000/2CE738F9-C212-E811-BD0E-EC0D9A8222CE.root"]
+files=["/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root"]
 p=PostProcessor(".",files,cut=preselection,branchsel=None,modules=[Analysis()],noOut=True,histFileName="histOut.root",histDirName="plots")
 p.run()
