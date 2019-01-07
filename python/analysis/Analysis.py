@@ -10,6 +10,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 from math import fabs
 from PhysicsTools.NanoAODTools.analysis.helper.Cleaner import *
+from PhysicsTools.NanoAODTools.analysis.helper.GenScouting import *
 
 class Analysis(Module):
     def __init__(self):
@@ -18,8 +19,17 @@ class Analysis(Module):
     def beginJob(self,histFile=None,histDirName=None):
 	Module.beginJob(self,histFile,histDirName)
 
+        self.h_isOSmumu =ROOT.TH1D('isOSmumu', 'isOSmumu', 2,-0.5,1.5); self.addObject(self.h_isOSmumu )
+        self.h_isOSee   =ROOT.TH1D('isOSee', 'isOSee', 2,-0.5,1.5); self.addObject(self.h_isOSee )
+        self.h_isOSemu  =ROOT.TH1D('isOSemu', 'isOSemu', 2,-0.5,1.5); self.addObject(self.h_isOSemu )
+        self.h_isSSmumu =ROOT.TH1D('isSSmumu', 'isSSmumu', 2,-0.5,1.5); self.addObject(self.h_isSSmumu )
+        self.h_isSSee   =ROOT.TH1D('isSSee', 'isSSee', 2,-0.5,1.5); self.addObject(self.h_isSSee )
+
 	self.h_vpt=ROOT.TH1F('vpt',   'vpt',   100, 0, 800);self.addObject(self.h_vpt )
         self.h_vmass=ROOT.TH1F('vmass',   'vmass',   100, 0, 200);self.addObject(self.h_vmass )
+
+        ## GEN signal
+        #self.h_w1 =ROOT.TH1D('isOSmumu', 'isOSmumu', 2,-0.5,1.5); self.addObject(self.h_w1 )
 
     def analyze(self, event):
 
@@ -81,15 +91,38 @@ class Analysis(Module):
             if( branch.GetName() == "nGenPart" ):
                 GEN=True
                 break
+        
         if GEN:
             # GEN Particles
             genparts = Collection(event, "GenPart")
             GenLists = filter(lambda x: x, genparts)
+            
             # GEN candidates objects with status code 62
-            theGenZ = FindGenParticle(GenLists, 23)
-            theGenW = FindGenParticle(GenLists, 24)
-            theGenTop = FindGenParticle(GenLists, 6)
-            theGenAntiTop = FindGenParticle(GenLists, -6)
+            theGenZ = FindGenParticle(GenLists, [23,-23])
+            theGenW = FindGenParticle(GenLists, [24,-24])
+            theGenTop = FindGenParticle(GenLists, [6])
+            theGenAntiTop = FindGenParticle(GenLists, [-6])
+
+            #byID
+            # w -> ll (62)
+            # h -> w -> ll (22)
+            theGenW1 = FindGenParticlebyStatus(GenLists, [24,-24], 62)
+            theGenW2 = FindGenParticlebyStatus(GenLists, [24,-24], 22)
+
+            if len(theGenW)>0:
+                print "===EVENT START==="
+                print "NtheGenZ = ", len(theGenZ)
+                print "NtheGenW = ", len(theGenW)
+                print "NtheGenTop = ", len(theGenTop)
+                print "NtheGenAntiTop = ", len(theGenAntiTop)
+                print "===EVENT END==="
+
+            if len(theGenW1)>0 or len(theGenW2)>0:
+                print "===EVENT START==="
+                print "NtheGenW1 = ", len(theGenW1)
+                print "NtheGenW2 = ", len(theGenW2)
+                print "===EVENT END==="
+
             # EWK Correction
             #####
             # TopPtReweighting correction
@@ -100,40 +133,39 @@ class Analysis(Module):
             #    ##FILL
             #if (theGenW):
             #    ##FILL
+
+            ## SIGNAL STUDY
+            
             
         ########################################
         #                ANALYSIS                                                   
         ######################################## 
 
         ##Categorization base on number of leptons and flavour combination.
-        isOSmumu=False
-        isOSee=False
-        isOSemu=False
-        isSSmumu=False
-        isSSee=False
+        isOSmumu=0; isOSee=0; isOSemu=0; isSSmumu=0; isSSee=0
         #More then two lepton final state
         if nElecList>=2 or nMuonList>=2:
             if nElecList>=2 and nMuonList>=2:
                 if MuonList[0].pt > ElecList[0].pt:
                     # same sign muon
                     if abs(MuonList[0].charge+MuonList[1].charge)==2:
-                        isSSmumu=True
+                        isSSmumu=1
                     # opposite sign muon
                     elif abs(MuonList[0].charge+MuonList[1].charge)==0:
-                        isOSmumu=True
+                        isOSmumu=1
                 else:
                     # same sign electron
                     if abs(ElecList[0].charge+ElecList[1].charge)==2:
-                        isSSee=True
+                        isSSee=1
                     # opposite sign electron
                     elif abs(ElecList[0].charge+ElecList[1].charge)==0:
-                        isOSee=True
+                        isOSee=1
         # One lepton final state
         elif nElecList==1 or nMuonList==1:
             if nElecList==1 and nMuonList==1:
                 # opposite sign; opposite flavor ; by construction electron is leading
                 if abs(MuonList[0].charge+ElecList[0].charge)==0 and ElecList[0].pt > MuonList[0].pt:
-                    isOSemu=True
+                    isOSemu=1
 
         ########################################
         #       Reconstruction of V boson
@@ -169,6 +201,13 @@ class Analysis(Module):
                     )
         else:
             return False
+        
+        ## Fill
+        self.h_isOSmumu.Fill(isOSmumu)
+        self.h_isOSee.Fill(isOSee)
+        self.h_isOSemu.Fill(isOSemu)
+        self.h_isSSmumu.Fill(isSSmumu)
+        self.h_isSSee.Fill(isSSee)
 
         self.h_vpt.Fill(Vpt)
         self.h_vmass.Fill(Vmass)
