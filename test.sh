@@ -8,7 +8,7 @@
 #(Tau_pt[0]>18 && Tau_eta[0]<2.3 && Tau_idDecayMode==1 && DeltaBetaIso ??? && ) &&
 #(Photon_pt[0]>15 &&  Photon_cutBased[0]>0)"
 
-test1=3
+test1=1
 
 if [ "$test1" == "0" ];then
     echo "LOCAL: SKIMMING + SLIMMING"

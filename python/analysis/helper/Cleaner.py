@@ -42,12 +42,14 @@ def FindGenParticle(InList, pdgid):
             newList.append(element)
     return newList
 
-def FindGenParticlebyStatus(InList, pdgid, statusid):
+def FindGenParticlebyStatus(InList, pdgid, statusid1, statusid2):
 
     newList=[]
     for element in InList:
-        if element.pdgId in pdgid and element.status==statusid:
-            newList.append(element)
+        if element.pdgId in pdgid and element.status==statusid1:
+            moId=element.genPartIdxMother
+            if InList[moId].status==statusid2:
+                newList.append(element)
     return newList
 
 def transverseMass(lepPt, lepPhi, met, metPhi):

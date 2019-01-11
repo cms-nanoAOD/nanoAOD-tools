@@ -12,6 +12,9 @@ MAGENTA = '\033[35m'
 CYAN = '\033[36m'
 YELLOW = '\033[33m'
 
+def getPt(pO):
+    return pO[0].pt
+
 def bitwiseJetId(jetid):
 
     code={
@@ -129,14 +132,28 @@ def recoFinder(obj1s,obj2s):
     dicts=matchObjectCollectionMultiple(obj1s,obj2s,0.4,lambda x,y : x.pdgId==y.pdgId)
     #else:
     #    dicts=matchObjectCollectionMultiple(obj1s,obj2s,0.4,lambda x,y : x.partonFlavour==y.pdgId)
-        
+    #print "dicts = ", dicts
     recoflatten=[]
     for key, value in dicts.iteritems():
         if value is None: continue # None means genparts list is empty.
         if len(value)==0: continue # empty list mean unsuccessful deltaR matching from GEN to Reco
+        #print "key = ", key
+        #print "value[0].pdgId = ", value[0].pdgId
+        
         recoflatten.append(key)
         
     return recoflatten
+
+def genRecoFinder(obj1s,obj2s):
+
+    dicts=matchObjectCollectionMultiple(obj1s,obj2s,0.4,lambda x,y : x.pdgId==y.pdgId)
+    genRecoflatten=[]
+    for key, value in dicts.iteritems():
+        if value is None: continue # None means genparts list is empty.
+        if len(value)==0: continue # empty list mean unsuccessful deltaR matching from GEN to Reco
+        genRecoflatten.append([key,value[0]])
+        
+    return genRecoflatten
     
 def daughterFinder(fgenparts,mothersList, genparts):
 
