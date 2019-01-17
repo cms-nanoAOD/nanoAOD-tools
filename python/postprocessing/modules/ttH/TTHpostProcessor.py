@@ -16,19 +16,20 @@ inputSlim  = os.environ['CMSSW_BASE']+"/python/PhysicsTools/NanoAODTools/postpro
 
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.collectionMerger import collectionMerger
-from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.skimNRecoLeps import *
-from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.l1JetCalibrations import l1JetCalibrations
+from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.skimNRecoLeps import skimRecoLeps
+#from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.l1JetCalibrations import l1JetCalibrations
+from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.isoTrackAnalysis import isoTrackAnalysis
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.TriggerBitFilter import TriggerBitFilter
 
 #
-minelpt  = 10
-minmupt  = 10
+minelpt  = 5
+minmupt  = 5
 maxeleta = 2.5
 maxmueta = 2.5
 
-isoAndIPCuts = lambda  x : x.miniPFRelIso_all < 0.1  and abs(x.dxy) < 0.05 and abs(x.dz) < 0.1 and x.sip3d < 8 
+isoAndIPCuts = lambda  x : x.miniPFRelIso_all < 0.4  and abs(x.dxy) < 0.05 and abs(x.dz) < 0.1 and x.sip3d < 8 
 
-goodElec = lambda x : x.pt > minelpt and abs(x.eta) < maxeleta and x.mvaFall17noIso_WPL and isoAndIPCuts(x)
+goodElec = lambda x : x.pt > minelpt and abs(x.eta) < maxeleta and x.mvaFall17V1noIso_WPL and isoAndIPCuts(x)
 goodMuon = lambda x : x.pt > minmupt and abs(x.eta) < maxmueta  and isoAndIPCuts(x)
 
 goodLepProducer = collectionMerger(input=["Electron","Muon"], output="LepGood",
@@ -37,19 +38,20 @@ goodLepProducer = collectionMerger(input=["Electron","Muon"], output="LepGood",
                                                   ("Muon", goodMuon)
                                                   ]))
 
-jetCalibrations = l1JetCalibrations( 'Fall17_17Nov2017F_V6_DATA') # '94X_dataRun2_v6' if doData else
-puAutoWeight    = puAutoWeight()
-skimRecoLeps    = skimRecoLeps()
+puAutoWeight     = puAutoWeight()
+skimRecoLeps     = skimRecoLeps(); skimRecoLeps.nMinLeps = 2
+isoTrackAnalysis = isoTrackAnalysis()
 
 from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import * 
 
 def BuildJsonForTesting():
 
  
-    sampOpt = { 'isData' : True,
-                'triggers' : triggers_ee + triggers_3e+triggers_ee_noniso,
-                'vetotriggers' : triggers_mumu_iso + triggers_3mu,
-                'json': '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
+    sampOpt = { 'isData' : False,
+                'triggers' : [],#triggers_ee + triggers_3e+triggers_ee_noniso,
+                'vetotriggers' : [],#triggers_mumu_iso + triggers_3mu,
+                #'json': '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
+                'json': None
                 }
 
     optjsonfile = open('options_sample.json','w')
@@ -65,14 +67,14 @@ def LoadCfgForSubmission():
     from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import getCrabOption
     doData=getCrabOption("doData",False)
 
-
+    print 'Shall we do data?', doData
 
 
     print '[TTHpostProcessor]: Submission step'
     from PhysicsTools.NanoAODTools.postprocessing.datasets.mc2017    import samples as mcSamples
     from PhysicsTools.NanoAODTools.postprocessing.datasets.data2017  import samples as dataSamples
     
-    selectedSamples=mcSamples
+    
     if doData:
         jsonFile='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'
         
@@ -103,6 +105,9 @@ def LoadCfgForSubmission():
                     
                     break
 
+    else:
+        selectedSamples=mcSamples
+
     return selectedSamples
 
 def LoadCfgToRun(inputFile=None):
@@ -115,9 +120,13 @@ def LoadCfgToRun(inputFile=None):
     sampOpt = json.loads(sampoptjson.read())
     sampoptjson.close()
 
-    mod = [puAutoWeight,  goodLepProducer, skimRecoLeps, jetCalibrations]
+
+    mod = [puAutoWeight,  goodLepProducer, skimRecoLeps, isoTrackAnalysis]
     if sampOpt['isData']: 
         mod.remove( puAutoWeight ) 
+    else:
+        from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017All, jetmetUncertainties2017
+        mod.extend([jetmetUncertainties2017()]) # jetmetUncertainties2017All()
 
     if 'triggers' in sampOpt:
         if not 'vetotriggers' in sampOpt:
@@ -150,9 +159,12 @@ else:
 
     BuildJsonForTesting()
     #filepath = ['root://xrootd-cms.infn.it///store/mc/RunIIFall17NanoAOD/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/20000/0CB20624-3642-E811-B93F-001E6739B849.root']
-    filepath = ['root://xrootd-cms.infn.it///store/data/Run2017F/DoubleEG/NANOAOD/31Mar2018-v1/10000/B471FCAD-734A-E811-BAD1-002590CB0B5A.root',]
+#    filepath = ['root://xrootd-cms.infn.it///store/data/Run2017F/DoubleEG/NANOAOD/31Mar2018-v1/10000/B471FCAD-734A-E811-BAD1-002590CB0B5A.root',]
+    filepath = ['/afs/cern.ch/work/s/sesanche/public/forEdge/test_forsynch_v2.root']
+    #filepath = ['root://xrootd-cms.infn.it///store/mc/RunIIFall17NanoAODv4/ZZTo4L_13TeV_powheg_pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/00000/8E11DCE3-B8F2-204E-9E55-EB57E8443B83.root']
     #filepath = ['fewEvents.root']
     #'root://xrootd-cms.infn.it///store/data/Run2017F/DoubleEG/NANOAOD/31Mar2018-v1/10000/FCF63A41-754A-E811-893A-0CC47A3B0572.root']
+
 
     outdir = '.'
 
