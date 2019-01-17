@@ -17,4 +17,3 @@ from EventDump import EventDump
 from InvariantSystem import InvariantSystem
 from JetTruthFlags import JetTruthFlags
 from JetTaggerResult import JetTaggerResult
-

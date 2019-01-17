@@ -13,12 +13,16 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from pprint import pprint
 
 class MuonSelection(Module):
-    def __init__(self, isData=True):
-        self.isData = isData
+    def __init__(self):
+        self.vetoPt = 15.
+        self.vetoEta = 2.5
         self.loosePt = 26.
-        self.looseEta = 2.4
+        self.looseEta = 2.5
         self.tightPt = 26.
         self.tightEta = 2.4
+        self.vetoIso = 25
+        self.looseIso = 25
+        self.tightIso = 15
         
     def beginJob(self):
         pass
@@ -28,7 +32,10 @@ class MuonSelection(Module):
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
+        self.out.branch("n_veto_muons","I")
         self.out.branch("n_loose_muons","I")
+        self.out.branch("n_tight_muons","I")
+        self.out.branch("muon_trigger","I")
        
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -41,23 +48,39 @@ class MuonSelection(Module):
         muons = Collection(event, "Muon")
         
         event.selectedMuons = {
+            "veto":[],
             "loose":[],
+            "tight":[],
         }
         
         for muon in muons:
 
-            if muon.pt > self.loosePt and abs(muon.eta) < self.looseEta and muon.pfRelIso04_all < 0.2:
+            if muon.pt > self.tightPt and abs(muon.eta) < self.tightEta and muon.pfRelIso04_all < self.tightIso and muon.tightId:
+                event.selectedMuons["tight"].append(muon)
+
+            if muon.pt > self.loosePt and abs(muon.eta) < self.looseEta and muon.pfRelIso04_all < self.looseIso:
                 event.selectedMuons["loose"].append(muon)
 
+            if muon.pt > self.vetoPt and abs(muon.eta) < self.vetoEta and muon.pfRelIso04_all < self.vetoIso:
+                event.selectedMuons["veto"].append(muon)
+
+    	self.out.fillBranch("n_veto_muons",len(event.selectedMuons["veto"]))
     	self.out.fillBranch("n_loose_muons",len(event.selectedMuons["loose"]))
+    	self.out.fillBranch("n_tight_muons",len(event.selectedMuons["tight"]))
+        self.out.fillBranch("muon_trigger", event.HLT_IsoMu24 or event.HLT_IsoTkMu24)
     	return True
 
 class ElectronSelection(Module):
-    def __init__(self,isData=False):
-        self.isData = isData
+    def __init__(self):
+
+        self.vetoPt = 15.
+        self.vetoEta = 2.5
         
-        self.loosePt = 15.
+        self.loosePt = 35.
         self.looseEta = 2.5
+
+        self.tightPt = 35.
+        self.tightEta = 2.5
     
     def beginJob(self):
         pass
@@ -68,6 +91,9 @@ class ElectronSelection(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.out.branch("n_veto_electrons","I")
+        self.out.branch("n_loose_electrons","I")
+        self.out.branch("n_tight_electrons","I")
+        self.out.branch("electron_trigger","I")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -76,19 +102,29 @@ class ElectronSelection(Module):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         electrons = Collection(event, "Electron")
         
-        event.selectedElectrons = {"veto":[], "tight":[]}
+        event.selectedElectrons = {"veto":[], "loose":[], "tight":[]}
 
         for electron in electrons:
             if electron.pt>self.loosePt and math.fabs(electron.eta)<self.looseEta and electron.cutBased>0:
+                event.selectedElectrons["loose"].append(electron)
+
+            if electron.pt>self.tightPt and math.fabs(electron.eta)<self.tightEta and electron.cutBased==3:
+                event.selectedElectrons["tight"].append(electron)
+
+
+            if electron.pt>self.vetoPt and math.fabs(electron.eta)<self.vetoEta and electron.cutBased==0:
                 event.selectedElectrons["veto"].append(electron)
 
+
     	self.out.fillBranch("n_veto_electrons",len(event.selectedElectrons["veto"]))
+    	self.out.fillBranch("n_loose_electrons",len(event.selectedElectrons["loose"]))
+    	self.out.fillBranch("n_tight_electrons",len(event.selectedElectrons["tight"]))
+        self.out.fillBranch("electron_trigger", event.HLT_Ele27_WPTight_Gsf)
 
         return True
     
 class JetSelection(Module):
-    def __init__(self,isData=True,getLeptonCollection=lambda x:None, process=None):
-        self.isData=isData
+    def __init__(self,getLeptonCollection=lambda x:None, process=None):
         self.getLeptonCollection = getLeptonCollection
         self.process = process
         self.jetGroups = {
@@ -289,7 +325,7 @@ class MetFilter(Module):
             return False
         if event.Flag_EcalDeadCellTriggerPrimitiveFilter==0:
             return False
-        if ("SingleMu" in self.process or "TT_Tune" in self.process) and event.Flag_eeBadScFilter==0: #not suggested on MC
+        if self.globalOptions["isData"] and event.Flag_eeBadScFilter==0: #not suggested on MC
             return False
         return True
  
@@ -297,13 +333,11 @@ class MetFilter(Module):
 files = []
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--isData', dest='isData', action='store_true',default=False)
 parser.add_argument('--input', dest='inputFiles', action='append',default=[])
 parser.add_argument('output', nargs=1)
 
 args = parser.parse_args()
 
-print "isData:",args.isData
 print "inputs:",len(args.inputFiles)
 f =  args.inputFiles[0]
 print f
@@ -321,27 +355,26 @@ for inputFile in args.inputFiles:
     
 print "output directory:",args.output[0]
 
-globalOptions = {
-    "isData":args.isData
-}
 
-modules = [MuonSelection(isData=args.isData),
-        ElectronSelection(isData=args.isData),
-        JetSelection(isData=args.isData, process=f),
+modules = [MuonSelection(),
+        ElectronSelection(),
+        JetSelection(getLeptonCollection=lambda event:event.selectedMuons["loose"], process=f),
         MetFilter(process=f)
         ]
 
 modules.append(EventSkim(selection=lambda event: len(event.selectedJets["central"]["loose"])>2))
 modules.append(EventSkim(selection=lambda event: len(event.selectedJets["forward"]["loose"])==0))
-modules.append(EventSkim(selection=lambda event: len(event.selectedJets["failId"]["loose"])==0))
-modules.append(EventSkim(selection=lambda event: event.n_veto_electrons == 0))
 
-if "SMS" in f:
-    modules.append(EventSkim(selection=lambda event: event.n_loose_muons == 0))
+if "SingleMu" in f:
+    modules.append(EventSkim(selection=lambda event: event.muon_trigger))
+    modules.append(EventSkim(selection=lambda event: event.n_veto_electrons == 0))
 
-elif "SingleMu" in f or "TT_Tune" in f:
-    modules.append(EventSkim(selection=lambda event: event.HLT_IsoMu24 or event.HLT_IsoTkMu24))
-    modules.append(EventSkim(selection=lambda event: event.n_loose_muons > 0))
+elif "SingleEle" in f:
+    modules.append(EventSkim(selection=lambda event: event.electron_trigger))
+    modules.append(EventSkim(selection=lambda event: event.n_veto_muons == 0))
+
+elif "TT" in f:
+    modules.append(EventSkim(selection=lambda event: event.electron_trigger or event.muon_trigger))
 
 p=PostProcessor(args.output[0],[args.inputFiles],cut=None,branchsel=None,modules=modules, friend=True, maxEvents=-1)
 p.run()
