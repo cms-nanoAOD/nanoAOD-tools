@@ -8,6 +8,8 @@ import random
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
+from utils import getHist, getXY
+
 class SignalTriggerSelection(Module):
     def __init__(
         self,
@@ -15,6 +17,11 @@ class SignalTriggerSelection(Module):
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
+         
+        if not self.globalOptions["isData"]:
+            self.trigger_nominal = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger_SF.root","mu/eff_nominal")
+            self.trigger_up = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger_SF.root","mu/eff_up")
+            self.trigger_down = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger_SF.root","mu/eff_down")
         self.outputName = outputName
         
     def beginJob(self):
@@ -27,13 +34,20 @@ class SignalTriggerSelection(Module):
         self.out = wrappedOutputTree
         
         self.out.branch(self.outputName+"_flag","I")
+
+        if not self.globalOptions["isData"]:
+            self.out.branch(self.outputName+"_weight_trigger_nominal", "F")
+            self.out.branch(self.outputName+"_weight_trigger_up", "F")
+            self.out.branch(self.outputName+"_weight_trigger_down", "F")
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
         
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
-            
+        mht = event.nominal_mht
+        R = event.nominal_mht/event.nominal_met
+        
         self.out.fillBranch(
             self.outputName+"_flag",
             event.HLT_MonoCentralPFJet80_PFMETNoMu90_PFMHTNoMu90_IDTight > 0 or
@@ -42,6 +56,14 @@ class SignalTriggerSelection(Module):
             event.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight > 0 or
             event.HLT_PFHT900
         )
+ 
+        if not self.globalOptions["isData"]:
+            weight_trigger_nominal, _ = getXY(self.trigger_nominal, mht, R)
+            weight_trigger_up, _ = getXY(self.trigger_up, mht, R)
+            weight_trigger_down, _ = getXY(self.trigger_down, mht, R)
             
+            self.out.fillBranch(self.outputName+"_weight_trigger_nominal",weight_trigger_nominal)
+            self.out.fillBranch(self.outputName+"_weight_trigger_up",weight_trigger_up)
+            self.out.fillBranch(self.outputName+"_weight_trigger_down",weight_trigger_down)
+
         return True
-        

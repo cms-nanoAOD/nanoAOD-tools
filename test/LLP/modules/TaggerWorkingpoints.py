@@ -69,10 +69,10 @@ class TaggerWorkingpoints(Module):
                     predictionsPerCtauAndClass[ctau][label].append(predictions[ctau][label])
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
-                predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
                 if self.saveAllLabels:
                     self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label, predictionsPerCtauAndClass[ctau][label])
                 else:
+                    predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
 
                     for m in self.multiplicities:
                         if m<len(predictionsPerCtauAndClass[ctau][label]):

@@ -113,6 +113,7 @@ analyzerChain.append(
         logctauValues = range(-3,5)
     )
 )
+'''
 
 analyzerChain.append(
     TaggerWorkingpoints(
@@ -145,6 +146,7 @@ analyzerChain.append(
         saveAllLabels=True
     )
 )
+'''
 
 p=PostProcessor(
     args.output[0],

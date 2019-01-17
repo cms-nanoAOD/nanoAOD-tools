@@ -1,6 +1,7 @@
 from MuonSelection import MuonSelection
 from MuonVeto import MuonVeto
 from SingleMuonTriggerSelection import SingleMuonTriggerSelection
+from SignalTriggerSelection import SignalTriggerSelection
 from JetMetUncertainties import JetMetUncertainties
 from JetSelection import JetSelection
 from TaggerEvaluation import TaggerEvaluation
