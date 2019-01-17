@@ -23,8 +23,8 @@ class jetmetUncertaintiesProducer(Module):
         self.jesUncertainties = jesUncertainties
 
         # smear jet pT to account for measured difference in JER between data and simulation.
-        self.jerInputFileName = "Spring16_25nsV10_MC_PtResolution_" + jetType + ".txt"
-        self.jerUncertaintyInputFileName = "Spring16_25nsV10_MC_SF_" + jetType + ".txt"
+        self.jerInputFileName = "Fall17_V3_MC_PtResolution_" + jetType + ".txt"
+        self.jerUncertaintyInputFileName = "Fall17_V3_MC_SF_" + jetType + ".txt"
         self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName)
 
         if "AK4" in jetType : 
@@ -103,7 +103,7 @@ class jetmetUncertaintiesProducer(Module):
         # implementation didn't seem to work for factorized JEC, try again another way
         for jesUncertainty in self.jesUncertainties:
             jesUncertainty_label = jesUncertainty
-            if self.era == "2016" and jesUncertainty == 'Total' and len(self.jesUncertainties) == 1:
+            if self.era == "2017" and jesUncertainty == 'Total' and len(self.jesUncertainties) == 1:
                 jesUncertainty_label = ''
             pars = ROOT.JetCorrectorParameters(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName),jesUncertainty_label)
             self.jesUncertainty[jesUncertainty] = ROOT.JetCorrectionUncertainty(pars)    
@@ -428,7 +428,7 @@ class jetmetUncertaintiesProducer(Module):
 
 jetmetUncertainties2016 = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "Total" ])
 jetmetUncertainties2016All = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "All" ])
-jetmetUncertainties2017 = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V6_MC", [ "Total" ])
+jetmetUncertainties2017 =    lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V6_MC", [ "Total" ])
 jetmetUncertainties2017All = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V6_MC", [ "All" ], redoJEC=True)
 
 jetmetUncertainties2016AK4Puppi = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "Total" ], jetType="AK4PFPuppi")

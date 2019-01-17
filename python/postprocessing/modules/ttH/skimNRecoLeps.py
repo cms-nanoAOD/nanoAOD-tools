@@ -6,10 +6,11 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 import itertools
 
-class skipNRecoLeps(Module):
+class SkimRecoLeps(Module):
     def __init__(self):
         self.prescaleIdx = -1
         self.prescaleFromSkim = 5
+        self.nMinLeps = 2 
 
     def beginJob(self):
         pass
@@ -17,7 +18,7 @@ class skipNRecoLeps(Module):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.wrappedOutputTree = wrappedOutputTree
-        self.wrappedOutputTree.branch('prescaleFromSkim','F')
+        #self.wrappedOutputTree.branch('prescaleFromSkim','F')
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -26,10 +27,12 @@ class skipNRecoLeps(Module):
         leps = Collection(event, 'LepGood')
         nlepgood = len(leps)
 
-        if nlepgood < 2: return False
-
+        if nlepgood < self.nMinLeps: return False
+        #self.wrappedOutputTree.fillBranch('prescaleFromSkim', 1)
         return True
 
+
+       # disabled for the moment
         hasSS = False
         for l1,l2 in itertools.product(leps,leps):
             if l1==l2: continue
@@ -52,5 +55,5 @@ class skipNRecoLeps(Module):
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-skimRecoLeps = lambda : skipNRecoLeps()
+skimRecoLeps = lambda : SkimRecoLeps()
  
