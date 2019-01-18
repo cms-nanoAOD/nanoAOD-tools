@@ -32,18 +32,20 @@ class IsoTrackAnalysis(Module):
             if not cand.isPFcand: continue 
             if hasattr(cand,'fromPV') and not getattr(cand,'fromPV'): continue # check only for IsoTracks, for Leptons should be true
             if abs(cand.pdgId) == 11 or abs(cand.pdgId) == 13:
-                if cand.pt < 5 or abs(cand.eta) > 2.4: continue
+                if abs(cand.pdgId) == 11: pt = cand.pt * cand.eCorr
+                else: pt = cand.pt
+                if pt < 5 or abs(cand.eta) > 2.4: continue
                 if abs(cand.dz)  > 0.1: continue
                 if abs(cand.dxy) > 0.2: continue
-                if cand.pfRelIso03_chg > 5: continue
-                if cand.pfRelIso03_chg/cand.pt < 0.2: continue
+                if cand.pfRelIso03_chg*pt > 5: continue
+                if cand.pfRelIso03_chg > 0.2: continue
                 nPFLep5 = nPFLep5 + 1 
             else: 
                 if cand.pt < 10 or abs(cand.eta) > 2.4: continue
                 if abs(cand.dz)  > 0.1: continue
                 if abs(cand.dxy) > 0.2: continue
-                if cand.pfRelIso03_chg > 5: continue
-                if cand.pfRelIso03_chg/cand.pt < 0.2: continue
+                if cand.pfRelIso03_chg*cand.pt > 5: continue
+                if cand.pfRelIso03_chg > 0.2: continue
                 nPFHad10 = nPFHad10 + 1 
 
         self.wrappedOutputTree.fillBranch("nPFHad10",nPFHad10)
