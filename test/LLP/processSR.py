@@ -12,7 +12,6 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 from modules import *
 
-
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -65,11 +64,6 @@ analyzerChain.append(
     )
 )
 
-analyzerChain.append(
-    SignalTriggerSelection(
-        globalOptions=globalOptions
-        )
-    )
 
 analyzerChain.extend(muonSelection)
 
@@ -112,7 +106,7 @@ if not args.isData:
     
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=2
+            len(event.selectedJets_nominal)>=2,
             #len(event.selectedJets_jerUp)>=2 or \
             #len(event.selectedJets_jerDown)>=2 or \
             #len(event.selectedJets_jesTotalUp)>=2 or \
@@ -210,7 +204,13 @@ if not args.isData:
             storeVariables=storeVariables
         )
     )
-    
+ 
+    analyzerChain.append(
+    SignalTriggerSelection(
+        globalOptions=globalOptions
+        )
+    )   
+
     analyzerChain.append(
         TaggerEvaluation(
             modelPath="PhysicsTools/NanoAODTools/data/nn/model_noda_retrain.pb",
@@ -288,10 +288,16 @@ else:
             storeKinematics=[],
         )
     )
-        
+         
     analyzerChain.append(
         EventSkim(selection=lambda event: 
             len(event.selectedJets_nominal)>=2
+        )
+    )
+
+    analyzerChain.append(
+        EventSkim(selection=lambda event: 
+            event.signalTrigger_flag > 0
         )
     )
     

@@ -61,11 +61,13 @@ analyzerChain.append(
     )
 )
 
+'''
 analyzerChain.append(
     SignalTriggerSelection(
         globalOptions=globalOptions
         )
     )
+
 
 analyzerChain.extend(muonSelection)
 
@@ -75,6 +77,8 @@ analyzerChain.append(
         globalTag="Summer16_23Sep2016V4_MC"
     )
 )
+
+'''
 for systName,collection in [
     ("nominal",lambda event: event.jets_nominal),
     #("jerUp",lambda event: event.jets_jerUp),
