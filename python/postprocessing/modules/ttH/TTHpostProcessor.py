@@ -18,7 +18,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer im
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.collectionMerger import collectionMerger
 from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.skimNRecoLeps import skimRecoLeps
 #from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.l1JetCalibrations import l1JetCalibrations
-from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.isoTrackAnalysis import isoTrackAnalysis
+from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.isoTrackAnalysis import IsoTrackAnalysis
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.TriggerBitFilter import TriggerBitFilter
 
 #
@@ -40,7 +40,7 @@ goodLepProducer = collectionMerger(input=["Electron","Muon"], output="LepGood",
 
 puAutoWeight     = puAutoWeight()
 skimRecoLeps     = skimRecoLeps(); skimRecoLeps.nMinLeps = 2
-isoTrackAnalysis = isoTrackAnalysis()
+isoTrackAnalysis = IsoTrackAnalysis(storeCollection=True) # store collection only for synch
 
 from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import * 
 
