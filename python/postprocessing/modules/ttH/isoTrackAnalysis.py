@@ -41,7 +41,7 @@ class IsoTrackAnalysis(Module):
             if not cand.isPFcand: continue 
             if hasattr(cand,'fromPV') and not getattr(cand,'fromPV'): continue # check only for IsoTracks, for Leptons should be true
             if abs(cand.pdgId) == 11 or abs(cand.pdgId) == 13:
-                if abs(cand.pdgId) == 11: pt = cand.pt * cand.eCorr
+                if abs(cand.pdgId) == 11: pt = cand.pt / cand.eCorr
                 else: pt = cand.pt
                 if pt < 5 or abs(cand.eta) > 2.4: continue
                 if abs(cand.dz)  > 0.1: continue
