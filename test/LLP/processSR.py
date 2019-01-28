@@ -200,7 +200,9 @@ if not args.isData:
             lambda tree,event: tree.fillBranch(
                 "MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight",
                 event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*1+\
-                event.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight*2
+                event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*2+\
+                event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*3+\
+                event.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight*4
             )
         ],
         [
@@ -270,12 +272,6 @@ if not args.isData:
             storeVariables=storeVariables
         )
     )
- 
-    analyzerChain.append(
-    SignalTriggerSelection(
-        globalOptions=globalOptions
-        )
-    )   
 
     analyzerChain.append(
         TaggerEvaluation(
@@ -358,12 +354,6 @@ else:
     analyzerChain.append(
         EventSkim(selection=lambda event: 
             len(event.selectedJets_nominal)>=2
-        )
-    )
-
-    analyzerChain.append(
-        EventSkim(selection=lambda event: 
-            event.signalTrigger_flag
         )
     )
     
@@ -455,7 +445,19 @@ else:
             globalOptions=globalOptions
         )
     )
-    
+
+analyzerChain.append(
+SignalTriggerSelection(
+    globalOptions=globalOptions
+    )
+)   
+
+analyzerChain.append(
+    EventSkim(selection=lambda event: 
+        event.signalTrigger_flag
+    )
+)
+
 p=PostProcessor(
     args.output[0],
     [args.inputFiles],

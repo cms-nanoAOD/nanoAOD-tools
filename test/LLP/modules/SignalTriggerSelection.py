@@ -1,4 +1,4 @@
-import osG
+import os
 import sys
 import math
 import json
