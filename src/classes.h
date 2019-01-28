@@ -5,6 +5,7 @@
 #include "PhysicsTools/NanoAODTools/interface/ReduceMantissa.h"
 #include "PhysicsTools/NanoAODTools/interface/EventShapes.h"
 #include "PhysicsTools/NanoAODTools/interface/TFEval.h"
+#include "PhysicsTools/NanoAODTools/interface/LHAInterface.h"
 
 namespace {
     PyJetResolutionWrapper jetRes;
@@ -19,4 +20,5 @@ namespace {
     TFEval::ValueFeatureGroup valueFeatureGroup("blub",10);
     TFEval::Result result;
     TFEval::PyAccessor pyAccessor(nullptr,nullptr);
+    LHAInterface lhainterface;
 }

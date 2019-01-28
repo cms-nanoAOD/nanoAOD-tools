@@ -79,7 +79,7 @@ muonSelection = [
         outputName = "dimuon",
     ),
     
-    EventSkim(selection=lambda event: event.dimuon_mass>=50.),
+    EventSkim(selection=lambda event: event.dimuon_mass>=50. and math.fabs(event.dimuon_mass-90.)>15),
     
 ]
 

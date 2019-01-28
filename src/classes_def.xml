@@ -11,6 +11,7 @@
   <class name="TFEval::Result"/>
   <class name="TFEval::BranchAccessor"/>
   <class name="TFEval::PyAccessor"/>
+  <class name="LHAInterface"/>
   <class name="ReduceMantissaToNbitsRounding"/>
 </selection>
 </lcgdict>
