@@ -363,7 +363,7 @@ else:
 
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.signalTrigger_flag > 0
+            event.signalTrigger_flag
         )
     )
     
