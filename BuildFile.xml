@@ -3,6 +3,7 @@
 <use name="CondFormats/JetMETObjects"/>
 <use name="JetMETCorrections/Modules"/>
 <use name="tensorflow-cc" />
+<use name="lhapdf" />
 <export>
   <lib   name="1"/>
 </export>

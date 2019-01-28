@@ -19,8 +19,10 @@ class JetTruthFlags(Module):
         flags={
             'isB':['isB','isBB','isGBB','isLeptonic_B','isLeptonic_C'],
             'isC':['isC','isCC','isGCC'],
-            'isUDSG':['isS','isUD','isG'],
-            'fromLLP':['fromLLP']
+            'isUDS':['isS','isUD'],
+            'isG':['isG'],
+            'fromLLP':['fromLLP'],
+            'isPU':['isPU']
         },
         globalOptions={"isData":False}
     ):

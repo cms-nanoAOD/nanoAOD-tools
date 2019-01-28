@@ -13,9 +13,6 @@ function run_test()
     rsync -r --stats /scripts/ PhysicsTools/NanoAODTools/. || return 1
     scram b || return 1
      
-    echo "--- Test analyzer chain ---"
-    python PhysicsTools/NanoAODTools/test/LLP/processNANOX.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
-    
     echo "--- Test evaluation script ---"
     wget -nv https://github.com/LLPDNNX/test-files/raw/master/pbmodel/model_ctau1.pb || return 1
     wget -nv https://github.com/LLPDNNX/test-files/raw/master/pbmodel/model_parametric.pb || return 1
@@ -24,7 +21,8 @@ function run_test()
     python PhysicsTools/NanoAODTools/test/LLP/testEval.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
 
     echo "--- Test new module chain ---"
-    python PhysicsTools/NanoAODTools/test/LLP/testProcess.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
+    python PhysicsTools/NanoAODTools/test/LLP/processSR.py --isData --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
+    python PhysicsTools/NanoAODTools/test/LLP/processMuonCR.py --input=https://github.com/LLPDNNX/test-files/raw/master/nanoaod/RunIISummer16NanoAODv2_MC.root . || return 1
 }
 
 

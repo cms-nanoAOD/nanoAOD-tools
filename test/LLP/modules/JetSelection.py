@@ -49,6 +49,7 @@ class JetSelection(Module):
         self.out = wrappedOutputTree
         if self.addSize:
             self.out.branch("n"+self.outputName,"I")
+            self.out.branch("nfailedId"+self.outputName,"I")
         if self.flagDA:
             self.out.branch(self.outputName+"_forDA","F",lenVar="nJet")
         
@@ -69,6 +70,7 @@ class JetSelection(Module):
         if self.flagDA:
             flagsDA = [0.]*event.nJet
             
+        failedId = 0
         
         for jet in jets:
             #if self.flagDA:
@@ -90,6 +92,7 @@ class JetSelection(Module):
         #    print
         if self.addSize:
             self.out.fillBranch("n"+self.outputName,len(selectedJets))
+            self.out.fillBranch("nfailedId"+self.outputName,failedId)
         if self.flagDA:
             self.out.fillBranch(self.outputName+"_forDA",flagsDA)
         for variable in self.storeKinematics:

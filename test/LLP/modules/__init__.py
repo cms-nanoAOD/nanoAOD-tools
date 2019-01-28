@@ -1,3 +1,10 @@
+import ROOT
+
+#can only load this once
+if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
+    print "Cannot load 'libPhysicsToolsNanoAODTools'"
+    sys.exit(1)
+
 from MuonSelection import MuonSelection
 from MuonVeto import MuonVeto
 from SingleMuonTriggerSelection import SingleMuonTriggerSelection
@@ -17,3 +24,6 @@ from EventDump import EventDump
 from InvariantSystem import InvariantSystem
 from JetTruthFlags import JetTruthFlags
 from JetTaggerResult import JetTaggerResult
+from PDFWeights import PDFWeights
+from WNLOWeights import WNLOWeights
+from JetFeatures import JetFeatures

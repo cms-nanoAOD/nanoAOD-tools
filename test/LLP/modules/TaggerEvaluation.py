@@ -13,9 +13,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 from utils import getCtauLabel
 
-if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
-    print "Cannot load 'libPhysicsToolsNanoAODTools'"
-    sys.exit(1)
+
 
 class TaggerEvaluation(Module):
 
