@@ -32,7 +32,6 @@ class TaggerWorkingpoints(Module):
         self.logctauLabels = map(lambda ctau: getCtauLabel(ctau),logctauValues)
         self.taggerName = taggerName
         self.saveAllLabels = saveAllLabels
-        
  
     def beginJob(self):
         pass
@@ -46,7 +45,7 @@ class TaggerWorkingpoints(Module):
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
                 if self.saveAllLabels:
-                    self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label,"F", lenVar="nJet")
+                    self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label,"F", lenVar="nselectedJets")
                 else:
                     for m in self.multiplicities:
                         self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),"F")

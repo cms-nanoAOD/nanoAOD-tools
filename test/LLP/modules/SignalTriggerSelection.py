@@ -19,9 +19,9 @@ class SignalTriggerSelection(Module):
         self.globalOptions = globalOptions
          
         if not self.globalOptions["isData"]:
-            self.trigger_nominal = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger.root","eff/nominal")
-            self.trigger_up = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger.root","eff/nominal")
-            self.trigger_down = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger.root","eff/nominal")
+            self.trigger_nominal = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger.root","eff/eff_nominal")
+            self.trigger_up = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger.root","eff/eff_up")
+            self.trigger_down = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger.root","eff/eff_down")
         self.outputName = outputName
         
     def beginJob(self):
@@ -58,7 +58,6 @@ class SignalTriggerSelection(Module):
  
         if not self.globalOptions["isData"]:
             weight_trigger_nominal, _ = getX(self.trigger_up, mht)
-            print weight_trigger_nominal
             weight_trigger_up, _ = getX(self.trigger_up, mht)
             weight_trigger_down, _ = getX(self.trigger_down, mht)
             

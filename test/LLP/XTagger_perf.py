@@ -113,7 +113,6 @@ analyzerChain.append(
     )
 )
 
-'''
 analyzerChain.append(
     TaggerWorkingpoints(
         inputCollection = lambda event: event.selectedJets,
@@ -145,7 +144,6 @@ analyzerChain.append(
         saveAllLabels=True
     )
 )
-'''
 
 p=PostProcessor(
     args.output[0],
