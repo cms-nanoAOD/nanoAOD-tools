@@ -49,9 +49,9 @@ class TaggerEvaluation(Module):
         
     def setupTFEval(self,tree,modelFile,featureDict):
         tfEval = ROOT.TFEval()
+        print "setup tfeval"
         if (not tfEval.loadGraph(modelFile)):
             sys.exit(1)
-            
         tfEval.addOutputNodeName("prediction")
         print "--- Model: ",modelFile," ---"
         for groupName,featureCfg in featureDict.iteritems():
@@ -83,8 +83,11 @@ class TaggerEvaluation(Module):
         
     def setup(self,tree):
         #load dynamically from file
+        print "loading feature dict..."
         featureDict = import_module('feature_dict').featureDict
+        print "imported feature dict..."
         self.tfEvalParametric = self.setupTFEval(tree,self.modelPath,featureDict)
+        print "setup model successfully..."
         
         genFeatureGroup = ROOT.TFEval.ValueFeatureGroup("gen",1)
         self.nJets = 0

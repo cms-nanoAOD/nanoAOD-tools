@@ -8,7 +8,7 @@ import random
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
-from utils import getHist, getXY
+from utils import getHist, getX
 
 class SignalTriggerSelection(Module):
     def __init__(
@@ -19,9 +19,9 @@ class SignalTriggerSelection(Module):
         self.globalOptions = globalOptions
          
         if not self.globalOptions["isData"]:
-            self.trigger_nominal = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger_SF.root","mu/eff_nominal")
-            self.trigger_up = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger_SF.root","mu/eff_up")
-            self.trigger_down = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger_SF.root","mu/eff_down")
+            self.trigger_nominal = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger.root","eff/nominal")
+            self.trigger_up = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger.root","eff/nominal")
+            self.trigger_down = getHist("PhysicsTools/NanoAODTools/data/trigger/trigger.root","eff/nominal")
         self.outputName = outputName
         
     def beginJob(self):
@@ -46,7 +46,6 @@ class SignalTriggerSelection(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         mht = event.nominal_mht
-        R = event.nominal_mht/event.nominal_met
         
         self.out.fillBranch(
             self.outputName+"_flag",
@@ -58,9 +57,10 @@ class SignalTriggerSelection(Module):
         )
  
         if not self.globalOptions["isData"]:
-            weight_trigger_nominal, _ = getXY(self.trigger_nominal, mht, R)
-            weight_trigger_up, _ = getXY(self.trigger_up, mht, R)
-            weight_trigger_down, _ = getXY(self.trigger_down, mht, R)
+            weight_trigger_nominal, _ = getX(self.trigger_up, mht)
+            print weight_trigger_nominal
+            weight_trigger_up, _ = getX(self.trigger_up, mht)
+            weight_trigger_down, _ = getX(self.trigger_down, mht)
             
             self.out.fillBranch(self.outputName+"_weight_trigger_nominal",weight_trigger_nominal)
             self.out.fillBranch(self.outputName+"_weight_trigger_up",weight_trigger_up)
