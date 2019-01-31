@@ -77,10 +77,10 @@ if not args.isData:
     )
     for systName,collection in [
         ("nominal",lambda event: event.jets_nominal),
-        #("jerUp",lambda event: event.jets_jerUp),
-        #("jerDown",lambda event: event.jets_jerDown),
-        #("jesTotalUp",lambda event: event.jets_jesUp["Total"]),
-        #("jesTotalDown",lambda event: event.jets_jesDown["Total"]),
+        ("jerUp",lambda event: event.jets_jerUp),
+        ("jerDown",lambda event: event.jets_jerDown),
+        ("jesTotalUp",lambda event: event.jets_jesUp["Total"]),
+        ("jesTotalDown",lambda event: event.jets_jesDown["Total"]),
     ]:
 
         analyzerChain.append(
@@ -116,12 +116,12 @@ if not args.isData:
     
     for systName,jetCollection,metObject in [
         ("nominal",lambda event: event.selectedJets_nominal,lambda event: event.met_nominal),
-        #("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
-        #("jerDown",lambda event: event.selectedJets_jerDown,lambda event: event.met_jerDown),
-        #("jesTotalUp",lambda event: event.selectedJets_jesTotalUp,lambda event: event.met_jesUp["Total"]),
-        #("jesTotalDown",lambda event: event.selectedJets_jesTotalDown,lambda event: event.met_jesDown["Total"]),
-        #("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
-        #("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
+        ("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
+        ("jerDown",lambda event: event.selectedJets_jerDown,lambda event: event.met_jerDown),
+        ("jesTotalUp",lambda event: event.selectedJets_jesTotalUp,lambda event: event.met_jesUp["Total"]),
+        ("jesTotalDown",lambda event: event.selectedJets_jesTotalDown,lambda event: event.met_jesDown["Total"]),
+        ("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
+        ("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
     ]:
     
         analyzerChain.append(
@@ -199,10 +199,10 @@ if not args.isData:
             lambda tree: tree.branch("MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight","I"),
             lambda tree,event: tree.fillBranch(
                 "MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight",
-                event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*1+\
-                event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*2+\
-                event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*3+\
-                event.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight*4
+                event.HLT_MonoCentralPFJet80_PFMETNoMu90_PFMHTNoMu90_IDTight*1+\
+                event.HLT_MonoCentralPFJet80_PFMETNoMu100_PFMHTNoMu100_IDTight*2+\
+                event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*4+\
+                event.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight*8
             )
         ],
         [
@@ -311,12 +311,12 @@ if not args.isData:
     )
     for systName,jetCollection,metObject in [
         ("nominal",lambda event: event.selectedJets_nominal,lambda event: event.met_nominal),
-        #("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
-        #("jerDown",lambda event: event.selectedJets_jerDown,lambda event: event.met_jerDown),
-        #("jesUp",lambda event: event.selectedJets_jesTotalUp,lambda event: event.met_jesUp["Total"]),
-        #("jesDown",lambda event: event.selectedJets_jesTotalDown,lambda event: event.met_jesDown["Total"]),
-        #("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
-        #("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
+        ("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
+        ("jerDown",lambda event: event.selectedJets_jerDown,lambda event: event.met_jerDown),
+        ("jesUp",lambda event: event.selectedJets_jesTotalUp,lambda event: event.met_jesUp["Total"]),
+        ("jesDown",lambda event: event.selectedJets_jesTotalDown,lambda event: event.met_jesDown["Total"]),
+        ("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
+        ("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
     ]:
         analyzerChain.append(
             TaggerWorkingpoints(
@@ -371,13 +371,12 @@ else:
             event.nominal_mht>200.
         )
     )
-    '''
+
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.nominal_mht/event.nominal_met<5.
+            event.nominal_mht/event.nominal_met<2.
         )
     )
-    '''
     
     storeVariables = [
         [lambda tree: tree.branch("rho","F"),lambda tree,event: tree.fillBranch("rho",event.fixedGridRhoFastjetAll)], 
