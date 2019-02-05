@@ -12,6 +12,7 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
 config.JobType.scriptExe = 'crab_script.sh'
+config.JobType.priority  = 10000
 
 config.JobType.inputFiles = ['crab_script.py','../scripts/haddnano.py','../python/postprocessing/SlimFile.txt',
                              'options.json', 'options_sample.json'] 

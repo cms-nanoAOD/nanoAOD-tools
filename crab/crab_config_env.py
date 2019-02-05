@@ -16,7 +16,7 @@ config.General.workArea = 'crab_' + os.environ["DATASET_NAME"] + "_" + os.enviro
 
 # this will divide task in *exactly* NJOBS jobs (for this we need JobType.pluginName = 'PrivateMC' and Data.splitting = 'EventBased')
 config.Data.unitsPerJob = 1
-config.Data.totalUnits = 10000
+#config.Data.totalUnits = 10000
 
 config.JobType.inputFiles.append(os.environ["CFG_FILE"])
 # arguments to pass to scriptExe. They have to be like "arg=value". 

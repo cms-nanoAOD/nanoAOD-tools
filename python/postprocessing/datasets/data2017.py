@@ -49,6 +49,16 @@ MET=[
     ComponentContainer('MET_Run2017F', '/MET/Run2017F-Nano14Dec2018-v1/NANOAOD'), 
 ]
 
-samples = SingleMuon+SingleElectron+MuonEG+DoubleMuon+DoubleElectron+MET
+Electron_noOverlapRemov=[
+    ComponentContainer('Electron_noOverlapRemov_Run2017B', '/SingleElectron/Run2017B-Nano14Dec2018-v1/NANOAOD'),
+    ComponentContainer('Electron_noOverlapRemov_Run2017C', '/SingleElectron/Run2017C-Nano14Dec2018-v1/NANOAOD'),
+    ComponentContainer('Electron_noOverlapRemov_Run2017D', '/SingleElectron/Run2017D-Nano14Dec2018-v1/NANOAOD'),
+    ComponentContainer('Electron_noOverlapRemov_Run2017E', '/SingleElectron/Run2017E-Nano14Dec2018-v1/NANOAOD'),
+    ComponentContainer('Electron_noOverlapRemov_Run2017F', '/SingleElectron/Run2017F-Nano14Dec2018-v1/NANOAOD'),
+    ]
+
+
+#samples = SingleMuon+SingleElectron+MuonEG+DoubleMuon+DoubleElectron+MET+Electron_noOverlapRemov
+samples = Electron_noOverlapRemov
 for sample in samples:
     sample.options['isData'] = True
