@@ -9,9 +9,9 @@ fileIn=[
     "/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/HWplusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root",
 ]
 #preselection=""
-branches="keep_and_drop_VH.txt"
-bIn="keep_and_drop_Input.txt"
-bOut="keep_and_drop_Output.txt"
+branches="scripts/keep_and_drop_VH.txt"
+bIn="scripts/keep_and_drop_Input.txt"
+bOut="scripts/keep_and_drop_Output.txt"
 #module="PhysicsTools.NanoAODTools.postprocessing.modules.analysis.exampleModule exampleModuleConstr"
 #module2="PhysicsTools.NanoAODTools.postprocessing.modules.analysis.exampleModule exampleModuleConstr"
 module="PhysicsTools.NanoAODTools.analysis.Producer producer"
