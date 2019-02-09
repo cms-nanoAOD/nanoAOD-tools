@@ -36,6 +36,7 @@ if __name__ == "__main__":
     print "args = ", args
 
     modules = []
+    print "options.imports = ", options.imports
     for mod, names in options.imports:
         print "mod = ", mod
         print "names = ", names
@@ -54,6 +55,7 @@ if __name__ == "__main__":
     if options.branchsel!=None:
         options.branchsel_in = options.branchsel
         options.branchsel_out = options.branchsel
+        outputbranchsel= options.branchsel
     p=PostProcessor(outdir,args,options.cut,options.branchsel_in,modules,options.Nevent,options.compression,options.friend,options.postfix,options.json,options.noOut,options.justcount,outputbranchsel= options.branchsel_out)
     p.run()
 

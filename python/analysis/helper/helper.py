@@ -66,51 +66,39 @@ def bitwiseJetId(jetid):
     return jetID
 
 def cleanFromlepton(InList,leptonList,dR=0.4):
-    
     for lepton in leptonList:
-        for element in InList:
-            if deltaR(lepton,element)<0.4:
-                InList.remove(element)
+        for phyobj in InList:
+            if deltaR(phyobj,lepton)<dR:
+                InList.remove(phyobj)
     InList.sort(key=getPt, reverse=True)
 
 def cleanFromleptonSS(InList,leptonList,dR=0.4):
-
     for lepton in leptonList:
-        for element in InList:
-            if deltaR(lepton,element)<0.4:
-                
-                if abs(lepton.pdgId)==13:
-                    #Good muon with pt>5 will be removed
-                    if lepton.tightId and lepton.pt>5:
-                        InList.remove(element)
-                    #If its passed the quality criteria
-                    elif lepton.mediumId and lepton.tightId:
-                        #Keep it if charge/neutral hadronic electromegatic fraction satisfy
-                        if element.chHEF>0.1 or element.neHEF>0.2:
-                            continue
-                        else:
-                            InList.remove(element)
-                        
-                elif abs(lepton.pdgId)==11:
-                    #Good electron with pt>15 will be removed
-                    if lepton.cutBased==4 and lepton.pt>15:
-                        InList.remove(element)
-                    #If its passed the quality criteria
+        for jet in InList:
+            if deltaR(jet,lepton)<dR:
+
+                if lepton._prefix.split('_')[0]=="Muon":
+                    if lepton.pt>5 and lepton.mediumId==1:
+                        InList.remove(jet)
+                    elif lepton.mediumId==1:
+                        if jet.chHEF<0.1 or jet.neHEF<0.2:
+                            InList.remove(jet)
+                         
+                if lepton._prefix.split('_')[0]=="Electron":
+                    if lepton.pt>15 and lepton.cutBased>0:
+                        InList.remove(jet)
                     elif lepton.cutBased>0:
-                        #Keep it if charge/neutral hadronic electromegatic fraction satisfy 
-                        if element.chHEF>0.1 or element.neHEF>0.2:
-                            continue
-                        else:
-                            InList.remove(element)
-                             
+                        if jet.chHEF<0.1 or jet.neHEF<0.2:
+                            InList.remove(jet)
+                        
     InList.sort(key=getPt, reverse=True)
 
 #Find the last particle in the chain before decay 23 -> 23 -> *23* -> 13 -13, return an GEN Object/ RECO??
-def FindGenParticle(InList, pdgid):
+def FindGenParticlebyStat(InList, pdgid, statusid):
 
     newList=[]
     for element in InList:
-        if element.pdgId in pdgid:
+        if element.pdgId in pdgid and element.status in statusid:
             #BIT 0; 8; 13; 14
             #if bitwise(element.statusFlags,0) and \
             #        bitwise(element.statusFlags,8) and \
@@ -118,7 +106,27 @@ def FindGenParticle(InList, pdgid):
             #        bitwise(element.statusFlags,14):
             #if element.status in ['62','1']:
             newList.append(element)
+    if len(newList)>0:
+        newList.sort(key=getPt, reverse=True)
     return newList
+
+def isGenMother(particle, motherid, motherstatus, motherflag, genpart):
+
+    moId=particle.genPartIdxMother
+    while moId!=-1:
+        if genpart[moId].pdgId in motherid and genpart[moId].status==motherstatus and genpart[moId].statusFlags==motherflag:
+            return True
+        moId=genpart[moId].genPartIdxMother
+    return False
+
+def isTauDecay(particle, genpart):
+
+    moId=particle.genPartIdxMother
+    while moId!=-1:
+        if genpart[moId].pdgId in [15,-15]:
+            return True
+        moId=genpart[moId].genPartIdxMother
+    return False
 
 def FindGenParticlebyStatus(InList, pdgid, statusid1, statusid2):
 
@@ -130,21 +138,30 @@ def FindGenParticlebyStatus(InList, pdgid, statusid1, statusid2):
                 newList.append(element)
     return newList
 
-def recoFinder(obj1s,obj2s):
+def fromHardProcess(particle,genpart):
     
-    dicts=matchObjectCollectionMultiple(obj1s,obj2s,0.4,lambda x,y : x.pdgId==y.pdgId)
-    #else:                                                                                                                                                           
-    #    dicts=matchObjectCollectionMultiple(obj1s,obj2s,0.4,lambda x,y : x.partonFlavour==y.pdgId)                                                          
-    #print "dicts = ", dicts
-    recoflatten=[]
-    for key, value in dicts.iteritems():
-        if value is None: continue # None means genparts list is empty.
-        if len(value)==0: continue # empty list mean unsuccessful deltaR matching from GEN to Reco                                                              
-        #print "key = ", key                                                                                                        
-        #print "value[0].pdgId = ", value[0].pdgId
-        recoflatten.append(key)
+    moId=particle.genPartIdxMother
+    while moId!=-1:
+        if genpart[moId].status==23:
+            return True
+	moId=genpart[moId].genPartIdxMother
+    return False
 
-    return recoflatten
+#def recoFinder(obj1s,obj2s):
+#    
+#    dicts=matchObjectCollectionMultiple(obj1s,obj2s,0.4,lambda x,y : x.pdgId==y.pdgId)
+#    #else:                                                                                                                                                           
+#    #    dicts=matchObjectCollectionMultiple(obj1s,obj2s,0.4,lambda x,y : x.partonFlavour==y.pdgId)                                                          
+#    #print "dicts = ", dicts
+#    recoflatten=[]
+#    for key, value in dicts.iteritems():
+#        if value is None: continue # None means genparts list is empty.
+#        if len(value)==0: continue # empty list mean unsuccessful deltaR matching from GEN to Reco                                                              
+#        #print "key = ", key                                                                                                        
+#        #print "value[0].pdgId = ", value[0].pdgId
+#        recoflatten.append(key)
+#
+#    return recoflatten
 
 def genRecoFinder(obj1s,obj2s):
 
@@ -154,7 +171,8 @@ def genRecoFinder(obj1s,obj2s):
         if value is None: continue # None means genparts list is empty.                                                   
         if len(value)==0: continue # empty list mean unsuccessful deltaR matching from GEN to Reco                                                                           
         genRecoflatten.append([key,value[0]])
-
+    if len(genRecoflatten)>0:
+        genRecoflatten.sort(key=getpt, reverse=True)
     return genRecoflatten
     
 def transverseMass(lepPt, lepPhi, met, metPhi):
@@ -230,3 +248,22 @@ def daughterFinder(fgenparts,mothersList, genparts):
                 break
 
     return [daughters]
+
+def printDecayCollection(inList,genpart):
+    print ":==BEGIN COLLECTION HISTORY==:"
+    for num,gen in enumerate(inList):
+        moId=gen.genPartIdxMother
+        print "Particle ",num, " --> pdgId = ", gen.pdgId , " ; status = ", gen.status , " ; pt = ", gen.pt, " ; mass = ", gen.mass," ; statflag = ", gen.statusFlags
+        while moId!=-1:
+            print "Particle ",num, " -- > mon pdgId = ", genpart[moId].pdgId , " ; mon status = ", genpart[moId].status , " ; pt = ", genpart[moId].pt , " ; mass = ", genpart[moId].mass," ; statflag = ", genpart[moId].statusFlags
+            moId=genpart[moId].genPartIdxMother
+    print ":==END==:"
+
+def printDecayParticle(obj,genpart):
+    print ":==BEGIN PARTICLE HISTORY==:"
+    moId=obj.genPartIdxMother
+    print " --> pdgId = ", obj.pdgId , " ; status = ", obj.status , " ; pt = ", obj.pt, " ; mass = ", obj.mass, " ; statflag = ", obj.statusFlags
+    while moId!=-1:
+        print " -- > mon pdgId = ", genpart[moId].pdgId , " ; mon status = ", genpart[moId].status , " ; pt = ", genpart[moId].pt , " ; mass = ", genpart[moId].mass," ; statflag = ", genpart[moId].statusFlags
+        moId=genpart[moId].genPartIdxMother
+    print ":==END==:"

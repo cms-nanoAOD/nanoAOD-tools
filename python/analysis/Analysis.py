@@ -18,70 +18,83 @@ class Analysis(Module):
     def beginJob(self,histFile=None,histDirName=None):
 	Module.beginJob(self,histFile,histDirName)
 
+        ## Global Variables
+        self.h_eventNumber =ROOT.TH1D('eventNumber', 'EventNumber', 2,0,2); self.addObject(self.h_eventNumber )
+        self.h_runNumber =ROOT.TH1D('runNumber', 'runNumber', 2,0,2); self.addObject(self.h_runNumber )
+        
         self.h_isOSmumu =ROOT.TH1D('isOSmumu', 'isOSmumu', 2,-0.5,1.5); self.addObject(self.h_isOSmumu )
         self.h_isOSee   =ROOT.TH1D('isOSee', 'isOSee', 2,-0.5,1.5); self.addObject(self.h_isOSee )
         self.h_isOSemu  =ROOT.TH1D('isOSemu', 'isOSemu', 2,-0.5,1.5); self.addObject(self.h_isOSemu )
         self.h_isSSmumu =ROOT.TH1D('isSSmumu', 'isSSmumu', 2,-0.5,1.5); self.addObject(self.h_isSSmumu )
         self.h_isSSee   =ROOT.TH1D('isSSee', 'isSSee', 2,-0.5,1.5); self.addObject(self.h_isSSee )
 
-	self.h_vpt=ROOT.TH1F('vpt',   'vpt',   100, 0, 800);self.addObject(self.h_vpt )
-        self.h_vmass=ROOT.TH1F('vmass',   'vmass',   100, 0, 200);self.addObject(self.h_vmass )
-
         ##Gen-level Objects
-        self.h_gen_Mu1pt  = ROOT.TH1F('gen_Mu1pt',   'Gen-level leading pt muon pt',   100, 0, 800);self.addObject(self.h_gen_Mu1pt )
-        self.h_gen_Mu1eta = ROOT.TH1F('gen_Mu1eta',   'Gen-level leading pt muon eta',   10, -5.5, 4.5);self.addObject(self.h_gen_Mu1eta )
-        self.h_gen_Mu1phi = ROOT.TH1F('gen_Mu1phi',   'Gen-level leading pt muon phi',   10, 0, 4);self.addObject(self.h_gen_Mu1phi )
+        genDict={}
+        for objects in ["Mu","Elec"]:
+            for num in range(1,4):
+                key="gen_%s%s" %(objects,num)
+                genDict["h_"+key+"pt"]=ROOT.TH1F(key+'pt',   '',   100, 0, 800)
+                genDict["h_"+key+"eta"]=ROOT.TH1F(key+'eta',   '',   10, -5.5, 4.5)
+                genDict["h_"+key+"phi"]=ROOT.TH1F(key+'phi',   '',   10, 0, 4)
+        for key, value in sorted(genDict.iteritems()):
+            self.addObject(value)
+            
+        ## RECO-GEN matched objects
+        genrecoDict={}
+        for objects in ["Mu","Elec"]:
+            for num in range(1,4):
+                key="genreco_%s%s" %(objects,num)
+                genrecoDict["h_"+key+"pt"]=ROOT.TH1F(key+'pt',   '',   100, 0, 800)
+		genrecoDict["h_"+key+"eta"]=ROOT.TH1F(key+'eta',   '',   10, -5.5, 4.5)
+                genrecoDict["h_"+key+"phi"]=ROOT.TH1F(key+'phi',   '',   10, 0, 4)
+        for key, value in sorted(genrecoDict.iteritems()):
+            self.addObject(value)
 
-        self.h_gen_Mu2pt  = ROOT.TH1F('gen_Mu2pt',   'Gen-level subleading pt muon pt',   100, 0, 800);self.addObject(self.h_gen_Mu2pt )
-        self.h_gen_Mu2eta = ROOT.TH1F('gen_Mu2eta',   'Gen-level subleading pt muon eta',   10, -5.5, 4.5);self.addObject(self.h_gen_Mu2eta )
-        self.h_gen_Mu2phi = ROOT.TH1F('gen_Mu2phi',   'Gen-level subleading pt muon phi',   10, 0, 4);self.addObject(self.h_gen_Mu2phi )
+        #GenW
+        self.h_gen_W1pt  = ROOT.TH1F('gen_W1pt',   'Gen-level leading pt W pt',   100, 0, 800);self.addObject(self.h_gen_W1pt )
+        self.h_gen_W1eta = ROOT.TH1F('gen_W1eta',   'Gen-level leading pt W eta',   10, -5.5, 4.5);self.addObject(self.h_gen_W1eta )
+        self.h_gen_W1phi = ROOT.TH1F('gen_W1phi',   'Gen-level leading pt W phi',   10, 0, 4);self.addObject(self.h_gen_W1phi )
 
-        self.h_gen_Mu3pt  = ROOT.TH1F('gen_Mu3pt',   'Gen-level subsubleading pt muon pt',   100, 0, 800);self.addObject(self.h_gen_Mu3pt )
-        self.h_gen_Mu3eta = ROOT.TH1F('gen_Mu3eta',   'Gen-level subsubleading pt muon eta',   10, -5.5, 4.5);self.addObject(self.h_gen_Mu3eta )
-        self.h_gen_Mu3phi = ROOT.TH1F('gen_Mu3phi',   'Gen-level subsubleading pt muon phi',   10, 0, 4);self.addObject(self.h_gen_Mu3phi )
-
-        self.h_gen_Elec1pt  = ROOT.TH1F('gen_Elec1pt',   'Gen-level leading pt electron pt',   100, 0, 800);self.addObject(self.h_gen_Elec1pt )
-        self.h_gen_Elec1eta = ROOT.TH1F('gen_Elec1eta',   'Gen-level leading pt electron eta',   10, -5.5, 4.5);self.addObject(self.h_gen_Elec1eta )
-        self.h_gen_Elec1phi = ROOT.TH1F('gen_Elec1phi',   'Gen-level leading pt electron phi',   10, 0, 4);self.addObject(self.h_gen_Elec1phi )
-
-        self.h_gen_Elec2pt  = ROOT.TH1F('gen_Elec2pt',   'Gen-level subleading pt electron pt',   100, 0, 800);self.addObject(self.h_gen_Elec2pt )
-	self.h_gen_Elec2eta = ROOT.TH1F('gen_Elec2eta',   'Gen-level subleading pt electron eta',   10, -5.5, 4.5);self.addObject(self.h_gen_Elec2eta )
-        self.h_gen_Elec2phi = ROOT.TH1F('gen_Elec2phi',   'Gen-level subleading pt electron phi',   10, 0, 4);self.addObject(self.h_gen_Elec2phi )
-
-        self.h_gen_Elec3pt  = ROOT.TH1F('gen_Elec3pt',   'Gen-level subsubleading pt electron pt',   100, 0, 800);self.addObject(self.h_gen_Elec3pt )
-        self.h_gen_Elec3eta = ROOT.TH1F('gen_Elec3eta',   'Gen-level subsubleading pt electron eta',   10, -5.5, 4.5);self.addObject(self.h_gen_Elec3eta )
-        self.h_gen_Elec3phi = ROOT.TH1F('gen_Elec3phi',   'Gen-level subsubleading pt electron phi',   10, 0, 4);self.addObject(self.h_gen_Elec3phi )
-
+        self.h_gen_Z1pt  = ROOT.TH1F('gen_Z1pt',   'Gen-level leading pt Z pt',   100, 0, 800);self.addObject(self.h_gen_Z1pt )
+        self.h_gen_Z1eta = ROOT.TH1F('gen_Z1eta',   'Gen-level leading pt Z eta',   10, -5.5, 4.5);self.addObject(self.h_gen_Z1eta )
+        self.h_gen_Z1phi = ROOT.TH1F('gen_Z1phi',   'Gen-level leading pt Z phi',   10, 0, 4);self.addObject(self.h_gen_Z1phi )
+        self.h_gen_Zptcorr = ROOT.TH1F('h_genZptcorr',   'Gen-level leading pt GenZpt Correction',   50, -10, 10);self.addObject(self.h_gen_Zptcorr )
+        
         ##Reco-level Objects
-        self.h_reco_Mu1pt  = ROOT.TH1F('reco_Mu1pt',   'Reco-level leading pt muon pt',   100, 0, 800);self.addObject(self.h_reco_Mu1pt )
-        self.h_reco_Mu1eta = ROOT.TH1F('reco_Mu1eta',   'Reco-level leading pt muon eta',   10, -5.5, 4.5);self.addObject(self.h_reco_Mu1eta )
-        self.h_reco_Mu1phi = ROOT.TH1F('reco_Mu1phi',   'Reco-level leading pt muon phi',   10, 0, 4);self.addObject(self.h_reco_Mu1phi )
+        self.h_reco_nMu = ROOT.TH1F('reco_nMu',   'Reco-level number of Muon',   15, -0.5, 14.5);self.addObject(self.h_reco_nMu )
+        self.h_reco_nEle = ROOT.TH1F('reco_nEle',   'Reco-level number of Electron',   15, -0.5, 14.5);self.addObject(self.h_reco_nEle )
+        self.h_reco_nTau = ROOT.TH1F('reco_nTau',   'Reco-level number of Tau',   15, -0.5, 14.5);self.addObject(self.h_reco_nTau )
+        self.h_reco_nPho = ROOT.TH1F('reco_nPho',   'Reco-level number of photon',   15, -0.5, 14.5);self.addObject(self.h_reco_nPho )
+        self.h_reco_nJet = ROOT.TH1F('reco_nJet',   'Reco-level number of jet',   15, -0.5, 14.5);self.addObject(self.h_reco_nJet )
 
-        self.h_reco_Mu2pt  = ROOT.TH1F('reco_Mu2pt',   'Reco-level subleading pt muon pt',   100, 0, 800);self.addObject(self.h_reco_Mu2pt )
-        self.h_reco_Mu2eta = ROOT.TH1F('reco_Mu2eta',   'Reco-level subleading pt muon eta',   10, -5.5, 4.5);self.addObject(self.h_reco_Mu2eta )
-        self.h_reco_Mu2phi = ROOT.TH1F('reco_Mu2phi',   'Reco-level subleading pt muon phi',   10, 0, 4);self.addObject(self.h_reco_Mu2phi )
+        recoDict={}
+        for objects in ["Mu","Elec","Tau","Pho","Jet"]:
+            for num in range(1,4):
+                key="reco_%s%s" %(objects,num)
+                recoDict["h_"+key+"pt"]=ROOT.TH1F(key+'pt',   '',   100, 0, 800)
+		recoDict["h_"+key+"eta"]=ROOT.TH1F(key+'eta',   '',   10, -5.5, 4.5)
+                recoDict["h_"+key+"phi"]=ROOT.TH1F(key+'phi',   '',   10, 0, 4)
+        for key, value in sorted(recoDict.iteritems()):
+            self.addObject(value)
 
-        self.h_reco_Mu3pt  = ROOT.TH1F('reco_Mu3pt',   'Reco-level subsubleading pt muon pt',   100, 0, 800);self.addObject(self.h_reco_Mu3pt )
-        self.h_reco_Mu3eta = ROOT.TH1F('reco_Mu3eta',   'Reco-level subsubleading pt muon eta',   10, -5.5, 4.5);self.addObject(self.h_reco_Mu3eta )
-        self.h_reco_Mu3phi = ROOT.TH1F('reco_Mu3phi',   'Reco-level subsubleading pt muon phi',   10, 0, 4);self.addObject(self.h_reco_Mu3phi )
-
-        self.h_reco_Elec1pt  = ROOT.TH1F('reco_Elec1pt',   'Reco-level leading pt electron pt',   100, 0, 800);self.addObject(self.h_reco_Elec1pt )
-        self.h_reco_Elec1eta = ROOT.TH1F('reco_Elec1eta',   'Reco-level leading pt electron eta',   10, -5.5, 4.5);self.addObject(self.h_reco_Elec1eta )
-        self.h_reco_Elec1phi = ROOT.TH1F('reco_Elec1phi',   'Reco-level leading pt electron phi',   10, 0, 4);self.addObject(self.h_reco_Elec1phi )
-
-        self.h_reco_Elec2pt  = ROOT.TH1F('reco_Elec2pt',   'Reco-level subleading pt electron pt',   100, 0, 800);self.addObject(self.h_reco_Elec2pt )
-        self.h_reco_Elec2eta = ROOT.TH1F('reco_Elec2eta',   'Reco-level subleading pt electron eta',   10, -5.5, 4.5);self.addObject(self.h_reco_Elec2eta )
-        self.h_reco_Elec2phi = ROOT.TH1F('reco_Elec2phi',   'Reco-level subleading pt electron phi',   10, 0, 4);self.addObject(self.h_reco_Elec2phi )
-
-        self.h_reco_Elec3pt  = ROOT.TH1F('reco_Elec3pt',   'Reco-level subsubleading pt electron pt',   100, 0, 800);self.addObject(self.h_reco_Elec3pt )
-        self.h_reco_Elec3eta = ROOT.TH1F('reco_Elec3eta',   'Reco-level subsubleading pt electron eta',   10, -5.5, 4.5);self.addObject(self.h_reco_Elec3eta )
-        self.h_reco_Elec3phi = ROOT.TH1F('reco_Elec3phi',   'Reco-level subsubleading pt electron phi',   10, 0, 4);self.addObject(self.h_reco_Elec3phi )
-
+        self.h_reco_Metpt  = ROOT.TH1F('reco_Metpt',   'Reco-level MET pt',   100, 0, 1000); self.addObject(self.h_reco_Metpt )
+        self.h_reco_Metet  = ROOT.TH1F('reco_Metet',   'Reco-level MET et',   100, 0, 1000); self.addObject(self.h_reco_Metet )
+        self.h_reco_Metphi = ROOT.TH1F('reco_Metphi',   'Reco-level MET phi',   10, 0, 4);   self.addObject(self.h_reco_Metphi )
+        
         #Composite Objects
-        self.h_ht  = ROOT.TH1F('ht',   'Hadronic Activity',   100, 0, 800);self.addObject(self.h_ht )
+        self.h_vpt=ROOT.TH1F('vpt',   'vpt',   100, 0, 800);self.addObject(self.h_vpt )
+        self.h_vmass=ROOT.TH1F('vmass',   'vmass',   100, 0, 200);self.addObject(self.h_vmass )
+        
+        self.h_htpt  = ROOT.TH1F('htpt',   'Hadronic Activity Pt',   100, 0, 1000);self.addObject(self.h_htpt )
+        self.h_htphi  = ROOT.TH1F('htphi',   'Hadronic Activity Pho',   10, 0, 4);self.addObject(self.h_htphi )
 
         ## GEN signal
         #self.h_w1 =ROOT.TH1D('isOSmumu', 'isOSmumu', 2,-0.5,1.5); self.addObject(self.h_w1 )
+    def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        self.FilesName=inputFile
+        pass
+    def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        pass
 
     def analyze(self, event):
 
@@ -95,27 +108,27 @@ class Analysis(Module):
         
         ## Electron
         electrons = Collection(event, "Electron")
-        ElecList =filter(lambda x: (x.pt>15 and x.cutBased>0), electrons)
-        nElecList=len(ElecList)
+        ElecList =filter(lambda x: (x.pt>15 and x.cutBased>3 and x.pfRelIso03_all<0.25), electrons)
+        nEle = len(ElecList)
 
         ## Muon
         muons = Collection(event, "Muon")
-        MuonList =filter(lambda x: (x.pt>5 and x.mediumId>0), muons)
-        nMuonList=len(MuonList)
+        MuonList =filter(lambda x: (x.pt>5 and x.mediumId>0 and x.pfRelIso03_all<0.25), muons)
+        nMu =len(MuonList)
 
         ## Taus
         taus = Collection(event, "Tau")
-        TauList =filter(lambda x: (x.pt>5 and fabs(x.eta)<2.5), taus)    
+        TauList =filter(lambda x: (x.pt>5 and fabs(x.eta)<2.5), taus)
         cleanFromlepton(TauList,ElecList)
         cleanFromlepton(TauList,MuonList)
         nTau = len(TauList)
-
+        
         ## Photon
         photons = Collection(event, "Photon")
         PhotonList =filter(lambda x: (x.pt>5 and fabs(x.eta)<2.5), photons)
         cleanFromlepton(PhotonList,ElecList)
         cleanFromlepton(PhotonList,MuonList)
-        nPhoton = len(PhotonList)
+        nPho = len(PhotonList)
 
         ## Jets
         jets = Collection(event, "Jet")
@@ -123,18 +136,26 @@ class Analysis(Module):
         #NOTE: cleaning by SSLep analysis Prescription
         cleanFromleptonSS(JetList,ElecList)
         cleanFromleptonSS(JetList,MuonList)
+        #cleanFromlepton(JetList,TauList)
+        
         nJet = len(JetList)
 
         #SUMHT
-        htpt = ROOT.TLorentzVector()
-        for jetlet in JetList:
-            htpt+=jetlet.p4()
+        htObj = ROOT.TLorentzVector()
+        for jet in JetList:
+            htObj+=jet.p4()
         #htpt = reduce(lambda x, y:x.p4()+y.p4(), JetList)
-        self.h_ht.Fill(htpt.Pt())
+        self.h_htpt.Fill(htObj.Pt())
+        self.h_htphi.Fill(htObj.Phi())
         
         ## MET
-        #METpt = event.MET_pt
+        self.h_reco_Metpt.Fill(event.MET_pt)
+        self.h_reco_Metphi.Fill(event.MET_phi)
+        self.h_reco_Metpt.Fill(event.MET_sumEt)
 
+        ## GenJet
+        genjets = Collection(event, "GenJet")
+        
         ########################################
         #                GEN LEVEL
         ########################################
@@ -151,190 +172,166 @@ class Analysis(Module):
             genparts = Collection(event, "GenPart")
             GenLists = filter(lambda x: x, genparts)
 
-            # GEN candidates objects with status code 62
-            #theGenZ = FindGenParticle(GenLists, [23,-23])
-            #theGenW = FindGenParticle(GenLists, [24,-24])
-            #theGenTop = FindGenParticle(GenLists, [6])
-            #theGenAntiTop = FindGenParticle(GenLists, [-6])
+            ## GEN candidates objects
+            # Gen V
+            theGenZ = FindGenParticle(GenLists, [23],22)
+            theGenW = FindGenParticle(GenLists, [24,-24],22)
+                
+            for gen in theGenW:
+                #print "pdgId = ", gen.pdgId , " ; pt = ", gen.pt , " ; mon = ", genparts[gen.genPartIdxMother].pdgId
+                if genparts[gen.genPartIdxMother].pdgId!=25:
+                    self.h_gen_W1pt.Fill(gen.pt)
+                    self.h_gen_W1eta.Fill(gen.eta)
+                    self.h_gen_W1phi.Fill(gen.phi)
+            # Gen Top
+            theGenTop = FindGenParticle(GenLists, [6],1)
+            theGenAntiTop = FindGenParticle(GenLists, [-6],1)
 
-            theWDecays1 = FindGenParticlebyStatus(GenLists, [11,-11,13,-13], 1, 62)
-            theWDecays2 = FindGenParticlebyStatus(GenLists, [11,-11,13,-13], 1, 22)
+            # GEN Leptons
+            genLepton = FindGenParticle(GenLists, [13,-13,11,-11],1)
+            genNeutrino = FindGenParticle(GenLists, [12,-12,14,-14],1)
+            genHadron = FindGenParticle(GenLists, [1,2,3,4,5,-1,-2,-3,-4,-5],1)
+            
+            genLep = filter(lambda x: ( isGenMother(x,[24,-24,25],62,genparts) and (x.pt>5 if abs(x.pdgId)==13 else x.pt>15) ), genLepton)
+            
+            #GEN-RECO matching
+            pairMu=genRecoFinder(genLep,MuonList)
+            pairElec=genRecoFinder(genLep,ElecList)
 
-            #mat = genRecoFinder(ElecList+MuonList,theWDecays1+theWDecays2)
-            #print "mat = ", mat
+            for num,pair in enumerate(pairMu):
 
-            #if len(theWDecays1)==1 and len(theWDecays2)==2:
-                #Reco matching with electron
-            RecoMatchList = genRecoFinder(ElecList+MuonList,theWDecays1+theWDecays2)
-                #print "RecoMatchList = ", RecoMatchList
-            RecoMatchList.sort(key=getpt, reverse=True)
-                #print "RecoMatchList = ", RecoMatchList
-            elef=0
-            muonf=0
-            for num,match in enumerate(RecoMatchList):
-                if abs(match[0].pdgId)==11:
-                    elef+=1
-                    if elef==1:
-                        #RECO
-                        self.h_reco_Elec1pt.Fill(match[0].pt)
-                        self.h_reco_Elec1eta.Fill(match[0].eta)
-                        self.h_reco_Elec1phi.Fill(match[0].phi)
-                        #GEN
-                        self.h_gen_Elec1pt.Fill(match[1].pt)
-                        self.h_gen_Elec1eta.Fill(match[1].eta)
-                        self.h_gen_Elec1phi.Fill(match[1].phi)
-                            
-                    elif elef==2:
-                        #RECO
-                        self.h_reco_Elec2pt.Fill(match[0].pt)
-                        self.h_reco_Elec2eta.Fill(match[0].eta)
-                        self.h_reco_Elec2phi.Fill(match[0].phi)
-                        #GEN
-                        self.h_gen_Elec2pt.Fill(match[1].pt)
-                        self.h_gen_Elec2eta.Fill(match[1].eta)
-                        self.h_gen_Elec2phi.Fill(match[1].phi)
-                            
-                    elif elef==3:
-                        #RECO
-                        self.h_reco_Elec3pt.Fill(match[0].pt)
-                        self.h_reco_Elec3eta.Fill(match[0].eta)
-                        self.h_reco_Elec3phi.Fill(match[0].phi)
-                        #GEN
-                        self.h_gen_Elec3pt.Fill(match[1].pt)
-                        self.h_gen_Elec3eta.Fill(match[1].eta)
-                        self.h_gen_Elec3phi.Fill(match[1].phi)
-                        
-                elif abs(match[0].pdgId)==13:
-                    muonf+=1
-                    if muonf==1:
-                        #RECO
-                        self.h_reco_Mu1pt.Fill(match[0].pt)
-                        self.h_reco_Mu1eta.Fill(match[0].eta)
-                        self.h_reco_Mu1phi.Fill(match[0].phi)
-                        #GEN
-                        self.h_gen_Mu1pt.Fill(match[1].pt)
-                        self.h_gen_Mu1eta.Fill(match[1].eta)
-                        self.h_gen_Mu1phi.Fill(match[1].phi)
-                            
-                    elif muonf==2:
-                        #RECO
-                        self.h_reco_Mu2pt.Fill(match[0].pt)
-                        self.h_reco_Mu2eta.Fill(match[0].eta)
-                        self.h_reco_Mu2phi.Fill(match[0].phi)
-                        #GEN
-                        self.h_gen_Mu2pt.Fill(match[1].pt)
-                        self.h_gen_Mu2eta.Fill(match[1].eta)
-                        self.h_gen_Mu2phi.Fill(match[1].phi)
+                getattr( self, "gen_Mu%spt" %(num+1) ).Fill(pair[0].pt)
+                getattr( self, "gen_Mu%seta" %(num+1) ).Fill(pair[0].eta)
+                getattr( self, "gen_Mu%sphi" %(num+1) ).Fill(pair[0].phi)
 
-                    elif muonf==3:
-                        #RECO
-                        self.h_reco_Mu3pt.Fill(match[0].pt)
-                        self.h_reco_Mu3eta.Fill(match[0].eta)
-                        self.h_reco_Mu3phi.Fill(match[0].phi)
-                        #GEN
-                        self.h_gen_Mu3pt.Fill(match[1].pt)
-                        self.h_gen_Mu3eta.Fill(match[1].eta)
-                        self.h_gen_Mu3phi.Fill(match[1].phi)
+                getattr( self, "genreco_Mu%spt" %(num+1) ).Fill(pair[1].pt)
+		getattr( self, "genreco_Mu%seta" %(num+1) ).Fill(pair[1].eta)
+                getattr( self, "genreco_Mu%sphi" %(num+1) ).Fill(pair[1].phi)
+                                
+            for num,pair in enumerate(pairElec):
+                
+                getattr( self, "gen_Elec%spt" %(num+1) ).Fill(pair[0].pt)
+		getattr( self, "gen_Elec%seta" %(num+1) ).Fill(pair[0].eta)
+                getattr( self, "gen_Elec%sphi" %(num+1) ).Fill(pair[0].phi)
 
-              
-            # W Boson
-            #byID
-            # w -> lv (44,62)
-            # h -> w -> ll (22,62)
-            theGenW1 = FindGenParticlebyStatus(GenLists, [24,-24], 62, 44)
-            theGenW2 = FindGenParticlebyStatus(GenLists, [24,-24], 22, 62)
-
-            # lepton
-
-
-            # EWK Correction
-            #####
-            # TopPtReweighting correction
-            #####
-
-            ##Fill
-            #if (theGenZ):
-            #    ##FILL
-            #if (theGenW):
-            #    ##FILL
-
-            ## SIGNAL STUDY
-
+                getattr( self, "genreco_Elec%spt" %(num+1) ).Fill(pair[1].pt)
+                getattr( self, "genreco_Elec%seta" %(num+1) ).Fill(pair[1].eta)
+                getattr( self, "genreco_Elec%sphi" %(num+1) ).Fill(pair[1].phi)
+                
+            #Perform PtZ correction computation
+            Zweight = 1.
+            NgenZ=0
+            if "DYJetsToLL" in self.FilesName.GetName().split('/')[-1].split('_')[0]:
+                for genZ in theGenZ:
+                    NgenZ+=1
+                    if NgenZ>1: continue
+                    Zpt=genZ.pt
+                    Zeta=genZ.eta
+                    Zphi=genZ.phi
+                    #Ugo's Prescription
+                    if Zpt<20: Zweight=1.2
+                    if Zpt>20 and Zpt<30: Zweight=1.
+                    if Zpt>30 and Zpt<40: Zweight=0.75
+                    if Zpt>40 and Zpt<50: Zweight=0.65
+                    if Zpt>50 and Zpt<200: Zweight=0.65-0.00034*Zpt
+                    if Zpt>200: Zweight=0.6
+                    self.h_gen_Z1pt.Fill(Zpt)
+                    self.h_gen_Z1eta.Fill(Zeta)
+                    self.h_gen_Z1phi.Fill(Zphi)
+        self.h_genZptcorr.Fill(Zweight)
 
         ########################################
-        #                ANALYSIS
+        #                ANALYSIS               ### TOMORROW CONTINUE HERE
         ########################################
-
+        
         ##Categorization base on number of leptons and flavour combination.
         isOSmumu=0; isOSee=0; isOSemu=0; isSSmumu=0; isSSee=0
-        #More then two lepton final state
-        if nElecList>=2 or nMuonList>=2:
-            if nElecList>=2 and nMuonList>=2:
+        if nMu>=2 or nEle>=2:
+            if nMu>=2 and nEle>=2:
+                #Leading Pt Muon take precedence
                 if MuonList[0].pt > ElecList[0].pt:
-                    # same sign muon
-                    if abs(MuonList[0].charge+MuonList[1].charge)==2:
-                        isSSmumu=1
-                    # opposite sign muon
-                    elif MuonList[0].charge + MuonList[1].charge==0:
+                    if MuonList[0].charge!=MuonList[1].charge:
                         isOSmumu=1
+                    elif  MuonList[0].charge==MuonList[1].charge:
+                        isSSmumu=1
                 else:
-                    # same sign electron
-                    if abs(ElecList[0].charge+ElecList[1].charge)==2:
-                        isSSee=1
-                    # opposite sign electron
-                    elif ElecList[0].charge + ElecList[1].charge==0:
+                    if ElecList[0].charge!=ElecList[0].charge:
                         isOSee=1
-        # One lepton final state
-        elif nElecList==1 or nMuonList==1:
-            if nElecList==1 and nMuonList==1:
-                # opposite sign; opposite flavor ; by construction electron is leading
-                if abs(MuonList[0].charge+ElecList[0].charge)==0 and ElecList[0].pt > MuonList[0].pt:
-                    isOSemu=1
+                    elif ElecList[0].charge==ElecList[0].charge:
+                        isSSee=1
+            elif nMu>=2:
+                if MuonList[0].charge!=MuonList[1].charge:
+                    isOSmumu=1
+                elif MuonList[0].charge==MuonList[1].charge:
+                    isSSmumu=1
+            elif nEle>=2:
+                if ElecList[0].charge!=ElecList[0].charge:
+                    isOSee=1
+                elif ElecList[0].charge==ElecList[0].charge:
+                    isSSee=1
+        elif nMu==1 and nEle==1:
+            if MuonList[0].pt < ElecList[0].pt:
+                isOSemu=1
 
         ########################################
         #       Reconstruction of V boson
         ########################################
 
-        ##Taking on only leading candidate
-        if isSSmumu or isOSmumu:
-            Vpt = invariantMassPt(\
-                MuonList[0].pt, MuonList[0].eta , MuonList[0].phi, MuonList[0].mass \
-                    ,MuonList[1].pt, MuonList[1].eta , MuonList[1].phi, MuonList[1].mass \
-                    )
-            Vmass = invariantMass(\
-                MuonList[0].pt, MuonList[0].eta , MuonList[0].phi, MuonList[0].mass \
-                    ,MuonList[1].pt, MuonList[1].eta , MuonList[1].phi, MuonList[1].mass \
-                    )
-        elif isSSee or isOSee:
-            Vpt = invariantMassPt(\
-                ElecList[0].pt, ElecList[0].eta , ElecList[0].phi, ElecList[0].mass \
-                    ,ElecList[1].pt, ElecList[1].eta , ElecList[1].phi, ElecList[1].mass \
-                    )
-            Vmass = invariantMass(\
-                ElecList[0].pt, ElecList[0].eta , ElecList[0].phi, ElecList[0].mass \
-                    ,ElecList[1].pt, ElecList[1].eta , ElecList[1].phi, ElecList[1].mass \
-                    )
-        elif isOSemu:
-            Vpt = invariantMassPt(\
-                ElecList[0].pt, ElecList[0].eta , ElecList[0].phi, ElecList[0].mass \
-                    ,MuonList[0].pt, MuonList[0].eta , MuonList[0].phi, MuonList[0].mass \
-                )
-            Vmass = invariantMass(\
-                ElecList[0].pt, ElecList[0].eta , ElecList[0].phi, ElecList[0].mass \
-                    ,MuonList[0].pt, MuonList[0].eta , MuonList[0].phi, MuonList[0].mass \
-                    )
-        else:
-            return False
+        ## Interesting Phase Space
+        Vpt=999.
+        Vmass=999.
+        if isOSmumu or isOSee or isSSmumu or isSSee:
+            if isSSmumu or isOSmumu:
+                V=MuonList[0].p4()+MuonList[1].p4()
+                Vpt=V.Pt()
+                Vmass=V.M()
 
+            elif isOSee or isSSee:
+                V=ElecList[0].p4()+ElecList[1].p4()
+                Vpt=V.Pt()
+                Vmass=V.M()
+        elif isOSemu:
+            V=ElecList[0].p4()+MuonList[0].p4()
+            Vpt=V.Pt()
+            Vmass=V.M()
+        
         ## Fill
         self.h_isOSmumu.Fill(isOSmumu)
         self.h_isOSee.Fill(isOSee)
         self.h_isOSemu.Fill(isOSemu)
         self.h_isSSmumu.Fill(isSSmumu)
         self.h_isSSee.Fill(isSSee)
-
+        
         self.h_vpt.Fill(Vpt)
         self.h_vmass.Fill(Vmass)
+        
+        ##Filling RECO Object
+        self.h_reco_nMu.Fill(nMu)
+        self.h_reco_nEle.Fill(nEle)
+        self.h_reco_nTau.Fill(nTau)
+        self.h_reco_nPho.Fill(nPho)
+        self.h_reco_nJet.Fill(nJet)
+        
+        for collection in [ ElecList , MuonList , TauList , PhotonList , JetList ]:
+
+            for num,reco in enumerate(collection):
+                if num>=3: continue
+                token="Elec"
+                if reco._prefix.split('_')[0]=="Muon":
+                    token="Mu"
+                elif reco._prefix.split('_')[0]=="Tau":
+                    token="Tau"
+                elif reco._prefix.split('_')[0]=="Photon":
+                    token="Pho"
+                elif reco._prefix.split('_')[0]=="Jet":
+                    token="Jet"
+                elif reco._prefix.split('_')[0]!="Electron":
+                    print "ERROR"
+                    exit()
+                    
+                getattr( self, "reco_%s%spt" %(token,num+1) ).Fill(reco.pt)
+                getattr( self, "reco_%s%seta" %(token,num+1) ).Fill(reco.eta)
+                getattr( self, "reco_%s%sphi" %(token,num+1) ).Fill(reco.phi)
 
         return True
 
@@ -345,9 +342,12 @@ preselection=""
 files=[
     #DIR+"HWminusJ_HToWWTo2L2Nu_WToLNu_M125_13TeV_powheg_pythia8-v1.root",
     #DIR+"HWplusJ_HToWWTo2L2Nu_WToLNu_M125_13TeV_powheg_pythia8-v1.root",
-    DIR+"HWminusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root",
+    #DIR+"HWminusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root",
     #DIR+"HWplusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root",
     #DIR+"VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root",
+    DIR+"DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root",
 ]
-p=PostProcessor(".",files,cut=preselection,branchsel=None,modules=[Analysis()],noOut=True,histFileName="vh.root",histDirName="plots")
+nEvent=30000
+
+p=PostProcessor(".",files,cut=preselection,branchsel=None,modules=[Analysis()],maxevent=nEvent,noOut=True,histFileName="Flat_"+files[0].split('/')[-1],histDirName="plots")
 p.run()

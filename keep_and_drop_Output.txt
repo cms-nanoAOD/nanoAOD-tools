@@ -1,0 +1,27 @@
+drop *
+
+keep Pileup*
+#keep GenJet*
+#keep GenJetAK8*
+#keep GenPart*
+keep PV*
+
+#keep Photon*
+#keep PuppiMET*
+#keep Tau*
+keep luminosityBlock
+#keep MET*
+#keep Muon*
+#keep Electron*
+#keep Jet*
+
+keepmatch HLT_IsoMu22
+keepmatch HLT_IsoMu22_eta2p1
+keepmatch HLT_IsoTkMu22_eta2p1
+keepmatch HLT_IsoMu24
+keepmatch HLT_IsoTkMu24
+keepmatch HLT_Mu45_eta2p1
+keepmatch HLT_Mu50
+keepmatch HLT_Ele25_WPTight_Gsf
+keepmatch HLT_Ele27_eta2p1_WPLoose_Gsf
+keepmatch HLT_Ele105_CaloIdVT_GsfTrkIdT
