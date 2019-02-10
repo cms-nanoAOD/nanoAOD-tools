@@ -93,14 +93,14 @@ class Producer(Module):
 	self.out.branch("JetEta", "F", 0, "nJet", "nJet", False)
         self.out.branch("JetPhi", "F", 0, "nJet", "nJet", False)
         self.out.branch("JetMass", "F", 0, "nJet", "nJet", False)
-        self.out.branch("JetSign", "I", 0, "nJet", "nJet", False)
+        #self.out.branch("JetSign", "I", 0, "nJet", "nJet", False)
 
         #CleanJet
         self.out.branch("CleanJetPt", "F", 0, "nCJet", "nCJet", False)
         self.out.branch("CleanJetEta", "F", 0, "nCJet", "nCJet", False)
         self.out.branch("CleanJetPhi", "F", 0, "nCJet", "nCJet", False)
         self.out.branch("CleanJetMass", "F", 0, "nCJet", "nCJet", False)
-        self.out.branch("CleanJetSign", "I", 0, "nCJet", "nCJet", False)
+        #self.out.branch("CleanJetSign", "I", 0, "nCJet", "nCJet", False)
         
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -195,7 +195,7 @@ class Producer(Module):
             JetEta[i] = ijet.eta
             JetPhi[i] = ijet.phi
             JetMass[i] = ijet.mass
-            JetSign[i] = ijet.partonFlavour
+            #JetSign[i] = ijet.partonFlavour
             #HT
             if ijet.pt<30: continue
             if fabs(ijet.eta)>2.5: continue
@@ -212,7 +212,7 @@ class Producer(Module):
             CleanJetEta[i] = icjet.eta
             CleanJetPhi[i] = icjet.phi
             CleanJetMass[i] = icjet.mass
-            CleanJetSign[i] = icjet.partonFlavour
+            #CleanJetSign[i] = icjet.partonFlavour
             
         #Inspecting "Clean jet"
         if self.debug:
@@ -454,14 +454,14 @@ class Producer(Module):
 	self.out.fillBranch("JetEta", JetEta)
         self.out.fillBranch("JetPhi", JetPhi)
         self.out.fillBranch("JetMass", JetMass)
-        self.out.fillBranch("JetSign", JetSign)
+        #self.out.fillBranch("JetSign", JetSign)
 
         #Cjet
         self.out.fillBranch("CleanJetPt", CleanJetPt)
         self.out.fillBranch("CleanJetEta", CleanJetEta)
         self.out.fillBranch("CleanJetPhi", CleanJetPhi)
         self.out.fillBranch("CleanJetMass", CleanJetMass)
-        self.out.fillBranch("CleanJetSign", CleanJetSign)
+        #self.out.fillBranch("CleanJetSign", CleanJetSign)
         
         self.out.fillBranch("nGoodElectron", nele);
         self.out.fillBranch("nGoodMuon", nmu);
