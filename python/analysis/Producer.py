@@ -79,7 +79,7 @@ class Producer(Module):
         self.out.branch("TauEta", "F", 0, "nTaulep", "nTaulep", False)
         self.out.branch("TauPhi", "F", 0, "nTaulep", "nTaulep", False)
         self.out.branch("TauMass", "F", 0, "nTaulep", "nTaulep", False)
-        self.out.branch("TauPartFlav", "I", 0, "nTaulep", "nTaulep", False)
+        #self.out.branch("TauPartFlav", "I", 0, "nTaulep", "nTaulep", False)
 
         #Photon
         self.out.branch("PhoPt", "F", 0, "nPho", "nPho", False)
@@ -158,14 +158,14 @@ class Producer(Module):
         cleanFromlepton(TauList,MuonList)
         ntau=len(TauList)
         #Initialization
-        TauPt=[0.]*(ntau); TauEta=[0.]*(ntau); TauPhi=[0.]*(ntau); TauMass=[0.]*(ntau); TauPartFlav=[0]*(ntau);
+        TauPt=[0.]*(ntau); TauEta=[0.]*(ntau); TauPhi=[0.]*(ntau); TauMass=[0.]*(ntau); #TauPartFlav=[0]*(ntau);
         for i,itau in enumerate(TauList):
             TauPt[i] = itau.pt
             TauEta[i] = itau.eta
             TauPhi[i] = itau.phi
             TauMass[i] = itau.mass
             ## https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc80X_doc.html#Tau
-            TauPartFlav[i] = itau.genPartFlav
+            #TauPartFlav[i] = itau.genPartFlav
             
         ## Photon
         PhotonList =filter(lambda x: (x.pt>15 and fabs(x.eta)<2.5), photons)
@@ -189,7 +189,7 @@ class Producer(Module):
         njet = len(JetListSS)
         ht = ROOT.TLorentzVector()
         #Initialization
-        JetPt=[0.]*(njet); JetEta=[0.]*(njet); JetPhi=[0.]*(njet); JetMass=[0.]*(njet); JetSign=[0]*(njet);
+        JetPt=[0.]*(njet); JetEta=[0.]*(njet); JetPhi=[0.]*(njet); JetMass=[0.]*(njet); #JetSign=[0]*(njet);
         for i,ijet in enumerate(JetListSS):
             JetPt[i] = ijet.pt
             JetEta[i] = ijet.eta
@@ -206,7 +206,7 @@ class Producer(Module):
         cleanFromlepton(CleanJetList,ElecList)
         cleanFromlepton(CleanJetList,MuonList)
         ncjet = len(CleanJetList)
-        CleanJetPt=[0.]*(ncjet); CleanJetEta=[0.]*(ncjet); CleanJetPhi=[0.]*(ncjet); CleanJetMass=[0.]*(ncjet); CleanJetSign=[0]*(ncjet);
+        CleanJetPt=[0.]*(ncjet); CleanJetEta=[0.]*(ncjet); CleanJetPhi=[0.]*(ncjet); CleanJetMass=[0.]*(ncjet); #CleanJetSign=[0]*(ncjet);
         for i,icjet in enumerate(CleanJetList):
             CleanJetPt[i] = icjet.pt
             CleanJetEta[i] = icjet.eta
@@ -440,7 +440,7 @@ class Producer(Module):
         self.out.fillBranch("TauEta", TauEta)
         self.out.fillBranch("TauPhi", TauPhi)
         self.out.fillBranch("TauMass", TauMass)
-        self.out.fillBranch("TauPartFlav", TauPartFlav)
+        #self.out.fillBranch("TauPartFlav", TauPartFlav)
         
         #Photon
         self.out.fillBranch("PhoPt", PhoPt)
