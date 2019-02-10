@@ -292,6 +292,7 @@ class Producer(Module):
             NgenZ=0
             if "DYJetsToLL" in self.FilesName.GetName().split('/')[-1].split('_')[0]:
                 for genZ in theGenZ:
+                    if genZ.status!=62: continue
                     NgenZ+=1
                     if NgenZ>1: continue
                     Zpt=genZ.pt
@@ -363,6 +364,26 @@ class Producer(Module):
                 GenWphi[num]=genW.phi
                 GenWsign[num]=genW.pdgId
                 GenWmass[num]=genW.mass
+
+            ##### Fill Gen-object
+            self.out.fillBranch("GenLpt", GenLpt)
+            self.out.fillBranch("GenLeta", GenLeta)
+            self.out.fillBranch("GenLphi", GenLphi)
+            self.out.fillBranch("GenLsign", GenLsign)
+            self.out.fillBranch("GenLmass", GenLmass)
+
+            # gen-reco
+            self.out.fillBranch("RecoLpt", RecoLpt)
+            self.out.fillBranch("RecoLeta", RecoLeta)
+            self.out.fillBranch("RecoLphi", RecoLphi)
+            self.out.fillBranch("RecoLsign", RecoLsign)
+            self.out.fillBranch("RecoLmass", RecoLmass)
+
+            self.out.fillBranch("GenWpt", GenWpt)
+            self.out.fillBranch("GenWeta", GenWeta)
+            self.out.fillBranch("GenWphi", GenWphi)
+            self.out.fillBranch("GenWsign", GenWsign)
+            self.out.fillBranch("GenWmass", GenWmass)
             
         ########################################
         #   ANALYSIS
@@ -395,28 +416,7 @@ class Producer(Module):
             Vpt=invariantMassPt(LepPt[0],LepEta[0],LepPhi[0],LepMass[0],LepPt[1],LepEta[1],LepPhi[1],LepMass[1])
 
 
-        #### END #######
-        
-        ##Fill GEN-Object
-        self.out.fillBranch("GenLpt", GenLpt)
-        self.out.fillBranch("GenLeta", GenLeta)
-        self.out.fillBranch("GenLphi", GenLphi)
-        self.out.fillBranch("GenLsign", GenLsign)
-        self.out.fillBranch("GenLmass", GenLmass)
-
-        # gen-reco
-        self.out.fillBranch("RecoLpt", RecoLpt)
-        self.out.fillBranch("RecoLeta", RecoLeta)
-        self.out.fillBranch("RecoLphi", RecoLphi)
-        self.out.fillBranch("RecoLsign", RecoLsign)
-        self.out.fillBranch("RecoLmass", RecoLmass)
-        
-        self.out.fillBranch("GenWpt", GenWpt)
-        self.out.fillBranch("GenWeta", GenWeta)
-        self.out.fillBranch("GenWphi", GenWphi)
-        self.out.fillBranch("GenWsign", GenWsign)
-        self.out.fillBranch("GenWmass", GenWmass)
-        
+        #### END #######        
         ##Fill RECO-Object
         self.out.fillBranch("isOSmumu",isOSmumu)
         self.out.fillBranch("isOSee",isOSee)
