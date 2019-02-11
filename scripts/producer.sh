@@ -16,4 +16,11 @@ module="PhysicsTools.NanoAODTools.analysis.Producer producer"
 #maxevent="2000"
 maxevent=$1
 
-python scripts/nano_postproc.py $outDir $fileIn -I $module -E ${maxevent} --bi ${bIn} --bo ${bOut}  #-b ${branches} #--bi ${bIn} --bo ${bOut}
+if [ -z "$maxevent" ]
+then
+    echo "No argument maxevent supplied"
+    echo "Example : ./producer.sh maxevent"
+    exit
+else
+    python scripts/nano_postproc.py $outDir $fileIn -I $module -E ${maxevent} --bi ${bIn} --bo ${bOut}  #-b ${branches} #--bi ${bIn} --bo ${bOut}
+fi
