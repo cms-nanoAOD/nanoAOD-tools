@@ -193,7 +193,7 @@ class Producer(Module):
         njet = len(JetListSS)
         ht = ROOT.TLorentzVector()
         #Initialization
-        JetPt=[0.]*(njet); JetEta=[0.]*(njet); JetPhi=[0.]*(njet); JetMass=[0.]*(njet); #JetSign=[0]*(njet);
+        JetPt=[0.]*(njet); JetEta=[0.]*(njet); JetPhi=[0.]*(njet); JetMass=[0.]*(njet); JetchHEF=[0.]*(njet); JetneHEF=[0.]*(njet) #JetSign=[0]*(njet);
         for i,ijet in enumerate(JetListSS):
             JetPt[i] = ijet.pt
             JetEta[i] = ijet.eta
@@ -212,7 +212,7 @@ class Producer(Module):
         cleanFromlepton(CleanJetList,ElecList)
         cleanFromlepton(CleanJetList,MuonList)
         ncjet = len(CleanJetList)
-        CleanJetPt=[0.]*(ncjet); CleanJetEta=[0.]*(ncjet); CleanJetPhi=[0.]*(ncjet); CleanJetMass=[0.]*(ncjet); #CleanJetSign=[0]*(ncjet);
+        CleanJetPt=[0.]*(ncjet); CleanJetEta=[0.]*(ncjet); CleanJetPhi=[0.]*(ncjet); CleanJetMass=[0.]*(ncjet); CleanJetchHEF=[0.]*(ncjet); CleanJetneHEF=[0.]*(ncjet); #CleanJetSign=[0]*(ncjet);
         for i,icjet in enumerate(CleanJetList):
             CleanJetPt[i] = icjet.pt
             CleanJetEta[i] = icjet.eta
