@@ -96,7 +96,7 @@ class Producer(Module):
         self.out.branch("JetchHEF", "F", 0, "nJet", "nJet", False)
         self.out.branch("JetneHEF", "F", 0, "nJet", "nJet", False)
         #self.out.branch("JetSign", "I", 0, "nJet", "nJet", False)
-
+        
         #CleanJet
         self.out.branch("CleanJetPt", "F", 0, "nCJet", "nCJet", False)
         self.out.branch("CleanJetEta", "F", 0, "nCJet", "nCJet", False)
@@ -105,7 +105,6 @@ class Producer(Module):
         self.out.branch("CleanJetchHEF", "F", 0, "nJet", "nJet", False)
         self.out.branch("CleanJetneHEF", "F", 0, "nJet", "nJet", False)
         #self.out.branch("CleanJetSign", "I", 0, "nCJet", "nCJet", False)
-        
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -136,30 +135,10 @@ class Producer(Module):
         MuonList =filter(lambda x: (x.pt>5 and fabs(x.eta)<2.4 and x.mediumId>0 ), muons)
         nmu =len(MuonList)
 
-        ## Lepton
-        LepList= ElecList + MuonList ; nlep=len(LepList)
-        LepList.sort(key=getPt, reverse=True)
-        #Initialization
-        LepPt=[0.]*(nlep); LepEta=[0.]*(nlep); LepPhi=[0.]*(nlep); LepMass=[0.]*(nlep); LepIso03=[0.]*(nlep); LepIso04=[0.]*(nlep); LepSign=[0]*(nlep);
-        LepMediumId=[-1]*(nlep); LepCutBased=[-1]*(nlep)
-        for i,ilep in enumerate(LepList):
-            LepPt[i]=ilep.pt
-            LepEta[i]=ilep.eta
-            LepPhi[i]=ilep.phi
-            LepMass[i]=ilep.mass
-            LepSign[i]=ilep.pdgId
-            if abs(LepSign[i])==11:
-                LepCutBased[i]=ilep.cutBased
-                LepIso03[i]=ilep.pfRelIso03_all
-            else:
-                LepMediumId[i]=ilep.mediumId
-                LepIso03[i]=ilep.pfRelIso03_all
-                LepIso04[i]=ilep.pfRelIso04_all
-        
+        LepList= ElecList + MuonList
         ## Taus
         TauList =filter(lambda x: (x.pt>18 and fabs(x.eta)<2.3), taus)
-        cleanFromlepton(TauList,ElecList)
-        cleanFromlepton(TauList,MuonList)
+        cleanFromlepton(TauList,LepList)
         ntau=len(TauList)
         #Initialization
         TauPt=[0.]*(ntau); TauEta=[0.]*(ntau); TauPhi=[0.]*(ntau); TauMass=[0.]*(ntau); #TauPartFlav=[0]*(ntau);
@@ -173,8 +152,7 @@ class Producer(Module):
             
         ## Photon
         PhotonList =filter(lambda x: (x.pt>15 and fabs(x.eta)<2.5), photons)
-        cleanFromlepton(PhotonList,ElecList)
-        cleanFromlepton(PhotonList,MuonList)
+        cleanFromlepton(PhotonList,LepList)
         npho = len(PhotonList)
         #Initialization
         PhoPt=[0.]*(npho); PhoEta=[0.]*(npho); PhoPhi=[0.]*(npho); PhoMass=[0.]*(npho); PhoSign=[0]*(npho);
@@ -187,13 +165,14 @@ class Producer(Module):
 
         ## Jets Analysis collection
         JetListSS =filter(lambda x: (x.pt>30 and fabs(x.eta)<2.5 and x.jetId>0 and x.puId>4), jets)
-        cleanFromleptonSS(JetListSS,ElecList)
-        cleanFromleptonSS(JetListSS,MuonList)
+        #cleanFromleptonSS(JetListSS,ElecList)
+        #cleanFromleptonSS(JetListSS,MuonList)
         #cleanFromleptonSS(JetListSS,TauList)
+        cleanFromleptonSS(JetListSS,LepList)
         njet = len(JetListSS)
         ht = ROOT.TLorentzVector()
         #Initialization
-        JetPt=[0.]*(njet); JetEta=[0.]*(njet); JetPhi=[0.]*(njet); JetMass=[0.]*(njet); JetchHEF=[0.]*(njet); JetneHEF=[0.]*(njet) #JetSign=[0]*(njet);
+        JetPt=[0.]*(njet); JetEta=[0.]*(njet); JetPhi=[0.]*(njet); JetMass=[0.]*(njet); JetchHEF=[0.]*(njet); JetneHEF=[0.]*(njet); #JetSign=[0]*(njet);
         for i,ijet in enumerate(JetListSS):
             JetPt[i] = ijet.pt
             JetEta[i] = ijet.eta
@@ -221,6 +200,27 @@ class Producer(Module):
             CleanJetchHEF[i] = icjet.chHEF
             CleanJetneHEF[i] = icjet.neHEF
             #CleanJetSign[i] = icjet.partonFlavour
+
+        #Lepton
+        nlep=len(LepList)
+        LepList.sort(key=getPt, reverse=True)
+        #Initialization
+        LepPt=[0.]*(nlep); LepEta=[0.]*(nlep); LepPhi=[0.]*(nlep); LepMass=[0.]*(nlep); LepIso03=[0.]*(nlep); LepIso04=[0.]*(nlep); LepSign=[0]*(nlep);
+        LepMediumId=[-1]*(nlep); LepCutBased=[-1]*(nlep)
+        for i,ilep in enumerate(LepList):
+            LepPt[i]=ilep.pt
+            LepEta[i]=ilep.eta
+            LepPhi[i]=ilep.phi
+            LepMass[i]=ilep.mass
+            LepSign[i]=ilep.pdgId
+            if abs(LepSign[i])==11:
+                LepCutBased[i]=ilep.cutBased
+                LepIso03[i]=ilep.pfRelIso03_all
+            else:
+                LepMediumId[i]=ilep.mediumId
+                LepIso03[i]=ilep.pfRelIso03_all
+                LepIso04[i]=ilep.pfRelIso04_all
+
             
         #Inspecting "Clean jet"
         if self.debug:
@@ -465,7 +465,8 @@ class Producer(Module):
         self.out.fillBranch("JetchHEF", JetchHEF)
         self.out.fillBranch("JetneHEF", JetneHEF)
         #self.out.fillBranch("JetSign", JetSign)
-
+        #self.out.fillBranch("JetdRLep", JetdRLep)
+        
         #Cjet
         self.out.fillBranch("CleanJetPt", CleanJetPt)
         self.out.fillBranch("CleanJetEta", CleanJetEta)
@@ -474,6 +475,7 @@ class Producer(Module):
         self.out.fillBranch("CleanJetchHEF", CleanJetchHEF)
         self.out.fillBranch("CleanJetneHEF", CleanJetneHEF)
         #self.out.fillBranch("CleanJetSign", CleanJetSign)
+        #self.out.fillBranch("CleanJetdRLep", CleanJetdRLep)
         
         self.out.fillBranch("nGoodElectron", nele);
         self.out.fillBranch("nGoodMuon", nmu);

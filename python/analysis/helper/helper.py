@@ -72,27 +72,74 @@ def cleanFromlepton(InList,leptonList,dR=0.4):
                 InList.remove(phyobj)
     InList.sort(key=getPt, reverse=True)
 
+#def cleanFromleptonSS(InList,leptonList,dR=0.4):
+#    for lepton in leptonList:
+#        for jet in InList:
+#            if deltaR(jet,lepton)<dR:
+#
+#                if lepton._prefix.split('_')[0]=="Muon":
+#                    if lepton.pt>5 and lepton.mediumId==1:
+#                        InList.remove(jet)
+#                    elif lepton.mediumId==1:
+#                        if jet.chHEF<0.1 or jet.neHEF<0.2:
+#                            InList.remove(jet)
+#                         
+#                if lepton._prefix.split('_')[0]=="Electron":
+#                    if lepton.pt>15 and lepton.cutBased>0:
+#                        InList.remove(jet)
+#                    elif lepton.cutBased>0:
+#                        if jet.chHEF<0.1 or jet.neHEF<0.2:
+#                            InList.remove(jet)
+#                        
+#    InList.sort(key=getPt, reverse=True)
+
 def cleanFromleptonSS(InList,leptonList,dR=0.4):
+    #cross clean leptonList
+    cleplist=[]
     for lepton in leptonList:
         for jet in InList:
             if deltaR(jet,lepton)<dR:
-
+                
                 if lepton._prefix.split('_')[0]=="Muon":
-                    if lepton.pt>5 and lepton.mediumId==1:
-                        InList.remove(jet)
-                    elif lepton.mediumId==1:
-                        if jet.chHEF<0.1 or jet.neHEF<0.2:
+                    if lepton.mediumId==1:
+                        if jet.chHEF>0.1 or (jet.chHEF<0.1 and jet.neHEF>0.2):
+                            #distinct jet
+                            leptonList.remove(lepton)
+                            break
+                        else:
+                            #good distinct lepton
                             InList.remove(jet)
-                         
-                if lepton._prefix.split('_')[0]=="Electron":
-                    if lepton.pt>15 and lepton.cutBased>0:
+                            continue
+                    elif lepton.mediumId==0:
+                        #bad distinct lepton
                         InList.remove(jet)
-                    elif lepton.cutBased>0:
-                        if jet.chHEF<0.1 or jet.neHEF<0.2:
-                            InList.remove(jet)
                         
+                elif lepton._prefix.split('_')[0]=="Electron":
+                    if lepton.cutBased>0:
+                        if jet.chHEF>0.1 or (jet.chHEF<0.1 and jet.neHEF>0.2):
+                            #distinct jet
+                            leptonList.remove(lepton)
+                            break
+                        else:
+                            #good distinct lepton
+                            InList.remove(jet)
+                            continue
+                    elif lepton.cutBased==0:
+                        #bad distinct lepton
+                        InList.remove(jet)
+
+    leptonList.sort(key=getPt, reverse=True)
     InList.sort(key=getPt, reverse=True)
 
+def dRClosestLep(ijet,leptonList):
+    mindR=9999.
+    for lepton in leptonList:
+        dR=deltaR(ijet,lepton)
+        if dR<mindR:
+            mindR=dR
+    if mindR>9900.: mindR = 6.5;
+    return mindR
+            
 #Find the last particle in the chain before decay 23 -> 23 -> *23* -> 13 -13, return an GEN Object/ RECO??
 def FindGenParticlebyStat(InList, pdgid, statusid):
 
