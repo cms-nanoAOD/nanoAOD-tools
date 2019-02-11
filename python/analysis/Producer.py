@@ -5,6 +5,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from math import fabs
 from PhysicsTools.NanoAODTools.analysis.helper.helper import *
+from PhysicsTools.NanoAODTools.postprocessing.tools import closest
 from ROOT import TLorentzVector
 
 class Producer(Module):
@@ -73,6 +74,7 @@ class Producer(Module):
         self.out.branch("LepSign", "I", 0, "nLepton", "nLepton", False)
         self.out.branch("LepMediumId", "I", 0, "nLepton", "nLepton", False)
         self.out.branch("LepCutBased", "I", 0, "nLepton", "nLepton", False)
+        self.out.branch("LepMindRJet", "F", 0, "nLepton", "nLepton", False)
 
         #Tau
         self.out.branch("TauPt", "F", 0, "nTaulep", "nTaulep", False)
@@ -205,8 +207,8 @@ class Producer(Module):
         nlep=len(LepList)
         LepList.sort(key=getPt, reverse=True)
         #Initialization
-        LepPt=[0.]*(nlep); LepEta=[0.]*(nlep); LepPhi=[0.]*(nlep); LepMass=[0.]*(nlep); LepIso03=[0.]*(nlep); LepIso04=[0.]*(nlep); LepSign=[0]*(nlep);
-        LepMediumId=[-1]*(nlep); LepCutBased=[-1]*(nlep)
+        LepPt=[0.]*(nlep); LepEta=[0.]*(nlep); LepPhi=[0.]*(nlep); LepMass=[0.]*(nlep); LepIso03=[0.]*(nlep); LepIso04=[0.]*(nlep); LepSign=[0]*(nlep); 
+        LepMediumId=[-1]*(nlep); LepCutBased=[-1]*(nlep); LepMindRJet=[6.5]*(nlep)
         for i,ilep in enumerate(LepList):
             LepPt[i]=ilep.pt
             LepEta[i]=ilep.eta
@@ -220,54 +222,9 @@ class Producer(Module):
                 LepMediumId[i]=ilep.mediumId
                 LepIso03[i]=ilep.pfRelIso03_all
                 LepIso04[i]=ilep.pfRelIso04_all
+            if closest(ilep,JetListSS)[1]<900:
+                LepMindRJet[i]=closest(ilep,JetListSS)[1]
 
-            
-        #Inspecting "Clean jet"
-        if self.debug:
-            for num,ijet in enumerate(JetListSS):
-                print num, "=== number of JET ==="
-                print "ijet.pt = ", ijet.pt
-                print "ijet.eta = ", ijet.eta
-                print "ijet.jetId = ", ijet.jetId
-                print "ijet.puId = ", ijet.puId
-
-                for num,index in enumerate([ijet.electronIdx1,ijet.electronIdx2]):
-
-                    if index==-1: continue
-                    if electrons[index].cutBased>=3 and ( ijet.chHEF<0.1 or ijet.neHEF<0.2): #and deltaR(ijet,electrons[index])<0.4:
-                        print "=== ",num,"st/nd Electron matching  ==="
-                        print "electron pt = ", electrons[index].pt
-                        print "electron eta = ", electrons[index].eta
-                        print "electron cutbase = ", electrons[index].cutBased
-                        print "electron pfRelIso03_all = ", electrons[index].pfRelIso03_all
-                        print "dr(jet,ele) = ", deltaR(ijet,electrons[index])
-                        print "Jet_chHEF = ", ijet.chHEF
-                        print "Jet_neHEF = ", ijet.neHEF
-                        print "len(ElecList) = ", len(ElecList)
-                        for iele in ElecList:
-                            print "iele.pt = ", iele.pt
-                            print "iele.cutBased = ", iele.cutBased
-                            print "iele.eta = ", iele.eta
-                        exit()
-                        
-                for num,index in enumerate([ijet.muonIdx1,ijet.muonIdx2]):
-                    
-                    if index==-1: continue
-                    if muons[index].mediumId==1 and ( ijet.chHEF<0.1 or ijet.neHEF<0.2): #and deltaR(ijet,muons[index])<0.4:
-                        print "=== ",num,"st/nd Muon matching  ==="
-                        print "first muon pt = ", muons[index].pt
-                        print "first muon eta = ", muons[index].eta
-                        print "first muon mediumId  = ", muons[index].mediumId
-                        print "first muon pfRelIso03_all = ", muons[index].pfRelIso03_all
-                        print "dr(jet,muon) = ", deltaR(ijet,muons[index])
-                        print "Jet_chHEF = ", ijet.chHEF
-		        print "Jet_neHEF = ", ijet.neHEF
-                        print "len(MuonList) = ", len(MuonList)
-                        for imu in MuonList:
-                            print "imu.pt = ", imu.pt
-                            print "imu.cutBased = ", imu.mediumId
-                            print "imu.eta = ", imu.eta
-                        exit()
 
         ###########################################
         #   GEN LEVEL
@@ -354,19 +311,6 @@ class Producer(Module):
             #Initialization
             GenWpt=[0.]*nPar; GenWeta=[0.]*nPar; GenWphi=[0.]*nPar; GenWsign=[0]*nPar; GenWmass=[0.]*nPar
             for num,genW in enumerate(theGenW):
-                #index=0
-                #if genW.pdgId==-24 and genW.status==62 and genW.statusFlags==10497:
-                #    index=0
-                #elif genW.pdgId==-24 and genW.status==22 and genW.statusFlags==14721:
-                #    index=1
-                #elif genW.pdgId==24 and genW.status==22 and genW.statusFlags==14721:
-                #    index=2
-                #elif genW.status==22 and genW.statusFlags==4481:
-                #    continue
-                #else:
-                #    print "GenW ERROR: DOUBLE COUNT"
-                #    exit()
-
                 GenWpt[num]=genW.pt
                 GenWeta[num]=genW.eta
                 GenWphi[num]=genW.phi
@@ -442,6 +386,7 @@ class Producer(Module):
         self.out.fillBranch("LepSign", LepSign)
         self.out.fillBranch("LepMediumId", LepMediumId)
         self.out.fillBranch("LepCutBased", LepCutBased)
+        self.out.fillBranch("LepMindRJet", LepMindRJet)
 
         #Tau
         self.out.fillBranch("TauPt", TauPt)
