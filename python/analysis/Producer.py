@@ -32,8 +32,6 @@ class Producer(Module):
         self.out.branch("isSSmumu","I")
         self.out.branch("isSSee","I")
 
-        self.out.branch("nGoodElectron", "I")
-        self.out.branch("nGoodMuon", "I")
         self.out.branch("htpt", "F")
         self.out.branch("htphi", "F")
         self.out.branch("Vmass", "F")
@@ -131,40 +129,10 @@ class Producer(Module):
         ## PRESELECTION + QUALITY SELECTION + PHASE SPACE SELECTION
         ## Electron
         ElecList =filter(lambda x: (x.pt>15 and fabs(x.eta)<2.4 and x.cutBased>0 ), electrons)
-        nele = len(ElecList)
-            
         ## Muon
         MuonList =filter(lambda x: (x.pt>5 and fabs(x.eta)<2.4 and x.mediumId>0 ), muons)
-        nmu =len(MuonList)
-
         LepList= ElecList + MuonList
-        ## Taus
-        TauList =filter(lambda x: (x.pt>18 and fabs(x.eta)<2.3), taus)
-        cleanFromlepton(TauList,LepList)
-        ntau=len(TauList)
-        #Initialization
-        TauPt=[0.]*(ntau); TauEta=[0.]*(ntau); TauPhi=[0.]*(ntau); TauMass=[0.]*(ntau); #TauPartFlav=[0]*(ntau);
-        for i,itau in enumerate(TauList):
-            TauPt[i] = itau.pt
-            TauEta[i] = itau.eta
-            TauPhi[i] = itau.phi
-            TauMass[i] = itau.mass
-            ## https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc80X_doc.html#Tau
-            #TauPartFlav[i] = itau.genPartFlav
-            
-        ## Photon
-        PhotonList =filter(lambda x: (x.pt>15 and fabs(x.eta)<2.5), photons)
-        cleanFromlepton(PhotonList,LepList)
-        npho = len(PhotonList)
-        #Initialization
-        PhoPt=[0.]*(npho); PhoEta=[0.]*(npho); PhoPhi=[0.]*(npho); PhoMass=[0.]*(npho); PhoSign=[0]*(npho);
-        for i,ipho in enumerate(PhotonList):
-            PhoPt[i] = ipho.pt
-            PhoEta[i] = ipho.eta
-            PhoPhi[i] = ipho.phi
-            PhoMass[i] = ipho.mass
-            PhoSign[i] = ipho.pdgId
-
+        
         ## Jets Analysis collection
         JetListSS =filter(lambda x: (x.pt>30 and fabs(x.eta)<2.5 and x.jetId>0 and x.puId>4), jets)
         #cleanFromleptonSS(JetListSS,ElecList)
@@ -225,6 +193,32 @@ class Producer(Module):
             if closest(ilep,JetListSS)[1]<900:
                 LepMindRJet[i]=closest(ilep,JetListSS)[1]
 
+        #Tau
+        TauList =filter(lambda x: (x.pt>18 and fabs(x.eta)<2.3), taus)
+        cleanFromlepton(TauList,LepList)
+        ntau=len(TauList)
+        #Initialization
+        TauPt=[0.]*(ntau); TauEta=[0.]*(ntau); TauPhi=[0.]*(ntau); TauMass=[0.]*(ntau); #TauPartFlav=[0]*(ntau); 
+        for i,itau in enumerate(TauList):
+            TauPt[i] = itau.pt
+            TauEta[i] = itau.eta
+            TauPhi[i] = itau.phi
+            TauMass[i] = itau.mass
+            ## https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc80X_doc.html#Tau
+            #TauPartFlav[i] = itau.genPartFlav
+
+        ## Photon                                                                                                                  
+        PhotonList =filter(lambda x: (x.pt>15 and fabs(x.eta)<2.5), photons)
+        cleanFromlepton(PhotonList,LepList)
+        npho = len(PhotonList)
+        #Initialization
+        PhoPt=[0.]*(npho); PhoEta=[0.]*(npho); PhoPhi=[0.]*(npho); PhoMass=[0.]*(npho); PhoSign=[0]*(npho);
+        for i,ipho in enumerate(PhotonList):
+            PhoPt[i] = ipho.pt
+            PhoEta[i] = ipho.eta
+            PhoPhi[i] = ipho.phi
+            PhoMass[i] = ipho.mass
+            PhoSign[i] = ipho.pdgId
 
         ###########################################
         #   GEN LEVEL
@@ -422,8 +416,6 @@ class Producer(Module):
         #self.out.fillBranch("CleanJetSign", CleanJetSign)
         #self.out.fillBranch("CleanJetdRLep", CleanJetdRLep)
         
-        self.out.fillBranch("nGoodElectron", nele);
-        self.out.fillBranch("nGoodMuon", nmu);
         self.out.fillBranch("htpt",ht.Pt())
         self.out.fillBranch("htphi",ht.Phi())
         self.out.fillBranch("Vmass",Vmass)

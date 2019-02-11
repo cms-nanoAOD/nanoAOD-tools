@@ -72,27 +72,6 @@ def cleanFromlepton(InList,leptonList,dR=0.4):
                 InList.remove(phyobj)
     InList.sort(key=getPt, reverse=True)
 
-#def cleanFromleptonSS(InList,leptonList,dR=0.4):
-#    for lepton in leptonList:
-#        for jet in InList:
-#            if deltaR(jet,lepton)<dR:
-#
-#                if lepton._prefix.split('_')[0]=="Muon":
-#                    if lepton.pt>5 and lepton.mediumId==1:
-#                        InList.remove(jet)
-#                    elif lepton.mediumId==1:
-#                        if jet.chHEF<0.1 or jet.neHEF<0.2:
-#                            InList.remove(jet)
-#                         
-#                if lepton._prefix.split('_')[0]=="Electron":
-#                    if lepton.pt>15 and lepton.cutBased>0:
-#                        InList.remove(jet)
-#                    elif lepton.cutBased>0:
-#                        if jet.chHEF<0.1 or jet.neHEF<0.2:
-#                            InList.remove(jet)
-#                        
-#    InList.sort(key=getPt, reverse=True)
-
 def cleanFromleptonSS(InList,leptonList,dR=0.4):
     #cross clean leptonList
     cleplist=[]
@@ -102,7 +81,8 @@ def cleanFromleptonSS(InList,leptonList,dR=0.4):
                 
                 if lepton._prefix.split('_')[0]=="Muon":
                     if lepton.mediumId==1:
-                        if jet.chHEF>0.1 or (jet.chHEF<0.1 and jet.neHEF>0.2):
+                        #if jet.chHEF>0.1 or (jet.chHEF<0.1 and jet.neHEF>0.2):
+                        if jet.chHEF>0.1 or jet.neHEF>0.2:
                             #distinct jet
                             leptonList.remove(lepton)
                             break
@@ -116,7 +96,8 @@ def cleanFromleptonSS(InList,leptonList,dR=0.4):
                         
                 elif lepton._prefix.split('_')[0]=="Electron":
                     if lepton.cutBased>0:
-                        if jet.chHEF>0.1 or (jet.chHEF<0.1 and jet.neHEF>0.2):
+                        #if jet.chHEF>0.1 or (jet.chHEF<0.1 and jet.neHEF>0.2):
+                        if jet.chHEF>0.1 or jet.neHEF>0.2:
                             #distinct jet
                             leptonList.remove(lepton)
                             break
@@ -130,15 +111,6 @@ def cleanFromleptonSS(InList,leptonList,dR=0.4):
 
     leptonList.sort(key=getPt, reverse=True)
     InList.sort(key=getPt, reverse=True)
-
-def dRClosestLep(ijet,leptonList):
-    mindR=9999.
-    for lepton in leptonList:
-        dR=deltaR(ijet,lepton)
-        if dR<mindR:
-            mindR=dR
-    if mindR>9900.: mindR = 6.5;
-    return mindR
             
 #Find the last particle in the chain before decay 23 -> 23 -> *23* -> 13 -13, return an GEN Object/ RECO??
 def FindGenParticlebyStat(InList, pdgid, statusid):
@@ -146,12 +118,6 @@ def FindGenParticlebyStat(InList, pdgid, statusid):
     newList=[]
     for element in InList:
         if element.pdgId in pdgid and element.status in statusid:
-            #BIT 0; 8; 13; 14
-            #if bitwise(element.statusFlags,0) and \
-            #        bitwise(element.statusFlags,8) and \
-            #        bitwise(element.statusFlags,13) and \
-            #        bitwise(element.statusFlags,14):
-            #if element.status in ['62','1']:
             newList.append(element)
     if len(newList)>0:
         newList.sort(key=getPt, reverse=True)
@@ -193,22 +159,6 @@ def fromHardProcess(particle,genpart):
             return True
 	moId=genpart[moId].genPartIdxMother
     return False
-
-#def recoFinder(obj1s,obj2s):
-#    
-#    dicts=matchObjectCollectionMultiple(obj1s,obj2s,0.4,lambda x,y : x.pdgId==y.pdgId)
-#    #else:                                                                                                                                                           
-#    #    dicts=matchObjectCollectionMultiple(obj1s,obj2s,0.4,lambda x,y : x.partonFlavour==y.pdgId)                                                          
-#    #print "dicts = ", dicts
-#    recoflatten=[]
-#    for key, value in dicts.iteritems():
-#        if value is None: continue # None means genparts list is empty.
-#        if len(value)==0: continue # empty list mean unsuccessful deltaR matching from GEN to Reco                                                              
-#        #print "key = ", key                                                                                                        
-#        #print "value[0].pdgId = ", value[0].pdgId
-#        recoflatten.append(key)
-#
-#    return recoflatten
 
 def genRecoFinder(obj1s,obj2s):
 
