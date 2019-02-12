@@ -58,7 +58,7 @@ Electron_noOverlapRemov=[
     ]
 
 
-#samples = SingleMuon+SingleElectron+MuonEG+DoubleMuon+DoubleElectron+MET+Electron_noOverlapRemov
-samples = Electron_noOverlapRemov
+samples = SingleMuon+SingleElectron+MuonEG+DoubleMuon+DoubleElectron+MET#+Electron_noOverlapRemov
+#samples = Electron_noOverlapRemov
 for sample in samples:
     sample.options['isData'] = True
