@@ -67,7 +67,7 @@ _crabGlobalOptions = {}
 
 def getCrabOption(name, default=None):
    global _crabGlobalOptions
-   return _crabGlobalOptions[name] if name in _crabGlobalOptions else default
+   return eval(_crabGlobalOptions[name]) if name in _crabGlobalOptions else default
 
 def setCrabOption(name, value=True):
    global _crabGlobalOptions

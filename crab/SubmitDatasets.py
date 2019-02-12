@@ -14,7 +14,7 @@ g1.add_option("-o", "--option", dest="extraOptions", type="string", action="appe
 g2 = OptionGroup(parser,"Stageout options")
 g2.add_option("-s", "--storage-site", dest="storageSite", help="site where the output should be staged out (T2_XX_YYYY)")
 g2.add_option("-d", "--output-dir", dest="outputDir", help="name of the directory where files will be staged out", default="nanoAOD")
-g2.add_option("-l", "--production-label", dest="production_label", help="production label", default="myNanoAODSkim")
+g2.add_option("-l", "--production-label", dest="production_label", help="production label", default="myNanoAODSkim_v4")
 
 parser.add_option_group(g2)
 g2.add_option("--only-unpacked", dest="only_unpacked", default=False, action="store_true", help="Only return the unpacked files, not the whole compressed output directory")

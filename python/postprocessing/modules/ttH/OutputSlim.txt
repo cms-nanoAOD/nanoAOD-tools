@@ -56,3 +56,4 @@ keep HLT_*TripleEl*
 keep HLT_*TripleMu*
 keep HLT_*SameSign*
 keep HLT_*DoubleMuSS*
+keep HLT_*MET*

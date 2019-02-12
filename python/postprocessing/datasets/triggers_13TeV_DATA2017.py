@@ -3,7 +3,10 @@
 triggers_mumu_iso    = [ "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8",
                          "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8",
                          "HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass3p8", 
-                         "HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass8", ] # Note: Mass3p8 and 19/9 missing in early data 
+                         "HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass8",
+                         "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v"
+                         "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v",
+                         ] # Note: Mass3p8 and 19/9 missing in early data 
 triggers_mumu_noniso = [ "HLT_Mu37_TkMu27" ] # Only in late data
 triggers_mumu_ss = [ "HLT_Mu18_Mu9_SameSign", # Only in late data
                      "HLT_Mu18_Mu9_SameSign_DZ", 
@@ -20,6 +23,9 @@ triggers_ee_noniso = ["HLT_DoubleEle25_CaloIdL_MW", # 25 and 27 missing in early
 triggers_mue   = [ "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL",  # NoDZ version only from 2017C
                    "HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", 
                    "HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ" ] # Mu8/Ele23 w/o DZ is always prescaled
+
+triggers_mue_noiso = [ 'HLT_Mu27_Ele37_CaloIdL_MW',
+                       'HLT_Mu37_Ele27_CaloIdL_MW']
 
 # note: all dilepton+HT are missing in the early part of the data taking (2017B)
 triggers_mumu_ht =  [ "HLT_DoubleMu8_Mass8_PFHT350",
@@ -80,6 +86,9 @@ triggers_leptau = ["HLT_IsoMu27_LooseChargedIsoPFTau20_SingleL1",
 triggers_htmet = ['HLT_PFHT500_PFMET100_PFMHT100_IDTight']
 
 triggers_metNoMu100_mhtNoMu100=["HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60"]
+
+triggers_met = [ 'HLT_PFMET120_PFMHT120_IDTight',
+                 'HLT_PFMET120_PFMHT120_IDTight_PFHT60']
 
 triggers_pfht = ["HLT_PFHT180",
                  "HLT_PFHT250",
