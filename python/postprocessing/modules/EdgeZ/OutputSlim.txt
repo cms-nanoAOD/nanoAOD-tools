@@ -1,8 +1,6 @@
 drop LHE*
-drop Tau*
 
 drop CaloMET*
-drop FatJet*
 drop GenJetAK8*
 drop GenVisTau*
 drop Photon*
@@ -17,6 +15,7 @@ drop OtherPV*
 drop SV*
 drop Muon*
 drop Electron*
+drop IsoTrack*
 
 # keep leptons
 keep LepGood*
@@ -57,3 +56,4 @@ keep HLT_*TripleEl*
 keep HLT_*TripleMu*
 keep HLT_*SameSign*
 keep HLT_*DoubleMuSS*
+keep HLT_*MET*

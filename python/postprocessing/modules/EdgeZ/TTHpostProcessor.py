@@ -16,27 +16,15 @@ inputSlim  = os.environ['CMSSW_BASE']+"/python/PhysicsTools/NanoAODTools/postpro
 
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.collectionMerger import collectionMerger
-from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.skimNRecoLeps import SkimRecoLeps
-#from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.l1JetCalibrations import l1JetCalibrations
-from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.isoTrackAnalysis import IsoTrackAnalysis
+from PhysicsTools.NanoAODTools.postprocessing.modules.EdgeZ.skimNRecoLeps import SkimRecoLeps
+from PhysicsTools.NanoAODTools.postprocessing.modules.EdgeZ.isoTrackAnalysis import IsoTrackAnalysis
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.TriggerBitFilter import TriggerBitFilter
+from PhysicsTools.NanoAODTools.postprocessing.modules.EdgeZ.edgeFriends import edgeFriends, _susyEdgeTight, _susyEdgeLoose
 
-#
-minelpt  = 5
-minmupt  = 5
-maxeleta = 2.5
-maxmueta = 2.4
 
-isoAndIPCuts = lambda  x : x.miniPFRelIso_all < 0.4  and abs(x.dxy) < 0.05 and abs(x.dz) < 0.1 and x.sip3d < 8 
 
-susy_ttH_el  = lambda x  : x.pt > minelpt and abs(x.eta) < maxeleta and x.mvaFall17V1noIso_WPL and isoAndIPCuts(x)
-susy_ttH_mu  = lambda x : x.pt > minmupt and abs(x.eta) < maxmueta  and isoAndIPCuts(x)
-
-top_el       = lambda x : x.pt > 20 and x.lostHits < 2 and x.cutBased == 4 and x.pfRelIso03_all < 0.0588 # (pf iso larger than the cuts used)
-top_mu       = lambda x : x.pt > 20 and x.tightId  and x.pfRelIso04_all < 0.4
-
-goodElec =  lambda x : susy_ttH_el(x) or top_el(x)
-goodMuon =  lambda x : susy_ttH_mu(x) or top_mu(x)
+goodElec =  lambda x : _susyEdgeLoose(x)
+goodMuon =  lambda x : _susyEdgeLoose(x)
 
 goodLepProducer = collectionMerger(input=["Electron","Muon"], output="LepGood",
                                    maxObjects=10,
@@ -47,12 +35,16 @@ goodLepProducer = collectionMerger(input=["Electron","Muon"], output="LepGood",
 puAutoWeight     = puAutoWeight()
 isoTrackAnalysis = IsoTrackAnalysis(storeCollection=True) # store collection only for synch
 
+edgeFriends = edgeFriends("Edge", lambda lep : _susyEdgeTight(lep),
+                          cleanJet = lambda lep,jet,dr : (jet.pt < 35 and dr < 0.4))
+
 from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import * 
+
 
 def BuildJsonForTesting():
 
  
-    sampOpt = { 'isData' : False,
+    sampOpt = { 'isData' : True,
                 'triggers' : [], #triggers_mumu_iso + triggers_3mu , # [],#triggers_ee + triggers_3e+triggers_ee_noniso,
                 'vetotriggers' : [],#triggers_mumu_iso + triggers_3mu,
                 'json':   None # '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
@@ -130,7 +122,7 @@ def LoadCfgToRun(inputFile=None):
     sampoptjson.close()
 
     skimRecoLeps     = SkimRecoLeps(sampOpt['isData'] == True, nMinLeps=2)
-    mod = [puAutoWeight,  goodLepProducer, skimRecoLeps, isoTrackAnalysis]
+    mod = [puAutoWeight,  goodLepProducer, skimRecoLeps, isoTrackAnalysis, edgeFriends]
     if sampOpt['isData']: 
         mod.remove( puAutoWeight ) 
     else:
@@ -170,9 +162,9 @@ else:
 
     BuildJsonForTesting()
     filepath  = [
-        #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/Run2017C_MuonEG_Nano14Dec2018-v1_F7055783-BE3F-BF4B-83A2-64A73E13EA85.root',
+        '/pool/ciencias/userstorage/sscruz/NanoAOD_test/Run2017C_MuonEG_Nano14Dec2018-v1_F7055783-BE3F-BF4B-83A2-64A73E13EA85.root',
         #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/SingleMuon_612BB142-CD08-B14D-BA60-2311FA0F2BD2.root',
-        '/pool/ciencias/userstorage/sscruz/NanoAOD_test/TTbar_4B84BCC5-FE7C-714B-81AD-5A76C3B511FF.root',
+        #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/TTbar_4B84BCC5-FE7C-714B-81AD-5A76C3B511FF.root',
                   ]
 
 
