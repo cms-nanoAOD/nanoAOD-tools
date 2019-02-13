@@ -48,21 +48,21 @@ class edgeFriends:
         vector = ROOT.vector('string')()
         vector.push_back("up")
         vector.push_back("down") 
-        self.calib = ROOT.BTagCalibration("csvv2",os.environ['CMSSW_BASE'] + "/src/CMGTools/TTHAnalysis/data/edge/btaggingweights/CSVv2_94XSF_V1_B_F.csv")
+        self.calib = ROOT.BTagCalibration("csvv2",os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/edge/btaggingweights/CSVv2_94XSF_V1_B_F.csv")
         self.reader_heavy = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
         self.reader_heavy.load(self.calib, 0, "comb") #0 means b-jets
         self.reader_c = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
         self.reader_c.load(self.calib, 1, "comb") #0 means b-jets
         self.reader_light = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
         self.reader_light.load(self.calib, 2, "incl") #0 means b-jets
-        self.calibFASTSIM = ROOT.BTagCalibration("csvv2", os.environ['CMSSW_BASE'] + "/src/CMGTools/TTHAnalysis/data/edge/btaggingweights/fastsim_csvv2_ttbar_26_1_2017.csv")
+        self.calibFASTSIM = ROOT.BTagCalibration("csvv2", os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/edge/btaggingweights/fastsim_csvv2_ttbar_26_1_2017.csv")
         self.reader_heavy_FASTSIM = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
         self.reader_heavy_FASTSIM.load(self.calibFASTSIM, 0, "fastsim") #0 means b-jets
         self.reader_c_FASTSIM = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
         self.reader_c_FASTSIM.load(self.calibFASTSIM, 1, "fastsim") #0 means b-jets
         self.reader_light_FASTSIM = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
         self.reader_light_FASTSIM.load(self.calibFASTSIM, 2, "fastsim") #0 means b-jets
-        self.f_btag_eff      = ROOT.TFile(os.environ['CMSSW_BASE'] + "/src/CMGTools/TTHAnalysis/data/edge/btaggingweights/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root")
+        self.f_btag_eff      = ROOT.TFile(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/edge/btaggingweights/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root")
         self.h_btag_eff_b    = copy.deepcopy(self.f_btag_eff.Get("h2_BTaggingEff_csv_med_Eff_b"   ))
         self.h_btag_eff_c    = copy.deepcopy(self.f_btag_eff.Get("h2_BTaggingEff_csv_med_Eff_c"   ))
         self.h_btag_eff_udsg = copy.deepcopy(self.f_btag_eff.Get("h2_BTaggingEff_csv_med_Eff_udsg"))
@@ -82,19 +82,19 @@ class edgeFriends:
                              'GenSusyMChargino'  , 'GenSusyMChargino2']
         
         ###################################### List of triggers
-        self.triggerlist = [ 'HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',
-                             'HLT_BIT_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',
-                             'HLT_BIT_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ',
-                             'HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',
-                             'HLT_BIT_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL',
-                             'HLT_BIT_HLT_DoubleEle25_CaloIdL_MW',
-                             'HLT_BIT_HLT_DoubleEle27_CaloIdL_MW',
-                             'HLT_BIT_HLT_DoubleEle33_CaloIdL_MW',
-                             'HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8',
-                             'HLT_BIT_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8',
-                             'HLT_BIT_HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass3p8',
-                             'HLT_BIT_HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass8',
-                             'HLT_BIT_HLT_Mu37_TkMu27',
+        self.triggerlist = [ 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',
+                             'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',
+                             'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ',
+                             'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',
+                             'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL',
+                             'HLT_DoubleEle25_CaloIdL_MW',
+                             'HLT_DoubleEle27_CaloIdL_MW',
+                             'HLT_DoubleEle33_CaloIdL_MW',
+                             'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8',
+                             'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8',
+                             'HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass3p8',
+                             'HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass8',
+                             'HLT_Mu37_TkMu27',
                              'HLT_PFHT180',
                              'HLT_PFHT250',
                              'HLT_PFHT370',
