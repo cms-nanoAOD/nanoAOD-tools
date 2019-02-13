@@ -11,8 +11,8 @@ import json
 cut = None
 
 ### SLIM FILE
-outputSlim = os.environ['CMSSW_BASE']+"/python/PhysicsTools/NanoAODTools/postprocessing/modules/ttH/OutputSlim.txt"
-inputSlim  = os.environ['CMSSW_BASE']+"/python/PhysicsTools/NanoAODTools/postprocessing/modules/ttH/InputSlim.txt"
+outputSlim = os.environ['CMSSW_BASE']+"/python/PhysicsTools/NanoAODTools/postprocessing/modules/EdgeZ/OutputSlim.txt"
+inputSlim  = os.environ['CMSSW_BASE']+"/python/PhysicsTools/NanoAODTools/postprocessing/modules/EdgeZ/InputSlim.txt"
 
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.collectionMerger import collectionMerger
@@ -162,7 +162,7 @@ else:
 
     BuildJsonForTesting()
     filepath  = [
-        '/pool/ciencias/userstorage/sscruz/NanoAOD_test/Run2017C_MuonEG_Nano14Dec2018-v1_F7055783-BE3F-BF4B-83A2-64A73E13EA85.root',
+        '/afs/cern.ch/work/s/sesanche/public/forEdge/test_forsynch_v4.root'
         #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/SingleMuon_612BB142-CD08-B14D-BA60-2311FA0F2BD2.root',
         #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/TTbar_4B84BCC5-FE7C-714B-81AD-5A76C3B511FF.root',
                   ]
