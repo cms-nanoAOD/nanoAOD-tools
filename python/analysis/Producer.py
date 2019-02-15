@@ -234,7 +234,7 @@ class Producer(Module):
             genparts = Collection(event, "GenPart")
             GenLists=filter(lambda x:x,genparts)
             ## GEN candidates objects
-            theGenZ = FindGenParticlebyStat(GenLists, [23],[23])
+            theGenZ = FindGenParticlebyStat(GenLists, [23],[62])
             theGenw = FindGenParticlebyStat(GenLists, [24,-24],[22,62])
             theGenW =filter(lambda x: x.statusFlags!=4481,theGenw)
             # Gen Top
@@ -249,9 +249,10 @@ class Producer(Module):
             ## GEN Zpt weight
             Zweight = 1.
             NgenZ=0
+
             if "DYJetsToLL" in self.FilesName.GetName().split('/')[-1].split('_')[0]:
                 for genZ in theGenZ:
-                    if genZ.status!=62: continue
+                    #if genZ.status!=62: continue
                     NgenZ+=1
                     if NgenZ>1: continue
                     Zpt=genZ.pt
