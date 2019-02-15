@@ -272,11 +272,12 @@ class Producer(Module):
             
             #GEN-Lepton
             #Initialization
-            nPar=3
-            GenLpt=[0.]*nPar; GenLeta=[0.]*nPar; GenLphi=[0.]*nPar; GenLsign=[0]*nPar; GenLmass=[0.]*nPar
-            RecoLpt=[0.]*nPar; RecoLeta=[0.]*nPar; RecoLphi=[0.]*nPar; RecoLsign=[0]*nPar; RecoLmass=[0.]*nPar
+            nPart=3 ## Number of lepton to write
+            GenLpt=[0.]*nPart; GenLeta=[0.]*nPart; GenLphi=[0.]*nPart; GenLsign=[0]*nPart; GenLmass=[0.]*nPart
+            RecoLpt=[0.]*nPart; RecoLeta=[0.]*nPart; RecoLphi=[0.]*nPart; RecoLsign=[0]*nPart; RecoLmass=[0.]*nPart
             matchPair=genRecoFinder(genLepton,ElecList+MuonList)
             for num,igenlep in enumerate(matchPair):
+                if (num+1)>nPart: continue
                 genlep=igenlep[0]
                 recolep=igenlep[1]
                 #W mom from outer leg
@@ -304,8 +305,9 @@ class Producer(Module):
 
             #GEN-Wboson
             #Initialization
-            GenWpt=[0.]*nPar; GenWeta=[0.]*nPar; GenWphi=[0.]*nPar; GenWsign=[0]*nPar; GenWmass=[0.]*nPar
+            GenWpt=[0.]*nPart; GenWeta=[0.]*nPart; GenWphi=[0.]*nPart; GenWsign=[0]*nPart; GenWmass=[0.]*nPart
             for num,genW in enumerate(theGenW):
+                if (num+1)>nPart: continue
                 GenWpt[num]=genW.pt
                 GenWeta[num]=genW.eta
                 GenWphi[num]=genW.phi
