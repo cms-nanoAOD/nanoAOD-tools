@@ -247,7 +247,9 @@ class Producer(Module):
             genHadron = FindGenParticlebyStat(GenLists, [1,2,3,4,5,-1,-2,-3,-4,-5],[1])
             
             ## GEN Zpt weight
-            Zweight = 1.
+            Zweight= 1.
+            Zpt=-999.
+            Zeta=-999.
             NgenZ=0
 
             if "DYJetsToLL" in self.FilesName.GetName().split('/')[-1].split('_')[0]:
@@ -266,7 +268,7 @@ class Producer(Module):
                     if Zpt>200: Zweight=0.6
                     self.out.fillBranch("Zpt",Zpt)
                     self.out.fillBranch("Zeta",Zeta)
-            self.out.fillBranch("ZptCorr",Zweight)
+                    self.out.fillBranch("ZptCorr",Zweight)
 
             ## GEN-level signal ANALYSIS
             
@@ -365,7 +367,12 @@ class Producer(Module):
             Vpt=invariantMassPt(LepPt[0],LepEta[0],LepPhi[0],LepMass[0],LepPt[1],LepEta[1],LepPhi[1],LepMass[1])
 
 
-        #### END #######        
+        #### FILLING BRANCHES #######
+        ##GEN
+        self.out.fillBranch("Zpt",Zpt)
+        self.out.fillBranch("Zeta",Zeta)
+        self.out.fillBranch("ZptCorr",Zweight)
+
         ##Fill RECO-Object
         self.out.fillBranch("isOSmumu",isOSmumu)
         self.out.fillBranch("isOSee",isOSee)
@@ -423,6 +430,7 @@ class Producer(Module):
         self.out.fillBranch("htphi",ht.Phi())
         self.out.fillBranch("Vmass",Vmass)
         self.out.fillBranch("Vpt",Vpt)
+
         if self.debug: print " === EVENT END === "
         return True
 
