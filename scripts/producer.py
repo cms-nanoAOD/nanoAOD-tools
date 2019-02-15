@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+
+#####
+##
+## SCRIPT FOR BATCH SUBMISSION
+##
+####
+
 import os, sys
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -6,6 +13,7 @@ from importlib import import_module
 from optparse import OptionParser
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.analysis.Producer import producer
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puWeight
 
 execfolder=os.environ["CMSSW_BASE"]
 
@@ -28,12 +36,7 @@ if __name__ == "__main__":
     preselection=options.cut
     OutDir=args[0]
     Infiles=["%s"%args[1]]
-    
-    #files=[
-    #    "/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/HWminusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root",
-    #    "/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/HWplusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root",
-    #]
-    
-    p=PostProcessor( OutDir , Infiles , cut=preselection , branchsel=bIn , modules=[producer()] , maxevent=Nevents , outputbranchsel=bOut )
+        
+    p=PostProcessor( OutDir , Infiles , cut=preselection , branchsel=bIn , modules=[ puWeight(), producer() ] , maxevent=Nevents , outputbranchsel=bOut )
     
     p.run()

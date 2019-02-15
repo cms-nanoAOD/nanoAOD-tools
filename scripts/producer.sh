@@ -11,7 +11,8 @@ bIn="scripts/keep_and_drop_Input.txt"
 bOut="scripts/keep_and_drop_Output.txt"
 #module="PhysicsTools.NanoAODTools.postprocessing.modules.analysis.exampleModule exampleModuleConstr"
 #module2="PhysicsTools.NanoAODTools.postprocessing.modules.analysis.exampleModule exampleModuleConstr"
-module="PhysicsTools.NanoAODTools.analysis.Producer producer"
+module1="PhysicsTools.NanoAODTools.analysis.Producer producer"
+
 #module="PhysicsTools.NanoAODTools.analysis.Producer_pf producer"
 #maxevent="2000"
 maxevent=$1
