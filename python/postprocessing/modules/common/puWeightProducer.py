@@ -67,6 +67,8 @@ class puWeightProducer(Module):
             self._worker_minus = ROOT.WeightCalculatorFromHistogram(self.myh,self.targeth_minus,self.norm,self.fixLargeWeights,self.verbose)
             self.out.branch(self.name+"Up","F")
             self.out.branch(self.name+"Down","F")
+        self.InputTree=inputTree
+
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
     def analyze(self, event):
@@ -77,7 +79,7 @@ class puWeightProducer(Module):
             if self.doSysVar:
                 weight_plus = self._worker_plus.getWeight(nvtx) if nvtx < self.myh.GetNbinsX() else 1
                 weight_minus = self._worker_minus.getWeight(nvtx) if nvtx < self.myh.GetNbinsX() else 1
-        else: weight = 1
+        else: weight = 1; weight_plus = 1; weight_minus = 1;
         self.out.fillBranch(self.name,weight)
         if self.doSysVar:
             self.out.fillBranch(self.name+"Up",weight_plus)
