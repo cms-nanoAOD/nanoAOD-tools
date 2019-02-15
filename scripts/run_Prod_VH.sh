@@ -12,6 +12,10 @@ samplelist=("testMC" "testData")
 queuelist=("local-cms-short" "local-cms-short")
 prodfolder=("00-testMC" "00-testData")
 
+#samplelist=("testData")
+#queuelist=("local-cms-short")
+#prodfolder=("00-testData")
+
 len=${#samplelist[@]}
 
 for ((i=0;i<$len;i++)); do
