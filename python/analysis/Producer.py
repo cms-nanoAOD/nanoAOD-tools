@@ -8,6 +8,8 @@ from PhysicsTools.NanoAODTools.analysis.helper.helper import *
 from PhysicsTools.NanoAODTools.postprocessing.tools import closest
 from ROOT import TLorentzVector
 
+from PhysicsTools.NanoAODTools.postprocessing.modules.common import puWeight
+
 class Producer(Module):
     #def __init__(self, jetSelection):
     def __init__(self, DEBUG):
@@ -121,7 +123,8 @@ class Producer(Module):
         photons = Collection(event, "Photon")
         jets = Collection(event, "Jet")
         
-        ## PU                                                                                                                                                                 
+        ## PU
+        puWeight
         ####                                                                                                                                                                   
         ## Trigger                                                                                                                                                             
         ####
