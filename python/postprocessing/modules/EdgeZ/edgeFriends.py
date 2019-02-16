@@ -2,12 +2,13 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 import os
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
+from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.tools import deltaR, deltaPhi
 
 import copy
 import math 
+
 
 #Loading BTagplugins
 ROOT.gSystem.Load("pluginRecoBTagPerformanceDBplugins.so")
@@ -136,7 +137,7 @@ class edgeFriends:
                     ("nJetSel_jecUp"+label, "I"),
                     ("nJetSel_jecDn"+label, "I"),
                     ("nFatJetSel"+label, "I"),
-                    ("nEdgeIsoTracks"+label, "I"),
+                    #("nEdgeIsoTracks"+label, "I"),
                     ("rightMjj"+label, "F"),
                     ("bestMjj"+label, "F"),
                     ("minMjj"+label, "F"),
@@ -154,7 +155,7 @@ class edgeFriends:
                     ("iLT"+label,"I",20,"nLepTight"+label), 
                     ("iJ"+label,"I",20,"nJetSel"+label), 
                     ("iFJ"+label,"I",20,"nFatJetSel"+label),
-                    ("nLepGood20"+label, "I"),
+                    #("nLepGood20"+label, "I"),
                     ("nJet35"+label, "I"),
                     ("nJet35_jecUp"+label, "I"),
                     ("nJet35_jecDn"+label, "I"),
@@ -221,8 +222,8 @@ class edgeFriends:
                     ("Lep1_tightCharge"+label, "F"), 
                     ("Lep1_mvaFall17V1Iso"+label, "F"),
                     ("Lep1_mvaFall17V1noIso"+label, "F"),
-                    ("Lep1_mcMatchId"+label, "F"),
-                    ("Lep1_minTauDR"+label, "F"),              
+                    # ("Lep1_mcMatchId"+label, "F"), # esto deberia volver
+                    #("Lep1_minTauDR"+label, "F"),              
                     ("Lep2_pt"+label, "F"), 
                     ("Lep2_eta"+label, "F"),
                     ("Lep2_phi"+label, "F"),
@@ -236,8 +237,8 @@ class edgeFriends:
                     ("Lep2_tightCharge"+label, "F"),
                     ("Lep2_mvaFall17V1Iso"+label, "F"),
                     ("Lep2_mvaFall17V1noIso"+label, "F"),
-                    ("Lep2_mcMatchId"+label, "F"),
-                    ("Lep2_minTauDR"+label, "F"),      
+                    #("Lep2_mcMatchId"+label, "F"), # esto deberia volver
+                    #("Lep2_minTauDR"+label, "F"),      
                     ("PileupW"+label, "F"), 
                     ("PileupW_Up"+label, "F"),
                     ("PileupW_Dn"+label, "F"), 
@@ -251,7 +252,7 @@ class edgeFriends:
                     ("sum_mlbUp"+label, "F"),
                     ("sum_mlbDn"+label, "F"),
                     ("st"+label,"F"), 
-                    ("srID"+label, "I"), 
+                    #("srID"+label, "I"), 
                     ("mT_lep1"+label, "F"),
                     ("mT_lep2"+label, "F"),
                     ("mT_dilep"+label, "F"),
@@ -274,7 +275,7 @@ class edgeFriends:
                     ("parPt" + label, "F"),
                     ("ortPt" + label, "F"),
                     ("dTheta" + label, "F"),
-                    ('passesFilters' +label, 'I'),
+                    #('passesFilters' +label, 'I'),
                     ('genWeight' +label, 'F'),
                     ('mbb'+label, 'F'),
                     ('mbb_jecUp'+label, 'F'),
@@ -295,8 +296,8 @@ class edgeFriends:
         biglist.append(("nPFLep5"+label, 'I'))
         biglist.append(("nPFHad10"+label, 'I'))
         
-        for itfloat in "pt eta phi dxy dz pfRelIso03_chg pdgId".split():
-            biglist.append( ("EdgeIsoTracksSel"+label+"_"+itfloat,"F",20,"nEdgeIsoTracks"+label) )
+        # for itfloat in "pt eta phi dxy dz pfRelIso03_chg pdgId".split():
+        #     biglist.append( ("EdgeIsoTracksSel"+label+"_"+itfloat,"F",20,"nEdgeIsoTracks"+label) )
         
         ################## Selected jets
         for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor".split():
@@ -305,25 +306,37 @@ class edgeFriends:
         biglist.append( ("JetSel"+label+"_mcPartonFlavour","I",20,"nJetSel"+label) )
         biglist.append( ("JetSel"+label+"_genJetIdx","I",20,"nJetSel"+label) )
         ################## Selected Fat jets
-        for fjfloat in "pt eta phi mass btagCSVV2 btagDeepB msoftdrop tau1 tau2 tau3".split():
+        for fjfloat in "pt eta phi mass btagCSVV2 msoftdrop tau1 tau2 tau3".split(): # btagDeepB  # esto tiene que volver
             biglist.append( ("FatJetSel"+label+"_"+fjfloat,"F",20,"nFatJetSel"+label) ) #if self.isMC:
-        biglist.append( ("FatJetSel"+label+"_mcPt",     "F",20,"nFatJetSel"+label) )
-        biglist.append( ("FatJetSel"+label+"_mcMatchId","I",20,"nFatJetSel"+label) )
-        biglist.append( ("FatJetSel"+label+"_hadronFlavour","I",20,"nFatJetSel"+label) )
+        # esto tiene que volver
+        #biglist.append( ("FatJetSel"+label+"_mcPt",     "F",20,"nFatJetSel"+label) )
+        #biglist.append( ("FatJetSel"+label+"_mcMatchId","I",20,"nFatJetSel"+label) )
+        #biglist.append( ("FatJetSel"+label+"_hadronFlavour","I",20,"nFatJetSel"+label) )
+
 
         for var in biglist:
             self.out.branch( *var ) 
+
+        self.biglist = biglist
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
 
     def analyze(self, event):
+
+
+        print 'calling'
+
         isData = event.isData
         ##### MC variables
         var_mcPt = 10 # mcPt
         ################## Get collections
-        leps  =  [l for l in Collection(event,"LepGood","nLepGood")]
-        map( lambda x : setattr(x, 'doCorrections', False), leps ) # Deactivate the energy corrections on electrons
+        leps  =  [l for l in Collection(event,"LepGood","nLepGood")] # using object wrapper so p4 is uncorrected for electrons
+        # removing ecorrections for electrons
+        for l in leps: 
+            if abs(l.pdgId) == 11: 
+                l.pt = l.pt/l.eCorr
+
         jetsc =  [j for j in Collection(event,"Jet","nJet")]
         jetslc = [j for j in Collection(event,"Jet","nJet")]
         fatjetsc =[fj for fj in Collection(event,"FatJet","nFatJet")] # Should be: "FatJet", "nFatJet"
@@ -331,7 +344,7 @@ class edgeFriends:
             genparts = [g for g in Collection(event,"GenPart","nGenPart")]
             genjets = [j for j in Collection(event, "GenJet", "nGenJet")] # Atencion
 
-        edgeisotracks =  [i for i in Collection(event,"EdgeIsoTracks","nEdgeIsoTracks")]
+        #edgeisotracks =  [i for i in Collection(event,"EdgeIsoTracks","nEdgeIsoTracks")]
         
         ################## Treatment of jets
         jetsc_jecUp = [j for j in Collection(event,"Jet","nJet")]
@@ -358,7 +371,7 @@ class edgeFriends:
         lepret  = {}
         trigret = {}
         edgeisotrackret = {}
-
+        print 'checking'
         ################## Starting to fill the dictionaries
         ################## Event stuff
         ret['run'] = event.run
@@ -400,6 +413,9 @@ class edgeFriends:
         ################### Isotracks stuff
         ret['nPFLep5'] = event.nPFLep5        
         ret['nPFHad10'] = event.nPFHad10        
+
+
+        print 'checking 2'
         if not isData:
             ret['nTrueInt'] = event.Pileup_nTrueInt
             ret['GenMET_pt']  = event.GenMET_pt
@@ -433,6 +449,7 @@ class edgeFriends:
         for trig in self.triggerlist:
             trigret[trig] = (0 if not hasattr(event, trig) else getattr(event, trig) )
 
+        print 'checking 3'
 
         ################### Definition of good leptons
         ret["iLT"] = []
@@ -456,6 +473,7 @@ class edgeFriends:
  
         ################### Calculating two lepton variables for all elements of the collection
         iL1iL2 = self.getPairVariables(lepst, metp4)
+
         ret['iL1T'] = ret["iLT"][ iL1iL2[0] ] if (len(ret["iLT"]) >=1 and iL1iL2[0] != -999) else -999
         ret['iL2T'] = ret["iLT"][ iL1iL2[1] ] if (len(ret["iLT"]) >=2 and iL1iL2[1] != -999) else -999
         ret['lepsMll'] = iL1iL2[2] 
@@ -469,6 +487,8 @@ class edgeFriends:
         ret['parPt']    = iL1iL2[10]
         ret['ortPt']    = iL1iL2[11]
         ret['dTheta']    = iL1iL2[12]
+
+        print 'checking 4'
 
         ################### Now working with the 2 good leptons
         l1 = ROOT.TLorentzVector()
@@ -493,8 +513,8 @@ class edgeFriends:
                     
                     if lfloat == 'mcMatchId' and isData:
                         lepret["Lep"+str(lcount)+"_"+lfloat+self.label] = 1
-                    elif lfloat == 'pt' and abs(getattr(lep, 'pdgId')) == 11 and hasattr(lep, 'doCorrections') and lep.doCorrections == False and not getattr(lep, 'eCorr') == 0:
-                        lepret["Lep"+str(lcount)+"_"+lfloat+self.label] = getattr(lep,lfloat)/getattr(lep, "eCorr") # if not corrections
+                    #elif lfloat == 'pt' and abs(getattr(lep, 'pdgId')) == 11 and hasattr(lep, 'doCorrections') and lep.doCorrections == False and not getattr(lep, 'eCorr') == 0:
+                    #    lepret["Lep"+str(lcount)+"_"+lfloat+self.label] = getattr(lep,lfloat)/getattr(lep, "eCorr") # if not corrections
                         #lepret["Lep"+str(lcount)+"_"+lfloat+self.label] = getattr(lep,lfloat) # if corrections
                     else:
                         lepret["Lep"+str(lcount)+"_"+lfloat+self.label] = getattr(lep,lfloat)
@@ -506,6 +526,7 @@ class edgeFriends:
             ret['nPairLep'] = 0
 
 
+        print 'checking 5'
 
         ################### Variables needed for 4l control regions
         if len(leps) < 4: 
@@ -553,6 +574,7 @@ class edgeFriends:
             ret['mllOtherZ'] = otherZmll                                                         
             ret['ptBestZ'] = best.Pt()                                                                                                                                                 
        
+        print 'checking 6'
 
         ################### Variables needed for 3l control region
         if (len(leps) < 3): 
@@ -627,6 +649,9 @@ class edgeFriends:
         ret['nJetSel_jecUp'] = len(ijlist_jecup)
         ret['nJetSel_jecDn'] = len(ijlist_jecdn)
         ret['nFatJetSel']    = len(ret["iFJ"])
+
+
+        print 'checking 7'
 
         ################### MT and MT2 variables
         mT_lep1 = -1.
@@ -705,6 +730,7 @@ class edgeFriends:
 
             del metp4obj, metp4obj_jecUp, metp4obj_jecDn
 
+        print 'checking 8'
 
         ret['mT_lep1'] = mT_lep1
         ret['mT_lep2'] = mT_lep2
@@ -720,7 +746,7 @@ class edgeFriends:
         ################### Sort jets by pt
         ret["iJ"].sort(key = lambda idx : jetsc[idx].pt, reverse = True)
         ret["iFJ"].sort(key = lambda idx : fatjetsc[idx].pt, reverse = True)
-        
+        print 'checking 8a'
 
         ################### Compute jet and fatjet variables Atencion
         for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor".split():
@@ -729,6 +755,7 @@ class edgeFriends:
             for jmc in "mcPt mcPartonFlavour genJetIdx".split():
                 #mcPt mcFlavour mcMatchId hadronFlavour
                 jetret[jmc] = []
+
         for idx in ret["iJ"]:
             jet = jetsc[idx] 
             for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor".split():
@@ -746,29 +773,32 @@ class edgeFriends:
                 #for jmc in "mcPt mcFlavour hadronFlavour".split(): # Atencion: Esto es lo que habia antes
                     #mcPt mcFlavour mcMatchId
                     #jetret[jmc].append( getattr(jet,jmc) if not isData else -1.)
+        print 'checking 8c'
+
         for fjfloat in "pt eta phi mass btagCSVV2 tau1 tau2 tau3 msoftdrop".split():
             fatjetret[fjfloat] = []
-        if not isData:
-            for fjmc in "".split(): 
-                #mcPt mcFlavour mcMatchId hadronFlavour
-                fatjetret[fjmc] = []
+#        if not isData:
+#            for fjmc in "mcPt mcMatchId hadronFlavour".split():  # mcFlavour 
+#                fatjetret[fjmc] = []
+        print 'checking 8d'
+        
         for idx in ret["iFJ"]:
             fatjet = fatjetsc[idx]
-            for fjfloat in "pt eta phi mass btagCSVV2 tau1 tau2 tau3 msoftdrop".split():
+            for fjfloat in "pt eta phi mass msoftdrop".split():# tau1 btagCSVV2 tau2 tau3    ".split():
                 fatjetret[fjfloat].append( getattr(fatjet,fjfloat) )
-            if not isData:
-                for fjmc in "".split(): 
-                    #mcPt mcFlavour mcMatchId hadronFlavour
-                    fatjetret[fjmc].append( getattr(fatjet,fjmc) if not isData else -1.)
+        #     if not isData:  
+        #         for fjmc in "mcPt mcMatchId hadronFlavour".split():  #  mcFlavour
+        #             fatjetret[fjmc].append( -1 ) # getattr(fatjet,fjmc) if not isData or not hasattr(fatjet,jfmc) else -1.)
 
-        
+        print 'checking 9'
+
         ################### Compute isotrack variables
-        ret["nEdgeIsoTracks"] = event.nEdgeIsoTracks
-        for itfloat in "pt eta phi dz dxy pfRelIso03_chg pdgId".split():
-            edgeisotrackret[itfloat] = []
-        for  it, track in enumerate(edgeisotracks):
-            for itfloat in "pt eta phi dz dxy pfRelIso03_chg pdgId".split():
-                edgeisotrackret[itfloat].append( getattr(track, itfloat) )
+        #ret["nEdgeIsoTracks"] = event.nEdgeIsoTracks
+        # for itfloat in "pt eta phi dz dxy pfRelIso03_chg pdgId".split():
+        #     edgeisotrackret[itfloat] = []
+        # for  it, track in enumerate(edgeisotracks):
+        #     for itfloat in "pt eta phi dz dxy pfRelIso03_chg pdgId".split():
+        #         edgeisotrackret[itfloat].append( getattr(track, itfloat) )
         
 
         ################### Compute the recoil of the jets
@@ -854,32 +884,41 @@ class edgeFriends:
             ret["min_mlb2%s"%jec] = max_mlb if max_mlb < 1e6  else -1.
             ret["sum_mlb%s"%jec] = (ret["min_mlb1%s"%jec] + ret["min_mlb2%s"%jec]) if ret["min_mlb1%s"%jec] > 0. and ret["min_mlb2%s"%jec] > 0. else -1.
        
-
+        print 'returning'
+        if ret['nPairLep'] < 2: return False # this could go before in the code
+        print 'it has an event'
 
         ret["st"] = met+lepret["Lep1_pt"+self.label]+lepret["Lep2_pt"+self.label]
-
-        fullret = {}
+        returned = []
+#        fullret = {}
         for k,v in ret.iteritems():
-            fullret[k+self.label] = v
+            self.out.fillBranch(k+self.label,v) # fullret[k+self.label] = v
+            print 'adding', k+self.label
+            returned.append(k+self.label)
         for k,v in jetret.iteritems(): 
-            fullret["JetSel%s_%s" % (self.label,k)] = v
+            self.out.fillBranch("JetSel%s_%s" % (self.label,k),v) # fullret["JetSel%s_%s" % (self.label,k)] = v
+            returned.append("JetSel%s_%s" % (self.label,k))
+
         for k,v in fatjetret.iteritems(): 
-            fullret["FatJetSel%s_%s" % (self.label,k)] = v
+            self.out.fillBranch("FatJetSel%s_%s" % (self.label,k),v) #fullret["FatJetSel%s_%s" % (self.label,k)] = v
+            returned.append("FatJetSel%s_%s" % (self.label,k))
         for k,v in lepret.iteritems(): 
-            fullret[k] = v
+            self.out.fillBranch(k,v) #fullret[k] = v
+            returned.append(k)
         for k,v in trigret.iteritems(): 
-            fullret[k+self.label] = v
+            self.out.fillBranch(k+self.label,v) # fullret[k+self.label] = v
+            returned.append(k+self.label)
+        # for k,v in edgeisotrackret.iteritems():
+        #     fullret["EdgeIsoTracksSel%s_%s" % (self.label,k)] = v
         
-        for k,v in edgeisotrackret.iteritems():
-            fullret["EdgeIsoTracksSel%s_%s" % (self.label,k)] = v
-        
-        for k,v in fullret.iteritems():
-            self.out.fillBranch(k,v)
 
+        for k in self.biglist: 
+            if k[0] not in returned: raise RuntimeError('Branch %s was not returned'%k[0])
 
+        return True
+#        for k,v in fullret.iteritems():
+            
 
-        if ret['nPairLep'] > 1: return True
-        else: return False
             
     def setJetCollection(self, jetcoll, lepst):
         for j in jetcoll:
@@ -1201,7 +1240,7 @@ class edgeFriends:
            h = self.h_btag_eff_udsg
 
        binx = h.GetXaxis().FindBin(pt_cutoff)
-       biny = h.GetYaxis().FindBin(fabs(eta))
+       biny = h.GetYaxis().FindBin(abs(eta))
 
        return h.GetBinContent(binx,biny)
     #################################################################################################################
@@ -1306,7 +1345,7 @@ def newMediumMuonId(muon):
 
 def _susyEdgeLoose(lep):
     
-    leppt = lep.pt/lep.eCorr if hasattr(lep,'eCorr') and not lep.eCorr == 0   else lep.pt# eCorr are dis-applied by default
+    leppt = lep.pt # /lep.eCorr if hasattr(lep,'eCorr') and not lep.eCorr == 0   else lep.pt# eCorr are dis-applied by default
         #leppt = lep.pt # If energy corrections applied
 
     if leppt <= 5.: return False # Atencion before 10.
@@ -1367,7 +1406,7 @@ def _susyEdgeLoose(lep):
 
 def _susyEdgeTight(lep):
 
-    leppt = lep.pt/lep.eCorr if not lep.eCorr == 0 and lep.doCorrections == False else lep.pt# If not energy corrections applied 
+    leppt = lep.pt # /lep.eCorr if not lep.eCorr == 0 and lep.doCorrections == False else lep.pt# If not energy corrections applied 
     #leppt = lep.pt # If energy corrections applied
 
     if leppt < 20.: return False
