@@ -18,8 +18,8 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer im
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.collectionMerger import collectionMerger
 from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.skimNRecoLeps import SkimRecoLeps
 #from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.l1JetCalibrations import l1JetCalibrations
-from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.isoTrackAnalysis import IsoTrackAnalysis
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.TriggerBitFilter import TriggerBitFilter
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.addFlags import AddFlags
 
 #
 minelpt  = 5
@@ -45,17 +45,17 @@ goodLepProducer = collectionMerger(input=["Electron","Muon"], output="LepGood",
                                                   ]))
 
 puAutoWeight     = puAutoWeight()
-isoTrackAnalysis = IsoTrackAnalysis(storeCollection=True) # store collection only for synch
 
 from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import * 
 
 def BuildJsonForTesting():
 
  
-    sampOpt = { 'isData' : False,
+    sampOpt = { 'isData' : True,
                 'triggers' : [], #triggers_mumu_iso + triggers_3mu , # [],#triggers_ee + triggers_3e+triggers_ee_noniso,
                 'vetotriggers' : [],#triggers_mumu_iso + triggers_3mu,
-                'json':   None # '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
+                'json':   None, # '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
+                'xsec' : 88.,
                 }
 
     optjsonfile = open('options_sample.json','w')
@@ -130,14 +130,20 @@ def LoadCfgToRun(inputFile=None):
     sampoptjson.close()
 
     skimRecoLeps     = SkimRecoLeps(sampOpt['isData'] == True, nMinLeps=2)
-    mod = [puAutoWeight,  goodLepProducer, skimRecoLeps, isoTrackAnalysis]
+    mod = [puAutoWeight,  goodLepProducer, skimRecoLeps]
     if sampOpt['isData']: 
         mod.remove( puAutoWeight ) 
     else:
+        ## add jet met uncertainties
         from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017All, jetmetUncertainties2017
         jmeUncert = jetmetUncertainties2017()
         jmeUncert.metBranchName = 'METFixEE2017'
         mod.extend([jmeUncert]) # jetmetUncertainties2017All()
+
+        ## add xsec branch
+        addFlags = AddFlags([ (('xsec','F'), lambda ev : sampOpt['xsec'] ) ])
+        mod.extend([addFlags])
+
 
     if 'triggers' in sampOpt:
         if not 'vetotriggers' in sampOpt:
@@ -172,7 +178,9 @@ else:
     filepath  = [
         #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/Run2017C_MuonEG_Nano14Dec2018-v1_F7055783-BE3F-BF4B-83A2-64A73E13EA85.root',
         #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/SingleMuon_612BB142-CD08-B14D-BA60-2311FA0F2BD2.root',
-        '/pool/ciencias/userstorage/sscruz/NanoAOD_test/TTbar_4B84BCC5-FE7C-714B-81AD-5A76C3B511FF.root',
+        #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/TTbar_4B84BCC5-FE7C-714B-81AD-5A76C3B511FF.root',
+        #'/afs/cern.ch/work/s/sesanche/public/forEdge/test_forsynch_v4.root'
+        'evt_1_70455_65628129.root'
                   ]
 
 
