@@ -51,7 +51,7 @@ os.environ["ONLYUNPACKED"] = str(options.only_unpacked)
 
 
 handle = open(options.cfg_file,'r')
-cfo = imp.load_source(options.cfg_file.rstrip('py'), options.cfg_file, handle)
+cfo = imp.load_source(options.cfg_file.split('/')[-1].rstrip('.py'), options.cfg_file, handle)
 
 #if cfo.jsonFile: 
 #    os.environ["LUMIJSON"] = cfo.jsonFile
@@ -68,3 +68,4 @@ for dataset in cfo.selectedSamples:
 
     os.system("crab submit %s -c crab_config_env.py"%("--dryrun" if options.dryrun else ""))
 
+    break ## change this 
