@@ -230,6 +230,10 @@ class Producer(Module):
         ## Mc Stitching
         ####
         ## GenParticle
+        ## Initialization
+        Zweight= 1.
+        Zpt=-999.
+        Zeta=-999.
         if "nGenPart" in self.InputTree.GetListOfBranches():
             genparts = Collection(event, "GenPart")
             GenLists=filter(lambda x:x,genparts)
@@ -247,9 +251,6 @@ class Producer(Module):
             genHadron = FindGenParticlebyStat(GenLists, [1,2,3,4,5,-1,-2,-3,-4,-5],[1])
             
             ## GEN Zpt weight
-            Zweight= 1.
-            Zpt=-999.
-            Zeta=-999.
             NgenZ=0
 
             if "DYJetsToLL" in self.FilesName.GetName().split('/')[-1].split('_')[0]:
@@ -266,9 +267,6 @@ class Producer(Module):
                     if Zpt>40 and Zpt<50: Zweight=0.65
                     if Zpt>50 and Zpt<200: Zweight=0.65-0.00034*Zpt
                     if Zpt>200: Zweight=0.6
-                    self.out.fillBranch("Zpt",Zpt)
-                    self.out.fillBranch("Zeta",Zeta)
-                    self.out.fillBranch("ZptCorr",Zweight)
 
             ## GEN-level signal ANALYSIS
             

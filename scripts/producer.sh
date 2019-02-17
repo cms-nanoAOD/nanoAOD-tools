@@ -2,8 +2,9 @@
 
 outDir="."
 #fileIn="/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/HWminusJ_HToWW_M125_13TeV_powheg_pythia8-v1.root"
-fileIn="/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root"
+#fileIn="/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/DYJetsToLL_Pt-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext2-v1.root"
 #fileIn="/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root"
+fileIn="/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/SingleMuonRun2016H-03Feb2017_ver2-v1_NANO.root"
 
 #preselection=""
 branches="scripts/keep_and_drop_VH.txt"
@@ -11,7 +12,7 @@ bIn="scripts/keep_and_drop_Input.txt"
 bOut="scripts/keep_and_drop_Output.txt"
 #module="PhysicsTools.NanoAODTools.postprocessing.modules.analysis.exampleModule exampleModuleConstr"
 #module2="PhysicsTools.NanoAODTools.postprocessing.modules.analysis.exampleModule exampleModuleConstr"
-module1="PhysicsTools.NanoAODTools.analysis.Producer producer"
+module="PhysicsTools.NanoAODTools.analysis.Producer producer"
 
 #module="PhysicsTools.NanoAODTools.analysis.Producer_pf producer"
 #maxevent="2000"
