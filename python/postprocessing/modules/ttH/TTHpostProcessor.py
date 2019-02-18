@@ -86,7 +86,7 @@ else:
 
 # postprocessor is only read when we are in running mode 
 
-if 'IS_CRAB' in os.environ:
+if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
     try:
         with open('options_sample.json','r') as sampoptjson: 
             sampOpt = json.loads(sampoptjson.read())
@@ -150,7 +150,7 @@ if 'IS_CRAB' in os.environ:
     
     
     jsonInput = sampOpt['json'] if 'json' in sampOpt else runsAndLumis()     
-    POSTPROCESSOR=PostProcessor(".",inputFiles(),cut,inputSlim,mod,provenance=True,fwkJobReport=True,jsonInput=jsonInput, outputbranchsel=outputSlim)
+    POSTPROCESSOR=PostProcessor(".",inputFiles() if 'IS_CRAB' in os.environ else [],cut,inputSlim,mod,provenance=True,fwkJobReport=True,jsonInput=jsonInput, outputbranchsel=outputSlim)
 
 
 
