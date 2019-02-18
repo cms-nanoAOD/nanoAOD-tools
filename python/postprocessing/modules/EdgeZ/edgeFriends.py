@@ -578,7 +578,7 @@ class edgeFriends:
             mllOtherZ  = otherZmll                                                         
             ptBestZ    = best.Pt()                                                                                                                                                 
        
-        self.out.fillBranch('MET_pt'   +self.label,newMet   )        
+        self.out.fillBranch('newMet'   +self.label,newMet   )        
         self.out.fillBranch('newMetPhi'+self.label,newMetPhi)
         self.out.fillBranch('mt2BestZ' +self.label,mt2BestZ )
         self.out.fillBranch('mllBestZ' +self.label,mllBestZ )
