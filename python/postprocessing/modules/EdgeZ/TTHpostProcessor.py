@@ -44,7 +44,7 @@ from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 i
 def BuildJsonForTesting():
 
  
-    sampOpt = { 'isData' : False,
+    sampOpt = { 'isData' : True,
                 'triggers' : [], #triggers_mumu_iso + triggers_3mu , # [],#triggers_ee + triggers_3e+triggers_ee_noniso,
                 'vetotriggers' : [],#triggers_mumu_iso + triggers_3mu,
                 'json':   None # '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
