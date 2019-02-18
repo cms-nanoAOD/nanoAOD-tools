@@ -41,6 +41,7 @@ class IsoTrackAnalysis(Module):
             if not cand.isPFcand: continue 
             if hasattr(cand,'fromPV') and not getattr(cand,'fromPV'): continue # check only for IsoTracks, for Leptons should be true
             if hasattr(cand, 'isFromLostTrack') and getattr(cand,'isFromLostTrack'): continue
+            if hasattr(cand, 'isPFcand') and not getattr(cand,'isPFcand'): continue # this is for muons
             if abs(cand.pdgId) == 11 or abs(cand.pdgId) == 13:
                 if abs(cand.pdgId) == 11: pt = cand.pt / cand.eCorr
                 else: pt = cand.pt

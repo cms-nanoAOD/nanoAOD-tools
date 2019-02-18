@@ -33,7 +33,7 @@ goodLepProducer = collectionMerger(input=["Electron","Muon"], output="LepGood",
                                                   ]))
 
 puAutoWeight     = puAutoWeight()
-isoTrackAnalysis = IsoTrackAnalysis(storeCollection=True) # store collection only for synch
+isoTrackAnalysis = IsoTrackAnalysis(storeCollection=False) # store collection only for synch
 
 edgeFriends = edgeFriends("Edge", lambda lep : _susyEdgeTight(lep),
                           cleanJet = lambda lep,jet,dr : (jet.pt < 35 and dr < 0.4))
@@ -44,7 +44,7 @@ from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 i
 def BuildJsonForTesting():
 
  
-    sampOpt = { 'isData' : True,
+    sampOpt = { 'isData' : False,
                 'triggers' : [], #triggers_mumu_iso + triggers_3mu , # [],#triggers_ee + triggers_3e+triggers_ee_noniso,
                 'vetotriggers' : [],#triggers_mumu_iso + triggers_3mu,
                 'json':   None # '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
@@ -129,7 +129,7 @@ def LoadCfgToRun(inputFile=None):
         from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017All, jetmetUncertainties2017
         jmeUncert = jetmetUncertainties2017()
         jmeUncert.metBranchName = 'METFixEE2017'
-        mod.extend([jmeUncert]) # jetmetUncertainties2017All()
+        mod.insert(mod.index(edgeFriends),jmeUncert) # jetmetUncertainties2017All()
 
     if 'triggers' in sampOpt:
         if not 'vetotriggers' in sampOpt:
@@ -140,7 +140,7 @@ def LoadCfgToRun(inputFile=None):
 
 
     jsonInput = sampOpt['json'] if 'json' in sampOpt else runsAndLumis()     
-    POSTPROCESSOR=PostProcessor(".",inputFile if inputFile else inputFiles(),cut,inputSlim,mod,provenance=True,fwkJobReport=True,jsonInput=jsonInput, outputbranchsel=outputSlim)
+    POSTPROCESSOR=PostProcessor(".",inputFile if inputFile else inputFiles(),cut,inputSlim,mod,provenance=True,fwkJobReport=True,jsonInput=jsonInput, outputbranchsel=outputSlim, friend=True)
         
     return POSTPROCESSOR
 
@@ -162,9 +162,11 @@ else:
 
     BuildJsonForTesting()
     filepath  = [
+        #'evt_1_70455_65628129.root'
         '/afs/cern.ch/work/s/sesanche/public/forEdge/test_forsynch_v4.root'
-        #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/SingleMuon_612BB142-CD08-B14D-BA60-2311FA0F2BD2.root',
-        #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/TTbar_4B84BCC5-FE7C-714B-81AD-5A76C3B511FF.root',
+        # 'evt_1_70569_65734360.root',
+        # 'evt_1_70571_65736864.root',
+        #'evt_1_70675_65833701.root',
                   ]
 
 
