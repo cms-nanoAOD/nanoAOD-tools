@@ -35,7 +35,7 @@ TT_SL    = ComponentContainer('TTToSemiLeptonic', '/TTToSemiLeptonic_TuneCP5_13T
 TT_2L    = ComponentContainer('TTTo2L2Nu','/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM',831.76*((3*0.108)**2))
 TT_SLTb  = ComponentContainer('TTJets_amc_SingleLeptFromTbar','/TTJets_SingleLeptFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM',831.76*(3*0.108)*(1-3*0.108))
 TT_SLT   = ComponentContainer('TTJets_amc_SingleLeptFromT','/TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 831.76*(3*0.108)*(1-3*0.108))
-TT_Had   = ComponentContainer('TTToHadronic', '/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM', 831.76*(1-3*0.108)*(1-3*0.108) ),
+TT_Had   = ComponentContainer('TTToHadronic', '/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM', 831.76*(1-3*0.108)*(1-3*0.108) )
 
 TT = [ TT_SL, TT_SL_PS, TT_2L, TT_SLT, TT_SLTb, TT_Had]
 
@@ -86,8 +86,8 @@ t_tch          = ComponentContainer('T_tch','/ST_t-channel_top_4f_InclusiveDecay
 t_tbarch       = ComponentContainer('Tbar_tch','/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM',80.95)
 
 
-tW = [tW_ + tW_noHad_PS, tW_noHad, tbarW_PS, tbarW, tbarW_noHad_PS, tbarW_noHad, t_sch, t_tch, t_tbarch]
-ST = tW + [t_tsch, t_tch, t_tbarch]
+tW = [tW_, tW_noHad_PS, tW_noHad, tbarW_PS, tbarW, tbarW_noHad_PS, tbarW_noHad, t_sch, t_tch, t_tbarch]
+ST = tW + [t_sch, t_tch, t_tbarch]
 
 
 WWTo2L2Nu = ComponentContainer("WWTo2L2Nu","/WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM",10.481)
@@ -117,7 +117,7 @@ GGToZZTo4mu_ext   = ComponentContainer('GluGluToContinToZZTo4mu_ext1','/GluGluTo
 GGToZZTo4tau      = ComponentContainer('GluGluToContinToZZTo4tau', '/GluGluToContinToZZTo4tau_13TeV_MCFM701_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6_ext1-v1/NANOAODSIM',0.00159)
 
 
-VV = [WWTo2L2Nu, WW_DPS, WZTo3LNu, WZTo2L2Q, ZZTo2L2Qm ZZTo2L2Nu, ZZTo2Q2Nu, ZZTo4L, ZZTo4L_ext, GGToZZTo2e2mu, GGToZZTo2e2mu_ext, GGToZZTo2e2nu, GGToZZTo2e2nu_ext, GGToZZTo2e2tau, GGToZZTo2e2tau_ext, GGToZZTo2mu2nu, GGToZZTo2mu2nu_ext, GGToZZTo2mu2tau, GGToZZTo2mu2tau_ext, GGToZZTo4e, GGToZZTo4e_ext, GGToZZTo4mu, GGToZZTo4mu_ext, GGToZZTo4tau]
+VV = [WWTo2L2Nu, WW_DPS, WZTo3LNu, WZTo2L2Q, ZZTo2L2Q, ZZTo2L2Nu, ZZTo2Q2Nu, ZZTo4L, ZZTo4L_ext, GGToZZTo2e2mu, GGToZZTo2e2mu_ext, GGToZZTo2e2nu, GGToZZTo2e2nu_ext, GGToZZTo2e2tau, GGToZZTo2e2tau_ext, GGToZZTo2mu2nu, GGToZZTo2mu2nu_ext, GGToZZTo2mu2tau, GGToZZTo2mu2tau_ext, GGToZZTo4e, GGToZZTo4e_ext, GGToZZTo4mu, GGToZZTo4mu_ext, GGToZZTo4tau]
 
 
 WWW =   ComponentContainer('WWW','/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM',0.2086)
