@@ -1,6 +1,34 @@
 from PhysicsTools.NanoAODTools.postprocessing.datasets.componentContainer import  ComponentContainer
 
+QCD_15to20_Mu    = ComponentContainer('QCD_15to20_Mu', '/QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 2.785e+06 )
+QCD_20to30_Mu    = ComponentContainer('QCD_20to30_Mu', '/QCD_Pt-20to30_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 2.49e+06 )
+QCD_30to50_Mu    = ComponentContainer('QCD_30to50_Mu', '/QCD_Pt-30to50_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 1.364e+06 )
+QCD_50to80_Mu    = ComponentContainer('QCD_50to80_Mu', '/QCD_Pt-50to80_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 377400 )
+QCD_80to120_Mu   = ComponentContainer('QCD_80to120_Mu', '/QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 88350 )
+QCD_120to170_Mu  = ComponentContainer('QCD_120to170_Mu', '/QCD_Pt-120to170_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 21250 )
+QCD_170to300_Mu  = ComponentContainer('QCD_170to300_Mu', '/QCD_Pt-170to300_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 6969 )
+QCD_300to470_Mu  = ComponentContainer('QCD_300to470_Mu', '/QCD_Pt-300to470_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 619.5 )
+QCD_470to600_Mu  = ComponentContainer('QCD_470to600_Mu', '/QCD_Pt-470to600_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 58.9 )
+#Still missing
+#QCD_600to800_Mu  = ComponentContainer('QCD_600to800_Mu', '/QCD_Pt-600to800_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 18.36 )
+#QCD_800to1000_Mu = ComponentContainer('QCD_800to1000_Mu', '/QCD_Pt-800to1000_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 3.253 )
+QCD_1000toInf_Mu = ComponentContainer('QCD_1000toInf_Mu', '/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 1.075 )
 
+QCD_Mu = [ QCD_15to20_Mu, QCD_20to30_Mu, QCD_30to50_Mu, QCD_50to80_Mu, QCD_80to120_Mu, QCD_120to170_Mu, QCD_170to300_Mu, QCD_300to470_Mu, QCD_470to600_Mu,QCD_1000toInf_Mu]  #Still missing: #QCD_600to800_Mu, #QCD_800to1000_Mu
+
+
+QCD_15to20_EM    = ComponentContainer('QCD_15to20_EM', '/QCD_Pt-15to20_EMEnriched_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM',  1.33e+06 )
+QCD_20to30_EM    = ComponentContainer('QCD_20to30_EM', '/QCD_Pt-20to30_EMEnriched_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 4.928e+06 )
+QCD_30to50_EM    = ComponentContainer('QCD_30to50_EM', '/QCD_Pt-30to50_EMEnriched_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 6.41e+06 )
+QCD_50to80_EM    = ComponentContainer('QCD_50to80_EM', '/QCD_Pt-50to80_EMEnriched_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 1.986e+06 )
+QCD_80to120_EM    = ComponentContainer('QCD_80to120_EM', '/QCD_Pt-80to120_EMEnriched_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 370900 )
+QCD_120to170_EM    = ComponentContainer('QCD_120to170_EM', '/QCD_Pt-120to170_EMEnriched_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 66760 )
+#Still Missing
+#QCD_170to300_EM    = ComponentContainer('QCD_170to300_EM', '/QCD_Pt-170to300_EMEnriched_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 16430 )
+QCD_300toInf_EM    = ComponentContainer('QCD_300toInf_EM', '/QCD_Pt-300toInf_EMEnriched_TuneCP5_13TeV_pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 1101 )
+
+QCD_EM = [QCD_15to20_EM, QCD_20to30_EM, QCD_30to50_EM, QCD_50to80_EM, QCD_80to120_EM, QCD_120to170_EM, QCD_300toInf_EM] #Still missing QCD_170to300_EM,
+QCD_FR =  QCD_Mu + QCD_EM
 
 TT_SL_PS = ComponentContainer('TTToSemiLeptonic_PSweights', '/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM', 2*831.76*(3*0.108)*(1-3*0.108) )
 TT_SL    = ComponentContainer('TTToSemiLeptonic', '/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM', 2*831.76*(3*0.108)*(1-3*0.108) )
