@@ -22,10 +22,12 @@ def InputTree(tree,entrylist=None):
     tree._extrabranches={}
     return tree
 
-def getArrayReader(tree, branchName):
+def getArrayReader(tree, branchName,forceReturn=False):
     """Make a reader for branch branchName containing a variable-length value array."""
     if branchName not in tree._ttras:
-       if not tree.GetBranch(branchName): raise RuntimeError, "Can't find branch '%s'" % branchName
+       if not tree.GetBranch(branchName): 
+           if forceReturn: return None
+           raise RuntimeError, "Can't find branch '%s'" % branchName
        leaf = tree.GetBranch(branchName).GetLeaf(branchName)
        if not bool(leaf.GetLeafCount()): raise RuntimeError, "Branch %s is not a variable-length value array" % branchName
        typ = leaf.GetTypeName()

@@ -5,5 +5,7 @@
   <class name="PyJetParametersWrapper"/>
   <class name="WeightCalculatorFromHistogram"/>
   <class name="ReduceMantissaToNbitsRounding"/>
+  <class name="CollectionSkimmer" transient="true" />
+  <class name="CollectionMerger" transient="true" />
 </selection>
 </lcgdict>

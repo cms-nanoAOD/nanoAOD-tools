@@ -3,6 +3,8 @@
 #include "PhysicsTools/NanoAODTools/interface/PyJetParametersWrapper.h"
 #include "PhysicsTools/NanoAODTools/interface/WeightCalculatorFromHistogram.h"
 #include "PhysicsTools/NanoAODTools/interface/ReduceMantissa.h"
+#include "PhysicsTools/NanoAODTools/interface/CollectionSkimmer.h"
+#include "PhysicsTools/NanoAODTools/interface/CollectionMerger.h"
 
 PyJetResolutionWrapper jetRes;
 PyJetResolutionScaleFactorWrapper jetResScaleFactor;
