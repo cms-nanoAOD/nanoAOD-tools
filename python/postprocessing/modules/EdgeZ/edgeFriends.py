@@ -369,7 +369,6 @@ class edgeFriends:
             genparts = [g for g in Collection(event,"GenPart","nGenPart")]
             genjets = [j for j in Collection(event, "GenJet", "nGenJet")] # Atencion
 
-        if not isData: 
             jetsc_jecUp = [j for j in Collection(event,"Jet","nJet")]
             jetsc_jecDn = [j for j in Collection(event,"Jet","nJet")]        
             jetsc_jecUp = self.smearJets(jetsc_jecUp,  1.0)
@@ -380,6 +379,7 @@ class edgeFriends:
             fatjetsc_jecUp = self.smearJets(fatjetsc_jecUp,  1.0)
             fatjetsc_jecDn = self.smearJets(fatjetsc_jecDn, -1.0)
 
+        else:
             jetsc_jecUp    = [] 
             jetsc_jecDn    = []
             fatjetsc_jecUp = []
@@ -826,8 +826,8 @@ class edgeFriends:
             for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor".split():
                 jetret[jfloat].append( getattr(jet,jfloat) )
 
-            jetret['pt_jecUp'].append( jetsc_jecUp[idx] if idx < len(jetsc_jecUp) else -99)
-            jetret['pt_jecDn'].append( jetsc_jecDn[idx] if idx < len(jetsc_jecUp) else -99)
+            jetret['pt_jecUp'].append( jetsc_jecUp[idx].pt if idx < len(jetsc_jecUp) else -99)
+            jetret['pt_jecDn'].append( jetsc_jecDn[idx].pt if idx < len(jetsc_jecUp) else -99)
 
             if not isData: # Atencion
                 jetret["genJetIdx"].append( getattr(jet, "genJetIdx") if not isData else -1.)
@@ -860,8 +860,8 @@ class edgeFriends:
             fatjet = fatjetsc[idx]
             for fjfloat in "pt eta phi mass tau1 btagCSVV2 tau2 tau3 msoftdrop".split():#     ".split(): 
                 fatjetret[fjfloat].append( getattr(fatjet,fjfloat) )
-            fatjetret['pt_jecUp'].append( fatjetsc_jecUp[idx] if idx < len(fatjetsc_jecUp) else -99) 
-            fatjetret['pt_jecDn'].append( fatjetsc_jecDn[idx] if idx < len(fatjetsc_jecDn) else -99) 
+            fatjetret['pt_jecUp'].append( fatjetsc_jecUp[idx].pt if idx < len(fatjetsc_jecUp) else -99) 
+            fatjetret['pt_jecDn'].append( fatjetsc_jecDn[idx].pt if idx < len(fatjetsc_jecDn) else -99) 
 
         #     if not isData:  
         #         for fjmc in "mcPt mcMatchId hadronFlavour".split():  #  mcFlavour
@@ -1005,9 +1005,9 @@ class edgeFriends:
         ret = []
         for f in fatjetcoll:
             f._clean = True
-            #if abs(f.eta) > 2.4 or f.pt < 25.:
-            #    f._clean = False
-            #    continue
+            if abs(f.eta) > 2.4 or f.pt < 25.:
+                f._clean = False
+                continue
             for l in lepst:
                 if deltaR(l,f) < 0.4:
                     f._clean = False

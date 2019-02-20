@@ -1,7 +1,7 @@
 import ROOT
 
 class CollectionMerger:
-    def __init__(self, outName, srcColl1, srcColl2, maxSize=100, ):
+    def __init__(self, outName, srcColl1, srcColl2, maxSize=100):
         """Read from a collection called srcColl1 and srcColl2, merges to a collection called outName (e.g. 'CleanJet')
            Clone the variables specified in the ints and floats list (e.g. 'mcMatchId', 'pt', ...)
            maxSize fixes the maximum allowed number of entries in the output. 
@@ -23,7 +23,6 @@ class CollectionMerger:
         if len(self._ints)+len(self._floats)+len(self._uchars) +len(self._bools) == 0: # dump all branches
             _brlist = tree.GetListOfBranches()
             branches = [_brlist.At(i) for i in xrange(_brlist.GetEntries())]
-           
             for br in branches:
                 name = br.GetName()
                 typ  = br.FindLeaf(br.GetName()).GetTypeName()
