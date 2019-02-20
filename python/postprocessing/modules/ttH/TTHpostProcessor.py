@@ -13,7 +13,6 @@ import json
 
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.collectionMerger import collectionMerger
-from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.skimNRecoLeps import SkimRecoLeps
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.TriggerBitFilter import TriggerBitFilter
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.addFlags import AddFlags
 from PhysicsTools.NanoAODTools.postprocessing.modules.ttH.objectCleaning import ObjectCleaning
@@ -33,8 +32,7 @@ inputSlim  = os.environ['CMSSW_BASE']+"/python/PhysicsTools/NanoAODTools/postpro
 
 doData=getCrabOption("doData",False)
 
-
-if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
+if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
 
     from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import * 
 
@@ -96,29 +94,6 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
     except: 
         raise RuntimeError("No options_sample.json found")
 
-    #1) definition of leptons and skim 
-    
-    # minelpt  = 5
-    # minmupt  = 5
-    # maxeleta = 2.5
-    # maxmueta = 2.4
-    
-    # isoAndIPCuts = lambda  x : x.miniPFRelIso_all < 0.4  and abs(x.dxy) < 0.05 and abs(x.dz) < 0.1 and x.sip3d < 8 
-    
-    # susy_ttH_el  = lambda x  : x.pt > minelpt and abs(x.eta) < maxeleta and x.mvaFall17V1noIso_WPL and isoAndIPCuts(x)
-    # susy_ttH_mu  = lambda x : x.pt > minmupt and abs(x.eta) < maxmueta  and isoAndIPCuts(x)
-    
-    # top_el       = lambda x : x.pt > 20 and x.lostHits < 2 and x.cutBased == 4 and x.pfRelIso03_all < 0.0588 # (pf iso larger than the cuts used)
-    # top_mu       = lambda x : x.pt > 20 and x.tightId  and x.pfRelIso04_all < 0.4
-    
-    # goodElec =  lambda x : susy_ttH_el(x) or top_el(x)
-    # goodMuon =  lambda x : susy_ttH_mu(x) or top_mu(x)
-    
-    # goodLepProducer = collectionMerger(input=["Electron","Muon"], output="LepGood",
-    #                                    maxObjects=10,
-    #                                    selector=dict([("Electron", goodElec),
-    #                                                   ("Muon", goodMuon)
-    #                                                   ]))
 
     def _ttH_idEmu_cuts_E3(lep):
         if (abs(lep.pdgId)!=11): return True
@@ -170,8 +145,7 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
     from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
 
 
-    skimRecoLeps     = SkimRecoLeps(sample.options['isData'] == True, nMinLeps=2)
-    mod = [objCleaning ] # goodLepProducer, skimRecoLeps]
+    mod = [objCleaning ] 
     
     if not sample.options['isData']:
         # add pile-up weight before any skim
@@ -202,66 +176,3 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
 
 
 
-
-
-
-# def BuildJsonForTesting():
-
- 
-#     sampOpt = { 'isData' : True,
-#                 'triggers' : [], #triggers_mumu_iso + triggers_3mu , # [],#triggers_ee + triggers_3e+triggers_ee_noniso,
-#                 'vetotriggers' : [],#triggers_mumu_iso + triggers_3mu,
-#                 'json':   None, # '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
-#                 'xsec' : 88.,
-#                 }
-
-#     optjsonfile = open('options_sample.json','w')
-#     optjsonfile.write(json.dumps(sampOpt))
-#     optjsonfile.close()
-
-    
-
-    
-
-# def LoadCfgForSubmission():
-
-
-#     return selectedSamples
-
-#def LoadCfgToRun(inputFile=None):
-
- #this takes care of converting the input files from CRAB
-        
-#    return POSTPROCESSOR
-
-
-
-
-
-# if not __name__ == "__main__": # this is only done when importing
-
-#     if 'IS_CRAB' in os.environ:
-#         POSTPROCESSOR = LoadCfgToRun()
-#     else:
-#         selectedSamples = LoadCfgForSubmission()
-
-
-# else:
-
-
-#     BuildJsonForTesting()
-#     filepath  = [
-#         #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/Run2017C_MuonEG_Nano14Dec2018-v1_F7055783-BE3F-BF4B-83A2-64A73E13EA85.root',
-#         #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/SingleMuon_612BB142-CD08-B14D-BA60-2311FA0F2BD2.root',
-#         #'/pool/ciencias/userstorage/sscruz/NanoAOD_test/TTbar_4B84BCC5-FE7C-714B-81AD-5A76C3B511FF.root',
-#         #'/afs/cern.ch/work/s/sesanche/public/forEdge/test_forsynch_v4.root'
-#         'evt_1_70455_65628129.root'
-#                   ]
-
-
-#     outdir = '.'
-
-
-
-#     POSTPROCESSOR = LoadCfgToRun(filepath)
-#     POSTPROCESSOR.run()
