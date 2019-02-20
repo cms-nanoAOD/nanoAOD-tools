@@ -91,6 +91,7 @@ class ObjectCleaning(Module):
             for el in elecLoose:
                 for mu in muonLoose:
                     if deltaR(el,mu) < self.cleanElectronsWithMuons: elecLoose.remove(el)
+                    break # breaking just in case three leptons are quite close
             
 
         # we define FOs on top of loose leptons
@@ -114,6 +115,7 @@ class ObjectCleaning(Module):
             for tau in tausFO:
                 if tau.jetIdx > -1 and jets[tau.jetIdx] in jetsSelec:
                     jetsSelec.remove( jets[tau.jetIdx] ) 
+                    break
 
         # we clean jets from FO taus and leps. Here no deltaR but using the matching
         if self.cleanJetsWithFOLeps:
