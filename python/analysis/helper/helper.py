@@ -2,6 +2,7 @@
 from math import fabs, cos, sqrt
 from PhysicsTools.NanoAODTools.postprocessing.tools import deltaPhi, deltaR, closest, matchObjectCollectionMultiple
 from ROOT import TLorentzVector
+from color import *
 
 def deltaPhi(phi1,phi2):
     PHI = fabs(phi1-phi2)
@@ -247,20 +248,21 @@ def daughterFinder(fgenparts,mothersList, genparts):
     return [daughters]
 
 def printDecayCollection(inList,genpart):
-    print ":==BEGIN COLLECTION HISTORY==:"
+    print HEADER+":==BEGIN COLLECTION HISTORY==:"+ENDC
     for num,gen in enumerate(inList):
+        if gen.status!=1 and gen.pdgId!=11 or gen.pdgId!=13: continue;
         moId=gen.genPartIdxMother
-        print "Particle ",num, " --> pdgId = ", gen.pdgId , " ; status = ", gen.status , " ; pt = ", gen.pt, " ; mass = ", gen.mass," ; statflag = ", gen.statusFlags
+        print OKGREEN+"Particle ",num, " --> pdgId = ", gen.pdgId , " ; status = ", gen.status , " ; pt = ", gen.pt, " ; mass = ", gen.mass," ; statflag = ", gen.statusFlags, ENDC
         while moId!=-1:
             print "Particle ",num, " -- > mon pdgId = ", genpart[moId].pdgId , " ; mon status = ", genpart[moId].status , " ; pt = ", genpart[moId].pt , " ; mass = ", genpart[moId].mass," ; statflag = ", genpart[moId].statusFlags
             moId=genpart[moId].genPartIdxMother
-    print ":==END==:"
+    print HEADER+":==END==:"+ENDC
 
 def printDecayParticle(obj,genpart):
-    print ":==BEGIN PARTICLE HISTORY==:"
+    print HEADER+":==BEGIN PARTICLE HISTORY==:"+ENDC
     moId=obj.genPartIdxMother
-    print " --> pdgId = ", obj.pdgId , " ; status = ", obj.status , " ; pt = ", obj.pt, " ; mass = ", obj.mass, " ; statflag = ", obj.statusFlags
+    print OKGREEN+" --> pdgId = ", obj.pdgId , " ; status = ", obj.status , " ; pt = ", obj.pt, " ; mass = ", obj.mass, " ; statflag = ", obj.statusFlags, ENDC
     while moId!=-1:
         print " -- > mon pdgId = ", genpart[moId].pdgId , " ; mon status = ", genpart[moId].status , " ; pt = ", genpart[moId].pt , " ; mass = ", genpart[moId].mass," ; statflag = ", genpart[moId].statusFlags
         moId=genpart[moId].genPartIdxMother
-    print ":==END==:"
+    print HEADER+":==END==:"+ENDC
