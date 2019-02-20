@@ -137,6 +137,8 @@ class edgeFriends:
                     ("nJetSel_jecUp"+label, "I"),
                     ("nJetSel_jecDn"+label, "I"),
                     ("nFatJetSel"+label, "I"),
+                    ("nFatJetSel_jecUp"+label, "I"),
+                    ("nFatJetSel_jecDn"+label, "I"),
                     #("nEdgeIsoTracks"+label, "I"),
                     ("rightMjj"+label, "F"),
                     ("bestMjj"+label, "F"),
@@ -304,13 +306,13 @@ class edgeFriends:
         #     biglist.append( ("EdgeIsoTracksSel"+label+"_"+itfloat,"F",20,"nEdgeIsoTracks"+label) )
         
         ################## Selected jets
-        for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor".split():
+        for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor pt_jecUp pt_jecDn".split():
             biglist.append( ("JetSel"+label+"_"+jfloat,"F",20,"nJetSel"+label) ) #if self.isMC:
         biglist.append( ("JetSel"+label+"_mcPt",     "F",20,"nJetSel"+label) )
         biglist.append( ("JetSel"+label+"_mcPartonFlavour","I",20,"nJetSel"+label) )
         biglist.append( ("JetSel"+label+"_genJetIdx","I",20,"nJetSel"+label) )
         ################## Selected Fat jets
-        for fjfloat in "pt eta phi mass btagCSVV2 msoftdrop tau1 tau2 tau3".split(): # btagDeepB  # esto tiene que volver
+        for fjfloat in "pt eta phi mass btagCSVV2 msoftdrop tau1 tau2 tau3 pt_jecUp pt_jecDn".split(): # btagDeepB  # esto tiene que volver
             biglist.append( ("FatJetSel"+label+"_"+fjfloat,"F",20,"nFatJetSel"+label) ) #if self.isMC:
         # esto tiene que volver
         #biglist.append( ("FatJetSel"+label+"_mcPt",     "F",20,"nFatJetSel"+label) )
@@ -367,11 +369,21 @@ class edgeFriends:
             genparts = [g for g in Collection(event,"GenPart","nGenPart")]
             genjets = [j for j in Collection(event, "GenJet", "nGenJet")] # Atencion
 
-        jetsc_jecUp = [j for j in Collection(event,"Jet","nJet")]
-        jetsc_jecDn = [j for j in Collection(event,"Jet","nJet")]        
-        jetsc_jecUp = [] if isData else self.smearJets(jetsc_jecUp,  1.0)
-        jetsc_jecDn = [] if isData else self.smearJets(jetsc_jecDn, -1.0)
+        if not isData: 
+            jetsc_jecUp = [j for j in Collection(event,"Jet","nJet")]
+            jetsc_jecDn = [j for j in Collection(event,"Jet","nJet")]        
+            jetsc_jecUp = self.smearJets(jetsc_jecUp,  1.0)
+            jetsc_jecDn = self.smearJets(jetsc_jecDn, -1.0)
 
+            fatjetsc_jecUp = [fj for fj in Collection(event,"FatJet","nFatJet")] 
+            fatjetsc_jecDn = [fj for fj in Collection(event,"FatJet","nFatJet")] 
+            fatjetsc_jecUp = self.smearJets(fatjetsc_jecUp,  1.0)
+            fatjetsc_jecDn = self.smearJets(fatjetsc_jecDn, -1.0)
+
+            jetsc_jecUp    = [] 
+            jetsc_jecDn    = []
+            fatjetsc_jecUp = []
+            fatjetsc_jecDn = []
 
         ################## Treatment of n of true events
         if not isData:
@@ -627,11 +639,15 @@ class edgeFriends:
         jetsc_jecUp = self.setJetCollection(jetsc_jecUp, lepst)
         jetsc_jecDn = self.setJetCollection(jetsc_jecDn, lepst)
         fatjetsc    = self.setFatJetCollection(fatjetsc, jetsc, lepst)
+        fatjetsc_jecUp    = self.setFatJetCollection(fatjetsc_jecUp, jetsc, lepst)
+        fatjetsc_jecDn    = self.setFatJetCollection(fatjetsc_jecDn, jetsc, lepst)
 
         (ijlist      ,nb25      ,nbl25      ,nb35      ,nl35      ,n35      ,n25      ,ht35      ,ht25      ,theJets      ,theBJets      ,mbb      ,the25BJets) = self.countJets(jetsc)
         (ijlist_jecup,nb25_jecUp,nbl25_jecUp,nb35_jecUp,nl35_jecUp,n35_jecUp,n25_jecUp,ht35_jecUp,ht25_jecUp,theJets_jecUp,theBJets_jecUp,mbb_jecUp,the25BJets_jecUp) = self.countJets(jetsc_jecUp)
         (ijlist_jecdn,nb25_jecDn,nbl25_jecDn,nb35_jecDn,nl35_jecDn,n35_jecDn,n25_jecDn,ht35_jecDn,ht25_jecDn,theJets_jecDn,theBJets_jecDn,mbb_jecDn,the25BJets_jecDn) = self.countJets(jetsc_jecDn)
         (ifjlist) = self.countFatJets(fatjetsc)
+        (ifjlist_jecUp) = self.countFatJets(fatjetsc_jecUp)
+        (ifjlist_jecDn) = self.countFatJets(fatjetsc_jecDn)
 
         self.out.fillBranch('FS_central_jets' + self.label, self.checkJetsGenJets(jetsc))
         self.out.fillBranch('nJet35'          + self.label, n35                         )
@@ -653,13 +669,15 @@ class edgeFriends:
         self.out.fillBranch('FS_central_jets_jecUp'     + self.label, self.checkJetsGenJets(jetsc_jecUp))
         self.out.fillBranch('FS_central_jets_jecDn'     + self.label, self.checkJetsGenJets(jetsc_jecDn))
 
-        self.out.fillBranch('nJetSel'       + self.label, len(ijlist)       )
-        self.out.fillBranch('nJetSel_jecUp' + self.label, len(ijlist_jecup) )
-        self.out.fillBranch('nJetSel_jecDn' + self.label, len(ijlist_jecdn) )
-        self.out.fillBranch('nFatJetSel'    + self.label, len(ifjlist)      )  
-        self.out.fillBranch('mbb'           + self.label, mbb      )
-        self.out.fillBranch('mbb_jecUp'     + self.label, mbb_jecUp)
-        self.out.fillBranch('mbb_jecDn'     + self.label, mbb_jecDn)
+        self.out.fillBranch('nJetSel'         + self.label, len(ijlist)       )
+        self.out.fillBranch('nJetSel_jecUp'   + self.label, len(ijlist_jecup) )
+        self.out.fillBranch('nJetSel_jecDn'   + self.label, len(ijlist_jecdn) )
+        self.out.fillBranch('nFatJetSel'      + self.label, len(ifjlist)      )
+        self.out.fillBranch('nFatJetSel_jecUp'+ self.label, len(ifjlist_jecUp))
+        self.out.fillBranch('nFatJetSel_jecDn'+ self.label, len(ifjlist_jecDn))  
+        self.out.fillBranch('mbb'             + self.label, mbb      )
+        self.out.fillBranch('mbb_jecUp'       + self.label, mbb_jecUp)
+        self.out.fillBranch('mbb_jecDn'       + self.label, mbb_jecDn)
 
         
         ################### MT and MT2 variables
@@ -787,12 +805,16 @@ class edgeFriends:
         
         ################### Sort jets by pt
         ijlist.sort(key = lambda idx : jetsc[idx].pt, reverse = True)
+        ijlist_jecup.sort(key = lambda idx : jetsc_jecUp[idx].pt, reverse = True)
+        ijlist_jecdn.sort(key = lambda idx : jetsc_jecDn[idx].pt, reverse = True)
         ifjlist.sort(key = lambda idx : fatjetsc[idx].pt, reverse = True)
+        ifjlist_jecUp.sort(key = lambda idx : fatjetsc_jecUp[idx].pt, reverse = True)
+        ifjlist_jecDn.sort(key = lambda idx : fatjetsc_jecDn[idx].pt, reverse = True)
 
 
         ################### Compute jet and fatjet variables Atencion
         jetret = {} 
-        for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor".split():
+        for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor pt_jecUp pt_jecDn".split():
             jetret[jfloat] = []
         if not isData:
             for jmc in "mcPt mcPartonFlavour genJetIdx".split():
@@ -803,6 +825,10 @@ class edgeFriends:
             jet = jetsc[idx] 
             for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor".split():
                 jetret[jfloat].append( getattr(jet,jfloat) )
+
+            jetret['pt_jecUp'].append( jetsc_jecUp[idx] if idx < len(jetsc_jecUp) else -99)
+            jetret['pt_jecDn'].append( jetsc_jecDn[idx] if idx < len(jetsc_jecUp) else -99)
+
             if not isData: # Atencion
                 jetret["genJetIdx"].append( getattr(jet, "genJetIdx") if not isData else -1.)
                 if getattr(jet, "genJetIdx") == -1 or len(genjets)<=jet.genJetIdx:
@@ -823,7 +849,7 @@ class edgeFriends:
 
         ## Variables of fatjets
         fatjetret = {} 
-        for fjfloat in "pt eta phi mass btagCSVV2 tau1 tau2 tau3 msoftdrop".split(): # 
+        for fjfloat in "pt eta phi mass btagCSVV2 tau1 tau2 tau3 msoftdrop pt_jecUp pt_jecDn".split(): # 
             fatjetret[fjfloat] = []
 #        if not isData:
 #            for fjmc in "mcPt mcMatchId hadronFlavour".split():  # mcFlavour 
@@ -834,6 +860,9 @@ class edgeFriends:
             fatjet = fatjetsc[idx]
             for fjfloat in "pt eta phi mass tau1 btagCSVV2 tau2 tau3 msoftdrop".split():#     ".split(): 
                 fatjetret[fjfloat].append( getattr(fatjet,fjfloat) )
+            fatjetret['pt_jecUp'].append( fatjetsc_jecUp[idx] if idx < len(fatjetsc_jecUp) else -99) 
+            fatjetret['pt_jecDn'].append( fatjetsc_jecDn[idx] if idx < len(fatjetsc_jecDn) else -99) 
+
         #     if not isData:  
         #         for fjmc in "mcPt mcMatchId hadronFlavour".split():  #  mcFlavour
         #             fatjetret[fjmc].append( -1 ) # getattr(fatjet,fjmc) if not isData or not hasattr(fatjet,jfmc) else -1.)
@@ -973,16 +1002,18 @@ class edgeFriends:
     #################################################################################################################
     ######## Atenttion how to do this.                                                                      
     def setFatJetCollection(self, fatjetcoll, jetcoll, lepst):
+        ret = []
         for f in fatjetcoll:
             f._clean = True
-           # for l in lepst:
-           #     if deltaR(l,f) < 0.4:
-           #         f._clean = False  
-           # for j in jetcoll:
-           #     if deltaR(j,f) < 0.8:
-           #         f._clean = False  
-           #         print "failed jet dR" 
-        return fatjetcoll                                            
+            #if abs(f.eta) > 2.4 or f.pt < 25.:
+            #    f._clean = False
+            #    continue
+            for l in lepst:
+                if deltaR(l,f) < 0.4:
+                    f._clean = False
+            if f._clean:
+                ret.append(f)
+        return ret 
 
     #################################################################################################################
 
@@ -1097,19 +1128,8 @@ class edgeFriends:
 
     def getRightMjj(self, jetsel):
         if len(jetsel) < 2: return -99.
-        selectedjets = []
-        for jeti in jetsel:
-            #if abs(jeti.partonMotherId) == 24:
-            #Atencion #Atencion #Atencion 
-            if 24 == 24:
-                jet = ROOT.TLorentzVector()
-                jet.SetPtEtaPhiM(jeti.pt, jeti.eta, jeti.phi, jeti.mass)
-                selectedjets.append(jet)
+        return (jetsel[0].p4() + jetsel[1].p4()).M()
 
-        if len(selectedjets) > 1:
-            return (selectedjets[0] + selectedjets[1]).M()
-        else:
-            return 0
     #################################################################################################################
 
     def getBestMjj(self, jetsel):
@@ -1165,11 +1185,9 @@ class edgeFriends:
         for j in jetcol:
             quot = 1.0-getattr(j, "rawFactor") #getattr(j, "CorrFactor_L1L2L3Res") if getattr(j, "CorrFactor_L1L2L3Res") > 0 else getattr(j, "CorrFactor_L1L2L3")
             if syst > 0: 
-                #j.pt = j.pt*getattr(j, "pt_jesTotalUp") / quot
-                j.pt = getattr(j, 'pt_jesTotalUp') # Atencion
+                j.pt = j.pt_jesTotalUp
             else:
-                #j.pt = j.pt*getattr(j, "pt_jesTotalDown") /quot
-                j.pt = getattr(j, 'pt_jesTotalDown')
+                j.pt = j.pt_jesTotalDown
         return jetcol
     #################################################################################################################
 

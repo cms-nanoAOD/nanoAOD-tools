@@ -126,10 +126,12 @@ def LoadCfgToRun(inputFile=None):
     if sampOpt['isData']: 
         mod.remove( puAutoWeight ) 
     else:
-        from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017All, jetmetUncertainties2017
-        jmeUncert = jetmetUncertainties2017()
-        jmeUncert.metBranchName = 'METFixEE2017'
-        mod.insert(mod.index(edgeFriends),jmeUncert) # jetmetUncertainties2017All()
+        from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017, jetmetUncertainties2017AK8chs
+        jmeUncertAK4 = jetmetUncertainties2017()
+        jmeUncertAK4.metBranchName = 'METFixEE2017'
+        jmeUncertAK8 = jetmetUncertainties2017AK8chs()
+        mod.insert(mod.index(edgeFriends ),jmeUncertAK4)
+        mod.insert(mod.index(jmeUncertAK4),jmeUncertAK8)
 
     if 'triggers' in sampOpt:
         if not 'vetotriggers' in sampOpt:
