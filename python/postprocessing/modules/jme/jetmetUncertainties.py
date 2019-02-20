@@ -13,7 +13,7 @@ class jetmetUncertaintiesProducer(Module):
     def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False):
 
         self.era = era
-	self.redoJEC = redoJEC
+        self.redoJEC = redoJEC
         self.noGroom = noGroom
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used, as there is no consistent set of txt files for
@@ -59,14 +59,14 @@ class jetmetUncertaintiesProducer(Module):
             if self.era == "2016":
                 self.jesUncertaintyInputFileName = "Summer16_23Sep2016V4_MC_Uncertainty_" + jetType + ".txt"
             elif self.era == "2017":
-                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V6_MC_Uncertainty_" + jetType + ".txt"
+                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V32_MC_Uncertainty_" + jetType + ".txt"
             else:
                 raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
         else:
             if self.era == "2016":
                 self.jesUncertaintyInputFileName = "Summer16_23Sep2016V4_MC_UncertaintySources_" + jetType + ".txt"
             elif self.era == "2017":
-                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V6_MC_UncertaintySources_" + jetType + ".txt"
+                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V32_MC_UncertaintySources_" + jetType + ".txt"
             else:
                 raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
 
@@ -80,9 +80,8 @@ class jetmetUncertaintiesProducer(Module):
                 self.jesUncertainties = sources
             
 
-	if self.redoJEC :
-	    self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
-	
+        if self.redoJEC :
+            self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
 
         # define energy threshold below which jets are considered as "unclustered energy"
         # (cf. JetMETCorrections/Type1MET/python/correctionTermsPfMetType1Type2_cff.py )
@@ -237,15 +236,15 @@ class jetmetUncertaintiesProducer(Module):
             # evaluate JER scale factors and uncertainties
             # (cf. https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution )
             ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
-	    
-	    jet_pt=jet.pt
+
+            jet_pt=jet.pt
             if hasattr(jet, "rawFactor"):
                 jet_rawpt = jet.pt * (1 - jet.rawFactor)
             else:
                 jet_rawpt = -1.0 * jet.pt #If factor not present factor will be saved as -1
             
-	    if self.redoJEC :
-		jet_pt = self.jetReCalibrator.correct(jet,rho)
+            if self.redoJEC :
+                jet_pt = self.jetReCalibrator.correct(jet,rho)
             jets_corr_JEC.append(jet_pt/jet_rawpt)
             jets_corr_JER.append(jet_pt_jerNomVal)
             
@@ -428,8 +427,8 @@ class jetmetUncertaintiesProducer(Module):
 
 jetmetUncertainties2016 = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "Total" ])
 jetmetUncertainties2016All = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "All" ])
-jetmetUncertainties2017 =    lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V6_MC", [ "Total" ])
-jetmetUncertainties2017All = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V6_MC", [ "All" ], redoJEC=True)
+jetmetUncertainties2017 =    lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "Total" ])
+jetmetUncertainties2017All = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "All" ], redoJEC=True)
 
 jetmetUncertainties2016AK4Puppi = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "Total" ], jetType="AK4PFPuppi")
 jetmetUncertainties2016AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC",  [ "All" ], jetType="AK4PFPuppi")
