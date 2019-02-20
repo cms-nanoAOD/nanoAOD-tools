@@ -147,7 +147,7 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
 
     mod = [objCleaning ] 
     
-    if not sample.options['isData']:
+    if not sampOpt['isData']:
         # add pile-up weight before any skim
         mod = [puAutoWeight] + mod
         

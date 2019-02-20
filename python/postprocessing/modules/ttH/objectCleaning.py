@@ -18,8 +18,8 @@ class ObjectCleaning(Module):
                  FOTauSelection            ,
                  jetSelection              ,
                  conePt,
-                 cleanElectronsWithMuons   = 0.09,
-                 cleanTausWithLooseLeptons = 0.09,
+                 cleanElectronsWithMuons   = 0.3,
+                 cleanTausWithLooseLeptons = 0.3,
                  cleanJetsWithFOLeps       = True,
                  cleanJetsWithFOTaus       = True
                  ):
