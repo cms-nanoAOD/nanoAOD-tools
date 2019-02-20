@@ -68,4 +68,3 @@ for dataset in cfo.selectedSamples:
 
     os.system("crab submit %s -c crab_config_env.py"%("--dryrun" if options.dryrun else ""))
 
-    break ## change this 
