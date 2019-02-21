@@ -46,8 +46,8 @@ options_sample.close()
 
 handle = open(options.cfg_file,'r')
 cfo = imp.load_source(options.cfg_file.split('/')[-1].rstrip('.py'), options.cfg_file, handle)
-#cfo.POSTPROCESSOR.inputFiles =   ['/afs/cern.ch/work/s/sesanche/public/forEdge/test_forsynch_v4.root'] # #
-cfo.POSTPROCESSOR.inputFiles =   ['B8C1C884-EE4A-1E49-82C9-45332E5C0DB9.root']
+cfo.POSTPROCESSOR.inputFiles =   ['/afs/cern.ch/work/s/sesanche/public/forEdge/test_forsynch_v4.root'] # #
+#cfo.POSTPROCESSOR.inputFiles =   ['B8C1C884-EE4A-1E49-82C9-45332E5C0DB9.root']
 cfo.POSTPROCESSOR.run()
 
 
