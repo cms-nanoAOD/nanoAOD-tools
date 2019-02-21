@@ -31,7 +31,7 @@ optjsonfile.close()
 ## create dummy sample json to run locally
 options_sample = open('options_sample.json','w')
 
-sampOpt = { 'isData' : True,
+sampOpt = { 'isData' : False,
             'triggers' : [], #triggers_mumu_iso + triggers_3mu , # [],#triggers_ee + triggers_3e+triggers_ee_noniso,
             'vetotriggers' : [],#triggers_mumu_iso + triggers_3mu,
             'json':   None, # '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_29497-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt',
@@ -46,5 +46,10 @@ options_sample.close()
 
 handle = open(options.cfg_file,'r')
 cfo = imp.load_source(options.cfg_file.split('/')[-1].rstrip('.py'), options.cfg_file, handle)
-cfo.POSTPROCESSOR.inputFiles = ['/afs/cern.ch/work/s/sesanche/public/forEdge/test_forsynch_v4.root'] 
+#cfo.POSTPROCESSOR.inputFiles =   ['/afs/cern.ch/work/s/sesanche/public/forEdge/test_forsynch_v4.root'] # #
+cfo.POSTPROCESSOR.inputFiles =   ['B8C1C884-EE4A-1E49-82C9-45332E5C0DB9.root']
 cfo.POSTPROCESSOR.run()
+
+
+# clean up environ
+del os.environ['IS_RUN']
