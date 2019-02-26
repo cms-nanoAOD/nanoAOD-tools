@@ -111,6 +111,15 @@ class Producer(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         if self.debug: print " === EVENT Begin === "
+
+        ########################################
+        # Initialization
+        ########################################
+        Zweight= 1.; Zpt=-999.; Zeta=-999.
+        htpt=-999.;htphi=-999.
+        isOSmumu=0; isOSee=0; isOSemu=0; isSSmumu=0; isSSee=0
+        Vmass=-999.; Vpt=-999.
+        
         ########################################
         #            READ OBJECTS                                                                                                                                                   
         ########################################
@@ -123,7 +132,7 @@ class Producer(Module):
         
         ## PU
         ####                                                                                                                                                                   
-        ## Trigger                                                                                                                                                             
+        ## Trigger                                                                                               
         ####
         
         ## PRESELECTION + QUALITY SELECTION + PHASE SPACE SELECTION
@@ -142,7 +151,7 @@ class Producer(Module):
         njet = len(JetListSS)
         ht = ROOT.TLorentzVector()
         #Initialization
-        JetPt=[0.]*(njet); JetEta=[0.]*(njet); JetPhi=[0.]*(njet); JetMass=[0.]*(njet); JetchHEF=[0.]*(njet); JetneHEF=[0.]*(njet); #JetSign=[0]*(njet);
+        JetPt=[-999.]*(njet); JetEta=[-99.]*(njet); JetPhi=[-99.]*(njet); JetMass=[-999.]*(njet); JetchHEF=[-99.]*(njet); JetneHEF=[-99.]*(njet); #JetSign=[0]*(njet);
         for i,ijet in enumerate(JetListSS):
             JetPt[i] = ijet.pt
             JetEta[i] = ijet.eta
@@ -161,7 +170,7 @@ class Producer(Module):
         cleanFromlepton(CleanJetList,ElecList)
         cleanFromlepton(CleanJetList,MuonList)
         ncjet = len(CleanJetList)
-        CleanJetPt=[0.]*(ncjet); CleanJetEta=[0.]*(ncjet); CleanJetPhi=[0.]*(ncjet); CleanJetMass=[0.]*(ncjet); CleanJetchHEF=[0.]*(ncjet); CleanJetneHEF=[0.]*(ncjet); #CleanJetSign=[0]*(ncjet);
+        CleanJetPt=[-999.]*(ncjet); CleanJetEta=[-99.]*(ncjet); CleanJetPhi=[-99.]*(ncjet); CleanJetMass=[-999.]*(ncjet); CleanJetchHEF=[-99.]*(ncjet); CleanJetneHEF=[-99.]*(ncjet); #CleanJetSign=[0]*(ncjet);
         for i,icjet in enumerate(CleanJetList):
             CleanJetPt[i] = icjet.pt
             CleanJetEta[i] = icjet.eta
@@ -175,7 +184,7 @@ class Producer(Module):
         nlep=len(LepList)
         LepList.sort(key=getPt, reverse=True)
         #Initialization
-        LepPt=[0.]*(nlep); LepEta=[0.]*(nlep); LepPhi=[0.]*(nlep); LepMass=[0.]*(nlep); LepIso03=[0.]*(nlep); LepIso04=[0.]*(nlep); LepSign=[0]*(nlep); 
+        LepPt=[-999.]*(nlep); LepEta=[-99.]*(nlep); LepPhi=[-99.]*(nlep); LepMass=[-999.]*(nlep); LepIso03=[-99.]*(nlep); LepIso04=[-99.]*(nlep); LepSign=[-99]*(nlep); 
         LepMediumId=[-1]*(nlep); LepCutBased=[-1]*(nlep); LepMindRJet=[6.5]*(nlep)
         for i,ilep in enumerate(LepList):
             LepPt[i]=ilep.pt
@@ -198,7 +207,7 @@ class Producer(Module):
         cleanFromlepton(TauList,LepList)
         ntau=len(TauList)
         #Initialization
-        TauPt=[0.]*(ntau); TauEta=[0.]*(ntau); TauPhi=[0.]*(ntau); TauMass=[0.]*(ntau); #TauPartFlav=[0]*(ntau); 
+        TauPt=[-999.]*(ntau); TauEta=[-99.]*(ntau); TauPhi=[-99.]*(ntau); TauMass=[-999.]*(ntau); #TauPartFlav=[0]*(ntau); 
         for i,itau in enumerate(TauList):
             TauPt[i] = itau.pt
             TauEta[i] = itau.eta
@@ -212,7 +221,7 @@ class Producer(Module):
         cleanFromlepton(PhotonList,LepList)
         npho = len(PhotonList)
         #Initialization
-        PhoPt=[0.]*(npho); PhoEta=[0.]*(npho); PhoPhi=[0.]*(npho); PhoMass=[0.]*(npho); PhoSign=[0]*(npho);
+        PhoPt=[-999.]*(npho); PhoEta=[-99.]*(npho); PhoPhi=[-99.]*(npho); PhoMass=[-999.]*(npho); PhoSign=[-99]*(npho);
         for i,ipho in enumerate(PhotonList):
             PhoPt[i] = ipho.pt
             PhoEta[i] = ipho.eta
@@ -231,12 +240,12 @@ class Producer(Module):
         ####
         ## GenParticle
         ## Initialization
-        Zweight= 1.
-        Zpt=-999.
-        Zeta=-999.
         if "nGenPart" in self.InputTree.GetListOfBranches():
             genparts = Collection(event, "GenPart")
             GenLists=filter(lambda x:x,genparts)
+
+            printDecayCollection(genparts,genparts)
+            
             ## GEN candidates objects
             theGenZ = FindGenParticlebyStat(GenLists, [23],[62])
             theGenw = FindGenParticlebyStat(GenLists, [24,-24],[22,62])
@@ -252,7 +261,7 @@ class Producer(Module):
             
             ## GEN Zpt weight
             NgenZ=0
-
+            ## correction to lo from nlo
             if "DYJetsToLL" in self.FilesName.GetName().split('/')[-1].split('_')[0]:
                 for genZ in theGenZ:
                     #if genZ.status!=62: continue
@@ -273,18 +282,22 @@ class Producer(Module):
             #GEN-Lepton
             #Initialization
             nPart=3 ## Number of lepton to write
-            GenLpt=[0.]*nPart; GenLeta=[0.]*nPart; GenLphi=[0.]*nPart; GenLsign=[0]*nPart; GenLmass=[0.]*nPart
-            RecoLpt=[0.]*nPart; RecoLeta=[0.]*nPart; RecoLphi=[0.]*nPart; RecoLsign=[0]*nPart; RecoLmass=[0.]*nPart
+            GenLpt=[-999.]*nPart; GenLeta=[-99.]*nPart; GenLphi=[-99.]*nPart; GenLsign=[-99]*nPart; GenLmass=[-999.]*nPart
+            RecoLpt=[-999.]*nPart; RecoLeta=[-99.]*nPart; RecoLphi=[-99.]*nPart; RecoLsign=[-99]*nPart; RecoLmass=[-999.]*nPart
             matchPair=genRecoFinder(genLepton,ElecList+MuonList)
             for num,igenlep in enumerate(matchPair):
                 if (num+1)>nPart: continue
                 genlep=igenlep[0]
                 recolep=igenlep[1]
-                #W mom from outer leg
+                #W mom from outer leg , categorize lepton base on the typy of mother:
+                # --> W1 -> lv
+                # --> W2 -> lv
+                # --> W2 -> lv
                 index=0
-                if isGenMother(genlep,[24,-24],62,10497,genparts):
+                # motherpdgId ; motherStatus; daughterFlag
+                if isGenMother(genlep,[24,-24],62,12673,genparts):
                     index=0
-                elif isGenMother(genlep,[-24,24],22,14721,genparts):
+                elif isGenMother(genlep,[-24,24],22,12673,genparts):
                     index=1
                 elif isGenMother(genlep,[-24,24],22,14721,genparts):
                     index=2
@@ -305,7 +318,7 @@ class Producer(Module):
 
             #GEN-Wboson
             #Initialization
-            GenWpt=[0.]*nPart; GenWeta=[0.]*nPart; GenWphi=[0.]*nPart; GenWsign=[0]*nPart; GenWmass=[0.]*nPart
+            GenWpt=[-999.]*nPart; GenWeta=[-99.]*nPart; GenWphi=[-99.]*nPart; GenWsign=[-99]*nPart; GenWmass=[-999.]*nPart
             for num,genW in enumerate(theGenW):
                 if (num+1)>nPart: continue
                 GenWpt[num]=genW.pt
@@ -338,9 +351,7 @@ class Producer(Module):
         #   ANALYSIS
         ########################################
         ##Categorization base on number of leptons and flavour combination.
-        isOSmumu=0; isOSee=0; isOSemu=0; isSSmumu=0; isSSee=0
-        Vmass=-999.
-        Vpt=-999.
+        
         #Filling only with leading and subleading lepton
         if nlep>=2:
             ##Opposite sign 
@@ -440,4 +451,3 @@ producer = lambda : Producer(DEBUG=False)
 #\
     #jetSelection= lambda j : (j.pt > 30 and abs(j.eta)<2.5)
 #\)
-
