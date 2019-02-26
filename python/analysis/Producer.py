@@ -299,7 +299,7 @@ class Producer(Module):
                     index=0
                 elif isGenMother(genlep,[-24,24],22,12673,genparts):
                     index=1
-                elif isGenMother(genlep,[-24,24],22,14721,genparts):
+                elif isGenMother(genlep,[11,-11,13,-13,15,-15],22,8449,genparts):
                     index=2
                 else:
                     continue
