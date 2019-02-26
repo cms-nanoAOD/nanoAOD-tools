@@ -10,9 +10,10 @@ from ROOT import TLorentzVector
 
 class Producer(Module):
     #def __init__(self, jetSelection):
-    def __init__(self, DEBUG):
+    def __init__(self, DEBUG, GENDECAY):
         #self.jetSel = jetSelection
         self.debug = DEBUG
+        self.printdecay = GENDECAY
         pass
     def beginJob(self):
         pass
@@ -244,7 +245,8 @@ class Producer(Module):
             genparts = Collection(event, "GenPart")
             GenLists=filter(lambda x:x,genparts)
 
-            printDecayCollection(genparts,genparts)
+            if self.printdecay:
+                printDecayCollection(genparts,genparts)
             
             ## GEN candidates objects
             theGenZ = FindGenParticlebyStat(GenLists, [23],[62])
@@ -446,7 +448,7 @@ class Producer(Module):
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-producer = lambda : Producer(DEBUG=False)
+producer = lambda : Producer(DEBUG=False, GENDECAY=False)
 
 #\
     #jetSelection= lambda j : (j.pt > 30 and abs(j.eta)<2.5)
