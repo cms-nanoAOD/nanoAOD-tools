@@ -124,11 +124,12 @@ def FindGenParticlebyStat(InList, pdgid, statusid):
         newList.sort(key=getPt, reverse=True)
     return newList
 
-def isGenMother(particle, motherid, motherstatus, motherflag, genpart):
+def isGenMother(particle, motherid, motherstatus, daughterflag, genpart): #motherflag
 
+    if particle.statusFlags!=daughterflag: return False
     moId=particle.genPartIdxMother
     while moId!=-1:
-        if genpart[moId].pdgId in motherid and genpart[moId].status==motherstatus and genpart[moId].statusFlags==motherflag:
+        if genpart[moId].pdgId in motherid and genpart[moId].status==motherstatus: #and genpart[moId].statusFlags==motherflag:
             return True
         moId=genpart[moId].genPartIdxMother
     return False
@@ -250,7 +251,7 @@ def daughterFinder(fgenparts,mothersList, genparts):
 def printDecayCollection(inList,genpart):
     print HEADER+":==BEGIN COLLECTION HISTORY==:"+ENDC
     for num,gen in enumerate(inList):
-        if gen.status!=1 and gen.pdgId!=11 or gen.pdgId!=13: continue;
+        if gen.statusFlags!=8449: continue;
         moId=gen.genPartIdxMother
         print OKGREEN+"Particle ",num, " --> pdgId = ", gen.pdgId , " ; status = ", gen.status , " ; pt = ", gen.pt, " ; mass = ", gen.mass," ; statflag = ", gen.statusFlags, ENDC
         while moId!=-1:
