@@ -60,6 +60,8 @@ class Producer(Module):
         self.out.branch("RecoLphi", "F", 0, "nRecoL", "nRecoL", False)
         self.out.branch("RecoLmass", "F", 0, "nRecoL", "nRecoL", False)
         self.out.branch("RecoLsign", "I", 0, "nRecoL", "nRecoL", False)
+        self.out.branch("RecoLIso03", "F", 0, "nRecoL", "nRecoL", False)
+        
         ## SIGNAL STUDY  ##############################################
         
         ##ANALYSIS-LEVEL
@@ -106,6 +108,7 @@ class Producer(Module):
         self.out.branch("CleanJetchHEF", "F", 0, "nJet", "nJet", False)
         self.out.branch("CleanJetneHEF", "F", 0, "nJet", "nJet", False)
         #self.out.branch("CleanJetSign", "I", 0, "nCJet", "nCJet", False)
+
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -286,6 +289,7 @@ class Producer(Module):
             nPart=3 ## Number of lepton to write
             GenLpt=[-999.]*nPart; GenLeta=[-99.]*nPart; GenLphi=[-99.]*nPart; GenLsign=[-99]*nPart; GenLmass=[-999.]*nPart
             RecoLpt=[-999.]*nPart; RecoLeta=[-99.]*nPart; RecoLphi=[-99.]*nPart; RecoLsign=[-99]*nPart; RecoLmass=[-999.]*nPart
+            RecoLIso03=[-99.]*nPart;
             matchPair=genRecoFinder(genLepton,ElecList+MuonList)
             for num,igenlep in enumerate(matchPair):
                 if (num+1)>nPart: continue
@@ -317,6 +321,10 @@ class Producer(Module):
                 RecoLphi[index]=recolep.phi
                 RecoLsign[index]=recolep.pdgId
                 RecoLmass[index]=recolep.mass
+                RecoLIso03[index]=recolep.pfRelIso03_all
+                
+            ##Composite variables
+            
 
             #GEN-Wboson
             #Initialization
@@ -342,6 +350,7 @@ class Producer(Module):
             self.out.fillBranch("RecoLphi", RecoLphi)
             self.out.fillBranch("RecoLsign", RecoLsign)
             self.out.fillBranch("RecoLmass", RecoLmass)
+            self.out.fillBranch("RecoLIso03", RecoLIso03)
 
             self.out.fillBranch("GenWpt", GenWpt)
             self.out.fillBranch("GenWeta", GenWeta)
