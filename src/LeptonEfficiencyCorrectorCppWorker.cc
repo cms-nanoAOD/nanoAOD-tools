@@ -41,14 +41,17 @@ float LeptonEfficiencyCorrectorCppWorker::getSF(int pdgid, float pt, float eta) 
   return out;
 }
 
-float LeptonEfficiencyCorrectorCppWorker::getSFErr(int pdgid, float pt, float eta) {
-  float out=1.;
+float LeptonEfficiencyCorrectorCppWorker::getSFErr(unsigned type, int pdgid, float pt, float eta) {
+  float out=0.;
   float x = pt;
   float y = abs(pdgid)==13 ? fabs(eta) : eta;
-  for(std::vector<TH2F*>::iterator hist=effmaps_.begin(); hist<effmaps_.end(); ++hist) {
-    WeightCalculatorFromHistogram wc(*hist);
-    out *= wc.getWeightErr(x,y);
+  if (type >= effmaps_.size()) {
+    std::cout << " Error, asking error type " << type << " out-of-bound, max size is " << effmaps_.size() << std::endl;
+    return 0;
   }
+  TH2F* hist=effmaps_[type];
+  WeightCalculatorFromHistogram wc(hist);
+  out = wc.getWeightErr(x,y);
   return out;
 }
 

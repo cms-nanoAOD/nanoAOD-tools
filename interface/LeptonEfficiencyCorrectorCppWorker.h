@@ -19,7 +19,7 @@ class LeptonEfficiencyCorrectorCppWorker {
   void setLeptons(int nLep, int *lepPdgId, float *lepPt, float *lepEta);
 
   float getSF(int pdgid, float pt, float eta);
-  float getSFErr(int pdgid, float pt, float eta);
+  float getSFErr(unsigned type, int pdgid, float pt, float eta);
   const std::vector<float> & run();
 
 private:
