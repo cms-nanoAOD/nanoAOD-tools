@@ -25,7 +25,7 @@ class jetmetUncertaintiesProducer(Module):
         # smear jet pT to account for measured difference in JER between data and simulation.
         if era == "2016":
             self.jerInputFileName = "Summer16_25nsV1_MC_PtResolution_" + jetType + ".txt"
-            self.jerUncertaintyInputFileName = "Summer16_25nsV1_25nsV10_MC_SF_" + jetType + ".txt"
+            self.jerUncertaintyInputFileName = "Summer16_25nsV1_MC_SF_" + jetType + ".txt"
         elif era == "2017" or era == "2018": # use Fall17 as temporary placeholder until post-Moriond 2019 JERs are out
             self.jerInputFileName = "Fall17_V3_MC_PtResolution_" + jetType + ".txt"
             self.jerUncertaintyInputFileName = "Fall17_V3_MC_SF_" + jetType + ".txt"
