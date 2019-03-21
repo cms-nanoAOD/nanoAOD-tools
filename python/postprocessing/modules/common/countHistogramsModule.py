@@ -26,7 +26,7 @@ class countHistogramsProducer(Module):
         #if genWeight.genWeight > 0:
         #    self.h_nweightedevents.Fill(0.5)
         #else:
-        #    self.h_nweightedevents.Fill(-0.5)
+        #    self.h_nweightedevents.Fill(0.5,-1)
 
         return True
 
