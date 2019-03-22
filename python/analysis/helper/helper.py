@@ -79,7 +79,7 @@ def cleanFromleptonSS(InList,leptonList,dR=0.4):
     for lepton in leptonList:
         for jet in InList:
             if deltaR(jet,lepton)<dR:
-                
+                #Muons
                 if lepton._prefix.split('_')[0]=="Muon":
                     if lepton.mediumId==1:
                         #if jet.chHEF>0.1 or (jet.chHEF<0.1 and jet.neHEF>0.2):
@@ -94,7 +94,7 @@ def cleanFromleptonSS(InList,leptonList,dR=0.4):
                     elif lepton.mediumId==0:
                         #bad distinct lepton
                         InList.remove(jet)
-                        
+                #Electrons
                 elif lepton._prefix.split('_')[0]=="Electron":
                     if lepton.cutBased>0:
                         #if jet.chHEF>0.1 or (jet.chHEF<0.1 and jet.neHEF>0.2):
