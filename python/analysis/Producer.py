@@ -105,8 +105,8 @@ class Producer(Module):
         self.out.branch("CleanJetEta", "F", 0, "nCJet", "nCJet", False)
         self.out.branch("CleanJetPhi", "F", 0, "nCJet", "nCJet", False)
         self.out.branch("CleanJetMass", "F", 0, "nCJet", "nCJet", False)
-        self.out.branch("CleanJetchHEF", "F", 0, "nJet", "nJet", False)
-        self.out.branch("CleanJetneHEF", "F", 0, "nJet", "nJet", False)
+        self.out.branch("CleanJetchHEF", "F", 0, "nCJet", "nCJet", False)
+        self.out.branch("CleanJetneHEF", "F", 0, "nCJet", "nCJet", False)
         #self.out.branch("CleanJetSign", "I", 0, "nCJet", "nCJet", False)
 
 
@@ -154,6 +154,7 @@ class Producer(Module):
         cleanFromleptonSS(JetListSS,LepList)
         njet = len(JetListSS)
         ht = ROOT.TLorentzVector()
+        ht.SetPtEtaPhiE(0.,0.,0.,0.)
         #Initialization
         JetPt=[-999.]*(njet); JetEta=[-99.]*(njet); JetPhi=[-99.]*(njet); JetMass=[-999.]*(njet); JetchHEF=[-99.]*(njet); JetneHEF=[-99.]*(njet); #JetSign=[0]*(njet);
         for i,ijet in enumerate(JetListSS):
@@ -165,8 +166,8 @@ class Producer(Module):
             JetneHEF[i] = ijet.neHEF
             #JetSign[i] = ijet.partonFlavour
             #HT
-            if ijet.pt<30: continue
-            if fabs(ijet.eta)>2.5: continue
+            #if ijet.pt<30: continue
+            #if fabs(ijet.eta)>2.5: continue
             ht += ijet.p4()
 
         ## CLEANJet
