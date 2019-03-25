@@ -18,7 +18,8 @@ do
     byte=`ls -l ${rootfile} | awk -F ' ' '{print $5}'`
     z=$(($byte / 1000000000))
 
-    if (( $z < 10 ));then
+    if (( $z < 40 ));then
+	echo "$rootfile with byte --> $z GB ; thus SHORT Queue"
 	((valS+=1))
 	if [ "$valS" == "1" ];then
 	    echo -e "#!/usr/bin/env python\n" > script1
@@ -26,7 +27,8 @@ do
 	else
 	    echo -e "\t'$rootfile'," >> script1
 	fi
-    elif (( $z > 10 ));then
+    elif (( $z >= 40 ));then
+	echo "$rootfile with byte --> $z GB ; thus LONG Queue"
 	((valL+=1))
 	if [ "$valL" == "1" ];then
             echo -e "#!/usr/bin/env python\n" > script2
@@ -42,3 +44,7 @@ echo -e "]" >> script1
 echo -e "]" >> script2
 mv script1 samplelist_shortQ.py
 mv script2 samplelist_longQ.py
+echo "========================="
+echo "samplelist_shortQ.py with $valS root files"
+echo "samplelist_longQ.py with $valL root files"
+echo "========================="
