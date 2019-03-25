@@ -9,9 +9,9 @@ DIR=""
 #queuelist=("local-cms-long" "local-cms-short" "local-cms-long")
 #prodfolder=("skim-Data2016_VH_long" "skim-MC_VH_short" "skim-MC_VH_long")
 
-samplelist=("2017_Data_VH")
-queuelist=("local-cms-long")
-prodfolder=("skim-Data2017_VH_long")
+samplelist=("AUX")
+queuelist=("local-cms-short")
+prodfolder=("AUX")
 
 #samplelist=("testMC" "testData")
 #queuelist=("local-cms-short" "local-cms-short")
