@@ -46,6 +46,7 @@ class PostProcessor :
                 compressionLevel = int(level)
                 if   algo == "LZMA": compressionAlgo  = ROOT.ROOT.kLZMA
                 elif algo == "ZLIB": compressionAlgo  = ROOT.ROOT.kZLIB
+                elif algo == "LZ4":  compressionAlgo  = ROOT.ROOT.kLZ4
                 else: raise RuntimeError("Unsupported compression %s" % algo)
             else:
                 compressionLevel = 0 
