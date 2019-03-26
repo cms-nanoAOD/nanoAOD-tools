@@ -1,0 +1,2 @@
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/WWJJToLNuLNu_EWK_QCD_noTop_13TeV-madgraph-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/90000/63DCBF9E-607D-FB49-9059-B7663D139910.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/WWJJToLNuLNu_EWK_QCD_noTop_13TeV-madgraph-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/90000/6E9B0459-708D-7947-9D05-79C1A379E5E0.root

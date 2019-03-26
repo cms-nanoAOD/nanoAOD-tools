@@ -1,0 +1,8 @@
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/50000/E654B015-C4A6-E749-8619-4B50ABC2DEE7.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/50000/2680A039-A67D-884E-991C-A8A63DCCC820.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/50000/A63603B7-09AB-CE4E-8804-5E3E75E53EBA.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/50000/E25FC861-7F78-8742-9C1D-2B5D8A0178CA.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/50000/69EF273F-0A6F-6043-A07F-0A82BCFA63CD.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/50000/9E2623EF-E1D5-3249-B6F8-FDFBC94B1F84.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/50000/3B2E7F40-6836-904D-97E2-AF349C514CF6.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/50000/F0F94D7E-F2C2-314C-A186-02CE67A42684.root

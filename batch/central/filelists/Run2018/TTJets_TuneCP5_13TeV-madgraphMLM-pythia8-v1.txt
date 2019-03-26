@@ -1,0 +1,10 @@
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/120000/8B78960A-C88A-D846-9BCF-6272B6F3C4EC.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/120000/297CFE2A-7822-B047-B733-ED0D20B21651.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/120000/A963ADE3-FD61-CF40-A937-F6F614590144.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/110000/53103181-3DD8-DB4F-978E-D6FF8B9DCD96.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/110000/46FB6A43-B761-F143-B307-F6EE7542E948.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/110000/70CBE7A0-0F01-9B46-BFE3-6E4A7EFC7A06.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/110000/95C4FD07-4D5C-A940-B61C-2A061F71FEEF.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/110000/EE1954C7-CAC8-1D47-9BB7-48E3EFFCEF7F.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/110000/1BCC5407-E3FD-DD4B-B90C-2722C97EC246.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/TTJets_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16-v1/110000/E611D619-E727-134E-B747-DB9241900647.root

@@ -1,0 +1,17 @@
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/C4B559AE-DEF8-9344-B401-15A6B28F9D93.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/0A17F378-52C4-104D-A8A0-53AA03246BE9.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/B7EC0044-5CD0-2F4C-B7AE-1D074A816273.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/9F6746CE-A79D-BE41-AC7A-0FE3CEB6282B.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/1AD2EF19-E9A0-744E-9ABA-8547B5E81795.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/86169C25-26BD-4848-A253-C33516A4AC46.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/5AB37A7E-BA9B-DA4D-B78E-9FA37960DF78.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/0BFF0D16-50E9-7E4F-9696-E1716E5A3F03.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/896A5D74-82C3-C340-B006-D19F64A8FDF5.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/33C665C0-E32E-674B-832F-1072E7EA3292.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/1C620F41-46B9-1846-A459-6737326D720E.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/99E15B9C-576F-8E49-A504-404BC6071056.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/A5B0E7E3-3154-754D-AC8C-FC7C66ACA08E.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/DB8FDDEF-D2AE-DB42-8FC9-BA60AE55DA32.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/0DC9E3F6-8E0C-0549-BEDA-7E9D811797EA.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/080D0563-0369-994B-B90B-A3ADE75A187A.root
+root://xrootd-cms.infn.it//store/data/Run2016C/DoubleMuon/NANOAOD/Nano14Dec2018-v1/90000/70D07C46-E6D9-454E-9FAF-9A39A720371D.root

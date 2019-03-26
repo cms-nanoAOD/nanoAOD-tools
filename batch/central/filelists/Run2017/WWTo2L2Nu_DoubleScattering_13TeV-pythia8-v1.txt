@@ -1,0 +1,1 @@
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WWTo2L2Nu_DoubleScattering_13TeV-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/80000/25832D37-EB81-9542-9A72-C92CA71C0E06.root

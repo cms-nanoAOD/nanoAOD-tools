@@ -1,0 +1,2 @@
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/DYJetsToLL_M-50_HT-2500toInf_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/280000/B4A76EBE-9767-CB4C-ABE4-9FA46066A5AB.root
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/DYJetsToLL_M-50_HT-2500toInf_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/280000/72375D55-23FF-BF4B-8E7F-970CC2755DDF.root

@@ -1,0 +1,4 @@
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WW_DoubleScattering_13TeV-pythia8_TuneCP5/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/90000/9FE451AD-D882-5F48-8FC0-AFF96ACFB5DA.root
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WW_DoubleScattering_13TeV-pythia8_TuneCP5/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/90000/633A2831-6BCD-9D45-82A1-7D104295D0C3.root
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WW_DoubleScattering_13TeV-pythia8_TuneCP5/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/90000/6577A0ED-ABB1-BE42-8B56-BD36EE7B7552.root
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WW_DoubleScattering_13TeV-pythia8_TuneCP5/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/90000/6AB2DA53-D233-4F4C-AF75-23D562906ED9.root

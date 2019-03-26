@@ -1,0 +1,3 @@
+root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWToLNuQQ_MWW-600To800_PtW-180_aTGC_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/30000/89363532-E68A-304D-B59A-2AF8F434F9FF.root
+root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWToLNuQQ_MWW-600To800_PtW-180_aTGC_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/30000/6C533C3D-EC78-564A-B3B7-89D84166241D.root
+root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWToLNuQQ_MWW-600To800_PtW-180_aTGC_13TeV-amcatnloFXFX-madspin-pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/30000/7F527FE2-9D3E-6449-A0D5-42F261A42233.root

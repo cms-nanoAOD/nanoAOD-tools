@@ -1,0 +1,1 @@
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WZTo3LNu_1Jets_MLL-50_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/90000/8A8AB855-7567-DF4C-8034-D093317F8C07.root

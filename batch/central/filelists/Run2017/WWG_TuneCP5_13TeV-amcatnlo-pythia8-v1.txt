@@ -1,0 +1,4 @@
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WWG_TuneCP5_13TeV-amcatnlo-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/10000/0070505E-FC31-0342-B4E9-D19ECA5D6AC0.root
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WWG_TuneCP5_13TeV-amcatnlo-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/10000/CB8A61C5-0D2A-3846-9E94-223F7EEDF92A.root
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WWG_TuneCP5_13TeV-amcatnlo-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/10000/E0A5D5B6-47DF-5447-82EB-24782F0C7F1D.root
+root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WWG_TuneCP5_13TeV-amcatnlo-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/280000/F5040974-DB56-BF48-9DCE-B004660DAE7D.root

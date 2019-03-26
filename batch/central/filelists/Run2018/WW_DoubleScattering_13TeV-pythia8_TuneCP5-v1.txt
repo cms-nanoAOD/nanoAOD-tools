@@ -1,0 +1,2 @@
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/WW_DoubleScattering_13TeV-pythia8_TuneCP5/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16_ext1-v1/60000/1785E1CD-7098-C74C-8AC2-C07029A5417C.root
+root://xrootd-cms.infn.it//store/mc/RunIIAutumn18NanoAODv4/WW_DoubleScattering_13TeV-pythia8_TuneCP5/NANOAODSIM/Nano14Dec2018_102X_upgrade2018_realistic_v16_ext1-v1/60000/07D5EFC1-48FB-CF4A-AD5A-564A5F39A03C.root
