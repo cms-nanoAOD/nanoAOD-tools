@@ -50,28 +50,22 @@ if __name__ == '__main__':
 
     cwd=os.getcwd()
     
-    parser = OptionParser(usage="%prog -y Year -t DataType")
+    parser = OptionParser(usage="%prog -y Year")
     parser.add_option("-y", "--year", action="store", dest="year", type="string", default="", help="Specify Year of Run: 2016, 2017, 2018")
-    parser.add_option("-t", "--datatype", action="store", dest="datatype", type="string", default="", help="Specify data type: MC, DATA")
+    #parser.add_option("-t", "--datatype", action="store", dest="datatype", type="string", default="", help="Specify data type: MC, DATA")
 
     (options, args) = parser.parse_args()
 
-    if options.year=="" or options.datatype=="" :
+    if options.year=="":
         parser.print_help()
         sys.exit(1)
 
     if options.year not in ['2016','2017','2018']:
         print "ENTER Collider Year: 2016,2017,2018"
         sys.exit(1)
-
-    if options.datatype not in ['MC','DATA','mc']:
-        print "ENTER EITHER MC OR DATA"
-        sys.exit(1)
     
     sys.path.append(cwd+"/filelists/datasets/Run%s/" %options.year)
-    DL=importlib.import_module('%s' %options.datatype)
-    mc=DL.mc
-    config.General.workArea = 'Run%s%s' %(options.year, options.datatype) 
+    #config.General.workArea = 'Run%s%s' %(options.year, options.datatype) 
     
     def submit(config):
         if len(sys.argv) ==1:
@@ -82,7 +76,7 @@ if __name__ == '__main__':
             return
         if len(sys.argv) > 1:
             ## if it is not in the request try the next                                                                                                                              
-            if sys.argv[1] !=       config.General.requestName: return
+            #if sys.argv[1] !=       config.General.requestName: return
             ###                                                                                                                                                                      
             print "--- Submitting " + "\033[01;32m" + config.General.requestName + "\033[00m"   + " ---"
             
@@ -96,13 +90,36 @@ if __name__ == '__main__':
 
     def setdata(value="True"):
         if value=='True':
+            DL=importlib.import_module('DATA')
+            global data
+            data=DL.data
+            config.General.workArea = 'Run%sDATA' %options.year
             config.Data.splitting = 'LumiBased'
-            url = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/"
-            config.Data.lumiMask = url + "Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt"
+            config.Data.unitsPerJob = 50 # Split by lumi
+            
+            if options.year == "2016":
+                token = options.year.split('0')[1]
+                url = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions%s/13TeV/ReReco/Final/" %token
+                config.Data.lumiMask = url + "Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt"
+            elif options.year == "2017":
+                token = options.year.split('0')[1]
+                url = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions%s/13TeV/ReReco/" %token
+                config.Data.lumiMask = url + "Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt"
+            elif options.year == "2018":
+                token = options.year.split('0')[1]
+                url = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions%s/13TeV/ReReco/" %token
+                config.Data.lumiMask = url + "Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt"
+                
         else:
-            config.Data.lumiMask = None
-            config.Data.splitting = 'FileBased'
+            DL=importlib.import_module('MC')
+            global mc
+            mc=DL.mc
+            config.General.workArea = 'Run%sMC' %options.year
 
+            config.Data.lumiMask = None
+            config.Data.splitting = 'FileBased' #EventBased
+            config.Data.unitsPerJob = 2
+            
         #for idx,par in enumerate(config.JobType.pyCfgParams):
         #    if "isData" in par:
         #        config.JobType.pyCfgParams[idx] = "isData=" + value
@@ -120,22 +137,25 @@ if __name__ == '__main__':
             else:
                 ##reading each dataset in a txt                                                                                                                                
                 config.Data.inputDataset = ll
-                print 'config.Data.inputDataset = ', ll
-
+                #print 'config.Data.inputDataset = ', ll
+                
             ##config.General.requestName
-            if split[-1]=='NANOAODSIM':
+            if split[-1] == "NANOAODSIM":
                 config.General.requestName = ll.split('/')[1]+'-'+ll.split('/')[-2].split('-')[-1]
-                print 'config.General.requestName = ', ll.split('/')[1]+'-'+ll.split('/')[-2].split('-')[-1]
-            elif 'ext' in split[-2]:
-                ext = findall('ext[0-9]+',split[-2])
-                if len(ext)>0:
-                    config.General.requestName = split[1] + '_' + ext[0]
-                else:
-                    config.General.requestName = split[1]
-            else:
-                #private file                                                                                                                                                        
-                config.General.requestName = split[-1].split('.')[0]
-            #submit(config)
+                #print 'config.General.requestName = ', ll.split('/')[1]+'-'+ll.split('/')[-2].split('-')[-1]
+            elif split[-1] == "NANOAOD":
+                config.General.requestName = ll.split('/')[1]+"_"+ll.split('/')[2].split('-')[0]+"_"+ll.split('/')[2].split('-')[2]
+                #print 'config.General.requestName = ', ll.split('/')[1]+"_"+ll.split('/')[2].split('-')[0]+"_"+ll.split('/')[2].split('-')[2]
+            #elif 'ext' in split[-2]:
+            #    ext = findall('ext[0-9]+',split[-2])
+            #    if len(ext)>0:
+            #        config.General.requestName = split[1] + '_' + ext[0]
+            #    else:
+            #        config.General.requestName = split[1]
+            #else:
+            #    #private file                                                                                                                                              
+            #    config.General.requestName = split[-1].split('.')[0]
+            submit(config)
 
 
     #############################################################################################
@@ -143,15 +163,8 @@ if __name__ == '__main__':
     #############################################################################################
     # EXAMPLE of submitting userInput file, --> /lustre/cmswork/hoh/NANO/SSLep/nanoskim/CMSSW_10_2_10/src/PhysicsTools/NanoAODTools/crab/datatest.txt (SPECIFY FULLPATH)
 
-    ## 2016
     setdata("False")
-    config.Data.splitting = 'FileBased'
-    config.Data.unitsPerJob = 2
-
     submitList(mc)
 
-    #setdata("True")
-    #config.Data.splitting = 'FileBased'
-    #config.Data.unitsPerJob = 2
-
-    #submitList(mc)
+    setdata("True")
+    submitList(data)
