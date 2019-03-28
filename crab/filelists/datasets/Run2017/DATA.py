@@ -1,0 +1,17 @@
+data = [
+	"/SingleMuon/Run2017B-Nano14Dec2018-v1/NANOAOD",
+	"/SingleMuon/Run2017C-Nano14Dec2018-v1/NANOAOD",
+	"/SingleMuon/Run2017D-Nano14Dec2018-v1/NANOAOD",
+	"/SingleMuon/Run2017E-Nano14Dec2018-v1/NANOAOD",
+	"/SingleMuon/Run2017F-Nano14Dec2018-v1/NANOAOD",
+	"/SingleElectron/Run2017B-Nano14Dec2018-v1/NANOAOD",
+	"/SingleElectron/Run2017C-Nano14Dec2018-v1/NANOAOD",
+	"/SingleElectron/Run2017D-Nano14Dec2018-v1/NANOAOD",
+	"/SingleElectron/Run2017E-Nano14Dec2018-v1/NANOAOD",
+	"/SingleElectron/Run2017F-Nano14Dec2018-v1/NANOAOD",
+	"/DoubleMuon/Run2017B-Nano14Dec2018-v1/NANOAOD",
+	"/DoubleMuon/Run2017C-Nano14Dec2018-v1/NANOAOD",
+	"/DoubleMuon/Run2017D-Nano14Dec2018-v1/NANOAOD",
+	"/DoubleMuon/Run2017E-Nano14Dec2018-v1/NANOAOD",
+	"/DoubleMuon/Run2017F-Nano14Dec2018-v1/NANOAOD",
+]

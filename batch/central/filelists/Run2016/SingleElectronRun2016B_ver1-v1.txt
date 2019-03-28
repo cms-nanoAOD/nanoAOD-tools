@@ -1,1 +1,0 @@
-root://xrootd-cms.infn.it//store/data/Run2016B_ver1/SingleElectron/NANOAOD/Nano14Dec2018_ver1-v1/00000/ECD4BD44-5DA0-5940-A5F1-120C84703015.root

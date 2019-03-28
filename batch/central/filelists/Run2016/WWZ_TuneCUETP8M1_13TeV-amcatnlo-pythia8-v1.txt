@@ -1,2 +1,0 @@
-root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/90000/B1D295EC-DEF7-1E4C-8548-A2DB8EDEBEF9.root
-root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/90000/296FFC55-FB3C-D54D-AB25-5CC1D75871B3.root

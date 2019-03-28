@@ -1,1 +1,0 @@
-root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWJJToLNuLNu_EWK_noTop_13TeV-madgraph-pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/30000/00F38539-5124-CA46-A1FA-1E3164701E7F.root

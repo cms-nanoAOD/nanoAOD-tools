@@ -1,3 +1,0 @@
-root://xrootd-cms.infn.it//store/data/Run2016B_ver1/SingleMuon/NANOAOD/Nano14Dec2018_ver1-v1/90000/BD130B6E-3ACD-0743-9F08-D0D6BDCD372D.root
-root://xrootd-cms.infn.it//store/data/Run2016B_ver1/SingleMuon/NANOAOD/Nano14Dec2018_ver1-v1/90000/87B8F064-C966-FD4F-BD32-E1FCB470AC7B.root
-root://xrootd-cms.infn.it//store/data/Run2016B_ver1/SingleMuon/NANOAOD/Nano14Dec2018_ver1-v1/90000/4074F613-50E6-5545-8347-CCF58D02E64C.root

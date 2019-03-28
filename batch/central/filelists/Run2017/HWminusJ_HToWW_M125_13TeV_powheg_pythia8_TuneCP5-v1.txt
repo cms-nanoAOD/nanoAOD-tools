@@ -1,2 +1,0 @@
-root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/HWminusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/280000/8F0E52A0-B458-BB45-B31D-63F7A219F62D.root
-root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/HWminusJ_HToWW_M125_13TeV_powheg_pythia8_TuneCP5/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/280000/D873F073-217A-FC4E-9D0B-021E18695F2C.root

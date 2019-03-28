@@ -1,4 +1,0 @@
-root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WWJJToLNuLNu_EWK_QCD_noTop-noHiggs_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/10000/E78F0A30-0ADF-FE48-ADF2-D85EED499045.root
-root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WWJJToLNuLNu_EWK_QCD_noTop-noHiggs_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/20000/A9308E5A-6612-8142-A8C9-5981B27B3DAB.root
-root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WWJJToLNuLNu_EWK_QCD_noTop-noHiggs_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/20000/2E7AC374-7492-B840-B90B-6F9A0DF01DCB.root
-root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/WWJJToLNuLNu_EWK_QCD_noTop-noHiggs_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/10000/53F6C850-1F63-3F4A-A7F5-A7A2829F7B37.root

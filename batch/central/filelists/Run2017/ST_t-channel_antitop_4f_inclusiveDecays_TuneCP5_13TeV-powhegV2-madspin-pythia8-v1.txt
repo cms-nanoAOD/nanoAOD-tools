@@ -1,3 +1,0 @@
-root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/40000/2EB22C8F-0437-DC45-B367-D60648F680C2.root
-root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/40000/0B8A938E-7969-5A4C-9D1F-B5B3B216D4BF.root
-root://xrootd-cms.infn.it//store/mc/RunIIFall17NanoAODv4/ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/40000/6268F071-5726-EE4F-99E4-52E2A6B29612.root

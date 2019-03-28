@@ -1,6 +1,0 @@
-root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/30000/A8F7F639-DF1A-CC45-8228-46035F203DE1.root
-root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/30000/0A355703-FDF4-C040-9304-4801B861B218.root
-root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/30000/1FBB2EAF-13EE-4744-9CA8-4A28B4485A85.root
-root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/30000/E76BF5D5-CD3D-C148-89B6-32E160604667.root
-root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/30000/263C6304-B8AD-4040-9A6E-2586F101D53B.root
-root://xrootd-cms.infn.it//store/mc/RunIISummer16NanoAODv4/WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/NANOAODSIM/PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/30000/4CAA5B30-0531-D24F-B5B3-A71C51888241.root
