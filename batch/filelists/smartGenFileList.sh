@@ -2,15 +2,19 @@
 
 files=`ls -v /lustre/cmswork/hoh/NANO/SSLep/data/*.root`
 #files=`ls -v /lustre/cmswork/hoh/NANO/SSLep/dataskim/*.root`
+#files=`ls -v /lustre/cmswork/hoh/NANO/SSLep/SkimDatav2/*.root`
+
 valS=0
 valL=0
 
-if [ -e samplelist_shortQ.py ];then
-    rm samplelist_shortQ.py
+Threshold=30
+
+if [ -e samplelist_SkimshortQ.py ];then
+    rm samplelist_SkimshortQ.py
 fi
 
-if [ -e samplelist_longQ.py ];then
-    rm samplelist_longQ.py
+if [ -e samplelist_SkimlongQ.py ];then
+    rm samplelist_SkimlongQ.py
 fi
 
 for rootfile in $files
@@ -18,21 +22,23 @@ do
     byte=`ls -l ${rootfile} | awk -F ' ' '{print $5}'`
     z=$(($byte / 1000000000))
 
-    if (( $z < 40 ));then
+    if (( $z < $Threshold ));then
 	echo "$rootfile with byte --> $z GB ; thus SHORT Queue"
 	((valS+=1))
 	if [ "$valS" == "1" ];then
 	    echo -e "#!/usr/bin/env python\n" > script1
 	    echo -e "samplelists=[" >> script1
+	    echo -e "\t'$rootfile'," >> script1
 	else
 	    echo -e "\t'$rootfile'," >> script1
 	fi
-    elif (( $z >= 40 ));then
+    elif (( $z >= $Threshold ));then
 	echo "$rootfile with byte --> $z GB ; thus LONG Queue"
 	((valL+=1))
 	if [ "$valL" == "1" ];then
             echo -e "#!/usr/bin/env python\n" > script2
             echo -e "samplelists=[" >> script2
+	    echo -e "\t'$rootfile'," >> script2
         else
             echo -e "\t'$rootfile'," >> script2
         fi
@@ -42,9 +48,9 @@ done
 
 echo -e "]" >> script1
 echo -e "]" >> script2
-mv script1 samplelist_shortQ.py
-mv script2 samplelist_longQ.py
+mv script1 samplelist_SkimshortQ.py
+mv script2 samplelist_SkimlongQ.py
 echo "========================="
-echo "samplelist_shortQ.py with $valS root files"
-echo "samplelist_longQ.py with $valL root files"
+echo "samplelist_SkimshortQ.py with $valS root files"
+echo "samplelist_SkimlongQ.py with $valL root files"
 echo "========================="
