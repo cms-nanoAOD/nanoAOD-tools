@@ -8,7 +8,7 @@ DIR=""
 #queuelist=("local-cms-long" "local-cms-short" "local-cms-long")
 #prodfolder=("14-Data2016_VH_long" "14-MC_VH_short" "14-MC_VH_long")
 
-samplelist=("skim_2016_VH_short" "skim_2016_VH_long")
+samplelist=("SkimshortQ" "SkimlongQ")
 queuelist=("local-cms-short" "local-cms-long")
 prodfolder=("16_2016_VH_short" "16_2016_VH_long")
 

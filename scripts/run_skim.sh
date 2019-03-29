@@ -3,7 +3,7 @@
 set -e
 DIR=""
 
-samplelist=("samplelist_shortQ" "samplelist_longQ")
+samplelist=("shortQ" "longQ")
 queuelist=("local-cms-short" "local-cms-long")
 prodfolder=("skim-shortQ" "skim-longQ")
 
