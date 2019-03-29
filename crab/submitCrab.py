@@ -69,15 +69,15 @@ if __name__ == '__main__':
     
     def submit(config):
         if len(sys.argv) ==1:
-            ## book the command and run python                                                                                                                                       
+            ## book the command and run python                                                                                                                  
             cmd = "python " + sys.argv[0] + " '" + config.General.requestName + "'"
             print "calling: "+cmd
             call(cmd,shell=True)
             return
         if len(sys.argv) > 1:
-            ## if it is not in the request try the next                                                                                                                              
+            ## if it is not in the request try the next                                                                                                                       
             #if sys.argv[1] !=       config.General.requestName: return
-            ###                                                                                                                                                                      
+            ###                                                                                                                                    
             print "--- Submitting " + "\033[01;32m" + config.General.requestName + "\033[00m"   + " ---"
             
             config.Data.outputDatasetTag = config.General.requestName
@@ -119,11 +119,7 @@ if __name__ == '__main__':
             config.Data.lumiMask = None
             config.Data.splitting = 'FileBased' #EventBased
             config.Data.unitsPerJob = 2
-            
-        #for idx,par in enumerate(config.JobType.pyCfgParams):
-        #    if "isData" in par:
-        #        config.JobType.pyCfgParams[idx] = "isData=" + value
-        #        return
+            config.Data.totalUnits = 10
 
     def submitList(l):
         for ll in l:
