@@ -36,7 +36,7 @@ config.JobType.maxMemoryMB = 2500
 config.JobType.priority = 999
 config.section_("Data")
 config.Data.inputDBS = 'global'
-config.Data.outLFNDirBase = '/store/user/%s/NanoProd' % (getUsernameFromSiteDB())
+config.Data.outLFNDirBase = '/store/user/%s/NanoProdv1' % (getUsernameFromSiteDB())
 config.Data.publication = False
 config.section_("Site")
 #config.Site.whitelist = [ 'T2_IT_Legnaro' , 'T2_IT_Bari ' , 'T2_IT_Pisa' , 'T2_IT_Rome ' , 'T2_AT_Vienna' , 'T2_BE_UCL' , 'T2_CH_CERN ' , 'T2_DE_DESY' , 'T2_DE_RWTH' , 'T2_UK_London_Brunel' , 'T2_HU_Budapest' , 'T2_CN_Beijing' , 'T2_CH_CSCS_HPC' , 'T2_US_MIT' , 'T3_US_FNALLPC' ]

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Query () {
+function Query () {
     #Construct query                                                                                                                                                                                                          
     if [[ "$1" == "MC" ]];then
 	token="mc"
@@ -40,7 +40,7 @@ Query () {
 
 }
 
-List () {
+function List () {
     version=`echo ${1} | awk -F '-' '{print $NF}' | awk -F '/' '{print $1}'`
     name=`echo ${1} | awk -F '/' '{print $2}'`
     ERA=""
