@@ -30,7 +30,7 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
 config.JobType.scriptExe = 'crab_script.sh' #script executing in CRAB, need prod.py
-config.JobType.inputFiles = [ 'prod.py' , '../scripts/keep_and_drop_Input.txt' , '../scripts/keep_and_drop_Output.txt' ] #hadd nano will not be needed once nano tools are in cmssw
+config.JobType.inputFiles = [ 'prod.py' , '../scripts/haddnano.py' , '../scripts/keep_and_drop_Input.txt' , '../scripts/keep_and_drop_Output.txt' ] #hadd nano will not be needed once nano tools are in cmssw
 config.JobType.sendPythonFolder	 = True
 config.JobType.maxMemoryMB = 2500
 config.JobType.priority = 999
@@ -130,8 +130,8 @@ if __name__ == '__main__':
             config.Data.lumiMask = None
             config.Data.splitting = 'FileBased' #EventBased
             config.Data.unitsPerJob = 2 #number of files per jobs
-            #NJOBS = 10  # This is not a configuration parameter, but an auxiliary variable that we use in the next line.
-            #config.Data.totalUnits = config.Data.unitsPerJob*NJOBS #number of event
+            NJOBS=5
+            config.Data.totalUnits = config.Data.unitsPerJob*NJOBS
 
     def submitList(l):
         for ll in l:
@@ -164,7 +164,8 @@ if __name__ == '__main__':
             #    config.General.requestName = split[-1].split('.')[0]
             
                 if options.year == "2016":
-                    url="%s/src/PhysicsTools/NanoAODTools/data/GoldenJSON/Run2016/" %os.environ['CMSSW_BASE']
+                    #url="%s/src/PhysicsTools/NanoAODTools/data/GoldenJSON/Run2016/" %os.environ['CMSSW_BASE']
+                    url="https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Era/ReReco/"
                     era=split[2].split('-')[0].split('Run%s' %options.year)[1]
                     if era in ['B','B_ver1','B_ver2']:
                         config.Data.lumiMask = url + "Cert_272007-275376_13TeV_23Sep2016ReReco_Collisions16_JSON_eraB.txt"
