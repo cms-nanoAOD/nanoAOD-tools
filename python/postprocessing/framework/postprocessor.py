@@ -80,6 +80,10 @@ class PostProcessor :
         t0 = time.clock()
 	totEntriesRead=0
 	for fname in self.inputFiles:
+	    ffnames = []
+	    if "," in fname:
+	        fnames = fname.split(',')
+	        fname, ffnames = fnames[0], fnames[1:]
 
 	    # open input file
 	    inFile = ROOT.TFile.Open(fname)
@@ -94,7 +98,15 @@ class PostProcessor :
 		continue
 	    else:
 		print 'Pre-select %d entries out of %s '%(elist.GetN() if elist else inTree.GetEntries(),inTree.GetEntries())
-		
+		inAddFiles = []
+		inAddTrees = []
+	    for ffname in ffnames:
+		inAddFiles.append(ROOT.TFile.Open(ffname))
+		inAddTree = inAddFiles[-1].Get("Events")
+		if inAddTree == None: inAddTree = inAddFiles[-1].Get("Friends")
+		inAddTrees.append(inAddTree)
+		inTree.AddFriend(inAddTree)
+
 	    if fullClone:
 		# no need of a reader (no event loop), but set up the elist if available
 		if elist: inTree.SetEntryList(elist)
