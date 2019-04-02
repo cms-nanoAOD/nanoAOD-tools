@@ -20,7 +20,8 @@ class TaggerWorkingpoints(Module):
         predictionLabels = ["B","C","UDS","G","LLP"],
         logctauValues = range(-3,5),
         multiplicities = range(0,5),
-        globalOptions={"isData":False}
+        globalOptions={"isData":False},
+        saveAllLabels = False,
     ):
         self.globalOptions = globalOptions
         self.inputCollection = inputCollection
@@ -30,7 +31,7 @@ class TaggerWorkingpoints(Module):
         self.multiplicities = multiplicities
         self.logctauLabels = map(lambda ctau: getCtauLabel(ctau),logctauValues)
         self.taggerName = taggerName
-        
+        self.saveAllLabels = saveAllLabels
  
     def beginJob(self):
         pass
@@ -43,8 +44,11 @@ class TaggerWorkingpoints(Module):
         
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
-                for m in self.multiplicities:
-                    self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),"F")
+                if self.saveAllLabels:
+                    self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label,"F", lenVar="nselectedJets")
+                else:
+                    for m in self.multiplicities:
+                        self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),"F")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -64,11 +68,16 @@ class TaggerWorkingpoints(Module):
                     predictionsPerCtauAndClass[ctau][label].append(predictions[ctau][label])
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
-                predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
-                for m in self.multiplicities:
-                    if m<len(predictionsPerCtauAndClass[ctau][label]):
-                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),predictionsPerCtauAndClass[ctau][label][m])
-                    else:
-                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
+                if self.saveAllLabels:
+                    self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label, predictionsPerCtauAndClass[ctau][label])
+                else:
+                    predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
+
+                    for m in self.multiplicities:
+                        if m<len(predictionsPerCtauAndClass[ctau][label]):
+                            self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),predictionsPerCtauAndClass[ctau][label][m])
+                        else:
+                            self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
+
         return True
         
