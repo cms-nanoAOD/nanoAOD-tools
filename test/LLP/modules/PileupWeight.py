@@ -4,6 +4,7 @@ import math
 import json
 import ROOT
 import random
+import numpy
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
@@ -35,6 +36,7 @@ class PileupWeight(Module):
                 self.mcHistPerProcess[k.GetName()].SetDirectory(0)
             fMC.Close()
             
+            
             fData = ROOT.TFile(self.dataFile)
             if not fData:
                 print "ERROR: Cannot find pileup file: ",self.dataFile
@@ -42,7 +44,8 @@ class PileupWeight(Module):
                 
             self.dataHist = fData.Get("pileup").Clone("pileup"+str(random.random()))
             self.dataHist.SetDirectory(0)
-            self.normHist(self.dataHist)
+           
+            
         
     def getWeight(self,nTrueInteractions):
         mcBin = self.mcHist.FindBin(nTrueInteractions)
@@ -62,7 +65,32 @@ class PileupWeight(Module):
             w = hist.GetBinWidth(ibin+1)
             c = hist.GetBinContent(ibin+1)
             hist.SetBinContent(ibin+1,c/w)
+            
+    '''
+    def interpolateHist(self,hist,binning):
+        newHist = ROOT.TH1F("new"+hist.GetName()+str(random.random()),"",
+            len(binning)-1,binning
+        )
+        newHist.SetDirectory(0)
+        for ibin in range(1,newHist.GetNbinsX()-1):
+            oldBin = hist.GetXaxis().FindBin(newHist.GetBinCenter(ibin+1))
+            if newHist.GetBinCenter(ibin+1)>hist.GetBinCenter(oldBin):
+                leftC = hist.GetBinContent(oldBin)
+                leftP = hist.GetBinCenter(oldBin)
                 
+                rightC = hist.GetBinContent(oldBin+1)
+                rightP = hist.GetBinCenter(oldBin+1)
+            else:
+                leftC = hist.GetBinContent(oldBin-1)
+                leftP = hist.GetBinCenter(oldBin-1)
+                
+                rightC = hist.GetBinContent(oldBin)
+                rightP = hist.GetBinCenter(oldBin)
+            
+            frac = (newHist.GetBinCenter(ibin+1)-leftP)/(rightP-leftP)
+            interC = frac*leftC+(1-frac)*rightC
+            newHist.SetBinContent(interC)
+    '''
         
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
@@ -78,7 +106,9 @@ class PileupWeight(Module):
             if self.mcHist==None:
                 print "ERROR: Cannot find pileup profile for file: "+inputFile.GetName()
                 sys.exit(1)
+                 
             self.normHist(self.mcHist)
+            self.normHist(self.dataHist)
 
             self.out.branch(self.outputName,"F")
             self.sum2 = 0

@@ -277,6 +277,14 @@ if not args.isData:
             logctauValues = range(-3,5)
         )
     )
+    
+    analyzerChain.append(
+        JetTruthFlags(
+            inputCollection=lambda event: event.selectedJets_nominal,
+            outputName="llpdnnx_noda",
+            globalOptions=globalOptions
+        )
+    )
 
     analyzerChain.append(
         TaggerWorkingpoints(
@@ -312,6 +320,13 @@ if not args.isData:
         ("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
         ("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
     ]:
+        analyzerChain.append(
+            JetTruthFlags(
+                inputCollection=jetCollection,
+                outputName="llpdnnx_da_"+systName,
+                globalOptions=globalOptions
+            )
+        )
         analyzerChain.append(
             TaggerWorkingpoints(
                 inputCollection = jetCollection,
@@ -446,6 +461,7 @@ p=PostProcessor(
     cut="(nJet>1)",
     branchsel=None,
     maxEvents=-1,
+    #maxEvents=15000,
     modules=analyzerChain,
     friend=True
 )
