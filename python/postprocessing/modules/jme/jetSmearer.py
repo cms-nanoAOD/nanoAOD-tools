@@ -20,7 +20,7 @@ class jetSmearer(Module):
         # Text files are now tarred so must extract first
         self.jerInputArchivePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
         self.jerTag = jerInputFileName[:jerInputFileName.find('_MC_')+len('_MC')]
-        self.jerArchive = tarfile.open(self.jerInputArchivePath+globalTag+".tgz", "r:gz")
+        self.jerArchive = tarfile.open(self.jerInputArchivePath+self.jerTag+".tgz", "r:gz")
         self.jerInputFilePath = "scratch/"+self.jerTag
         self.jerArchive.extractall(self.jerInputFilePath)
         self.jerInputFileName = jerInputFileName
