@@ -12,7 +12,6 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 from modules import *
 
-
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -66,7 +65,6 @@ analyzerChain.append(
 )
 
 
-
 analyzerChain.extend(muonSelection)
 
 
@@ -108,11 +106,11 @@ if not args.isData:
     
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=2 or \
-            len(event.selectedJets_jerUp)>=2 or \
-            len(event.selectedJets_jerDown)>=2 or \
-            len(event.selectedJets_jesTotalUp)>=2 or \
-            len(event.selectedJets_jesTotalDown)>=2
+            len(event.selectedJets_nominal)>=2,
+            #len(event.selectedJets_jerUp)>=2 or \
+            #len(event.selectedJets_jerDown)>=2 or \
+            #len(event.selectedJets_jesTotalUp)>=2 or \
+            #len(event.selectedJets_jesTotalDown)>=2
         )
     )
     
@@ -137,6 +135,13 @@ if not args.isData:
     #loose skim on mht/met
     analyzerChain.append(
         EventSkim(selection=lambda event: 
+            event.nominal_mht>200. and
+            event.nominal_mht/event.nominal_met<2.
+        )
+    )
+    '''
+    analyzerChain.append(
+        EventSkim(selection=lambda event: 
             event.nominal_mht>200. or \
             event.jerUp_mht>200. or \
             event.jerDown_mht>200. or \
@@ -147,7 +152,6 @@ if not args.isData:
         )
     )
     
-    '''
     analyzerChain.append(
         EventSkim(selection=lambda event: 
             event.nominal_mht/event.nominal_met<5. or \
@@ -195,8 +199,10 @@ if not args.isData:
             lambda tree: tree.branch("MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight","I"),
             lambda tree,event: tree.fillBranch(
                 "MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight",
-                event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*1+\
-                event.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight*2
+                event.HLT_MonoCentralPFJet80_PFMETNoMu90_PFMHTNoMu90_IDTight*1+\
+                event.HLT_MonoCentralPFJet80_PFMETNoMu100_PFMHTNoMu100_IDTight*2+\
+                event.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight*4+\
+                event.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight*8
             )
         ],
         [
@@ -266,7 +272,7 @@ if not args.isData:
             storeVariables=storeVariables
         )
     )
-    
+
     analyzerChain.append(
         TaggerEvaluation(
             modelPath="PhysicsTools/NanoAODTools/data/nn/model_noda_retrain.pb",
@@ -302,10 +308,10 @@ if not args.isData:
             modelPath="PhysicsTools/NanoAODTools/data/nn/model_singlemuon_retrain.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal,
-                lambda event: event.selectedJets_jerUp,
-                lambda event: event.selectedJets_jerDown,
-                lambda event: event.selectedJets_jesTotalUp,
-                lambda event: event.selectedJets_jesTotalDown,
+                #lambda event: event.selectedJets_jerUp,
+                #lambda event: event.selectedJets_jerDown,
+                #lambda event: event.selectedJets_jesTotalUp,
+                #lambda event: event.selectedJets_jesTotalDown,
             ],
             taggerName="llpdnnx_da",
             logctauValues = range(-3,5)
@@ -359,7 +365,7 @@ else:
             storeKinematics=[],
         )
     )
-        
+         
     analyzerChain.append(
         EventSkim(selection=lambda event: 
             len(event.selectedJets_nominal)>=2
@@ -380,13 +386,12 @@ else:
             event.nominal_mht>200.
         )
     )
-    '''
+
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.nominal_mht/event.nominal_met<5.
+            event.nominal_mht/event.nominal_met<2.
         )
     )
-    '''
     
     storeVariables = [
         [lambda tree: tree.branch("rho","F"),lambda tree,event: tree.fillBranch("rho",event.fixedGridRhoFastjetAll)], 
@@ -454,7 +459,19 @@ else:
             globalOptions=globalOptions
         )
     )
-    
+
+analyzerChain.append(
+SignalTriggerSelection(
+    globalOptions=globalOptions
+    )
+)   
+
+analyzerChain.append(
+    EventSkim(selection=lambda event: 
+        event.signalTrigger_flag
+    )
+)
+
 p=PostProcessor(
     args.output[0],
     [args.inputFiles],

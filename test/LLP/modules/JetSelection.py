@@ -23,7 +23,8 @@ class JetSelection(Module):
         flagDA = False,
         addSize = True,
         storeKinematics=['pt','eta'],
-        globalOptions={"isData":False}
+        globalOptions={"isData":False},
+        jetId = 0
     ):
         self.globalOptions = globalOptions
         self.inputCollection = inputCollection
@@ -35,6 +36,7 @@ class JetSelection(Module):
         self.flagDA = flagDA
         self.addSize = addSize
         self.storeKinematics = storeKinematics
+        self.jetId = jetId
         
  
     def beginJob(self):
@@ -73,11 +75,7 @@ class JetSelection(Module):
         for jet in jets:
             #if self.flagDA:
             #    print "event=%i, index=%i, pt=%.4f, eta=%.4f, "%(event._entry,jet._index,origJets[jet._index].pt,origJets[jet._index].eta)
-            if jet.pt>self.jetMinPt and math.fabs(jet.eta)<self.jetMaxEta:
-                if (jet.jetId<1):
-                    unselectedJets.append(jet)
-                    failedId+=1
-                    continue
+            if jet.pt>self.jetMinPt and math.fabs(jet.eta)<self.jetMaxEta and (jet.jetId>self.jetId):
                 leptons = self.leptonCollection(event)
                 if self.dRCleaning>0. and leptons!=None and len(leptons)>0:
                     mindr = min(map(lambda lepton: deltaR(lepton,jet),leptons))

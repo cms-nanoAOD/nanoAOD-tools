@@ -8,6 +8,7 @@ if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
 from MuonSelection import MuonSelection
 from MuonVeto import MuonVeto
 from SingleMuonTriggerSelection import SingleMuonTriggerSelection
+from SignalTriggerSelection import SignalTriggerSelection
 from JetMetUncertainties import JetMetUncertainties
 from JetSelection import JetSelection
 from TaggerEvaluation import TaggerEvaluation
@@ -26,4 +27,3 @@ from JetTaggerResult import JetTaggerResult
 from PDFWeights import PDFWeights
 from WNLOWeights import WNLOWeights
 from JetFeatures import JetFeatures
-

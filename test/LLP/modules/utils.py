@@ -86,6 +86,11 @@ def combineHist2D(hist1,hist2,w1,w2):
                 )
             )
     return result
+     
+def getX(hist, x):
+    xbin = hist.GetXaxis().FindBin(x)
+    
+    return hist.GetBinContent(xbin), hist.GetBinError(xbin)
     
 def getSFPtEta(hist,pt,eta):
     ptBin = hist.GetXaxis().FindBin(pt)
@@ -103,3 +108,8 @@ def getSFPtEta(hist,pt,eta):
         
     return hist.GetBinContent(ptBin,etaBin),hist.GetBinError(ptBin,etaBin)
     
+def getSFPt(hist,pt):
+    ptBin = hist.GetXaxis().FindBin(pt)
+    
+    return hist.GetBinContent(ptBin),hist.GetBinError(ptBin)
+ 

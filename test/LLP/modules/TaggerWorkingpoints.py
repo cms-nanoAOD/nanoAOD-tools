@@ -32,18 +32,7 @@ class TaggerWorkingpoints(Module):
         self.logctauLabels = map(lambda ctau: getCtauLabel(ctau),logctauValues)
         self.taggerName = taggerName
         self.saveJetOutput = saveJetOutput
-        '''
-        self.thresholds = {
-            -3: 0.387823150883,
-            -2: 0.384857432375,
-            -1: 0.391062097082,
-            0: 0.49578781558,
-            1: 0.524539457092,
-            2: 0.507625327835,
-            3: 0.58713464571,
-            4: 0.699834154377
-        }
-        '''
+
         self.thresholds = {      
             -3: 0.37245617939,
             -2: 0.368606702814,
@@ -142,7 +131,6 @@ class TaggerWorkingpoints(Module):
                         self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),predictionsPerCtauAndClass[ctau][label][m])
                     else:
                         self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
-        
         
         return True
         
