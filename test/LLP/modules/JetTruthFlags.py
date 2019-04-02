@@ -21,7 +21,7 @@ class JetTruthFlags(Module):
             'isC':['isC','isCC','isGCC'],
             'isUDS':['isS','isUD'],
             'isG':['isG'],
-            'fromLLP':['fromLLP'],
+            'isLLP':['fromLLP'],
             'isPU':['isPU']
         },
         globalOptions={"isData":False}
@@ -39,13 +39,13 @@ class JetTruthFlags(Module):
         
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        
+        '''
         if not self.globalOptions['isData']:
             self.out.branch(self.outputName+"_nsv","I",lenVar="n"+self.outputName)
             self.out.branch(self.outputName+"_svxysig","F",lenVar="n"+self.outputName)
             for k in sorted(self.flags.keys()):
                 self.out.branch(self.outputName+"_"+k,"F",lenVar="n"+self.outputName)
-        
+        '''
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -75,6 +75,8 @@ class JetTruthFlags(Module):
                 if math.fabs(jet.eta-jetGlobal[jet._index].eta)>0.01:
                     print "Warning - no proper match between jetorigin and nanoaod jets"    
                     #print jet.pt,jet.eta,jetGlobal[jet._index].pt,jetGlobal[jet._index].eta
+                    for k in sorted(self.flags.keys()):
+                        setattr(jet,k,False)
                     continue
                 else:
                     nsv[ijet] = int(round(jetNSV[jet._index].length))
@@ -91,12 +93,13 @@ class JetTruthFlags(Module):
                                 flavorFlag = 1.
                                 break
                         flavors[k][ijet]=flavorFlag
-                        
+                        setattr(jet,k,flavorFlag>0.5)
+        '''
         self.out.fillBranch(self.outputName+"_nsv",nsv)
         self.out.fillBranch(self.outputName+"_svxysig",svxysig)
                         
         for k in sorted(self.flags.keys()):
             self.out.fillBranch(self.outputName+"_"+k,flavors[k])
-        
+        '''
         return True
         
