@@ -106,11 +106,11 @@ if not args.isData:
     
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=2,
-            #len(event.selectedJets_jerUp)>=2 or \
-            #len(event.selectedJets_jerDown)>=2 or \
-            #len(event.selectedJets_jesTotalUp)>=2 or \
-            #len(event.selectedJets_jesTotalDown)>=2
+            len(event.selectedJets_nominal)>=2 or \
+            len(event.selectedJets_jerUp)>=2 or \
+            len(event.selectedJets_jerDown)>=2 or \
+            len(event.selectedJets_jesTotalUp)>=2 or \
+            len(event.selectedJets_jesTotalDown)>=2
         )
     )
     
@@ -135,13 +135,6 @@ if not args.isData:
     #loose skim on mht/met
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.nominal_mht>200. and
-            event.nominal_mht/event.nominal_met<2.
-        )
-    )
-    '''
-    analyzerChain.append(
-        EventSkim(selection=lambda event: 
             event.nominal_mht>200. or \
             event.jerUp_mht>200. or \
             event.jerDown_mht>200. or \
@@ -163,7 +156,6 @@ if not args.isData:
             event.unclEnDown_mht/event.unclEnDown_met<5.
         )
     )
-    '''
     
     if args.inputFiles[0].find("WJetsToLNu_HT")>=0:
         analyzerChain.append(WNLOWeights())
@@ -308,10 +300,10 @@ if not args.isData:
             modelPath="PhysicsTools/NanoAODTools/data/nn/model_singlemuon_retrain.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal,
-                #lambda event: event.selectedJets_jerUp,
-                #lambda event: event.selectedJets_jerDown,
-                #lambda event: event.selectedJets_jesTotalUp,
-                #lambda event: event.selectedJets_jesTotalDown,
+                lambda event: event.selectedJets_jerUp,
+                lambda event: event.selectedJets_jerDown,
+                lambda event: event.selectedJets_jesTotalUp,
+                lambda event: event.selectedJets_jesTotalDown,
             ],
             taggerName="llpdnnx_da",
             logctauValues = range(-3,5)
@@ -377,19 +369,6 @@ else:
             jetCollection = lambda event: event.selectedJets_nominal,
             metInput = lambda event: Object(event,"MET"),
             outputName = "nominal",
-        )
-    )
-    
-    #loose skim on mht/met
-    analyzerChain.append(
-        EventSkim(selection=lambda event: 
-            event.nominal_mht>200.
-        )
-    )
-
-    analyzerChain.append(
-        EventSkim(selection=lambda event: 
-            event.nominal_mht/event.nominal_met<2.
         )
     )
     
