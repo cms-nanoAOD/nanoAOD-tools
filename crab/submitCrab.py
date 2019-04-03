@@ -188,13 +188,12 @@ if __name__ == '__main__':
                     elif era in ['H']:
                         config.Data.lumiMask = url + "Cert_280919-284044_13TeV_PromptReco_Collisions16_JSON_eraH.txt" #--> ?
                         print "--- \033[93m ERA DEPENDENT 2016 RUN = %s \033[00m ---" %era
-                        '''
                 else:
                     print "ERROR on 2016 cert id, quitting"
                     exit
-                    
+            '''
 
-            submit(config)
+            #submit(config)
 
 
     #############################################################################################
