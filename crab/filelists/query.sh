@@ -74,7 +74,7 @@ fi
 
 # Step1 query dataset
 ### Execute
-echo file reads: "$PWD/nametmp"
+echo file reads: "$PWD/stanDS"
 
 VAR=0
 while IFS= read -r var
@@ -84,7 +84,7 @@ do
     datatype=`echo $var | awk -F ' ' '{print $2}'`
     echo Query $datatype $year $name
     Query $datatype $year $name $VAR
-done < "$PWD/nametmp"
+done < "$PWD/stanDS"
 
 #if [ ! -e "dataset.txt" ];then
 #    echo dataset.txt does not exist, exiting

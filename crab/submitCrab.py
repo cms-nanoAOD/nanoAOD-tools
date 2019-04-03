@@ -108,10 +108,10 @@ if __name__ == '__main__':
             #config.Data.unitsPerJob = 12000
             
             #NOTE : 2016 is Era dependent:
-            #if options.year == "2016":
-            #    token = options.year.split('0')[1]
-            #    url = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions%s/13TeV/ReReco/Final/" %token
-            #    config.Data.lumiMask = url + "Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt"
+            if options.year == "2016":
+                token = options.year.split('0')[1]
+                url = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions%s/13TeV/ReReco/Final/" %token
+                config.Data.lumiMask = url + "Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt"
             if options.year == "2017":
                 token = options.year.split('0')[1]
                 url = "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions%s/13TeV/ReReco/" %token
@@ -162,7 +162,7 @@ if __name__ == '__main__':
             #else:
             #    #private file                                                                                                                                              
             #    config.General.requestName = split[-1].split('.')[0]
-            
+            '''
                 if options.year == "2016":
                     #url="%s/src/PhysicsTools/NanoAODTools/data/GoldenJSON/Run2016/" %os.environ['CMSSW_BASE']
                     url="https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Era/ReReco/"
@@ -188,6 +188,7 @@ if __name__ == '__main__':
                     elif era in ['H']:
                         config.Data.lumiMask = url + "Cert_280919-284044_13TeV_PromptReco_Collisions16_JSON_eraH.txt" #--> ?
                         print "--- \033[93m ERA DEPENDENT 2016 RUN = %s \033[00m ---" %era
+                        '''
                 else:
                     print "ERROR on 2016 cert id, quitting"
                     exit
