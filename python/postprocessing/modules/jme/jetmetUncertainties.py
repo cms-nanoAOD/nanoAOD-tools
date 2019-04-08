@@ -1,5 +1,5 @@
 import ROOT
-import math, os,re, tarfile, shutil
+import math, os,re, tarfile, tempfile
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -60,9 +60,9 @@ class jetmetUncertaintiesProducer(Module):
         # read jet energy scale (JES) uncertainties
         # (downloaded from https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC )
         self.jesInputArchivePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
-        # Text files are now tarred so must extract first
+        # Text files are now tarred so must extract first into temporary directory (gets deleted during python memory management at script exit)
         self.jesArchive = tarfile.open(self.jesInputArchivePath+globalTag+".tgz", "r:gz")
-        self.jesInputFilePath = "scratch/"+globalTag
+        self.jesInputFilePath = tempfile.mkdtemp()
         self.jesArchive.extractall(self.jesInputFilePath)
         
         if len(jesUncertainties) == 1 and jesUncertainties[0] == "Total":
@@ -125,7 +125,6 @@ class jetmetUncertaintiesProducer(Module):
         self.jetSmearer.beginJob()
 
     def endJob(self):
-        shutil.rmtree("scratch/")
         self.jetSmearer.endJob()
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):

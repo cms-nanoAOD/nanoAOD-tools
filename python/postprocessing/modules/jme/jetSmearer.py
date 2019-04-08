@@ -1,5 +1,5 @@
 import ROOT
-import math, os, tarfile
+import math, os, tarfile, tempfile
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -21,7 +21,7 @@ class jetSmearer(Module):
         self.jerInputArchivePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
         self.jerTag = jerInputFileName[:jerInputFileName.find('_MC_')+len('_MC')]
         self.jerArchive = tarfile.open(self.jerInputArchivePath+self.jerTag+".tgz", "r:gz")
-        self.jerInputFilePath = "scratch/"+self.jerTag
+        self.jerInputFilePath = tempfile.mkdtemp()
         self.jerArchive.extractall(self.jerInputFilePath)
         self.jerInputFileName = jerInputFileName
         self.jerUncertaintyInputFileName = jerUncertaintyInputFileName
