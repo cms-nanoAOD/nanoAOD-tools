@@ -14,7 +14,7 @@ bIn="keep_and_drop_Input.txt"
 bOut="keep_and_drop_Output.txt"
 Nevent=-1
 
-p=PostProcessor( "." , inputFiles() , cut=preselection , branchsel=bIn , modules=[ puWeight(), producer() ] , maxevent=Nevent , provenance=True , fwkJobReport=True , jsonInput=runsAndLumis() , outputbranchsel=bOut )
+p=PostProcessor( "." , inputFiles() , cut=preselection , branchsel=bIn , modules=[ puWeight(), producer() ] , maxevent=Nevent , provenance=False , fwkJobReport=True , jsonInput=runsAndLumis() , outputbranchsel=bOut )
 p.run()
 
 print "DONE"
