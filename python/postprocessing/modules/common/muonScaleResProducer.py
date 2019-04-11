@@ -50,8 +50,6 @@ class muonScaleResProducer(Module):
             genparticles = Collection(event, "GenPart")
         roccor = self._roccor
         if self.is_mc:
-            u1 = random.uniform(0.0, 1.0)
-            u2 = random.uniform(0.0, 1.0)
             pt_corr=[]
             pt_err=[]
             for mu in muons:
@@ -61,8 +59,10 @@ class muonScaleResProducer(Module):
                     pt_corr.append(mu.pt * mk_safe(roccor.kSpreadMC, mu.charge, mu.pt, mu.eta, mu.phi, genMu.pt))
                     pt_err.append(mu.pt*mk_safe(roccor.kSpreadMCerror, mu.charge, mu.pt, mu.eta, mu.phi, genMu.pt))
                 else:
+                    u1 = random.uniform(0.0, 1.0)
                     pt_corr.append(mu.pt*mk_safe(roccor.kSmearMC, mu.charge, mu.pt, mu.eta, mu.phi, mu.nTrackerLayers, u1))
-                    pt_err.append(mu.ptErr*mk_safe(roccor.kSmearMCerror, mu.charge, mu.pt, mu.eta, mu.phi, mu.nTrackerLayers, u1))
+                    pt_err.append(mu.pt*mk_safe(roccor.kSmearMCerror, mu.charge, mu.pt, mu.eta, mu.phi, mu.nTrackerLayers, u1))
+
         else:
             pt_corr = list(
                 mu.pt * mk_safe(
@@ -76,11 +76,10 @@ class muonScaleResProducer(Module):
                     ) for mu in muons)
 
         self.out.fillBranch("Muon_corrected_pt", pt_corr)
-        pt_corr_up   = list( max(pt_corr[imu]+pt_err[imu], 0.0) for imu,mu in enumerate(muons) )
+        pt_corr_up = list( max(pt_corr[imu]+pt_err[imu], 0.0) for imu,mu in enumerate(muons) )
         pt_corr_down = list( max(pt_corr[imu]-pt_err[imu], 0.0) for imu,mu in enumerate(muons) )
         self.out.fillBranch("Muon_correctedUp_pt",  pt_corr_up)
         self.out.fillBranch("Muon_correctedDown_pt",  pt_corr_down)
-
         return True
 
 
