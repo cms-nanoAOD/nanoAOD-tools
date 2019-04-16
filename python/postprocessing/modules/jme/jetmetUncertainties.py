@@ -87,7 +87,7 @@ class jetmetUncertaintiesProducer(Module):
 
         # read all uncertainty source names from the loaded file
         if jesUncertainties[0] == "All":
-            with open(self.jesInputFilePath+self.jesUncertaintyInputFileName) as f:
+            with open(self.jesInputFilePath+'/'+self.jesUncertaintyInputFileName) as f:
                 lines = f.read().split("\n")
                 sources = filter(lambda x: x.startswith("[") and x.endswith("]"), lines)
                 sources = map(lambda x: x[1:-1], sources)
@@ -446,7 +446,7 @@ jetmetUncertainties2017 = lambda : jetmetUncertaintiesProducer("2017", "Fall17_1
 jetmetUncertainties2017All = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "All" ], redoJEC=True)
 
 jetmetUncertainties2018 = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ])
-jetmetUncertainties2018All = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "All" ])
+jetmetUncertainties2018All = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "All" ], redoJEC=True)
 
 
 jetmetUncertainties2016AK4Puppi = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", [ "Total" ], jetType="AK4PFPuppi")
