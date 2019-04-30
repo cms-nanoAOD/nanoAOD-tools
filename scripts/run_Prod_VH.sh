@@ -8,17 +8,17 @@ DIR=""
 #queuelist=("local-cms-long" "local-cms-short" "local-cms-long")
 #prodfolder=("14-Data2016_VH_long" "14-MC_VH_short" "14-MC_VH_long")
 
-samplelist=("SkimshortQ" "SkimlongQ")
-queuelist=("local-cms-short" "local-cms-long")
-prodfolder=("16_2016_VH_short" "16_2016_VH_long")
+#samplelist=("SkimshortQ" "SkimlongQ")
+#queuelist=("local-cms-short" "local-cms-long")
+#prodfolder=("16_2016_VH_short" "16_2016_VH_long")
 
 #samplelist=("testMC" "testData")
 #queuelist=("local-cms-short" "local-cms-short")
 #prodfolder=("00-testMC" "00-testData")
 
-#samplelist=("testData")
-#queuelist=("local-cms-short")
-#prodfolder=("00-testData")
+samplelist=("testData")
+queuelist=("local-cms-short")
+prodfolder=("00-testData")
 
 len=${#samplelist[@]}
 
@@ -27,7 +27,7 @@ for ((i=0;i<$len;i++)); do
     python scripts/submitLSFjobs.py \
 	--queue ${queuelist[$i]} \
 	--cfg producer.py \
-	--preselection "" \
+	--preselection "( (Muon_pt[0]>5 && Muon_mediumId[0]>0 ) || (Electron_pt[0]>15 && Electron_cutBased[0]>0 && Muon_pt[0]>5 && Muon_mediumId[0]>0 ) )" \
 	--Nevent -1 \
 	--samplelists ${samplelist[$i]} \
 	--out Prod_v${prodfolder[$i]}

@@ -1,8 +1,8 @@
+#ALL USEFUL PARAMETER CAN BE FOUND HERE:
+#https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
 from WMCore.Configuration import Configuration
-#from CRABClient.UserUtilities import config, getUsernameFromSiteDB
 from CRABClient.UserUtilities import getUsernameFromSiteDB
-from subprocess import call, check_output
-
+from subprocess import call, check_output, Popen, PIPE
 import sys, os
 from re import findall
 import time
@@ -32,7 +32,8 @@ config.JobType.psetName = 'PSet.py'
 config.JobType.scriptExe = 'crab_script.sh' #script executing in CRAB, need prod.py
 config.JobType.inputFiles = [ 'prod.py' , '../scripts/haddnano.py' , '../scripts/keep_and_drop_Input.txt' , '../scripts/keep_and_drop_Output.txt' ] #hadd nano will not be needed once nano tools are in cmssw
 config.JobType.sendPythonFolder	 = True
-config.JobType.maxMemoryMB = 2500
+config.JobType.maxMemoryMB = 2000 #2500
+config.JobType.maxJobRuntimeMin = 1315 # 21H55M
 config.JobType.priority = 999
 config.section_("Data")
 config.Data.inputDBS = 'global'
@@ -44,6 +45,8 @@ config.Site.storageSite = "T2_IT_Legnaro"
 
 
 if __name__ == '__main__':
+
+    smartSplit=0
 
     from CRABAPI.RawCommand import crabCommand
     from CRABClient.ClientExceptions import ClientException
@@ -97,11 +100,10 @@ if __name__ == '__main__':
             DL=importlib.import_module('DATA')
             global data
             data=DL.data
-            config.General.workArea = 'Run%sDATA' %options.year
+            config.General.workArea = 're-Run%sDATA' %options.year
             config.Data.splitting = 'LumiBased'
-            config.Data.unitsPerJob = 100
-            #NJOBS=500
-            #config.Data.totalUnits = config.Data.unitsPerJob*NJOBS #58962
+            config.Data.unitsPerJob = 80 # how many units luminosity sections to include in each job --> LumiBased
+            #config.Data.totalUnits = #How many luminosity sections to analyze ; How many event to analyze --> EventAwareLumiBased
             
             ##Generate too much file
             #config.Data.splitting = 'EventAwareLumiBased'
@@ -125,13 +127,14 @@ if __name__ == '__main__':
             DL=importlib.import_module('MC')
             global mc
             mc=DL.mc
-            config.General.workArea = 'Run%sMC' %options.year
-
+            config.General.workArea = 're-Run%sMC' %options.year
+            #BY DEFAULT
+            if not smartSplit: print "Using default splitting on MC"
             config.Data.lumiMask = None
             config.Data.splitting = 'FileBased' #EventBased
-            config.Data.unitsPerJob = 2 #number of files per jobs
-            NJOBS=5
-            config.Data.totalUnits = config.Data.unitsPerJob*NJOBS
+            config.Data.unitsPerJob = 2
+            #NJOBS=5
+            #config.Data.totalUnits = config.Data.unitsPerJob*NJOBS
 
     def submitList(l):
         for ll in l:
@@ -150,6 +153,27 @@ if __name__ == '__main__':
             if split[-1] == "NANOAODSIM":
                 config.General.requestName = ll.split('/')[1]+'-'+ll.split('/')[-2].split('-')[-1]
                 #print 'config.General.requestName = ', ll.split('/')[1]+'-'+ll.split('/')[-2].split('-')[-1]
+
+                ##OVERWRITTEN splitting parameter for MC
+                if smartSplit:
+                    print "Using smart splitting on MC"
+                    p1 = Popen('dasgoclient --query "file dataset=%s | sum(file.nevents)"'%(ll), stdout=PIPE, shell=True)
+                    p2 = Popen('dasgoclient --query "summary dataset=%s | grep summary.nfiles"'%(ll), stdout=PIPE, shell=True)
+                    nevents=float(p1.stdout.read().split(': ')[1])
+                    nfiles=int(p2.stdout.read().replace(" ", ""))
+                    ##### Splitting PARAM #####
+                    crabtime=4
+                    eventpersec=30
+                    ###########################
+                    splitting=max( int(nevents/(crabtime*3600*eventpersec)) , 1 )
+                    config.Data.splitting = 'FileBased'
+                    config.Data.unitsPerJob = splitting
+                    NJOB=(int(nfiles)/splitting)+1
+                    config.Data.totalUnits = config.Data.unitsPerJob*NJOB
+                    print "\033[93mNumber of job made = ", NJOB , "\033[00m"
+                    print "\033[93mNumber of unit per one job = ", config.Data.unitsPerJob , "\033[00m"
+                    print "\033[93mTotal unit for all job = ", config.Data.totalUnits , "\033[00m"
+
             elif split[-1] == "NANOAOD":
                 config.General.requestName = ll.split('/')[1]+"_"+ll.split('/')[2].split('-')[0]+"_"+ll.split('/')[2].split('-')[2]
                 #print 'config.General.requestName = ', ll.split('/')[1]+"_"+ll.split('/')[2].split('-')[0]+"_"+ll.split('/')[2].split('-')[2]
@@ -193,7 +217,7 @@ if __name__ == '__main__':
                     exit
             '''
 
-            #submit(config)
+            submit(config)
 
 
     #############################################################################################
@@ -202,8 +226,8 @@ if __name__ == '__main__':
     # EXAMPLE of submitting userInput file, --> /lustre/cmswork/hoh/NANO/SSLep/nanoskim/CMSSW_10_2_10/src/PhysicsTools/NanoAODTools/crab/datatest.txt (SPECIFY FULLPATH)
     start_time = time.time()
 
-    setdata("False")
-    submitList(mc)
+    #setdata("False")
+    #submitList(mc)
     
     setdata("True")
     submitList(data)

@@ -5,11 +5,15 @@ function Query () {
     if [[ "$1" == "MC" ]];then
 	token="mc"
 	if [[ "$2" == "2016" ]];then
-            dataset="/${3}/RunIISummer16NanoAODv4-*_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v*/NANOAODSIM"
+            Nanodataset="/${3}/RunIISummer16NanoAODv4-*_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v*/NANOAODSIM"
+	    Minidataset="/${3}/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v*/MINIAODSIM"
 	elif [[ "$2" == "2017" ]];then
-            dataset="/${3}/RunIIFall17NanoAODv4-*_Nano14Dec2018*/NANOAODSIM"
+            #Nanodataset="/${3}/RunIIFall17NanoAODv4-*_Nano14Dec2018_102X_mc2017_realistic_v6-v*/NANOAODSIM"
+	    Nanodataset="/${3}/RunIIFall17NanoAODv4-*_Nano14Dec2018*/NANOAODSIM"
+	    Minidataset="/${3}/RunIIFall17MiniAODv2-*12Apr2018_94X_mc2017_realistic_v*/MINIAOD"
 	elif [[ "$2" == "2018" ]];then
-            dataset="/${3}/RunIIAutumn18NanoAODv4-Nano14Dec2018*/NANOAODSIM"
+            Nanodataset="/${3}/RunIIAutumn18NanoAODv4-Nano14Dec2018*102X_upgrade2018_realistic_v1*/NANOAODSIM"
+	    Minidataset="/${3}/RunIIAutumn18MiniAOD-*102X_upgrade2018_realistic_v*/MINIAODSIM"
 	else
             echo NULL year
             exit
@@ -17,11 +21,11 @@ function Query () {
     elif [[ "$1" == "DATA" ]];then
 	token="data"
 	if [[ "$2" == "2016" ]];then
-            dataset="/${3}/Run2016*-Nano14Dec2018*-v*/NANOAOD"
+            Nanodataset="/${3}/Run2016*-Nano14Dec2018*-v*/NANOAOD"
 	elif [[ "$2" == "2017" ]];then
-            dataset="/${3}/Run2017*-Nano14Dec2018*-v*/NANOAOD"
+            Nanodataset="/${3}/Run2017*-Nano14Dec2018*-v*/NANOAOD"
 	elif [[ "$2" == "2018" ]];then
-            dataset="/${3}/Run2018*-Nano14Dec2018*-v*/NANOAOD"
+            Nanodataset="/${3}/Run2018*-Nano14Dec2018*-v*/NANOAOD"
 	else
             echo NULL year
             exit
@@ -35,9 +39,13 @@ function Query () {
     fi
     
     path="datasets/Run${2}/$token.txt"
-    query1="dasgoclient --limit=0 --query=\"dataset=${dataset}\" ${sign} ${path}"
+    query1="dasgoclient --limit=0 --query=\"dataset=${Nanodataset}\" ${sign} ${path}"
     eval $query1
-
+    query11=`dasgoclient --limit=0 --query="dataset=${Nanodataset}"`
+    if [ -z "$query11" ];then
+	echo -e "\e[91m ${3} IS MISSING \e[0m"
+	#echo  -e "\e[93m Try MINIAOD /${3}/RunIISummer16MiniAODv3-*/MINIAODSIM \e[0m"
+    fi
 }
 
 function List () {
@@ -67,14 +75,23 @@ then
 else
     year=$1  
     if [ -e "datasets/Run${year}" ];then
+	echo Deleting datasets/Run${year}
 	rm -r datasets/Run${year}
     fi
     mkdir -p datasets/Run${year}
+
+    if [[ "$1" == "2016" ]];then
+	DB="stanDS16"
+    elif [[ "$1" == "2017" ]];then
+	DB="stanDS17"
+    elif [[ "$1" == "2018" ]];then
+	DB="stanDS18"
+    fi
 fi
 
 # Step1 query dataset
 ### Execute
-echo file reads: "$PWD/stanDS"
+echo file reads: "$PWD/$DB"
 
 VAR=0
 while IFS= read -r var
@@ -84,7 +101,7 @@ do
     datatype=`echo $var | awk -F ' ' '{print $2}'`
     echo Query $datatype $year $name
     Query $datatype $year $name $VAR
-done < "$PWD/stanDS"
+done < "$PWD/$DB"
 
 #if [ ! -e "dataset.txt" ];then
 #    echo dataset.txt does not exist, exiting

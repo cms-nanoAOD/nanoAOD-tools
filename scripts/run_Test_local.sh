@@ -12,7 +12,7 @@ outDir="."
 #fileIn="/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8.root"
 #fileIn="/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/SingleMuonRun2016H-03Feb2017_ver2-v1_NANO.root"
 
-fileIn="/Users/shoh/Projects/CMS/PhD/Analysis/SSL/NANOAOD/WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8-v1.root"
+fileIn="/lustre/cmswork/hoh/NANO/SSLep/data/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext1-v2.root"
 
 #preselection=""
 branches="scripts/keep_and_drop_VH.txt"
@@ -20,9 +20,9 @@ bIn="scripts/keep_and_drop_Input.txt"
 bOut="scripts/keep_and_drop_Output.txt"
 #module="PhysicsTools.NanoAODTools.postprocessing.modules.analysis.exampleModule exampleModuleConstr"
 #module2="PhysicsTools.NanoAODTools.postprocessing.modules.analysis.exampleModule exampleModuleConstr"
-module="PhysicsTools.NanoAODTools.analysis.Producer producer"
+#module="PhysicsTools.NanoAODTools.analysis.Producer producer"
+module="PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer lepSF"
 
-#module="PhysicsTools.NanoAODTools.analysis.Producer_pf producer"
 #maxevent="2000"
 maxevent=$1
 

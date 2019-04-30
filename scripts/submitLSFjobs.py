@@ -61,10 +61,10 @@ samplelists = samplelistmod.samplelists
 #1 job/1 root file
 for l in samplelists:
     tag=l.split("/")[-1].split('.')[0]
-    if not tag in sample:
-        if not '_Skim' in tag:
-            print tag, 'not in samples\n'
-            continue
+    #if not tag in sample:
+    #    if not '_Skim' in tag:
+    #        print tag, 'not in samples\n'
+    #        continue
 
     #dir= 'Run2016' if 'Run2016' in l else 'Summer16'
     print "one rootfile one job: processing rootfile --> %s" %l

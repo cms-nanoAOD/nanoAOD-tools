@@ -35,6 +35,12 @@ sample = {
 	'matcheff': 1.0,
 	'kfactor' : 1.0,
 		},
+        'DYJetsToLL_M-50_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' : {
+        'nevents' : 0,
+        'xsec'    : 0, #0.03737                                                                                                                                                                                                       
+        'matcheff': 1.0,
+        'kfactor' : 1.0,
+        },
 	'DoubleMuonRun2016B-03Feb2017_ver2-v2': {
 	'nevents' : 82535526,
 	'xsec'    : 1.0,
@@ -47,6 +53,12 @@ sample = {
 	'matcheff': 1.0,
 	'kfactor' : 1.0,
 		},
+        'DoubleMuon_Run2016C_v1': {
+        'nevents' : 27934629,
+        'xsec'    : 1.0,
+        'matcheff': 1.0,
+        'kfactor' : 1.0,
+        },
 	'DoubleMuonRun2016D-03Feb2017-v1': {
 	'nevents' : 33861745,
 	'xsec'    : 1.0,

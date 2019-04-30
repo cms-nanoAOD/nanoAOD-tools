@@ -1,8 +1,9 @@
 #!/bin/bash
 
-files=`ls -v /lustre/cmswork/hoh/NANO/SSLep/data/*.root`
+#files=`ls -v /lustre/cmswork/hoh/NANO/SSLep/data/*.root`
 #files=`ls -v /lustre/cmswork/hoh/NANO/SSLep/dataskim/*.root`
 #files=`ls -v /lustre/cmswork/hoh/NANO/SSLep/SkimDatav2/*.root`
+files=`ls -v /lustre/cmswork/hoh/NANO/PrivateSignal/signals/LO-v1/Wplushwwlvjj_M125_Madspin_slc6_amd64_gcc481_CMSSW_7_1_30/*.root`
 
 valS=0
 valL=0

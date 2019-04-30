@@ -1,5 +1,33 @@
 #!/usr/bin/env python
 
 samplelists=[
-    '/lustre/cmswork/hoh/NANO/SSLep/data/ttHToNonbb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8-v1.root'
+    #'/lustre/cmswork/hoh/NANO/SSLep/data/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8-v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/data/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext1-v2.root'
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/CMSSW_9_4_6_patch1/src/PhysicsTools/NanoAODTools/DYJetsToLL_M-50_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/DoubleMuon_Run2016C_v1.root'
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/DoubleMuon_Run2016C_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/DoubleMuon_Run2016D_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/DoubleMuon_Run2016E_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/DoubleMuon_Run2016F_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/DoubleMuon_Run2016G_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/DoubleMuon_Run2016H_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleElectron_Run2016C_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleElectron_Run2016D_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleElectron_Run2016E_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleElectron_Run2016F_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleElectron_Run2016G_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleElectron_Run2016H_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleMuon_Run2016B_ver2_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleMuon_Run2016C_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleMuon_Run2016D_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleMuon_Run2016E_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleMuon_Run2016F_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleMuon_Run2016G_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/SingleMuon_Run2016H_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/nanoskim/CMSSW_9_4_6_patch1/src/PhysicsTools/NanoAODTools/crab/Run2016DATA/crab_SingleElectron_Run2016B_ver2_v1/SingleElectronRun2016B_ver2_v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/data/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext1-v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/data/ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8-v1.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/data/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_ext1-v3.root',
+    #'/lustre/cmswork/hoh/NANO/SSLep/data/tZq_ll_4f_13TeV-amcatnlo-pythia8_ext1-v1.root',
+    '/lustre/cmswork/hoh/NANO/SSLep/nanoskim/CMSSW_9_4_6_patch1/src/PhysicsTools/NanoAODTools/crab/Run2016DATA/crab_DoubleMuon_Run2016B_ver2_v1/DoubleMuon_Run2016B_ver2_v1.root',
     ]

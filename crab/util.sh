@@ -3,7 +3,7 @@
 Folder=$1
 comd=$2
 curr=$PWD
-dest="/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17/"
+dest="/lustre/cmswork/hoh/NANO/SSLep/nanoskim/dataset-crab/2016/v17data/"
 
 if [ -z $Folder ] || [ -z $comd ];then
     echo "Select a crab folder or/and option"
@@ -22,6 +22,9 @@ echo -e "--- Looking at \e[32m${Folder}\e[0m ---"
 for crablet in `ls ${Folder}`
 do
     eval cd ${curr}
+    if [ ${crablet} == "crab.log" ];then
+	continue
+    fi
     name=`echo ${crablet} | awk -F 'crab_' '{print $2}'`
     if (( $comd < 4 ));then
 	echo -e "\e[92m$crablet\e[0m"
@@ -31,11 +34,11 @@ do
 	    action="status"
 	elif [ $comd == 2 ];then
 	    echo "$comd : getoutput of job"
-	    numoutputfiles=`ls ${Folder}/${crablet}/results/ | wc -l`
-	    if [ $numoutputfiles != 0 ];then
-		echo "roor file retrieved and exist"
-		continue;
-	    fi
+	    #numoutputfiles=`ls ${Folder}/${crablet}/results/ | wc -l`
+	    #if [ $numoutputfiles != 0 ];then
+		#echo "root file retrieved and exist"
+		#continue;
+	    #fi
 	    action="getoutput"
 	elif [ $comd == 3 ];then
 	    echo "$comd : kill job"
@@ -46,8 +49,8 @@ do
     elif [ $comd == 4 ];then
 	echo -e "Mergining root files output in \e[92m$crablet\e[0m"
 	eval cd ${curr}/${Folder}/${crablet}/results
-	if [ -e "${name}.root" ];then
-	    rm ${name}.root
+	if [ -e "${dest}/${name}.root" ];then
+	    rm ${dest}/${name}.root
 	fi
 	echo "python ${curr}/../scripts/haddnano.py ${name}.root *"
 	python ${curr}/../scripts/haddnano.py ${dest}/${name}.root *

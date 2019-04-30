@@ -13,7 +13,9 @@ from importlib import import_module
 from optparse import OptionParser
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.analysis.Producer import producer
-from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puWeight
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puWeight_2016
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer import lepSF
+from PhysicsTools.NanoAODTools.postprocessing.modules.jme.mht import mht
 
 execfolder=os.environ["CMSSW_BASE"]
 
@@ -37,6 +39,6 @@ if __name__ == "__main__":
     OutDir=args[0]
     Infiles=["%s"%args[1]]
         
-    p=PostProcessor( OutDir , Infiles , cut=preselection , branchsel=bIn , modules=[ puWeight(), producer() ] , maxevent=Nevents , outputbranchsel=bOut )
+    p=PostProcessor( OutDir , Infiles , cut=preselection , branchsel=bIn , modules=[ puWeight_2016(), lepSF(), mht(), producer() ] , maxevent=Nevents , outputbranchsel=bOut )
 
     p.run()
