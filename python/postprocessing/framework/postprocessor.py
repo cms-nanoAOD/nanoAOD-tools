@@ -12,7 +12,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.jobreport import JobRepo
 
 class PostProcessor :
     def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,
-		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None):
+		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None):
 	self.outputDir=outputDir
 	self.inputFiles=inputFiles
 	self.cut=cut
@@ -35,6 +35,7 @@ class PostProcessor :
         self.outputbranchsel = BranchSelection(outputbranchsel) if outputbranchsel else None
         self.histFileName=histFileName
         self.histDirName=histDirName
+        self.maxEntries = maxEntries if maxEntries else 9223372036854775807L # 2^63 - 1, largest int64
     def run(self) :
         outpostfix = self.postfix if self.postfix != None else ("_Friend" if self.friend else "_Skim")
     	if not self.noOut:
@@ -91,14 +92,15 @@ class PostProcessor :
 	    #get input tree
 	    inTree = inFile.Get("Events")
 	    if inTree == None: inTree = inFile.Get("Friends")
-	    totEntriesRead+=inTree.GetEntries()
+	    nEntries = min(inTree.GetEntries(), self.maxEntries)
+	    totEntriesRead+=nEntries
 	    # pre-skimming
-	    elist,jsonFilter = preSkim(inTree, self.json, self.cut)
+	    elist,jsonFilter = preSkim(inTree, self.json, self.cut, maxEntries = self.maxEntries)
 	    if self.justcount:
-		print 'Would select %d entries from %s'%(elist.GetN() if elist else inTree.GetEntries(), fname)
+		print 'Would select %d entries from %s'%(elist.GetN() if elist else nEntries, fname)
 		continue
 	    else:
-		print 'Pre-select %d entries out of %s '%(elist.GetN() if elist else inTree.GetEntries(),inTree.GetEntries())
+		print 'Pre-select %d entries out of %s '%(elist.GetN() if elist else nEntries,nEntries)
 		inAddFiles = []
 		inAddTrees = []
 	    for ffname in ffnames:
@@ -132,7 +134,7 @@ class PostProcessor :
                         outFile,
                         branchSelection=self.branchsel,
                         outputbranchSelection=self.outputbranchsel,
-                        fullClone=fullClone,
+                        fullClone=fullClone, maxEntries = self.maxEntries,
                         jsonFilter=jsonFilter,
                         provenance=self.provenance)
             else : 
@@ -141,10 +143,10 @@ class PostProcessor :
 
 	    # process events, if needed
 	    if not fullClone:
-		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree)
-		print 'Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, inTree.GetEntries(), npass)
+		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree, maxEvents = self.maxEntries)
+		print 'Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, nEntries, npass)
 	    else:
-                nall = inTree.GetEntries()
+                nall = nEntries
 		print 'Selected %d entries from %s' % (outTree.tree().GetEntries(), fname)
 
 	    # now write the output

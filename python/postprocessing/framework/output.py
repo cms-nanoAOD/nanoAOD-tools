@@ -74,6 +74,7 @@ class FullOutput(OutputTree):
             branchSelection=None,
             outputbranchSelection=None,
             fullClone=False,
+            maxEntries=None,
             provenance=False,
             jsonFilter=None
     ):
@@ -85,7 +86,7 @@ class FullOutput(OutputTree):
             outputbranchSelection.selectBranches(inputTree)
 
         if fullClone:
-            outputTree = inputTree.CopyTree('1')
+            outputTree = inputTree.CopyTree('1', "", maxEntries if maxEntries else ROOT.TVirtualTreePlayer.kMaxEntries)
         else:            
             outputTree = inputTree.CloneTree(0)
             
