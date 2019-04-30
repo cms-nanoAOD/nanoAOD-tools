@@ -161,7 +161,8 @@ class PostProcessor :
 
 
 	if self.haddFileName :
-		os.system("./haddnano.py %s %s" %(self.haddFileName," ".join(outFileNames))) #FIXME: remove "./" once haddnano.py is distributed with cms releases
+		haddnano = "./haddnano.py" if os.path.isfile("./haddnano.py") else "haddnano.py"
+		os.system("%s %s %s" %(haddnano, self.haddFileName," ".join(outFileNames)))
 	if self.jobReport :
 		self.jobReport.addOutputFile(self.haddFileName)
 		self.jobReport.save()
