@@ -9,6 +9,7 @@ keep Pileup*
 keep PV*
 
 ## Trigger
+keepmatch HLT_IsoMu20
 keepmatch HLT_IsoMu22
 keepmatch HLT_IsoMu22_eta2p1
 keepmatch HLT_IsoTkMu22_eta2p1
@@ -16,13 +17,18 @@ keepmatch HLT_IsoMu24
 keepmatch HLT_IsoTkMu24
 keepmatch HLT_Mu45_eta2p1
 keepmatch HLT_Mu50
+
 keepmatch HLT_Ele25_WPTight_Gsf
 keepmatch HLT_Ele27_WPTight_Gsf
 keepmatch HLT_Ele27_eta2p1_WPLoose_Gsf
+keepmatch HLT_Ele23_WPLoose_Gsf
+keepmatch HLT_Ele27_WPLoose_Gsf
 keepmatch HLT_Ele105_CaloIdVT_GsfTrkIdT
 
 keepmatch HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL
 keepmatch HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL
+keepmatch HLT_Mu27_TkMu8
+keepmatch HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ
 
 ## Variable
 # GEN
