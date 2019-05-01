@@ -57,7 +57,6 @@ function List () {
 	ERA="Run${letter}"
     fi
     query2="dasgoclient --limit=0 --query=\"file dataset=${1}\" > filelists/Run${2}/${name}${ERA}-${version}.txt"
-    echo $query2
     eval $query2
     #add director
     #US --> root://cmsxrootd.fnal.gov/ ; Eu --> root://xrootd-cms.infn.it/ ; global --> root://cms-xrd-global.cern.ch/
@@ -81,9 +80,11 @@ else
     mkdir -p datasets/Run${year}
 
     if [[ "$1" == "2016" ]];then
-	DB="stanDS16"
+	#DB="stanDS16"
+	DB="2016-dataset"
     elif [[ "$1" == "2017" ]];then
-	DB="stanDS17"
+	#DB="stanDS17"
+	DB="2017-dataset"
     elif [[ "$1" == "2018" ]];then
 	DB="stanDS18"
     fi
