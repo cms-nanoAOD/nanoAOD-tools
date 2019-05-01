@@ -5,15 +5,14 @@ function Query () {
     if [[ "$1" == "MC" ]];then
 	token="mc"
 	if [[ "$2" == "2016" ]];then
-            Nanodataset="/${3}/RunIISummer16NanoAODv4-*_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v*/NANOAODSIM"
-	    Minidataset="/${3}/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v*/MINIAODSIM"
+            Nanodataset="/${3}/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6*/NANOAODSIM"
+	    Minidataset="/${3}/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3*/MINIAODSIM"
 	elif [[ "$2" == "2017" ]];then
-            #Nanodataset="/${3}/RunIIFall17NanoAODv4-*_Nano14Dec2018_102X_mc2017_realistic_v6-v*/NANOAODSIM"
-	    Nanodataset="/${3}/RunIIFall17NanoAODv4-*_Nano14Dec2018*/NANOAODSIM"
-	    Minidataset="/${3}/RunIIFall17MiniAODv2-*12Apr2018_94X_mc2017_realistic_v*/MINIAOD"
+            Nanodataset="/${3}/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6*/NANOAODSIM"
+	    Minidataset="/${3}/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14*/MINIAODSIM"
 	elif [[ "$2" == "2018" ]];then
-            Nanodataset="/${3}/RunIIAutumn18NanoAODv4-Nano14Dec2018*102X_upgrade2018_realistic_v1*/NANOAODSIM"
-	    Minidataset="/${3}/RunIIAutumn18MiniAOD-*102X_upgrade2018_realistic_v*/MINIAODSIM"
+            Nanodataset="/${3}/RunIIAutumn18NanoAODv4-Nano14Dec2018_102X_upgrade2018_realistic_v16*/NANOAODSIM"
+	    Minidataset="/${3}/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15*/MINIAODSIM"
 	else
             echo NULL year
             exit
@@ -39,12 +38,20 @@ function Query () {
     fi
     
     path="datasets/Run${2}/$token.txt"
-    query1="dasgoclient --limit=0 --query=\"dataset=${Nanodataset}\" ${sign} ${path}"
-    eval $query1
     query11=`dasgoclient --limit=0 --query="dataset=${Nanodataset}"`
+
     if [ -z "$query11" ];then
-	echo -e "\e[91m ${3} IS MISSING \e[0m"
-	#echo  -e "\e[93m Try MINIAOD /${3}/RunIISummer16MiniAODv3-*/MINIAODSIM \e[0m"
+	#echo -e "\e[91m ${3} IS MISSING \e[0m"
+	echo  -e "\e[93m Try MINIAOD ${Minidataset} \e[0m"
+	query12=`dasgoclient --limit=0 --query="dataset=${Minidataset}"`
+	if [ -z "$query12" ];then
+	    echo -e "\e[91m ${3} IS MISSING \e[0m"
+	else
+	    echo  -e "\e[32m MINIAOD FOUND, PLEASE REPROCESS THIS:  ${Minidataset} \e[0m"
+	fi
+    else
+	query="dasgoclient --limit=0 --query=\"dataset=${Nanodataset}\" ${sign} ${path}"
+	eval $query
     fi
 }
 
