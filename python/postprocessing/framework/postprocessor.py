@@ -14,7 +14,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.jobreport import JobRepo
 
 class PostProcessor :
     def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,
-		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,
+		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,firstEntry=0,
 		 prefetch=False,longTermCache=False):
 	self.outputDir=outputDir
 	self.inputFiles=inputFiles
@@ -39,8 +39,9 @@ class PostProcessor :
         self.histFileName=histFileName
         self.histDirName=histDirName
         self.maxEntries = maxEntries if maxEntries else 9223372036854775807L # 2^63 - 1, largest int64
-        self.prefetch = prefetch
-        self.longTermCache = longTermCache
+        self.firstEntry = firstEntry
+        self.prefetch = prefetch # prefetch files to TMPDIR using xrdcp
+        self.longTermCache = longTermCache # keep cached files across runs (it's then up to you to clean up the temp)
     def prefetchFile(self, fname, verbose=True):
         tmpdir = os.environ['TMPDIR'] if 'TMPDIR' in os.environ else "/tmp"
         if not fname.startswith("root://"):
@@ -125,10 +126,10 @@ class PostProcessor :
 	    #get input tree
 	    inTree = inFile.Get("Events")
 	    if inTree == None: inTree = inFile.Get("Friends")
-	    nEntries = min(inTree.GetEntries(), self.maxEntries)
+	    nEntries = min(inTree.GetEntries() - self.firstEntry, self.maxEntries)
 	    totEntriesRead+=nEntries
 	    # pre-skimming
-	    elist,jsonFilter = preSkim(inTree, self.json, self.cut, maxEntries = self.maxEntries)
+	    elist,jsonFilter = preSkim(inTree, self.json, self.cut, maxEntries = self.maxEntries, firstEntry = self.firstEntry)
 	    if self.justcount:
 		print 'Would select %d entries from %s'%(elist.GetN() if elist else nEntries, fname)
 		if self.prefetch:
@@ -169,7 +170,9 @@ class PostProcessor :
                         outFile,
                         branchSelection=self.branchsel,
                         outputbranchSelection=self.outputbranchsel,
-                        fullClone=fullClone, maxEntries = self.maxEntries,
+                        fullClone=fullClone, 
+                        maxEntries=self.maxEntries, 
+                        firstEntry=self.firstEntry,
                         jsonFilter=jsonFilter,
                         provenance=self.provenance)
             else : 
@@ -178,7 +181,8 @@ class PostProcessor :
 
 	    # process events, if needed
 	    if not fullClone:
-		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree, maxEvents = self.maxEntries)
+                eventRange = xrange(self.firstEntry, self.firstEntry + nEntries) if nEntries > 0 and not elist else None
+		(nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile, inTree, outTree, eventRange=eventRange, maxEvents=self.maxEntries)
 		print 'Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, nEntries, npass)
 	    else:
                 nall = nEntries
