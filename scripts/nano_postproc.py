@@ -17,6 +17,9 @@ if __name__ == "__main__":
     parser.add_option("--friend",  dest="friend", action="store_true", default=False, help="Produce friend trees in output (current default is to produce full trees)")
     parser.add_option("--full",  dest="friend", action="store_false",  default=False, help="Produce full trees in output (this is the current default)")
     parser.add_option("--noout",  dest="noOut", action="store_true",  default=False, help="Do not produce output, just run modules")
+    parser.add_option("-P", "--prefetch",  dest="prefetch", action="store_true",  default=False, help="Prefetch input files locally instead of accessing them via xrootd")
+    parser.add_option("--long-term-cache",  dest="longTermCache", action="store_true",  default=False, help="Keep prefetched files across runs instead of deleting them at the end")
+    parser.add_option("-N", "--max-entries", dest="maxEntries", type="long",  default=None, help="Maximum number of entries to process from any single given input tree")
     parser.add_option("--justcount",   dest="justcount", default=False, action="store_true",  help="Just report the number of selected events") 
     parser.add_option("-I", "--import", dest="imports",  type="string", default=[], action="append", nargs=2, help="Import modules (python package, comma-separated list of ");
     parser.add_option("-z", "--compression",  dest="compression", type="string", default=("LZMA:9"), help="Compression: none, or (algo):(level) ")
@@ -47,6 +50,19 @@ if __name__ == "__main__":
     if options.branchsel!=None:
         options.branchsel_in = options.branchsel
         options.branchsel_out = options.branchsel
-    p=PostProcessor(outdir,args,options.cut,options.branchsel_in,modules,options.compression,options.friend,options.postfix,options.json,options.noOut,options.justcount,outputbranchsel= options.branchsel_out)
+    p=PostProcessor(outdir,args,
+            cut = options.cut,
+            branchsel = options.branchsel_in,
+            modules = modules,
+            compression = options.compression,
+            friend = options.friend,
+            postfix = options.postfix,
+            jsonInput = options.json,
+            noOut = options.noOut,
+            justcount = options.justcount,
+            prefetch = options.prefetch,
+            longTermCache = options.longTermCache,
+            maxEntries = options.maxEntries,
+            outputbranchsel = options.branchsel_out)
     p.run()
 
