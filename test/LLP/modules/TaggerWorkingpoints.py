@@ -46,9 +46,9 @@ class TaggerWorkingpoints(Module):
             for label in self.predictionLabels:
                 if self.saveAllLabels:
                     self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label,"F", lenVar="nselectedJets")
-                else:
-                    for m in self.multiplicities:
-                        self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),"F")
+
+                for m in self.multiplicities:
+                    self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),"F")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -70,14 +70,14 @@ class TaggerWorkingpoints(Module):
             for label in self.predictionLabels:
                 if self.saveAllLabels:
                     self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label, predictionsPerCtauAndClass[ctau][label])
-                else:
-                    predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
 
-                    for m in self.multiplicities:
-                        if m<len(predictionsPerCtauAndClass[ctau][label]):
-                            self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),predictionsPerCtauAndClass[ctau][label][m])
-                        else:
-                            self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
+                predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
+
+                for m in self.multiplicities:
+                    if m<len(predictionsPerCtauAndClass[ctau][label]):
+                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),predictionsPerCtauAndClass[ctau][label][m])
+                    else:
+                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
 
         return True
         
