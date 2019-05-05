@@ -82,7 +82,7 @@ class JetFeatures(Module):
                         cpfoffset+=int(round(jetNCPF[i].length))
                         npfoffset+=int(round(jetNNPF[i].length))
                     
-                    
+                        print jetSV[cpfoffset].sv_dxy
                     
                         
         

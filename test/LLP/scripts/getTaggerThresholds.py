@@ -365,7 +365,7 @@ with open('eventyields.json',) as f:
 def getProcessDict(filePath):
     processDict = {}
     for processFolder in os.listdir(filePath):
-        print "reading ",processFolder,"...",
+        #print "reading ",processFolder,"...",
         processName = processFolder
         if extensions.has_key(processFolder):
             processName = extensions[processFolder]
@@ -381,20 +381,20 @@ def getProcessDict(filePath):
             fullFilePath = os.path.join(filePath,processFolder,f)
             processDict[processName]["files"].append(fullFilePath)
 
-        print len(processDict[processName]["files"]),
+        #print len(processDict[processName]["files"]),
        
         #if xsecs.has_key(processFolder) and genweights.has_key(processFolder):
         if xsecs.has_key(processName):
-            print genweights[processFolder]["sum"],genweights[processFolder]["weighted"]
+            #print genweights[processFolder]["sum"],genweights[processFolder]["weighted"]
             processDict[processName]["xsec"] = xsecs[processName]
             processDict[processName]["integral"] += genweights[processFolder]["weighted"]
-        else: 
-            print 'noxsec'
+        #else: 
+        #    print 'noxsec'
         
     for processName in sorted(processDict.keys()):
         if processDict[processName]["integral"]>0:
             processDict[processName]["weight"] = processDict[processName]["xsec"]/processDict[processName]["integral"]
-        print processName,len(processDict[processName]["files"]),processDict[processName]["weight"]
+        #print processName,len(processDict[processName]["files"]),processDict[processName]["weight"]
     return processDict
     
 class Chain(object):
@@ -483,14 +483,14 @@ def createArray(fileName,processDict,processList,preselection):
             #if chain.selectedJets_nominal_pt[0]<100.:
             #    continue
             selectedEvents["tagger"].append(numpy.array([
-                [chain.llpdnnx_da_nominal_0p001_LLP_min0,chain.llpdnnx_da_nominal_0p001_LLP_min1,chain.llpdnnx_da_nominal_0p001_LLP_min2],
-                [chain.llpdnnx_da_nominal_0p01_LLP_min0,chain.llpdnnx_da_nominal_0p01_LLP_min1,chain.llpdnnx_da_nominal_0p01_LLP_min2],
-                [chain.llpdnnx_da_nominal_0p1_LLP_min0,chain.llpdnnx_da_nominal_0p1_LLP_min1,chain.llpdnnx_da_nominal_0p1_LLP_min2],
-                [chain.llpdnnx_da_nominal_0_LLP_min0,chain.llpdnnx_da_nominal_0_LLP_min1,chain.llpdnnx_da_nominal_0_LLP_min2],
-                [chain.llpdnnx_da_nominal_10_LLP_min0,chain.llpdnnx_da_nominal_10_LLP_min1,chain.llpdnnx_da_nominal_10_LLP_min2],
-                [chain.llpdnnx_da_nominal_100_LLP_min0,chain.llpdnnx_da_nominal_100_LLP_min1,chain.llpdnnx_da_nominal_100_LLP_min2],
-                [chain.llpdnnx_da_nominal_1000_LLP_min0,chain.llpdnnx_da_nominal_1000_LLP_min1,chain.llpdnnx_da_nominal_1000_LLP_min2],
-                [chain.llpdnnx_da_nominal_10000_LLP_min0,chain.llpdnnx_da_nominal_10000_LLP_min1,chain.llpdnnx_da_nominal_10000_LLP_min2],
+                [chain.llpdnnx_da_nominal_0p001_LLP_min0,chain.llpdnnx_da_nominal_0p001_LLP_min1,chain.llpdnnx_da_nominal_0p001_LLP_min2,chain.llpdnnx_da_nominal_0p001_LLP_min3,chain.llpdnnx_da_nominal_0p001_LLP_min4],
+                [chain.llpdnnx_da_nominal_0p01_LLP_min0,chain.llpdnnx_da_nominal_0p01_LLP_min1,chain.llpdnnx_da_nominal_0p01_LLP_min2,chain.llpdnnx_da_nominal_0p01_LLP_min3,chain.llpdnnx_da_nominal_0p01_LLP_min4],
+                [chain.llpdnnx_da_nominal_0p1_LLP_min0,chain.llpdnnx_da_nominal_0p1_LLP_min1,chain.llpdnnx_da_nominal_0p1_LLP_min2,chain.llpdnnx_da_nominal_0p1_LLP_min3,chain.llpdnnx_da_nominal_0p1_LLP_min4],
+                [chain.llpdnnx_da_nominal_0_LLP_min0,chain.llpdnnx_da_nominal_0_LLP_min1,chain.llpdnnx_da_nominal_0_LLP_min2,chain.llpdnnx_da_nominal_0_LLP_min3,chain.llpdnnx_da_nominal_0_LLP_min4],
+                [chain.llpdnnx_da_nominal_10_LLP_min0,chain.llpdnnx_da_nominal_10_LLP_min1,chain.llpdnnx_da_nominal_10_LLP_min2,chain.llpdnnx_da_nominal_10_LLP_min3,chain.llpdnnx_da_nominal_10_LLP_min4],
+                [chain.llpdnnx_da_nominal_100_LLP_min0,chain.llpdnnx_da_nominal_100_LLP_min1,chain.llpdnnx_da_nominal_100_LLP_min2,chain.llpdnnx_da_nominal_100_LLP_min3,chain.llpdnnx_da_nominal_100_LLP_min4],
+                [chain.llpdnnx_da_nominal_1000_LLP_min0,chain.llpdnnx_da_nominal_1000_LLP_min1,chain.llpdnnx_da_nominal_1000_LLP_min2,chain.llpdnnx_da_nominal_1000_LLP_min3,chain.llpdnnx_da_nominal_1000_LLP_min4],
+                [chain.llpdnnx_da_nominal_10000_LLP_min0,chain.llpdnnx_da_nominal_10000_LLP_min1,chain.llpdnnx_da_nominal_10000_LLP_min2,chain.llpdnnx_da_nominal_10000_LLP_min3,chain.llpdnnx_da_nominal_10000_LLP_min4],
             ]))
             selectedEvents["ht"].append(
                 chain.nominal_ht
@@ -550,14 +550,14 @@ def createArrayLL(fileName,processDict,llp,lsp,xsec,processList,preselection):
             #if chain.selectedJets_nominal_pt[0]<100.:
             #    continue
             selectedEvents["tagger"].append(numpy.array([
-                [chain.llpdnnx_da_nominal_0p001_LLP_min0,chain.llpdnnx_da_nominal_0p001_LLP_min1,chain.llpdnnx_da_nominal_0p001_LLP_min2],
-                [chain.llpdnnx_da_nominal_0p01_LLP_min0,chain.llpdnnx_da_nominal_0p01_LLP_min1,chain.llpdnnx_da_nominal_0p01_LLP_min2],
-                [chain.llpdnnx_da_nominal_0p1_LLP_min0,chain.llpdnnx_da_nominal_0p1_LLP_min1,chain.llpdnnx_da_nominal_0p1_LLP_min2],
-                [chain.llpdnnx_da_nominal_0_LLP_min0,chain.llpdnnx_da_nominal_0_LLP_min1,chain.llpdnnx_da_nominal_0_LLP_min2],
-                [chain.llpdnnx_da_nominal_10_LLP_min0,chain.llpdnnx_da_nominal_10_LLP_min1,chain.llpdnnx_da_nominal_10_LLP_min2],
-                [chain.llpdnnx_da_nominal_100_LLP_min0,chain.llpdnnx_da_nominal_100_LLP_min1,chain.llpdnnx_da_nominal_100_LLP_min2],
-                [chain.llpdnnx_da_nominal_1000_LLP_min0,chain.llpdnnx_da_nominal_1000_LLP_min1,chain.llpdnnx_da_nominal_1000_LLP_min2],
-                [chain.llpdnnx_da_nominal_10000_LLP_min0,chain.llpdnnx_da_nominal_10000_LLP_min1,chain.llpdnnx_da_nominal_10000_LLP_min2],
+                [chain.llpdnnx_da_nominal_0p001_LLP_min0,chain.llpdnnx_da_nominal_0p001_LLP_min1,chain.llpdnnx_da_nominal_0p001_LLP_min2,chain.llpdnnx_da_nominal_0p001_LLP_min3,chain.llpdnnx_da_nominal_0p001_LLP_min4],
+                [chain.llpdnnx_da_nominal_0p01_LLP_min0,chain.llpdnnx_da_nominal_0p01_LLP_min1,chain.llpdnnx_da_nominal_0p01_LLP_min2,chain.llpdnnx_da_nominal_0p01_LLP_min3,chain.llpdnnx_da_nominal_0p01_LLP_min4],
+                [chain.llpdnnx_da_nominal_0p1_LLP_min0,chain.llpdnnx_da_nominal_0p1_LLP_min1,chain.llpdnnx_da_nominal_0p1_LLP_min2,chain.llpdnnx_da_nominal_0p1_LLP_min3,chain.llpdnnx_da_nominal_0p1_LLP_min4],
+                [chain.llpdnnx_da_nominal_0_LLP_min0,chain.llpdnnx_da_nominal_0_LLP_min1,chain.llpdnnx_da_nominal_0_LLP_min2,chain.llpdnnx_da_nominal_0_LLP_min3,chain.llpdnnx_da_nominal_0_LLP_min4],
+                [chain.llpdnnx_da_nominal_10_LLP_min0,chain.llpdnnx_da_nominal_10_LLP_min1,chain.llpdnnx_da_nominal_10_LLP_min2,chain.llpdnnx_da_nominal_10_LLP_min3,chain.llpdnnx_da_nominal_10_LLP_min4],
+                [chain.llpdnnx_da_nominal_100_LLP_min0,chain.llpdnnx_da_nominal_100_LLP_min1,chain.llpdnnx_da_nominal_100_LLP_min2,chain.llpdnnx_da_nominal_100_LLP_min3,chain.llpdnnx_da_nominal_100_LLP_min4],
+                [chain.llpdnnx_da_nominal_1000_LLP_min0,chain.llpdnnx_da_nominal_1000_LLP_min1,chain.llpdnnx_da_nominal_1000_LLP_min2,chain.llpdnnx_da_nominal_1000_LLP_min3,chain.llpdnnx_da_nominal_1000_LLP_min4],
+                [chain.llpdnnx_da_nominal_10000_LLP_min0,chain.llpdnnx_da_nominal_10000_LLP_min1,chain.llpdnnx_da_nominal_10000_LLP_min2,chain.llpdnnx_da_nominal_10000_LLP_min3,chain.llpdnnx_da_nominal_10000_LLP_min4],
             ]))
             selectedEvents["ht"].append(
                 chain.nominal_ht
@@ -589,146 +589,243 @@ def createArrayLL(fileName,processDict,llp,lsp,xsec,processList,preselection):
 #selectedEvents["weights"] = numpy.ones(selectedEvents["weights"].shape)
     
         
-def getThreholds(array,varIndex,p1=[0.,0.9],p2=[0.,0.9,0.99,0.999],ht=lambda x:x>-1,pt=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
-    cut1 = numpy.logical_and(numpy.logical_and(numpy.logical_and(ht(array["ht"]),pt(array["pt"])),mht(array["mht"])),njets(array["njets"]))
-    weightsSelected1 = array["weights"][cut1]
+def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,pt=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
+    cut = numpy.logical_and(numpy.logical_and(numpy.logical_and(ht(array["ht"]),pt(array["pt"])),mht(array["mht"])),njets(array["njets"]))
+    tagger1Selected = array["tagger"][cut,varIndex,0]
+    tagger2Selected = array["tagger"][cut,varIndex,1]
+    tagger3Selected = array["tagger"][cut,varIndex,2]
+    tagger4Selected = array["tagger"][cut,varIndex,3]
     
-    tagger1Selected1 = array["tagger"][cut1,varIndex,1]
-    tagger2Selected1 = array["tagger"][cut1,varIndex,0]
-    
-    sortedIndices1 = numpy.argsort(tagger1Selected1)
-    tagger1Selected1Sorted = tagger1Selected1[sortedIndices1]
-    weightsSelected1Sorted = weightsSelected1[sortedIndices1]
-    weightsSelected1SortedCumulative = numpy.cumsum(weightsSelected1Sorted)/numpy.sum(weightsSelected1Sorted)
-    weightsSelected1SortedCumulativeYield = 36000.*numpy.cumsum(weightsSelected1Sorted)
+    njetsSelected = array["njets"][cut]
 
-    values = []
-    for i in range(len(p1)): 
-        values1 = []
-        if i==(len(p1)-1):
-            index1 = (numpy.abs(weightsSelected1SortedCumulative-p1[i])).argmin()
-            #print "  t2<",p1[i],len(weightsSelected1SortedCumulative)-index1,"/",len(weightsSelected1SortedCumulative),weightsSelected1SortedCumulativeYield[-1]-weightsSelected1SortedCumulativeYield[index1],tagger1Selected1Sorted[index1]
-            cut2 = tagger1Selected1>tagger1Selected1Sorted[index1]
-            values1.append(tagger1Selected1Sorted[index1])
-        else:
-            index1low = (numpy.abs(weightsSelected1SortedCumulative-p1[i])).argmin()
-            index1up = (numpy.abs(weightsSelected1SortedCumulative-p1[i+1])).argmin()
-            #print "  ",p1[i],"<t2<",p1[i+1],index1up-index1low,"/",len(weightsSelected1SortedCumulative),weightsSelected1SortedCumulativeYield[-1]-weightsSelected1SortedCumulativeYield[index1],tagger1Selected1Sorted[index1low],tagger1Selected1Sorted[index1up]
-            cut2 = numpy.logical_and(tagger1Selected1>tagger1Selected1Sorted[index1low],tagger1Selected1<tagger1Selected1Sorted[index1up])
-            values1.append(tagger1Selected1Sorted[index1low])
+    def getWpByEv(sel,ntag,nev):
+        taggerSelected = array["tagger"][sel,varIndex,ntag]
+        taggerSelectedSortedIndices = numpy.argsort(taggerSelected)
+        taggerSelectedSorted = taggerSelected[taggerSelectedSortedIndices]       
+        weightsSortedCumu = numpy.cumsum((36000.*array["weights"][sel])[taggerSelectedSortedIndices])
+        wp = taggerSelectedSorted[numpy.argmin(numpy.abs(weightsSortedCumu-weightsSortedCumu[-1]+nev))]+10**-5
+        return wp
         
-        weightsSelected12 = weightsSelected1[cut2]
-        tagger2Selected12 = tagger2Selected1[cut2]
+    def getWpByFrac(sel,ntag,frac):
+        taggerSelected = array["tagger"][sel,varIndex,ntag]
+        taggerSelectedSortedIndices = numpy.argsort(taggerSelected)
+        taggerSelectedSorted = taggerSelected[taggerSelectedSortedIndices]       
+        weightsSortedCumu = numpy.cumsum((36000.*array["weights"][sel])[taggerSelectedSortedIndices])
+        wp = taggerSelectedSorted[numpy.argmin(numpy.abs(weightsSortedCumu-weightsSortedCumu[-1]*(1-frac)))]+10**-5
+        return wp
+    
+    
         
-        sortedIndices2 = numpy.argsort(tagger2Selected12)
-        tagger2Selected12Sorted = tagger2Selected12[sortedIndices2]
-        weightsSelected12Sorted = weightsSelected12[sortedIndices2]
-        weightsSelected12SortedCumulative = numpy.cumsum(weightsSelected12Sorted)/numpy.sum(weightsSelected12Sorted)
-        weightsSelected12SortedCumulativeYield = 36000.*numpy.cumsum(weightsSelected12Sorted)
-        
-        values2 = []
-        for j,p2Q in enumerate(p2):
-            if j>=(len(p2)-i):
-                continue
-            index2 = (numpy.abs(weightsSelected12SortedCumulative-p2Q)).argmin()
-            if j==(len(p2)-i-1):
-                print "      t1>",p2Q,len(weightsSelected12SortedCumulative)-index2,"/",len(weightsSelected12SortedCumulative),weightsSelected12SortedCumulativeYield[-1]-weightsSelected12SortedCumulativeYield[index2],tagger2Selected12Sorted[index2]
-                pass
-            values2.append(tagger2Selected12Sorted[index2])
+    wpT = 1.#tagger2SelectedSorted[numpy.argmin(numpy.abs(weights2SortedCumu-weights2SortedCumu[-1]+200))]+10**-5
+    
+    bestHt = -1
+    wpM = -1
+    bestDiff = 1000
+    '''
+    for htCut in range(500,1550,50):
+        nH = getWpByEv(cut*(array["ht"]>htCut)*(array["njets"]>5.5),2,3)
+        nL = getWpByEv(cut*(array["ht"]<htCut)*(array["njets"]>5.5),2,3)
+        diff = nH-nL
+        if diff**2<bestDiff**2:
+            bestDiff = diff
+            bestHt = htCut
+            wpM = min(nH,nL)
+    '''
+    wpM = min(
+        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]<4.5),1,3),
+        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,3),
+        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]>5.5),2,3),
+        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]<4.5),1,3),
+        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,3),
+        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]>5.5),2,3)
+    )
+    
+    #wpM = getWpByEv((array["ht"]<htThres)*(array["njets"]>5.5),2,5)
+    
+    #wpM = getWpByFrac(cut,0,0.06)
+    #wpM = getWpByEv(cut,3,5)
+    
+    
+   
+    print bestHt,wpM#,numpy.sum(array["weights"][cut*(array["tagger"][cut,varIndex,0]>wpM)])/numpy.sum(array["weights"][cut])
+    
+    selectedWeights = numpy.stack([36000.*array["weights"][cut],tagger1Selected,tagger2Selected,tagger3Selected,tagger4Selected],axis=0)
+    
+    N = 0
+    
+    
+    for t in [3,5,6]:
+        if t==3:
+            for m in [2]:
+                cutTagger=(njetsSelected>=2.5)*(njetsSelected<4.5)
+                if m==2:
+                    cutTagger*=(selectedWeights[2]>wpM)
+                #elif m==3:
+                #    cutTagger*=(selectedWeights[3]>wpM)
+                sel = 36000.*selectedWeights[0,cutTagger]
+                print "%8s  %8s   "%(
+                    str(m)+"m"+str(t)+"t",""
+                ),
+        elif t==5:
+            for m in [2]:
+                cutTagger=(njetsSelected>4.5)*(njetsSelected<5.5)
+                if m==2:
+                    cutTagger*=(selectedWeights[2]>wpM)
+                sel = 36000.*selectedWeights[0,cutTagger]
+                print "%8s  %8s   "%(
+                    str(m)+"m"+str(t)+"t",""
+                ),
+        elif t==6:
+            for m in [3]:
+                cutTagger=(njetsSelected>5.5)
+                if m==3:
+                    cutTagger*=(selectedWeights[3]>wpM)
+                sel = 36000.*selectedWeights[0,cutTagger]
+                print "%8s  %8s   "%(
+                    str(m)+"m"+str(t)+"t",""
+                ),
+    
+                  
+            '''
+            if t==0:
+                cutTagger=(selectedWeights[2]<wpT)*(selectedWeights[1]<wpT)
+                if m==0:
+                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)*(selectedWeights[1]<wpM)
+                elif m==1:
+                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)*(selectedWeights[1]>wpM)
+                elif m==2:
+                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]>wpM)
+                elif m==3:
+                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]>wpM)
+                elif m==4:
+                    cutTagger*=(selectedWeights[4]>wpM)
             
-        values1.append(values2)
-        values.append(values1)
-    '''
-    print "   [",
-    for elem1 in values:
-        print "[%.4f,["%elem1[0],
-        for elem2 in elem1[1]:
-            print "%.4f,"%elem2,
-        print "1.1]], ",
-    print "[1.1,[]]],"
-    '''
-    
-    return values
-    
-def getThreholdsYields(array,varIndex,n1=[1000],n2=[100,10],ht=lambda x:x>-1,pt=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
-    cut1 = numpy.logical_and(numpy.logical_and(numpy.logical_and(ht(array["ht"]),pt(array["pt"])),mht(array["mht"])),njets(array["njets"]))
-    weightsSelected1 = array["weights"][cut1]
-    
-    tagger1Selected1 = array["tagger"][cut1,varIndex,1]
-    tagger2Selected1 = array["tagger"][cut1,varIndex,0]
-    
-    sortedIndices1 = numpy.argsort(tagger1Selected1)
-    tagger1Selected1Sorted = tagger1Selected1[sortedIndices1]
-    weightsSelected1Sorted = weightsSelected1[sortedIndices1]
-    weightsSelected1SortedCumulative = numpy.cumsum(weightsSelected1Sorted)/numpy.sum(weightsSelected1Sorted)
-    weightsSelected1SortedCumulativeYield = 36000.*numpy.cumsum(weightsSelected1Sorted)
+            elif t==1:
+                cutTagger=(selectedWeights[2]<wpT)*(selectedWeights[1]>wpT)
+                if m==0:
+                    cutTagger*=(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)
+                elif m==1:
+                    cutTagger*=(selectedWeights[3]<wpM)*(selectedWeights[2]>wpM)
+                elif m==2:
+                    cutTagger*=(selectedWeights[3]>wpM)
+                    
+            elif t==2:
+                cutTagger=(selectedWeights[2]>wpT)
+                if m==0:
+                    cutTagger*=(selectedWeights[3]<wpM)
+                elif m==1:
+                    cutTagger*=(selectedWeights[3]>wpM)
+            '''
+            '''
+            sel = selectedWeights[:,cutTagger]
+            n = sel.shape[1]
+            #if n==0:
+            #    #print "%1im%1it: empty"%(m,t)
+            #    continue
+            N+=n
+            '''
+            '''
+            print "%1im%1it: t1=[%5.2f;%5.2f], t2=[%5.2f;%5.2f], t3=[%5.2f;%5.2f], N=%i"%(
+                m,t,
+                numpy.min(sel[1,:]),numpy.max(sel[1,:]),
+                numpy.min(sel[2,:]),numpy.max(sel[2,:]),
+                numpy.min(sel[3,:]),numpy.max(sel[3,:]),
+                n
+            )
+            '''
+            
+           
+    print
+        
+    #print selectedWeights.shape[1],N
 
-    values = []
-    for i in range(len(n1)): 
-        values1 = []
-        if i==(len(n1)-1):
-            index1 = (numpy.abs(weightsSelected1SortedCumulativeYield[-1]-weightsSelected1SortedCumulativeYield-n1[i])).argmin()
-            #print "  t2<",n1[i],len(weightsSelected1SortedCumulative)-index1,"/",len(weightsSelected1SortedCumulative),weightsSelected1SortedCumulativeYield[-1]-weightsSelected1SortedCumulativeYield[index1],tagger1Selected1Sorted[index1]
-            cut2 = tagger1Selected1>tagger1Selected1Sorted[index1]
-            values1.append(tagger1Selected1Sorted[index1])
-        else:
-            index1low = (numpy.abs(weightsSelected1SortedCumulativeYield[-1]-weightsSelected1SortedCumulativeYield-n1[i])).argmin()
-            index1up = (numpy.abs(weightsSelected1SortedCumulativeYield[-1]-weightsSelected1SortedCumulativeYield-n1[i+1])).argmin()
-            #print "  ",n1[i],"<t2<",n1[i+1],index1up-index1low,"/",len(weightsSelected1SortedCumulative),weightsSelected1SortedCumulativeYield[-1]-weightsSelected1SortedCumulativeYield[index1],tagger1Selected1Sorted[index1low],tagger1Selected1Sorted[index1up]
-            cut2 = numpy.logical_and(tagger1Selected1>tagger1Selected1Sorted[index1low],tagger1Selected1<tagger1Selected1Sorted[index1up])
-            values1.append(tagger1Selected1Sorted[index1low])
-        
-        weightsSelected12 = weightsSelected1[cut2]
-        tagger2Selected12 = tagger2Selected1[cut2]
-        
-        sortedIndices2 = numpy.argsort(tagger2Selected12)
-        tagger2Selected12Sorted = tagger2Selected12[sortedIndices2]
-        weightsSelected12Sorted = weightsSelected12[sortedIndices2]
-        weightsSelected12SortedCumulative = numpy.cumsum(weightsSelected12Sorted)/numpy.sum(weightsSelected12Sorted)
-        weightsSelected12SortedCumulativeYield = 36000.*numpy.cumsum(weightsSelected12Sorted)
-        
-        
-        values2 = []
-        for j,n2Q in enumerate(n2):
-            if j>=(len(n2)-i):
-                continue
-            index2 = (numpy.abs(weightsSelected12SortedCumulativeYield[-1]-weightsSelected12SortedCumulativeYield-n2Q)).argmin()
-            #if j==(len(n2)-i-1):
-            #print "      t1>",n2Q,len(weightsSelected12SortedCumulative)-index2,"/",len(weightsSelected12SortedCumulative),weightsSelected12SortedCumulativeYield[-1]-weightsSelected12SortedCumulativeYield[index2],tagger2Selected12Sorted[index2]
-            #    pass
-            values2.append(tagger2Selected12Sorted[index2])
-            
-        values1.append(values2)
-        values.append(values1)
+    return {"m":wpM,"t":wpT}
     
-    print "   [",
-    for elem1 in values:
-        print "[%.4f,["%elem1[0],
-        for elem2 in elem1[1]:
-            print "%.4f,"%elem2,
-        print "1.1]], ",
-    print "[1.1,[]]],"
-    
-    
-    return values
+
     
     
 def applyThreshold(array,thresholds,varIndex,ht=lambda x:x>-1,pt=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
     cut = numpy.logical_and(numpy.logical_and(numpy.logical_and(ht(array["ht"]),pt(array["pt"])),mht(array["mht"])),njets(array["njets"]))
+    tagger1Selected = array["tagger"][cut,varIndex,0]
+    tagger2Selected = array["tagger"][cut,varIndex,1]
+    tagger3Selected = array["tagger"][cut,varIndex,2]
+    tagger4Selected = array["tagger"][cut,varIndex,3]
     
-    tagger1Selected = array["tagger"][cut,varIndex,1]
-    tagger2Selected = array["tagger"][cut,varIndex,0]
+    njetsSelected = array["njets"][cut]
     
-    weightsSelected = array["weights"][cut]
+    wpM = thresholds["m"]
+    wpT = thresholds["t"]
     
-    for elem1 in thresholds:
-        tagger2Selected1 = tagger2Selected[tagger1Selected>elem1[0]]
-        weightsSelected1 = weightsSelected[tagger1Selected>elem1[0]]
-        cut2 = numpy.logical_and(tagger2Selected1>elem1[1][-2],tagger2Selected1>elem1[1][-1])
-        weightsSelected2 = weightsSelected1[cut2]
-        #print "      - ",36000*numpy.sum(weightsSelected2)
-        return 36000*numpy.sum(weightsSelected2)
+    
+    selectedWeights = numpy.stack([array["weights"][cut],tagger1Selected,tagger2Selected,tagger3Selected,tagger4Selected],axis=0)
+    
+    N = 0
+    
+    
+    for t in [3,5,6]:
+        if t==3:
+            for m in [2]:
+                cutTagger=(njetsSelected>2.5)*(njetsSelected<4.5)
+                if m==2:
+                    cutTagger*=(selectedWeights[2]>wpM)
+                #elif m==3:
+                #    cutTagger*=(selectedWeights[3]>wpM)
+                sel = 36000.*selectedWeights[0,cutTagger]
+                print "%8.1f (%8i)  "%(
+                    numpy.sum(sel),len(sel)
+                ),
+        elif t==5:
+            for m in [2]:
+                cutTagger=(njetsSelected>4.5)*(njetsSelected<5.5)
+                if m==2:
+                    cutTagger*=(selectedWeights[2]>wpM)
+                sel = 36000.*selectedWeights[0,cutTagger]
+                print "%8.1f (%8i)  "%(
+                    numpy.sum(sel),len(sel)
+                ),
+        elif t==6:
+            for m in [3]:
+                cutTagger=(njetsSelected>5.5)
+                if m==3:
+                    cutTagger*=(selectedWeights[3]>wpM)
+                sel = 36000.*selectedWeights[0,cutTagger]
+                print "%8.1f (%8i)  "%(
+                    numpy.sum(sel),len(sel)
+                ),
+
+            '''
+            if t==0:
+                cutTagger=(selectedWeights[2]<wpT)*(selectedWeights[1]<wpT)
+                if m==0:
+                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)*(selectedWeights[1]<wpM)
+                elif m==1:
+                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)*(selectedWeights[1]>wpM)
+                elif m==2:
+                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]>wpM)
+                elif m==3:
+                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]>wpM)
+                elif m==4:
+                    cutTagger*=(selectedWeights[4]>wpM)
+                    
+            elif t==1:
+                cutTagger=(selectedWeights[2]<wpT)*(selectedWeights[1]>wpT)
+                if m==0:
+                    cutTagger*=(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)
+                elif m==1:
+                    cutTagger*=(selectedWeights[3]<wpM)*(selectedWeights[2]>wpM)
+                elif m==2:
+                    cutTagger*=(selectedWeights[3]>wpM)
+                    
+            elif t==2:
+                cutTagger=(selectedWeights[2]>wpT)
+                if m==0:
+                    cutTagger*=(selectedWeights[3]<wpM)
+                elif m==1:
+                    cutTagger*=(selectedWeights[3]>wpM)
+            '''
+                
             
+    print
      
         
     
@@ -811,7 +908,7 @@ signalArray = createArray("thresholdDict_SR.npz",processDictSR,[
     "WToLNu_1J_13TeV-amcatnloFXFX-pythia8",
     "WToLNu_2J_13TeV-amcatnloFXFX-pythia8",
 ],preselection=selectionSR)
-
+'''
 singleMuonArray = createArray("thresholdDict_singlemuon.npz",processDictCR,[
     "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
     "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
@@ -833,129 +930,9 @@ diMuonArray = createArray("thresholdDict_dimuon.npz",processDictCR,[
     "WToLNu_1J_13TeV-amcatnloFXFX-pythia8",
     "WToLNu_2J_13TeV-amcatnloFXFX-pythia8",
 ],preselection=selectionDiMuon)
-    
-    
-def scanBin(name,varIndex,ht,mht,title=""):
-    nevents = numpy.logspace(-1,2,75)
-    sensitivityCompressed = numpy.zeros(len(nevents))
-    sensitivityUncompressed = numpy.zeros(len(nevents))
-    nsignalCompressed = numpy.zeros(len(nevents))
-    nsignalUncompressed = numpy.zeros(len(nevents))
-    nbackgroundSR = numpy.zeros(len(nevents))
-    
-    nbackgroundSingleMuon = numpy.zeros(len(nevents))
-    nbackgroundDiMuon = numpy.zeros(len(nevents))
-    
-    nbackgroundSingleMuon10 = numpy.zeros(len(nevents))
-    nbackgroundDiMuon10 = numpy.zeros(len(nevents))
-    
-    for iev in range(len(nevents)):
-    
-        #thresholds = getThreholds(signalArray,varIndex,p1=[0.0],p2=[0.,0],ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-        thresholds = getThreholdsYields(signalArray,varIndex,n1=[500],n2=[500,nevents[iev]],ht=ht,mht=mht)
-        thresholds10 = getThreholdsYields(signalArray,varIndex,n1=[500],n2=[500,nevents[iev]*10],ht=ht,mht=mht)
-        #print thresholds
-        nbackgroundSR[iev] = applyThreshold(signalArray,thresholds,varIndex,ht=ht,mht=mht)
-        nbackgroundSingleMuon[iev] = applyThreshold(singleMuonArray,thresholds,varIndex,ht=ht,mht=mht)
-        nbackgroundDiMuon[iev] = applyThreshold(diMuonArray,thresholds,varIndex,ht=ht,mht=mht)
-        nbackgroundSingleMuon10[iev] = applyThreshold(singleMuonArray,thresholds10,varIndex,ht=ht,mht=mht)
-        nbackgroundDiMuon10[iev] = applyThreshold(diMuonArray,thresholds10,varIndex,ht=ht,mht=mht)
-        nsignalUncompressed[iev] = applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=ht,mht=mht)
-        nsignalCompressed[iev] = applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=ht,mht=mht)
-   
-        sensitivityCompressed[iev] = nsignalCompressed[iev]/math.sqrt(nsignalCompressed[iev]+nbackgroundSR[iev])
-        sensitivityUncompressed[iev] = nsignalUncompressed[iev]/math.sqrt(nsignalUncompressed[iev]+nbackgroundSR[iev])
-        
-        
-    cv = ROOT.TCanvas("cv"+name+str(random.random()),"",800,650)
-    cv.SetLogy(1)
-    cv.SetLogx(1)
-    cv.SetRightMargin(0.27)
-    axis = ROOT.TH2F("axis"+name+str(random.random()),";#events in last bin;",50,nevents[0],nevents[-1],10,0.01,550)
-    axis.Draw("AXIS")
-    
-    legend = ROOT.TLegend(1-cv.GetRightMargin()+0.01,1-cv.GetTopMargin(),0.99,0.2)
-    legend.SetBorderSize(0)
-    legend.SetFillColor(ROOT.kWhite)
-    legend.SetTextFont(43)
-    legend.SetTextSize(28)
-    
-    graph_nbackgroundSR = ROOT.TGraph(len(nevents),nevents,nbackgroundSR)
-    graph_nbackgroundSR.SetLineColor(ROOT.kGray)
-    graph_nbackgroundSR.SetLineWidth(2)
-    graph_nbackgroundSR.Draw("L")
-    legend.AddEntry(graph_nbackgroundSR,"#bkg. SR","L")
-    
-    graph_nbackgroundSingleMuon = ROOT.TGraph(len(nevents),nevents,nbackgroundSingleMuon)
-    graph_nbackgroundSingleMuon.SetLineColor(ROOT.kGreen-7)
-    graph_nbackgroundSingleMuon.SetLineWidth(2)
-    graph_nbackgroundSingleMuon.Draw("L")
-    legend.AddEntry(graph_nbackgroundSingleMuon,"#bkg. #mu","L")
-    
-    graph_nbackgroundSingleMuon10 = ROOT.TGraph(len(nevents),nevents,nbackgroundSingleMuon10)
-    graph_nbackgroundSingleMuon10.SetLineColor(ROOT.kGreen+1)
-    graph_nbackgroundSingleMuon10.SetLineWidth(3)
-    graph_nbackgroundSingleMuon10.SetLineStyle(2)
-    graph_nbackgroundSingleMuon10.Draw("L")
-    legend.AddEntry(graph_nbackgroundSingleMuon10,"10#timesev.","L")
-    
-    graph_nbackgroundDiMuon = ROOT.TGraph(len(nevents),nevents,nbackgroundDiMuon)
-    graph_nbackgroundDiMuon.SetLineColor(ROOT.kAzure-4)
-    graph_nbackgroundDiMuon.SetLineWidth(2)
-    graph_nbackgroundDiMuon.Draw("L")
-    legend.AddEntry(graph_nbackgroundDiMuon,"#bkg. #mu#mu","L")
-    
-    graph_nbackgroundDiMuon10 = ROOT.TGraph(len(nevents),nevents,nbackgroundDiMuon10)
-    graph_nbackgroundDiMuon10.SetLineColor(ROOT.kBlue+1)
-    graph_nbackgroundDiMuon10.SetLineWidth(3)
-    graph_nbackgroundDiMuon10.SetLineStyle(2)
-    graph_nbackgroundDiMuon10.Draw("L")
-    legend.AddEntry(graph_nbackgroundDiMuon10,"10#timesev.","L")
-    
-    graph_nsignalUncompressed = ROOT.TGraph(len(nevents),nevents,nsignalUncompressed)
-    graph_nsignalUncompressed.SetLineColor(ROOT.kOrange+7)
-    graph_nsignalUncompressed.SetLineWidth(2)
-    graph_nsignalUncompressed.SetLineStyle(1)
-    graph_nsignalUncompressed.Draw("L")
-    legend.AddEntry(graph_nsignalUncompressed,"#uncomp.","L")
-    
-    graph_nsignalCompressed = ROOT.TGraph(len(nevents),nevents,nsignalCompressed)
-    graph_nsignalCompressed.SetLineColor(ROOT.kRed+1)
-    graph_nsignalCompressed.SetLineWidth(3)
-    graph_nsignalCompressed.SetLineStyle(2)
-    graph_nsignalCompressed.Draw("L")
-    legend.AddEntry(graph_nsignalCompressed,"#comp.","L")
-    
-    
+'''
 
-    graph_sensitivityUncompressed = ROOT.TGraph(len(nevents),nevents,sensitivityUncompressed)
-    graph_sensitivityUncompressed.SetLineColor(ROOT.kBlack)
-    graph_sensitivityUncompressed.SetLineWidth(3)
-    graph_sensitivityUncompressed.SetLineStyle(1)
-    graph_sensitivityUncompressed.Draw("L")
-    legend.AddEntry(graph_sensitivityUncompressed,"#scale[0.65]{#frac{S}{#sqrt{S+B}}} uncomp.","L")
-    
-    graph_sensitivityCompressed = ROOT.TGraph(len(nevents),nevents,sensitivityCompressed)
-    graph_sensitivityCompressed.SetLineColor(ROOT.kBlack)
-    graph_sensitivityCompressed.SetLineWidth(3)
-    graph_sensitivityCompressed.SetLineStyle(2)
-    graph_sensitivityCompressed.Draw("L")
-    legend.AddEntry(graph_sensitivityCompressed,"#scale[0.65]{#frac{S}{#sqrt{S+B}}} comp.","L")
-    
-    legend.Draw("Same")
-    
-    pLumi=ROOT.TPaveText(1-cv.GetRightMargin(),0.94,1-cv.GetRightMargin(),0.94,"NDC")
-    pLumi.SetFillColor(ROOT.kWhite)
-    pLumi.SetBorderSize(0)
-    pLumi.SetTextFont(43)
-    pLumi.SetTextSize(27)
-    pLumi.SetTextAlign(31)
-    pLumi.AddText(title)
-    pLumi.Draw("Same")
-    
-    cv.Update()
-    cv.Print(name+".pdf")
-    cv.Print(name+".png")
+
     
 metSymbol = "p#kern[-0.8]{ }#lower[0.3]{#scale[0.7]{T}}#kern[-2.3]{ }#lower[-0.8]{#scale[0.7]{miss}}"
 metSymbol_lc = "p#kern[-0.8]{ }#lower[0.3]{#scale[0.7]{T}#kern[-2.3]{ }#lower[-0.8]{#scale[0.7]{miss,#kern[-0.5]{ }#mu-corr.}}}"
@@ -976,45 +953,74 @@ ctauSymbol=[
     ["c#tau#kern[-0.5]{ }=#kern[-0.5]{ }1#kern[-0.5]{ }m","1000"],
     ["c#tau#kern[-0.5]{ }=#kern[-0.5]{ }10#kern[-0.5]{ }m","10000"],
 ]
+
 for varIndex in range(signalArray["tagger"].shape[1]):
     print "-"*60
     #print "var",i,"no ht"
     #getThreholds(i,ht=-1)
     
-    htThres = 1000.
-    mhtThresHigh = 600.
+    htThres = 900.
+    mhtThresHigh = 400.
     mhtThresLow = 500.
+    
     if varIndex>=6:
-        htThres = 900
-        mhtThresHigh = 500.
+        htThres = 800.
     
-    print "var",varIndex,"ht>%f, mht>%f"%(htThres,mhtThresHigh)
+    print "var",varIndex,ctauSymbol[varIndex]#,"ht>%f, mht>%f"%(htThres,mhtThresHigh)
     
+    thresholds = getThreholds(signalArray,varIndex,htThres)
+    #thresholds = getThreholds(signalArray,varIndex,ht=lambda x:x<htThres,njets=lambda x:x>5.5)
+    
+    
+    print "="*100
+    applyThreshold(signalArray,thresholds,varIndex)
+    applyThreshold(llArray[varIndex][0],thresholds,varIndex)
+    applyThreshold(llArray[varIndex][1],thresholds,varIndex)
+    print "="*100
     #thresholds = getThreholds(signalArray,varIndex,p1=[0.0],p2=[0.,0],ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    thresholds = getThreholdsYields(signalArray,varIndex,n1=[552],n2=[552,50,2],ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
+    #thresholds = getThreholds(signalArray,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
     #print thresholds
     #applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
+    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
+    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
+    #print "-"*100
     #applyThreshold(singleMuonArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
     #applyThreshold(diMuonArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
     #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
     #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
     
+    
+    applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x>htThres)
+    applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres)
+    applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres)
+    print "-"*100
+    
     #scanBin("scan_ctau%i_ht1000_mht600"%varIndex,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh,
     #    title=(ctauSymbol[varIndex][0]+", "+htSymbol+"#kern[-0.7]{ }>#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV, "+mhtSymbol+"#kern[-0.7]{ }>#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV")%(htThres,mhtThresHigh)
     #)
     
-    thresholds = getThreholdsYields(signalArray,varIndex,n1=[553],n2=[553,53,3],ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
+    #thresholds = getThreholds(signalArray,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
     #print thresholds
     #applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
+    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
+    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
+    #print "-"*100
     #applyThreshold(singleMuonArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
     #applyThreshold(diMuonArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
     #scanBin("scan_ctau%i_ht1000_mht300"%varIndex,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh,
     #    title=(ctauSymbol[varIndex][0]+", "+htSymbol+"#kern[-0.7]{ }>#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV, "+mhtSymbol+"#kern[-0.7]{ }<#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV")%(htThres,mhtThresHigh)
     #)
     
-    thresholds = getThreholdsYields(signalArray,varIndex,n1=[555],n2=[555,55,5],ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
+    applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x<htThres)
+    applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x<htThres)
+    applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x<htThres)
+    
+    #thresholds = getThreholds(signalArray,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
     #print thresholds
     #applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
+    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
+    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
+    #print "-"*100
     #applyThreshold(singleMuonArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
     #applyThreshold(diMuonArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
     
@@ -1022,9 +1028,11 @@ for varIndex in range(signalArray["tagger"].shape[1]):
     #    title=(ctauSymbol[varIndex][0]+", "+htSymbol+"#kern[-0.7]{ }<#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV, "+mhtSymbol+"#kern[-0.7]{ }>#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV")%(htThres,mhtThresLow)
     #)
     
-    thresholds = getThreholdsYields(signalArray,varIndex,n1=[570],n2=[570,60,10],ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
+    #thresholds = getThreholds(signalArray,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
     #print thresholds
     #applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
+    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
+    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
     #applyThreshold(singleMuonArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
     #applyThreshold(diMuonArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
     
