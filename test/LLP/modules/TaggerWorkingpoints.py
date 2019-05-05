@@ -90,6 +90,8 @@ class TaggerWorkingpoints(Module):
             for ctau in self.logctauValues:
                 for label in self.predictionLabels:
                     predictionsPerCtauAndClass[ctau][label].append(predictions[ctau][label])
+                    if self.saveJetOutput!=None:
+                        taggerOutputsPerCtau[ctau][label][ijet] = predictions[ctau][label]
                     
         if self.saveJetOutput!=None:
             for ctau in self.logctauValues:
