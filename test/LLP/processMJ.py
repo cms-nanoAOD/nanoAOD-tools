@@ -41,11 +41,9 @@ globalOptions = {
 muonSelection = [
     MuonVeto(
         inputCollection=lambda event: Collection(event,"Muon"),
-        globalOptions=globalOptions
     ),
     ElectronVeto(
         inputCollection=lambda event: Collection(event,"Electron"),
-        globalOptions=globalOptions
     ),
     
     EventSkim(selection=lambda event: event.nvetoMuons==0),
@@ -61,122 +59,59 @@ analyzerChain.append(
     )
 )
 
-'''
-analyzerChain.append(
-    SignalTriggerSelection(
-        globalOptions=globalOptions
-        )
-    )
-
+analyzerChain.append(MetFilter(outputName="metFilterSkim"))
 
 analyzerChain.extend(muonSelection)
 
 analyzerChain.append(
-    JetMetUncertainties(
-        era="2016",
-        globalTag="Summer16_23Sep2016V4_MC"
+    JetSelection(
+        outputName="selectedJets_nominal",
+        jetMinPt = 30.,
+        jetMaxEta = 2.4,
+        storeKinematics=[],
     )
 )
 
-'''
-for systName,collection in [
-    ("nominal",lambda event: event.jets_nominal),
-    #("jerUp",lambda event: event.jets_jerUp),
-    #("jerDown",lambda event: event.jets_jerDown),
-    #("jesTotalUp",lambda event: event.jets_jesUp["Total"]),
-    #("jesTotalDown",lambda event: event.jets_jesDown["Total"]),
-]:
-
-    analyzerChain.append(
-        JetSelection(
-            inputCollection=collection,
-            leptonCollection=lambda event: [],
-            outputName="selectedJets_"+systName,
-            jetMinPt = 30.,
-            jetMaxEta = 2.4,
-            storeKinematics=['pt','eta'],
-        )
+analyzerChain.append(
+    JetSelection(
+        inputCollection=lambda event: event.selectedJets_nominal_unselected,
+        outputName="vetoFwdJets_nominal",
+        jetMinPt = 50.,
+        jetMaxEta = 5.0,
+        storeKinematics=[],
     )
-    analyzerChain.append(
-        JetSelection(
-            inputCollection=lambda event,systName=systName: getattr(event,"selectedJets_"+systName+"_unselected"),
-            leptonCollection=lambda event: [],
-            outputName="vetoFwdJets_"+systName,
-            jetMinPt = 50.,
-            jetMaxEta = 5.0,
-            storeKinematics=[],
-        )
-    )
+)
 
 analyzerChain.append(
     EventSkim(selection=lambda event: 
-        len(event.selectedJets_nominal)>=3 and len(event.vetoFwdJets_nominal)==0)
-        #len(event.selectedJets_jerUp)>=2 or \
-        #len(event.selectedJets_jerDown)>=2 or \
-        #len(event.selectedJets_jesTotalUp)>=2 or \
-        #len(event.selectedJets_jesTotalDown)>=2
-)
-
-for systName,jetCollection,metObject in [
-    ("nominal",lambda event: event.selectedJets_nominal,lambda event: event.met_nominal),
-    #("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
-    #("jerDown",lambda event: event.selectedJets_jerDown,lambda event: event.met_jerDown),
-    #("jesTotalUp",lambda event: event.selectedJets_jesTotalUp,lambda event: event.met_jesUp["Total"]),
-    #("jesTotalDown",lambda event: event.selectedJets_jesTotalDown,lambda event: event.met_jesDown["Total"]),
-    #("unclEnUp",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnUp),
-    #("unclEnDown",lambda event: event.selectedJets_nominal,lambda event: event.met_unclEnDown),
-]:
-
-    analyzerChain.append(
-        EventObservables(
-            jetInputCollection = jetCollection,
-            metInput = metObject,
-            outputName = systName,
-        )
+        len(event.selectedJets_nominal)>=3,
     )
+)
 
 analyzerChain.append(
     EventSkim(selection=lambda event: 
-        event.nominal_mht>200.
-        #event.jerUp_met>150. or \
-        #event.jerDown_met>150. or \
-        #event.jesTotalUp_met>150. or \
-        #event.jesTotalDown_met>150. or \
-        #event.unclEnUp_met>150. or \
-        #event.unclEnDown_met>150.
+        len(event.vetoFwdJets_nominal)==0,
     )
 )
 
-analyzerChain.extend([
-    PileupWeight(
-        dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU69000.root"),
-        outputName ="puweight",
-        processName = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen",
-        globalOptions=globalOptions
-    ),
-    PileupWeight(
-        dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU72500.root"),
-        outputName ="puweightUp",
-        processName = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen",
-        globalOptions=globalOptions
-    ),
-    PileupWeight(
-        dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU65500.root"),
-        outputName ="puweightDown",
-        processName = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen",
-        globalOptions=globalOptions
-    )   
-])
+analyzerChain.append(
+    EventObservables(
+        jetCollection = lambda event: event.selectedJets_nominal,
+        outputName = "nominal",
+    )
+)
 
+analyzerChain.append(
+    EventSkim(selection=lambda event: 
+        event.nominal_mht>270.,
+    )
+)
+   
 analyzerChain.append(
     TaggerEvaluation(
         modelPath="PhysicsTools/NanoAODTools/data/nn/model_bothmuon_retrain.pb",
         inputCollections=[
             lambda event: event.selectedJets_nominal,
-            #lambda event: event.selectedJets_jerUp,
-            #lambda event: event.selectedJets_jerDown,
-            #lambda event: event.selectedJets_jesTotalUp,
-            #lambda event: event.selectedJets_jesTotalDown,
         ],
         taggerName="llpdnnx_da",
         logctauValues = range(-3,5)
@@ -189,9 +124,20 @@ analyzerChain.append(
         taggerName = "llpdnnx_da",
         outputName = "llpdnnx_da_nominal",
         logctauValues = range(-3,5),
-        globalOptions=globalOptions
+        globalOptions=globalOptions,
+        saveAllLabels=True
     )
 )
+
+
+analyzerChain.extend([
+    PileupWeight(
+        dataFile = os.path.expandvars("$CMSSW_BASE/src/PhysicsTools/NanoAODTools/data/pu/PU69000.root"),
+        outputName ="puweight",
+        processName = "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen",
+        globalOptions=globalOptions
+    )
+])
 
 p=PostProcessor(
     args.output[0],
