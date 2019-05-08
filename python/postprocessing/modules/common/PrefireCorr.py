@@ -9,9 +9,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class PrefCorr(Module):
     def __init__(self, jetroot="L1prefiring_jetpt_2017BtoF.root", jetmapname="L1prefiring_jetpt_2017BtoF",
-                 photonroot="L1prefiring_photonpt_2017BtoF.root", photonmapname="L1prefiring_photonpt_2017BtoF",
-                 UseEMpT=0):
-# UseEMpT: Set to 1 if the jet map is defined for energy deposited in ECAL (pT_EM vs pT). For jet map only, not photon!
+                 photonroot="L1prefiring_photonpt_2017BtoF.root", photonmapname="L1prefiring_photonpt_2017BtoF"):
 
         cmssw_base = os.getenv('CMSSW_BASE')
 
@@ -21,7 +19,7 @@ class PrefCorr(Module):
         self.jet_file = self.open_root(cmssw_base + "/src/PhysicsTools/NanoAODTools/data/prefire_maps/" + jetroot)
         self.jet_map = self.get_root_obj(self.jet_file, jetmapname)
 
-        self.UseEMpT = UseEMpT
+        self.UseEMpT = ("jetempt" in jetroot)
 
     def open_root(self, path):
         r_file = ROOT.TFile.Open(path)
