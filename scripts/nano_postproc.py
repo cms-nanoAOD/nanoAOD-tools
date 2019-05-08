@@ -20,6 +20,7 @@ if __name__ == "__main__":
     parser.add_option("-P", "--prefetch",  dest="prefetch", action="store_true",  default=False, help="Prefetch input files locally instead of accessing them via xrootd")
     parser.add_option("--long-term-cache",  dest="longTermCache", action="store_true",  default=False, help="Keep prefetched files across runs instead of deleting them at the end")
     parser.add_option("-N", "--max-entries", dest="maxEntries", type="long",  default=None, help="Maximum number of entries to process from any single given input tree")
+    parser.add_option("--first-entry", dest="firstEntry", type="long",  default=0, help="First entry to process in the three (to be used together with --max-entries)")
     parser.add_option("--justcount",   dest="justcount", default=False, action="store_true",  help="Just report the number of selected events") 
     parser.add_option("-I", "--import", dest="imports",  type="string", default=[], action="append", nargs=2, help="Import modules (python package, comma-separated list of ");
     parser.add_option("-z", "--compression",  dest="compression", type="string", default=("LZMA:9"), help="Compression: none, or (algo):(level) ")
@@ -63,6 +64,7 @@ if __name__ == "__main__":
             prefetch = options.prefetch,
             longTermCache = options.longTermCache,
             maxEntries = options.maxEntries,
+            firstEntry = options.firstEntry,
             outputbranchsel = options.branchsel_out)
     p.run()
 
