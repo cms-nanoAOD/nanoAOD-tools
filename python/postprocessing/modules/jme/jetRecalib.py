@@ -19,10 +19,7 @@ class jetRecalib(Module):
         else:
             raise ValueError("ERROR: Invalid jet type = '%s'!" % jetType)
         self.rhoBranchName = "fixedGridRhoFastjetAll"
-        self.lenVar = "n" + self.jetBranchName
-        # To do : change to real values
-        self.jmsVals = [1.00, 0.99, 1.01]
-        
+        self.lenVar = "n" + self.jetBranchName        
 
         self.jesInputArchivePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
         # Text files are now tarred so must extract first into temporary directory (gets deleted during python memory management at script exit)
