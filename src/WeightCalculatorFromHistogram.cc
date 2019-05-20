@@ -40,7 +40,7 @@ float WeightCalculatorFromHistogram::getWeightErr(float x, float y) const {
     return histogram_->GetBinError(bin);
   } else {
     int binx = std::max(1, std::min(histogram_->GetNbinsX(), histogram_->GetXaxis()->FindBin(x)));
-    int biny = std::max(1, std::min(histogram_->GetNbinsX(), histogram_->GetXaxis()->FindBin(y)));
+    int biny = std::max(1, std::min(histogram_->GetNbinsY(), histogram_->GetYaxis()->FindBin(y)));
     return histogram_->GetBinError(binx,biny);
   }
 }

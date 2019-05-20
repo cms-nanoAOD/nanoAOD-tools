@@ -46,7 +46,7 @@ class JSONFilter:
         return filteredList
                 
 
-def preSkim(tree, jsonInput = None, cutstring = None):
+def preSkim(tree, jsonInput = None, cutstring = None, maxEntries = None, firstEntry = 0):
     if jsonInput == None and cutstring == None: 
         return None,None
     cut = None
@@ -59,7 +59,8 @@ def preSkim(tree, jsonInput = None, cutstring = None):
         cut = jsonFilter.runCut()
     if cutstring != None: 
         cut = "(%s) && (%s)" % (cutstring, cut) if cut else cutstring
-    tree.Draw('>>elist',cut,"entrylist")
+    if maxEntries is None: maxEntries = ROOT.TVirtualTreePlayer.kMaxEntries
+    tree.Draw('>>elist',cut,"entrylist", maxEntries, firstEntry)
     elist = ROOT.gDirectory.Get('elist')
     if jsonInput:
         elist = jsonFilter.filterEList(tree,elist)
