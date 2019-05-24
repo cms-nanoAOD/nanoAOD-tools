@@ -345,13 +345,6 @@ class jetmetUncertaintiesProducer(Module):
                 self.jesUncertainty[jesUncertainty].setJetPt(jet_pt_nom)
                 self.jesUncertainty[jesUncertainty].setJetEta(jet.eta)
                 delta = self.jesUncertainty[jesUncertainty].getUncertainty(True)
-                # print ""
-                # print "******"
-                # print ("Jet pt: %s" % (jet_pt_nom))
-                # print ("Jet eta: %s" % (jet.eta))
-                # print ("%s pt shift: %s" % (jesUncertainty,delta))
-                # print "******"
-                # print ""
                 jet_pt_jesUp[jesUncertainty]   = jet_pt_nom*(1. + delta)
                 jet_pt_jesDown[jesUncertainty] = jet_pt_nom*(1. - delta)
                 jets_pt_jesUp[jesUncertainty].append(jet_pt_jesUp[jesUncertainty])
@@ -499,4 +492,4 @@ jetmetUncertainties2017AK8Puppi = lambda : jetmetUncertaintiesProducer("2017", "
 jetmetUncertainties2017AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", ["All"], jetType="AK8PFPuppi")
 
 jetmetUncertainties2018AK8Puppi = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ], jetType="AK8PFPuppi")
-jetmetUncertainties2018AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", ["All"], jetType="AK8PFPuppi")
+jetmetUncertainties2018AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", ["All"], jetType="AK8PFPuppi",redoJEC = True)
