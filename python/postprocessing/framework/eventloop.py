@@ -3,7 +3,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools imp
 import sys, time
 import ROOT
 
-class Module:
+class Module(object):
     def __init__(self):
         self.writeHistFile=False
     def beginJob(self,histFile=None,histDirName=None):
