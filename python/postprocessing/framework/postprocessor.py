@@ -178,6 +178,8 @@ class PostProcessor :
             else : 
                 outFile = None
                 outTree = None
+                if self.branchsel:
+                  self.branchsel.selectBranches(inTree)
 
 	    # process events, if needed
 	    if not fullClone:

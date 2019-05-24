@@ -1,4 +1,5 @@
 import json
+import re
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 class JSONFilter:
@@ -60,6 +61,11 @@ def preSkim(tree, jsonInput = None, cutstring = None, maxEntries = None, firstEn
     if cutstring != None: 
         cut = "(%s) && (%s)" % (cutstring, cut) if cut else cutstring
     if maxEntries is None: maxEntries = ROOT.TVirtualTreePlayer.kMaxEntries
+    while "AltBranch$" in cut:
+        m = re.search(r"AltBranch\$\(\s*(\w+)\s*,\s*(\w+)\s*\)", cut)
+        if not m:
+            raise RuntimeError("Error, found AltBranch$ in cut string, but it doesn't comply with the syntax this code can support. The cut is %r" % cut)
+        cut = cut.replace(m.group(0), m.group(1) if tree.GetBranch(m.group(1)) else m.group(2))
     tree.Draw('>>elist',cut,"entrylist", maxEntries, firstEntry)
     elist = ROOT.gDirectory.Get('elist')
     if jsonInput:
