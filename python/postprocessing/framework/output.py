@@ -2,19 +2,6 @@ from array import array
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
-reduceMantissa="""
-float reduceMantissaToNbits(const float &f, int bits)
-        {
-            uint32_t mask = (0xFFFFFFFF >> (23-bits)) << (23-bits);
-            union { float flt; uint32_t i32; } conv;
-            conv.flt=f;
-            conv.i32&=mask;
-            return conv.flt;
-        }
-"""
-print "load reduce mantissa"
-ROOT.gROOT.ProcessLine(reduceMantissa)
-
 from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import setExtraBranch
 
 _rootBranchType2PythonArray = { 'b':'B', 'B':'b', 'i':'I', 'I':'i', 'F':'f', 'D':'d', 'l':'L', 'L':'l', 'O':'B' }
