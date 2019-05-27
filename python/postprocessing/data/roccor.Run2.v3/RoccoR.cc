@@ -75,7 +75,7 @@ double RocRes::kSmear(double pt, double eta, TYPE type, double v, double u) cons
 
 double RocRes::kSmear(double pt, double eta, TYPE type, double w, double u, int n) const{
     int H = etaBin(fabs(eta));
-    int F = n-NMIN;
+    int F = n>NMIN ? n-NMIN : 0;
     if(type==Data) F = trkBin(rndm(H, F, w), H, Data);
     const ResParams &rp = resol[H];
     double x = rp.kRes[type] * Sigma(pt, H, F) * rp.cb[F].invcdf(u);
