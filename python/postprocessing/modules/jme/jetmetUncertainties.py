@@ -53,9 +53,21 @@ class jetmetUncertaintiesProducer(Module):
         self.metBranchName = "MET"
         self.rhoBranchName = "fixedGridRhoFastjetAll"
         self.lenVar = "n" + self.jetBranchName
-        # To do : change to real values
+
+        #jet mass scale
+        # Ungroomed
+        #To do : change to real values
         self.jmsVals = [1.00, 0.99, 1.01]
-        
+
+        #Groomed
+        if self.doGroomed :
+            #W-tagging PUPPI softdrop JMS values: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
+            if self.era == "2016":
+                self.jmsGroomedVals = [1.00, 0.9906, 1.0094]
+            elif self.era == "2017":
+                self.jmsGroomedVals = [0.982, 0.978, 0.986]
+            elif self.era == "2018": #update when available
+                self.jmsGroomedVals = [1.00, 0.99, 1.01]
 
         # read jet energy scale (JES) uncertainties
         # (downloaded from https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC )
@@ -140,6 +152,7 @@ class jetmetUncertaintiesProducer(Module):
             self.out.branch("%s_msoftdrop_raw" % self.jetBranchName, "F", lenVar=self.lenVar)
             self.out.branch("%s_msoftdrop_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
             self.out.branch("%s_msoftdrop_corr_JMR" % self.jetBranchName, "F", lenVar=self.lenVar)
+            self.out.branch("%s_msoftdrop_corr_JMS" % self.jetBranchName, "F", lenVar=self.lenVar)
             
         if self.corrMET:
             self.out.branch("%s_pt_nom" % self.metBranchName, "F")
@@ -233,6 +246,7 @@ class jetmetUncertaintiesProducer(Module):
             jets_msdcorr_raw = []
             jets_msdcorr_nom = []
             jets_msdcorr_corr_JMR   = []
+            jets_msdcorr_corr_JMS   = []
             jets_msdcorr_jerUp   = []
             jets_msdcorr_jerDown = []
             jets_msdcorr_jmrUp   = []
@@ -321,24 +335,30 @@ class jetmetUncertaintiesProducer(Module):
             jets_mass_jmsDown.append(jet_pt_jerNomVal *jet_mass_jmrNomVal *jmsDownVal *jet_mass)
 
             if self.doGroomed :
-                # to evaluate JES uncertainties
+                # evaluate JES uncertainties
                 jet_msdcorr_jesUp   = {}
                 jet_msdcorr_jesDown = {}
 
+                # Evaluate JMS and JMR scale factors and uncertainties
+                jmsGroomedNomVal = self.jmsGroomedVals[0]
+                jmsGroomedDownVal = self.jmsGroomedVals[1]
+                jmsGroomedUpVal = self.jmsGroomedVals[2]
                 ( jet_msdcorr_jmrNomVal, jet_msdcorr_jmrUpVal, jet_msdcorr_jmrDownVal ) = self.jetSmearer.getSmearValsM(groomedP4, genGroomedJet) if groomedP4 != None and genGroomedJet != None else (0.,0.,0.)
                 jet_msdcorr_raw = groomedP4.M() if groomedP4 != None else 0.0
+                jets_msdcorr_corr_JMS.append(jmsGroomedNomVal)
+                jets_msdcorr_corr_JMR.append(jet_msdcorr_jmrNomVal)
+
                 if jet_msdcorr_raw < 0.0:
                     jet_msdcorr_raw *= -1.0
-                jet_msdcorr_nom           = jet_pt_jerNomVal*jet_msdcorr_jmrNomVal*jmsNomVal*jet_msdcorr_raw
+                jet_msdcorr_nom           = jet_pt_jerNomVal*jet_msdcorr_jmrNomVal*jmsGroomedNomVal*jet_msdcorr_raw
                 jets_msdcorr_raw    .append(jet_msdcorr_raw) #fix later so jec's not applied
                 jets_msdcorr_nom    .append(jet_msdcorr_nom)
-                jets_msdcorr_jerUp  .append(jet_pt_jerUpVal  *jet_msdcorr_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_jerDown.append(jet_pt_jerDownVal*jet_msdcorr_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_corr_JMR.append(jet_msdcorr_jmrNomVal)
-                jets_msdcorr_jmrUp  .append(jet_pt_jerNomVal *jet_msdcorr_jmrUpVal  *jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_jmrDown.append(jet_pt_jerNomVal *jet_msdcorr_jmrDownVal*jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_jmsUp  .append(jet_pt_jerNomVal *jet_msdcorr_jmrNomVal *jmsUpVal   *jet_msdcorr_raw)
-                jets_msdcorr_jmsDown.append(jet_pt_jerNomVal *jet_msdcorr_jmrNomVal *jmsDownVal *jet_msdcorr_raw)
+                jets_msdcorr_jerUp  .append(jet_pt_jerUpVal  *jet_msdcorr_jmrNomVal *jmsGroomedNomVal  *jet_msdcorr_raw)
+                jets_msdcorr_jerDown.append(jet_pt_jerDownVal*jet_msdcorr_jmrNomVal *jmsGroomedNomVal  *jet_msdcorr_raw)
+                jets_msdcorr_jmrUp  .append(jet_pt_jerNomVal *jet_msdcorr_jmrUpVal  *jmsGroomedNomVal  *jet_msdcorr_raw)
+                jets_msdcorr_jmrDown.append(jet_pt_jerNomVal *jet_msdcorr_jmrDownVal*jmsGroomedNomVal  *jet_msdcorr_raw)
+                jets_msdcorr_jmsUp  .append(jet_pt_jerNomVal *jet_msdcorr_jmrNomVal *jmsGroomedUpVal   *jet_msdcorr_raw)
+                jets_msdcorr_jmsDown.append(jet_pt_jerNomVal *jet_msdcorr_jmrNomVal *jmsGroomedDownVal *jet_msdcorr_raw)
             
             for jesUncertainty in self.jesUncertainties:
                 # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties )
@@ -422,9 +442,10 @@ class jetmetUncertaintiesProducer(Module):
         if self.doGroomed :
             self.out.fillBranch("%s_msoftdrop_raw" % self.jetBranchName, jets_msdcorr_raw)
             self.out.fillBranch("%s_msoftdrop_nom" % self.jetBranchName, jets_msdcorr_nom)
+            self.out.fillBranch("%s_msoftdrop_corr_JMS" % self.jetBranchName, jets_msdcorr_corr_JMS)
+            self.out.fillBranch("%s_msoftdrop_corr_JMR" % self.jetBranchName, jets_msdcorr_corr_JMR)
             self.out.fillBranch("%s_msoftdrop_jerUp" % self.jetBranchName, jets_msdcorr_jerUp)
             self.out.fillBranch("%s_msoftdrop_jerDown" % self.jetBranchName, jets_msdcorr_jerDown)
-            self.out.fillBranch("%s_msoftdrop_corr_JMR" % self.jetBranchName, jets_msdcorr_corr_JMR)
             self.out.fillBranch("%s_msoftdrop_jmrUp" % self.jetBranchName, jets_msdcorr_jmrUp)
             self.out.fillBranch("%s_msoftdrop_jmrDown" % self.jetBranchName, jets_msdcorr_jmrDown)
             self.out.fillBranch("%s_msoftdrop_jmsUp" % self.jetBranchName, jets_msdcorr_jmsUp)
