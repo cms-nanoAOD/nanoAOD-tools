@@ -23,8 +23,9 @@ class TaggerEvaluation(Module):
         inputCollections = [lambda event: Collection(event, "Jet")],
         taggerName = "llpdnnx",
         predictionLabels = ["B","C","UDS","G","LLP"],
-        logctauValues = range(-3,5),#[0],
-        globalOptions={"isData":False}
+        logctauValues = range(-3,5),
+        globalOptions = {"isData":False},
+        saveOutput = False
     ):
         self.globalOptions = globalOptions
         self.inputCollections = inputCollections
@@ -34,6 +35,7 @@ class TaggerEvaluation(Module):
         
         self.modelPath = modelPath
         self.taggerName = taggerName
+        self.saveOutput = saveOutput
  
     def beginJob(self):
         pass
@@ -44,10 +46,14 @@ class TaggerEvaluation(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.setup(inputTree)
+
+        if self.saveOutput:
+            for ctau in self.logctauValues:
+                for label in self.predictionLabels:
+                    self.out.branch(self.taggerName+"_"+getCtauLabel(ctau)+"_"+label, "F", lenVar="nselectedJets")
         
     def setupTFEval(self,tree,modelFile,featureDict):
         tfEval = ROOT.TFEval()
-        print "setup tfeval"
         if (not tfEval.loadGraph(modelFile)):
             sys.exit(1)
         tfEval.addOutputNodeName("prediction")
@@ -63,7 +69,6 @@ class TaggerEvaluation(Module):
                     lengthBranch
                 )
                 for branchName in featureCfg["branches"]:
-                    #print " + add feature: ",branchName
                     featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
                 tfEval.addFeatureGroup(featureGroup)
             else:
@@ -73,7 +78,6 @@ class TaggerEvaluation(Module):
                     len(featureCfg["branches"])
                 )
                 for branchName in featureCfg["branches"]:
-                    #print " + add feature: ",branchName
                     featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
                 tfEval.addFeatureGroup(featureGroup)
                 
@@ -99,14 +103,19 @@ class TaggerEvaluation(Module):
         pass
         
     def analyze(self, event):
+
+        if self.saveOutput:
+            predictionsPerCtauAndClass = {ctau: {className: [] for className in self.predictionLabels} for ctau in self.logctauValues}
+
         jetglobal = Collection(event, "global")
         
         jetOriginIndices = set() #superset of all indices to evaluate
-        
-        
+
         for jetCollection in self.inputCollections:
             jets = jetCollection(event)
+            testJets = Collection(event, "Jet")
             for ijet,jet in enumerate(jets):
+                testjet = testJets[ijet]
                 if jet._index>=len(jetglobal):
                     #this is very strange - why has it not been filled?
                     continue
@@ -128,33 +137,51 @@ class TaggerEvaluation(Module):
             
         evaluationIndices = numpy.array(evaluationIndices,numpy.int64)
             
-        #print evaluationIndices,len(evaluationIndices)
         result = self.tfEvalParametric.evaluate(
             evaluationIndices.shape[0],
             evaluationIndices
         )
         
         predictionsPerIndexAndCtau = {}
+
         for ijet,jetIndex in enumerate(jetOriginIndices):
             predictionsPerIndexAndCtau[jetIndex] = {}
+
             for ictau,ctau in enumerate(self.logctauValues):
                 predictionIndex = ijet*len(self.logctauValues)+ictau
                 predictionsPerIndexAndCtau[jetIndex][ctau] = result.get("prediction",predictionIndex)
                 
                 
-                
         for jetCollection in self.inputCollections:
             jets = jetCollection(event)
+
             for ijet,jet in enumerate(jets):
                 taggerOutput = {}
+
                 for ictau,ctau in enumerate(self.logctauValues):
                     taggerOutput[self.logctauValues[ictau]] = {}
+
                     for iclass, classLabel in enumerate(self.predictionLabels):  
                         if jet._index<len(jetglobal):
                             taggerOutput[self.logctauValues[ictau]][classLabel] = \
-                                predictionsPerIndexAndCtau[jet._index][ctau][iclass]
+                                    predictionsPerIndexAndCtau[jet._index][ctau][iclass]
                         else:
                             taggerOutput[self.logctauValues[ictau]][classLabel] = -1
-                setattr(jet,self.taggerName,taggerOutput)
+
+                setattr(jet, self.taggerName, taggerOutput)
+
+                if self.saveOutput:
+                    for ctau in self.logctauValues:
+                        for label in self.predictionLabels:
+                            predictionsPerCtauAndClass[ctau][label].append(taggerOutput[ctau][label])
+                            if taggerOutput[ctau][label] == 0:
+                                print "???"
+
+
+        if self.saveOutput:
+            for ctau in self.logctauValues:
+                for label in self.predictionLabels:
+                    self.out.fillBranch(self.taggerName+"_"+getCtauLabel(ctau)+"_"+label, predictionsPerCtauAndClass[ctau][label])
+                    assert len(predictionsPerCtauAndClass[ctau][label]), len(event.selectedJets)
 
         return True
