@@ -133,4 +133,3 @@ class TaggerWorkingpoints(Module):
                         self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
         
         return True
-        
