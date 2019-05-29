@@ -30,7 +30,13 @@ class jetmetUncertaintiesProducer(Module):
             self.jerInputFileName = "Fall17_V3_MC_PtResolution_" + jetType + ".txt"
             self.jerUncertaintyInputFileName = "Fall17_V3_MC_SF_" + jetType + ".txt"
 
-        self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName)
+        #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
+        if self.era == "2016" or self.era == "2018": #update when 2018 values available
+            self.jmrVals = [1.0, 1.2, 0.8] #nominal, up, down
+        else: 
+            self.jmrVals = [1.09, 1.14, 1.04]
+
+        self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName, self.jmrVals)
 
         if "AK4" in jetType : 
             self.jetBranchName = "Jet"
@@ -57,7 +63,7 @@ class jetmetUncertaintiesProducer(Module):
         #jet mass scale
         # Ungroomed
         #To do : change to real values
-        self.jmsVals = [1.00, 0.99, 1.01]
+        self.jmsVals = [1.00, 0.99, 1.01] #nominal, down, up
 
         #Groomed
         if self.doGroomed :
@@ -103,6 +109,7 @@ class jetmetUncertaintiesProducer(Module):
                 sources = filter(lambda x: x.startswith("[") and x.endswith("]"), lines)
                 sources = map(lambda x: x[1:-1], sources)
                 self.jesUncertainties = sources
+                print self.jesUncertainties
             
         if self.redoJEC :
             self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
