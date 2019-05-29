@@ -51,7 +51,7 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
     entries = inputTree.entries
 
     for i in xrange(entries) if eventRange == None else eventRange:
-        if maxEvents > 0 and i >= maxEvents-1: break
+        if maxEvents > 0 and i >= maxEvents: break
         e = Event(inputTree,i)
         clearExtraBranches(inputTree)
         doneEvents += 1
