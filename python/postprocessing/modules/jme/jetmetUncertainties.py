@@ -76,23 +76,9 @@ class jetmetUncertaintiesProducer(Module):
         self.jesArchive.extractall(self.jesInputFilePath)
         
         if len(jesUncertainties) == 1 and jesUncertainties[0] == "Total":
-            if self.era == "2016":
-                self.jesUncertaintyInputFileName = "Summer16_07Aug2017_V11_MC_Uncertainty_" + jetType + ".txt"
-            elif self.era == "2017":
-                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V32_MC_Uncertainty_" + jetType + ".txt"
-            elif self.era == "2018":
-                self.jesUncertaintyInputFileName = "Autumn18_V8_MC_Uncertainty_" + jetType + ".txt"
-            else:
-                raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
+            self.jesUncertaintyInputFileName = globalTag + "_Uncertainty_" + jetType + ".txt"
         else:
-            if self.era == "2016":
-                self.jesUncertaintyInputFileName = "Summer16_07Aug2017_V11_MC_UncertaintySources_" + jetType + ".txt"
-            elif self.era == "2017":
-                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V32_MC_UncertaintySources_" + jetType + ".txt"
-            elif self.era == "2018":
-                self.jesUncertaintyInputFileName = "Autumn18_V8_MC_UncertaintySources_" + jetType + ".txt"
-            else:
-                raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
+            self.jesUncertaintyInputFileName = globalTag + "_UncertaintySources_" + jetType + ".txt"
 
         # read all uncertainty source names from the loaded file
         if jesUncertainties[0] == "All":
@@ -350,6 +336,7 @@ class jetmetUncertaintiesProducer(Module):
                 jets_msdcorr_nom    .append(jet_msdcorr_nom)
                 jets_msdcorr_jerUp  .append(jet_pt_jerUpVal  *jet_msdcorr_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
                 jets_msdcorr_jerDown.append(jet_pt_jerDownVal*jet_msdcorr_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
+                jets_msdcorr_corr_JMR.append(jet_msdcorr_jmrNomVal)
                 jets_msdcorr_jmrUp  .append(jet_pt_jerNomVal *jet_msdcorr_jmrUpVal  *jmsNomVal  *jet_msdcorr_raw)
                 jets_msdcorr_jmrDown.append(jet_pt_jerNomVal *jet_msdcorr_jmrDownVal*jmsNomVal  *jet_msdcorr_raw)
                 jets_msdcorr_jmsUp  .append(jet_pt_jerNomVal *jet_msdcorr_jmrNomVal *jmsUpVal   *jet_msdcorr_raw)
