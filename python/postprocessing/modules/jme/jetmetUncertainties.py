@@ -51,7 +51,7 @@ class jetmetUncertaintiesProducer(Module):
             self.genSubJetBranchName = "SubGenJetAK8"
             if not self.noGroom:
                 self.doGroomed = True
-                self.puppiCorrFile = TFile.Open(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/puppiCorr.root")
+                self.puppiCorrFile = ROOT.TFile.Open(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/puppiCorr.root")
                 self.puppisd_corrGEN = self.puppiCorrFile.Get("puppiJECcorr_gen")
                 self.puppisd_corrRECO_cen = self.puppiCorrFile.Get("puppiJECcorr_reco_0eta1v3")
                 self.puppisd_corrRECO_for = self.puppiCorrFile.Get("puppiJECcorr_reco_1v3eta2v5")
@@ -285,14 +285,16 @@ class jetmetUncertaintiesProducer(Module):
                     groomedP4 = None
 
                 # LC: Apply PUPPI SD mass correction https://github.com/cms-jet/PuppiSoftdropMassCorr/
-                puppisd_genCorr = puppisd_corrGEN.Eval(jet.pt)
+                puppisd_genCorr = self.puppisd_corrGEN.Eval(jet.pt)
                 if abs(jet.eta) <= 1.3:
                     puppisd_recoCorr = self.puppisd_corrRECO_cen.Eval(jet.pt)
                 else:
                     puppisd_recoCorr = self.puppisd_corrRECO_for.Eval(jet.pt)
 
                 puppisd_total = puppisd_genCorr * puppisd_recoCorr
-                groomedP4.M() = groomedP4.M()*puppisd_total
+                jets_msdcorr_corr_PUPPI.append(puppisd_total)
+                if groomedP4 != None:
+                    groomedP4.SetPtEtaPhiM(groomedP4.Perp(), groomedP4.Eta(), groomedP4.Phi(), groomedP4.M()*puppisd_total)
 
             # evaluate JER scale factors and uncertainties
             # (cf. https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution )

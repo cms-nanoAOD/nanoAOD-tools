@@ -41,9 +41,9 @@ class jetSmearer(Module):
                 print("Load Library '%s'" % library.replace("lib", ""))
                 ROOT.gSystem.Load(library)
 
-        self.puppiJMRFile = TFile.Open(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/puppiSoftdropResol.root")
-        self.puppisd_resolution_cen = filejmr.Get("massResolution_0eta1v3")
-        self.puppisd_resolution_for = filejmr.Get("massResolution_1v3eta2v5")
+        self.puppiJMRFile = ROOT.TFile.Open(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/puppiSoftdropResol.root")
+        self.puppisd_resolution_cen = self.puppiJMRFile.Get("massResolution_0eta1v3")
+        self.puppisd_resolution_for = self.puppiJMRFile.Get("massResolution_1v3eta2v5")
 
     def beginJob(self):
 
@@ -178,9 +178,9 @@ class jetSmearer(Module):
 
         # Get mass resolution
         if abs(jet.Eta()) <= 1.3:
-            jet_m_resolution = puppisd_resolution_cen->Eval( jet.Pt() )
+            jet_m_resolution = self.puppisd_resolution_cen.Eval( jet.Pt() )
         else:
-            jet_m_resolution = puppisd_resolution_for->Eval( jet.Pt() )
+            jet_m_resolution = self.puppisd_resolution_for.Eval( jet.Pt() )
 
         # generate random number with flat distribution between 0 and 1
         u = self.rnd.Rndm()
