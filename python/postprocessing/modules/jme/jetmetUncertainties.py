@@ -320,8 +320,8 @@ class jetmetUncertaintiesProducer(Module):
             
             # Evaluate JMS and JMR scale factors and uncertainties
             jmsNomVal = self.jmsVals[0]
-            jmsDownVal = self.jmsVals[1]
-            jmsUpVal = self.jmsVals[2]
+            jmsUpVal = self.jmsVals[1]
+            jmsDownVal = self.jmsVals[2]
             ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = self.jetSmearer.getSmearValsM(self.jmrVals, jet, genJet)
             jets_corr_JMS   .append(jmsNomVal)
             jets_corr_JMR   .append(jet_mass_jmrNomVal)
