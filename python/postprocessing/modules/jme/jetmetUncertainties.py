@@ -10,7 +10,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetS
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
 class jetmetUncertaintiesProducer(Module):
-    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False, jerTag=""):
 
         self.era = era
         self.redoJEC = redoJEC
@@ -23,12 +23,8 @@ class jetmetUncertaintiesProducer(Module):
         self.jesUncertainties = jesUncertainties
 
         # smear jet pT to account for measured difference in JER between data and simulation.
-        if era == "2016":
-            self.jerInputFileName = "Summer16_25nsV1_MC_PtResolution_" + jetType + ".txt"
-            self.jerUncertaintyInputFileName = "Summer16_25nsV1_MC_SF_" + jetType + ".txt"
-        elif era == "2017" or era == "2018": # use Fall17 as temporary placeholder until post-Moriond 2019 JERs are out
-            self.jerInputFileName = "Fall17_V3_MC_PtResolution_" + jetType + ".txt"
-            self.jerUncertaintyInputFileName = "Fall17_V3_MC_SF_" + jetType + ".txt"
+        self.jerInputFileName = jerTag + "_PtResolution_" + jetType + ".txt"
+        self.jerUncertaintyInputFileName = jerTag + "_SF_"  + jetType + ".txt"
 
         #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
         if self.era == "2016" or self.era == "2018": #update when 2018 values available
@@ -76,21 +72,13 @@ class jetmetUncertaintiesProducer(Module):
         self.jesArchive.extractall(self.jesInputFilePath)
         
         if len(jesUncertainties) == 1 and jesUncertainties[0] == "Total":
-            if self.era == "2016":
-                self.jesUncertaintyInputFileName = "Summer16_07Aug2017_V11_MC_Uncertainty_" + jetType + ".txt"
-            elif self.era == "2017":
-                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V32_MC_Uncertainty_" + jetType + ".txt"
-            elif self.era == "2018":
-                self.jesUncertaintyInputFileName = "Autumn18_V8_MC_Uncertainty_" + jetType + ".txt"
+            if self.era in ["2016", "2017", "2018"]:
+                self.jesUncertaintyInputFileName = self.jesUncertaintyInputFileName = globalTag + "_Uncertainty_" + jetType + ".txt"
             else:
                 raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
         else:
-            if self.era == "2016":
-                self.jesUncertaintyInputFileName = "Summer16_07Aug2017_V11_MC_UncertaintySources_" + jetType + ".txt"
-            elif self.era == "2017":
-                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V32_MC_UncertaintySources_" + jetType + ".txt"
-            elif self.era == "2018":
-                self.jesUncertaintyInputFileName = "Autumn18_V8_MC_UncertaintySources_" + jetType + ".txt"
+            if self.era in ["2016", "2017", "2018"]:
+                self.jesUncertaintyInputFileName = globalTag + "_UncertaintySources_" + jetType + ".txt"
             else:
                 raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
 
