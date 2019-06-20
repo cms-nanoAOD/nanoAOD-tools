@@ -64,7 +64,7 @@ class jetmetUncertaintiesProducer(Module):
         #W-tagging PUPPI softdrop JMS values: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
         #2016 values - use for 2018 until new values available
         self.jmsVals = [1.00, 0.9906, 1.0094] #nominal, down, up
-        if self.era == "2017":
+        if self.era in ["2017","2018"]:
             self.jmsVals = [0.982, 0.978, 0.986]
 
         # read jet energy scale (JES) uncertainties
@@ -76,23 +76,9 @@ class jetmetUncertaintiesProducer(Module):
         self.jesArchive.extractall(self.jesInputFilePath)
         
         if len(jesUncertainties) == 1 and jesUncertainties[0] == "Total":
-            if self.era == "2016":
-                self.jesUncertaintyInputFileName = "Summer16_07Aug2017_V11_MC_Uncertainty_" + jetType + ".txt"
-            elif self.era == "2017":
-                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V32_MC_Uncertainty_" + jetType + ".txt"
-            elif self.era == "2018":
-                self.jesUncertaintyInputFileName = "Autumn18_V8_MC_Uncertainty_" + jetType + ".txt"
-            else:
-                raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
+            self.jesUncertaintyInputFileName = globalTag + "_Uncertainty_" + jetType + ".txt"
         else:
-            if self.era == "2016":
-                self.jesUncertaintyInputFileName = "Summer16_07Aug2017_V11_MC_UncertaintySources_" + jetType + ".txt"
-            elif self.era == "2017":
-                self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V32_MC_UncertaintySources_" + jetType + ".txt"
-            elif self.era == "2018":
-                self.jesUncertaintyInputFileName = "Autumn18_V8_MC_UncertaintySources_" + jetType + ".txt"
-            else:
-                raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
+            self.jesUncertaintyInputFileName = globalTag + "_UncertaintySources_" + jetType + ".txt"
 
         # read all uncertainty source names from the loaded file
         if jesUncertainties[0] == "All":
