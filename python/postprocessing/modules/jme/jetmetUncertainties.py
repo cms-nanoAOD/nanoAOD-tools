@@ -359,7 +359,7 @@ class jetmetUncertaintiesProducer(Module):
                 if jet_msdcorr_raw < 0.0:
                     jet_msdcorr_raw *= -1.0
                 jet_msdcorr_nom           = jet_pt_jerNomVal*jet_msdcorr_jmrNomVal*jmsNomVal*jet_msdcorr_raw
-                jets_msdcorr_raw    .append(jet_msdcorr_raw) #fix later so jec's not applied
+                jets_msdcorr_raw    .append(jet_msdcorr_raw) #fix later so jec's not applied - LC: Current PUPPI SD mass correction implementation needs the JECs applied before looking up the correction so make sure that's accounted for if this is changed.
                 jets_msdcorr_nom    .append(jet_msdcorr_nom)
                 jets_msdcorr_jerUp  .append(jet_pt_jerUpVal  *jet_msdcorr_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
                 jets_msdcorr_jerDown.append(jet_pt_jerDownVal*jet_msdcorr_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
