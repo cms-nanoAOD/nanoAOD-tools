@@ -1,5 +1,5 @@
 import ROOT
-import math, os
+import math, os, tarfile, tempfile
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -8,7 +8,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.tools import matchObjectCollection, matchObjectCollectionMultiple
 
 class jetSmearer(Module):
-    def __init__(self, globalTag, jetType = "AK4PFchs", jerInputFileName = "Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt", jerUncertaintyInputFileName = "Spring16_25nsV10_MC_SF_AK4PFchs.txt"):
+    def __init__(self, globalTag, jetType = "AK4PFchs", jerInputFileName = "Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt", jerUncertaintyInputFileName = "Spring16_25nsV10_MC_SF_AK4PFchs.txt", jmr_vals=[1.09, 1.14, 1.04]):
 
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used, as there is no consistent set of txt files for
@@ -17,9 +17,16 @@ class jetSmearer(Module):
 
         # read jet energy resolution (JER) and JER scale factors and uncertainties
         # (the txt files were downloaded from https://github.com/cms-jet/JRDatabase/tree/master/textFiles/Spring16_25nsV10_MC )
-        self.jerInputFilePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
+        # Text files are now tarred so must extract first
+        self.jerInputArchivePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
+        self.jerTag = jerInputFileName[:jerInputFileName.find('_MC_')+len('_MC')]
+        self.jerArchive = tarfile.open(self.jerInputArchivePath+self.jerTag+".tgz", "r:gz")
+        self.jerInputFilePath = tempfile.mkdtemp()
+        self.jerArchive.extractall(self.jerInputFilePath)
         self.jerInputFileName = jerInputFileName
         self.jerUncertaintyInputFileName = jerUncertaintyInputFileName
+
+        self.jmr_vals = jmr_vals
 
         self.params_sf_and_uncertainty = ROOT.PyJetParametersWrapper()
         self.params_resolution = ROOT.PyJetParametersWrapper()
@@ -159,7 +166,7 @@ class jetSmearer(Module):
         enum_shift_down      = 1
         #--------------------------------------------------------------------------------------------
 
-        jet_m_sf_and_uncertainty = dict( zip( [enum_nominal, enum_shift_up, enum_shift_down], [0.1, 0.2, 0.0] ) )
+        jet_m_sf_and_uncertainty = dict( zip( [enum_nominal, enum_shift_up, enum_shift_down], self.jmr_vals ) )
 
         # generate random number with flat distribution between 0 and 1
         u = self.rnd.Rndm()

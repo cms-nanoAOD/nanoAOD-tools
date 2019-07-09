@@ -70,6 +70,15 @@ class btagSFProducer(Module):
                 }
             },
             'deepcsv' : {
+                'Legacy2016' : {
+                    'inputFileName' : "DeepCSV_2016LegacySF_V1.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
                 '2017' : {
                     'inputFileName' : "DeepCSV_94XSF_V2_B_F.csv",
                     'measurement_types' : {
@@ -78,7 +87,45 @@ class btagSFProducer(Module):
                         2 : "incl"   # light
                     },
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
-                }
+                },
+                '2018' : {
+                    'inputFileName' : "DeepCSV_102XSF_V1.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"] 
+                }    
+            },
+            'deepjet' : {
+                'Legacy2016' : {
+                    'inputFileName' : "DeepJet_2016LegacySF_V1.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
+                '2017' : {
+                    'inputFileName' : "DeepFlavour_94XSF_V2_B_F.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
+                '2018' : {
+                    'inputFileName' : "DeepJet_102XSF_V1.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                }    
             },
             'cmva' : {
                 '2016' : {

@@ -3,7 +3,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools imp
 import sys, time
 import ROOT
 
-class Module:
+class Module(object):
     def __init__(self):
         self.writeHistFile=False
     def beginJob(self,histFile=None,histDirName=None):
@@ -56,9 +56,11 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
 
     t0 = time.clock(); tlast = t0; doneEvents = 0; acceptedEvents = 0
     entries = inputTree.entries
+    if eventRange: entries = len(eventRange)
+    if maxEvents > 0: entries = min(entries, maxEvents)
 
-    for i in xrange(entries) if eventRange == None else eventRange:
-        if maxEvents > 0 and i >= maxEvents-1: break
+    for ie,i in enumerate(xrange(entries) if eventRange == None else eventRange):
+        if maxEvents > 0 and ie >= maxEvents: break
         e = Event(inputTree,i)
         weight = 1.
         if hasattr(e, "genWeight"):
@@ -81,10 +83,10 @@ def eventLoop(modules, inputFile, outputFile, inputTree, wrappedOutputTree, maxE
             h_nevents.Fill(3.5,weight)
             wrappedOutputTree.fill()
         if progress:
-            if i > 0 and i % progress[0] == 0:
+            if ie > 0 and ie % progress[0] == 0:
                 t1 = time.clock()
-                progress[1].write("Processed %8d/%8d entries (elapsed time %7.1fs, curr speed %8.3f kHz, avg speed %8.3f kHz), accepted %8d/%8d events (%5.2f%%)\n" % (
-                        i,entries, t1-t0, (progress[0]/1000.)/(max(t1-tlast,1e-9)), i/1000./(max(t1-t0,1e-9)), acceptedEvents, doneEvents, acceptedEvents/(0.01*doneEvents) ))
+                progress[1].write("Processed %8d/%8d entries, %5.2f%% (elapsed time %7.1fs, curr speed %8.3f kHz, avg speed %8.3f kHz), accepted %8d/%8d events (%5.2f%%)\n" % (
+                        ie,entries, ie/float(0.01*entries), t1-t0, (progress[0]/1000.)/(max(t1-tlast,1e-9)), ie/1000./(max(t1-t0,1e-9)), acceptedEvents, doneEvents, acceptedEvents/(0.01*doneEvents) ))
                 tlast = t1
     for m in modules: 
         m.endFile(inputFile, outputFile, inputTree, wrappedOutputTree)
