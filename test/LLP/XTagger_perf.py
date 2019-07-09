@@ -61,7 +61,7 @@ analyzerChain.append(
         outputName="selectedJets",
         jetMinPt = 30.,
         jetMaxEta = 2.4,
-        storeKinematics=['pt','eta','btagCMVA', 'btagCSVV2', 'btagDeepB']
+        storeKinematics=['pt','eta', 'btagDeepB', 'btagDeepFlavB', 'btagCSVV2', 'chEmEF', 'chHEF', 'neEmEF', 'neHEF', 'nConstituents', 'CHM'],
     )
 )
 
@@ -95,13 +95,22 @@ if args.inputFiles[0].find("SMS-T1qqqq_ctau")>=0:
         [lambda tree: tree.branch("llp","I"),lambda tree,event: tree.fillBranch("llp",int(round(Collection(event,"llpinfo")[0].llp_mass/100.))*100)],
         [lambda tree: tree.branch("lsp","I"),lambda tree,event: tree.fillBranch("lsp",int(round(Collection(event,"llpinfo")[0].lsp_mass/100.))*100)],
     ])
-    
+ 
+analyzerChain.append(
+    MetFilter(
+        globalOptions=globalOptions
+    )
+)
+
+   
  
 analyzerChain.append(
     EventInfo(
         storeVariables=storeVariables
     )
 )
+
+'''
 
 analyzerChain.append(
     TaggerEvaluation(
@@ -110,17 +119,8 @@ analyzerChain.append(
             lambda event: event.selectedJets
         ],
         taggerName="llpdnnx_noda",
-    )
-)
-
-analyzerChain.append(
-    TaggerWorkingpoints(
-        inputCollection = lambda event: event.selectedJets,
-        taggerName = "llpdnnx_noda",
-        outputName = "llpdnnx_noda_nominal",
-        logctauValues = range(-3,5),
-        globalOptions=globalOptions,
-        saveAllLabels=True
+        #logctauValues = [0, 3],
+        #predictionLabels = ["LLP"],
     )
 )
 
@@ -131,19 +131,36 @@ analyzerChain.append(
             lambda event: event.selectedJets,
         ],
         taggerName="llpdnnx_da",
-        logctauValues = range(-3,5)
+        #logctauValues = [0, 3],
+        #predictionLabels = ["LLP"],
     )
 )
+
 analyzerChain.append(
-    TaggerWorkingpoints(
+    JetTaggerResult(
         inputCollection = lambda event: event.selectedJets,
         taggerName = "llpdnnx_da",
-        outputName = "llpdnnx_da_nominal",
-        logctauValues = range(-3,5),
-        globalOptions=globalOptions,
-        saveAllLabels=True
+        logctauValues = [0, 3],
+        predictionLabels = ["LLP"],
     )
 )
+
+analyzerChain.append(
+    JetTaggerResult(
+        inputCollection = lambda event: event.selectedJets,
+        taggerName = "llpdnnx_noda",
+        logctauValues = [0, 3],
+        predictionLabels = ["LLP"],
+    )
+)
+
+'''
+analyzerChain.append(
+    LegacyTagger(
+        inputCollection = lambda event: event.selectedJets,
+    )
+)
+ 
 
 p=PostProcessor(
     args.output[0],

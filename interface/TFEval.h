@@ -49,13 +49,23 @@ class TFEval
                 
                 virtual int64_t size() const
                 {
-                    //if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
+                    if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
                     return _branch->GetSize();
                 }
                 
                 virtual float value(int64_t jetIndex, int64_t batchIndex) const
                 {
-                    //if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
+                    if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
+                    if (std::isnan(_branch->At(jetIndex))){
+                        std::cout << "Nan entry found in branch " << _branch->GetBranchName() << std::endl;
+                        throw std::runtime_error("Aborting");
+                    }
+
+                    if (std::isinf(_branch->At(jetIndex))){
+                        std::cout << "Inf entry found in branch " << _branch->GetBranchName() << std::endl;
+                        throw std::runtime_error("Aborting");
+                    }
+
                     return _branch->At(jetIndex);
                 }
                 
@@ -310,6 +320,7 @@ class TFEval
                                 if (std::isnan(values(b,j)) or std::isinf(values(b,j)))
                                 {
                                     data[b][j] = 0;
+                                    throw std::runtime_error("Nan or Inf found");
                                 }
                                 else
                                 {
@@ -317,7 +328,7 @@ class TFEval
                                 }
                             }
                         }
-                        //data.assign(values.data(),values.data()+values.size());
+                        data.assign(values.data(),values.data()+values.size());
                         
                         
                         result._result[names[i]] = data;

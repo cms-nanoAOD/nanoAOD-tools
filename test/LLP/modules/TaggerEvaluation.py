@@ -47,11 +47,6 @@ class TaggerEvaluation(Module):
         self.out = wrappedOutputTree
         self.setup(inputTree)
 
-        if self.saveOutput:
-            for ctau in self.logctauValues:
-                for label in self.predictionLabels:
-                    self.out.branch(self.taggerName+"_"+getCtauLabel(ctau)+"_"+label, "F", lenVar="nselectedJets")
-        
     def setupTFEval(self,tree,modelFile,featureDict):
         tfEval = ROOT.TFEval()
         if (not tfEval.loadGraph(modelFile)):
@@ -104,9 +99,6 @@ class TaggerEvaluation(Module):
         
     def analyze(self, event):
 
-        if self.saveOutput:
-            predictionsPerCtauAndClass = {ctau: {className: [] for className in self.predictionLabels} for ctau in self.logctauValues}
-
         jetglobal = Collection(event, "global")
         
         jetOriginIndices = set() #superset of all indices to evaluate
@@ -141,7 +133,7 @@ class TaggerEvaluation(Module):
             evaluationIndices.shape[0],
             evaluationIndices
         )
-        
+
         predictionsPerIndexAndCtau = {}
 
         for ijet,jetIndex in enumerate(jetOriginIndices):
@@ -169,19 +161,4 @@ class TaggerEvaluation(Module):
                             taggerOutput[self.logctauValues[ictau]][classLabel] = -1
 
                 setattr(jet, self.taggerName, taggerOutput)
-
-                if self.saveOutput:
-                    for ctau in self.logctauValues:
-                        for label in self.predictionLabels:
-                            predictionsPerCtauAndClass[ctau][label].append(taggerOutput[ctau][label])
-                            if taggerOutput[ctau][label] == 0:
-                                print "???"
-
-
-        if self.saveOutput:
-            for ctau in self.logctauValues:
-                for label in self.predictionLabels:
-                    self.out.fillBranch(self.taggerName+"_"+getCtauLabel(ctau)+"_"+label, predictionsPerCtauAndClass[ctau][label])
-                    assert len(predictionsPerCtauAndClass[ctau][label]), len(event.selectedJets)
-
-        return True
+            return True

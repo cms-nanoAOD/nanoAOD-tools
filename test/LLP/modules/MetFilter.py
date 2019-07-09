@@ -28,16 +28,18 @@ class MetFilter(Module):
         pass
         
     def passFilters(self,event):
-        #https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2#Moriond_2017
+        #https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2#2016_data
         if event.Flag_goodVertices==0:
             return False
-        if event.Flag_globalTightHalo2016Filter==0:
+        if event.Flag_globalSuperTightHalo2016Filter==0:
             return False
         if event.Flag_HBHENoiseFilter==0:
             return False
         if event.Flag_HBHENoiseIsoFilter==0:
             return False
         if event.Flag_EcalDeadCellTriggerPrimitiveFilter==0:
+            return False
+        if event.Flag_BadPFMuonFilter==0:
             return False
         if self.globalOptions["isData"] and event.Flag_eeBadScFilter==0: #not suggested on MC
             return False
