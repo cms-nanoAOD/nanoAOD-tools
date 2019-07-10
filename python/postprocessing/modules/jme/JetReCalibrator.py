@@ -96,8 +96,7 @@ class JetReCalibrator:
         raw = 1.-jet.rawFactor  
         corr = self.getCorrection(jet,rho,delta)
         if corr <= 0:
-            return jet.pt
+            return (jet.pt, jet.mass)
         newpt = jet.pt*raw*corr
-        return newpt
-
-
+        newmass = jet.mass*raw*corr
+        return (newpt, newmass)
