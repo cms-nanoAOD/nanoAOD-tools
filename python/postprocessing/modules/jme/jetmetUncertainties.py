@@ -73,7 +73,7 @@ class jetmetUncertaintiesProducer(Module):
         
         if len(jesUncertainties) == 1 and jesUncertainties[0] == "Total":
             if self.era in ["2016", "2017", "2018"]:
-                self.jesUncertaintyInputFileName = self.jesUncertaintyInputFileName = globalTag + "_Uncertainty_" + jetType + ".txt"
+                self.jesUncertaintyInputFileName = globalTag + "_Uncertainty_" + jetType + ".txt"
             else:
                 raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
         else:
