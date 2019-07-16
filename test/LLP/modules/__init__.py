@@ -1,4 +1,5 @@
 import ROOT
+import sys
 
 #can only load this once
 if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):

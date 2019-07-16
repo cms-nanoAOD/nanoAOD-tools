@@ -4,6 +4,7 @@
   <class name="PyJetResolutionScaleFactorWrapper"/>
   <class name="PyJetParametersWrapper"/>
   <class name="WeightCalculatorFromHistogram"/>
+  <class name="ReduceMantissaToNbitsRounding"/>
   <class name="EventShapes"/>
   <class name="TFEval"/>
   <class name="TFEval::ArrayFeatureGroup"/>
@@ -12,6 +13,5 @@
   <class name="TFEval::BranchAccessor"/>
   <class name="TFEval::PyAccessor"/>
   <class name="LHAInterface"/>
-  <class name="ReduceMantissaToNbitsRounding"/>
 </selection>
 </lcgdict>

@@ -328,7 +328,7 @@ class TFEval
                                 }
                             }
                         }
-                        data.assign(values.data(),values.data()+values.size());
+                        //data.assign(values.data(),values.data()+values.size()); !!!!! FIX
                         
                         
                         result._result[names[i]] = data;
