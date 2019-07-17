@@ -52,16 +52,18 @@ leptonSelection = [
 
 analyzerChain = []
 
+analyzerChain.append(JetFeatures(outputName="preselectedJets"))
+
 analyzerChain.extend(leptonSelection)
 
 analyzerChain.append(
     JetSelection(
-        inputCollection=lambda event:Collection(event,"Jet"),
+        inputCollection=lambda event: event.preselectedJets,
         leptonCollection=lambda event: event.looseMuons,
         outputName="selectedJets",
         jetMinPt = 30.,
         jetMaxEta = 2.4,
-        storeKinematics=['pt','eta', 'btagDeepB', 'btagDeepFlavB', 'btagCSVV2', 'chEmEF', 'chHEF', 'neEmEF', 'neHEF', 'nConstituents', 'CHM'],
+        storeKinematics=['pt','eta', 'btagDeepB', 'btagDeepFlavB', 'btagCSVV2', 'chEmEF', 'chHEF', 'neEmEF', 'neHEF', 'nConstituents', 'nsv'],
     )
 )
 
@@ -110,11 +112,10 @@ analyzerChain.append(
     )
 )
 
-'''
 
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/model_noda_retrain.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/new_test_noda_lol.pb",
         inputCollections=[
             lambda event: event.selectedJets
         ],
@@ -123,6 +124,7 @@ analyzerChain.append(
         #predictionLabels = ["LLP"],
     )
 )
+'''
 
 analyzerChain.append(
     TaggerEvaluation(
@@ -136,15 +138,7 @@ analyzerChain.append(
     )
 )
 
-analyzerChain.append(
-    JetTaggerResult(
-        inputCollection = lambda event: event.selectedJets,
-        taggerName = "llpdnnx_da",
-        logctauValues = [0, 3],
-        predictionLabels = ["LLP"],
-    )
-)
-
+'''
 analyzerChain.append(
     JetTaggerResult(
         inputCollection = lambda event: event.selectedJets,
@@ -156,6 +150,16 @@ analyzerChain.append(
 
 '''
 analyzerChain.append(
+    JetTaggerResult(
+        inputCollection = lambda event: event.selectedJets,
+        taggerName = "llpdnnx_noda",
+        logctauValues = [0, 3],
+        predictionLabels = ["LLP"],
+    )
+)
+'''
+
+analyzerChain.append(
     LegacyTagger(
         inputCollection = lambda event: event.selectedJets,
     )
@@ -165,10 +169,8 @@ analyzerChain.append(
 p=PostProcessor(
     args.output[0],
     [args.inputFiles],
-    cut=None,
-    branchsel=None,
-    maxEvents=-1,
     modules=analyzerChain,
+    maxEvents=-1,
     friend=True
 )
 p.run()

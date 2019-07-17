@@ -13,8 +13,6 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 from utils import getCtauLabel
 
-
-
 class TaggerEvaluation(Module):
 
     def __init__(
@@ -48,7 +46,10 @@ class TaggerEvaluation(Module):
         self.setup(inputTree)
 
     def setupTFEval(self,tree,modelFile,featureDict):
+        print "Building TFEval object"
         tfEval = ROOT.TFEval()
+        print "Succesfully built TFEval object"
+
         if (not tfEval.loadGraph(modelFile)):
             sys.exit(1)
         tfEval.addOutputNodeName("prediction")

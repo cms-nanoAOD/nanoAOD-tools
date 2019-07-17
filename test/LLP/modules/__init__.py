@@ -28,3 +28,4 @@ from JetTaggerResult import JetTaggerResult
 from PDFWeights import PDFWeights
 from WNLOWeights import WNLOWeights
 from JetFeatures import JetFeatures
+from LegacyTagger import LegacyTagger

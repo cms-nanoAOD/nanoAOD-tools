@@ -1,23 +1,5 @@
 featureDict = {
-     "sv" : {
-        "branches":[
-            'sv_pt',
-            'sv_deltaR',
-            'sv_mass',
-            'sv_ntracks',
-            'sv_chi2',
-            'sv_normchi2',
-            'sv_dxy',
-            'sv_dxysig',
-            'sv_d3d',
-            'sv_d3dsig',
-            'sv_costhetasvpv',
-            'sv_enratio',
-        ],
-        "length":"svlength_length",
-        "max":4
-    },
-    
+   
     "globalvars": {
         "branches": [
             'global_pt',
@@ -33,7 +15,10 @@ featureDict = {
             'csv_trackSip3dValAboveCharm', 
             'csv_trackSip3dSigAboveCharm', 
             'csv_jetNSelectedTracks', 
-            'csv_jetNTracksEtaRel'
+            'csv_jetNTracksEtaRel',
+            'legacyTag_median_dxy',
+            'legacyTag_median_trackSip2dSig',
+            'legacyTag_alpha'
         ],
 
     },
@@ -55,8 +40,10 @@ featureDict = {
             'cpf_ptrel', 
             'cpf_drminsv',
             'cpf_vertex_association',
+            'cpf_fromPV',
             'cpf_puppi_weight',
             'cpf_track_chi2',
+            'cpf_track_ndof',
             'cpf_track_quality'
         ],
         "length":"cpflength_length",
@@ -74,5 +61,25 @@ featureDict = {
         ],
         "length":"npflength_length",
         "max":25
-    }
+    },
+
+     "sv" : {
+        "branches":[
+            'sv_pt',
+            'sv_deltaR',
+            'sv_mass',
+            'sv_ntracks',
+            'sv_chi2',
+            'sv_ndof',
+            'sv_dxy',
+            'sv_dxysig',
+            'sv_d3d',
+            'sv_d3dsig',
+            'sv_costhetasvpv',
+            'sv_enratio',
+        ],
+        "length":"svlength_length",
+        "max":4
+    },
+ 
 }

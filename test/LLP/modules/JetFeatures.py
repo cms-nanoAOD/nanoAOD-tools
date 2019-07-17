@@ -23,8 +23,8 @@ class JetFeatures(Module):
     ):
         self.globalOptions = globalOptions
         self.features = features
-        self.inputCollection = inputCollection
         self.outputName = outputName
+        self.inputCollection = inputCollection
  
     def beginJob(self):
         pass
@@ -35,21 +35,17 @@ class JetFeatures(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         
-        for feature in self.features:
-            self.out.branch(self.outputName+"_"+feature,"F",lenVar="n"+self.outputName)
-            
+        self.out.branch(self.outputName+"_nsv","F",lenVar="n"+self.outputName)
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
         
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
-        if self.globalOptions['isData']:
-            return True
             
         jets = self.inputCollection(event)
-        
         jetGlobal = Collection(event,"global")
+        jetOrigin = Collection(event,"jetorigin")
         
         jetNSV = Collection(event,"svlength")
         jetSV = Collection(event,"sv")
@@ -59,32 +55,23 @@ class JetFeatures(Module):
         
         jetNNPF = Collection(event,"npflength")
         jetNPF = Collection(event,"npf")
-        
+
         #allocate output
         jetFeatures = {}
         for feature in self.features:
             jetFeatures[feature] = [0 for _ in range(len(jets))]
-        
-        
+
+        selectedJets = []
+        nsvs = []
 
         for ijet,jet in enumerate(jets):
-            if jet._index<len(jetGlobal) and jet._index<len(jetOrigin):
-                if math.fabs(jet.eta-jetGlobal[jet._index].eta)>0.01:
-                    print "Warning - no proper match between jetorigin and nanoaod jets"
-                    continue
-                else:
+            if jet.pt < 30.:
+                continue
+            selectedJets.append(jet)
+            setattr(jet, "nsv", jetNSV[ijet].length)
+            nsvs.append(jet.nsv)
+
+        self.out.fillBranch(self.outputName+"_nsv", nsvs)
+        setattr(event, self.outputName, selectedJets)
                     
-                    svoffset = 0
-                    cpfoffset = 0
-                    npfoffset = 0
-                    for i in range(jet._index):
-                        svoffset+=int(round(jetNSV[i].length))
-                        cpfoffset+=int(round(jetNCPF[i].length))
-                        npfoffset+=int(round(jetNNPF[i].length))
-                    
-                        print jetSV[cpfoffset].sv_dxy
-                    
-                        
-        
         return True
-        
