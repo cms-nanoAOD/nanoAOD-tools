@@ -91,4 +91,7 @@ class Collection:
         return ret
     def __len__(self):
         return self._len
+    def __iter__(self):
+        for index in range(self._len):
+            yield self[index]
 
