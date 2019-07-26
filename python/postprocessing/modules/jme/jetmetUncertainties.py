@@ -257,15 +257,6 @@ class jetmetUncertaintiesProducer(Module):
         pairs = matchObjectCollection(jets, genJets)
  
         for jet in jets:
-            genJet = pairs[jet]
-            if self.doGroomed :                
-                genGroomedSubJets = genSubJetMatcher[genJet] if genJet != None else None
-                genGroomedJet = genGroomedSubJets[0].p4() + genGroomedSubJets[1].p4() if genGroomedSubJets != None and len(genGroomedSubJets) >= 2 else None
-                if jet.subJetIdx1 >= 0 and jet.subJetIdx2 >= 0 :
-                    groomedP4 = subJets[ jet.subJetIdx1 ].p4() + subJets[ jet.subJetIdx2].p4() #check subjet jecs
-                else :
-                    groomedP4 = None
-
             #jet pt and mass corrections
             jet_pt=jet.pt
             jet_mass=jet.mass
@@ -284,7 +275,7 @@ class jetmetUncertaintiesProducer(Module):
             jets_corr_JEC.append(jet_pt/jet_rawpt)
 
             genJet = pairs[jet]
-            if self.doGroomed :                
+            if self.doGroomed and "AK8PFPuppi" in jetType:                
                 genGroomedSubJets = genSubJetMatcher[genJet] if genJet != None else None
                 genGroomedJet = genGroomedSubJets[0].p4() + genGroomedSubJets[1].p4() if genGroomedSubJets != None and len(genGroomedSubJets) >= 2 else None
                 if jet.subJetIdx1 >= 0 and jet.subJetIdx2 >= 0 :

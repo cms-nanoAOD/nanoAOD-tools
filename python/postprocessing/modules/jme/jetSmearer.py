@@ -182,9 +182,6 @@ class jetSmearer(Module):
         else:
             jet_m_resolution = self.puppisd_resolution_for.Eval( jet.Pt() )
 
-        # generate random number with flat distribution between 0 and 1
-        u = self.rnd.Rndm()
-
         smear_vals = {}
         for central_or_shift in [ enum_nominal, enum_shift_up, enum_shift_down ]:
 
