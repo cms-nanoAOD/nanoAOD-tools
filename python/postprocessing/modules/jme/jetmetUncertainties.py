@@ -66,8 +66,9 @@ class jetmetUncertaintiesProducer(Module):
 
         #jet mass scale
         #W-tagging PUPPI softdrop JMS values: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
-        #2016 values - use for 2018 until new values available
+        #2016 values 
         self.jmsVals = [1.00, 0.9906, 1.0094] #nominal, down, up
+        # Use 2017 values for 2018 until 2018 are released
         if self.era in ["2017","2018"]:
             self.jmsVals = [0.982, 0.978, 0.986]
 
