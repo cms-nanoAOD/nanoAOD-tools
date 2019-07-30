@@ -4,7 +4,8 @@
 #include <utility>
 #include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>
-#include "DataFormats/Math/interface/LorentzVector.h"
+//#include "DataFormats/Math/interface/LorentzVector.h"
+#include <TLorentzVector.h>
 
 class mhtjuProducerCppWorker {
 

@@ -1,6 +1,5 @@
 # this is a comment
-keep * # start with all
-drop HLT_* 
-keepmatch HLT_(Iso)?Mu\d+
-drop *_cleanmask
-dropmatch FatJet_tau[12]
+drop * # start with all
+keep Electron*
+keep Muon*
+keep Jet*

@@ -1,4 +1,5 @@
 import ROOT
+import sys
 
 #can only load this once
 if (ROOT.gSystem.Load("libPhysicsToolsNanoAODTools.so")!=0):
@@ -27,3 +28,4 @@ from JetTaggerResult import JetTaggerResult
 from PDFWeights import PDFWeights
 from WNLOWeights import WNLOWeights
 from JetFeatures import JetFeatures
+from LegacyTagger import LegacyTagger

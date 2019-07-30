@@ -118,7 +118,7 @@ analyzerChain.append(
 
 analyzerChain.append(
     EventObservables(
-        jetInputCollection = lambda event: event.selectedJets_nominal,
+        jetCollection = lambda event: event.selectedJets_nominal,
         metInput = lambda event: Object(event,"MET"),
         outputName = "nominal",
     )
@@ -126,7 +126,8 @@ analyzerChain.append(
 
 analyzerChain.append(
     EventSkim(selection=lambda event: 
-        event.nominal_met>150. and event.nominal_met<250.
+        #event.nominal_met>150. and event.nominal_met<250.
+        event.nominal_met>150.
     )
 )
 

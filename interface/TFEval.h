@@ -49,13 +49,22 @@ class TFEval
                 
                 virtual int64_t size() const
                 {
-                    //if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
                     return _branch->GetSize();
                 }
                 
                 virtual float value(int64_t jetIndex, int64_t batchIndex) const
                 {
-                    //if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
+                    if (std::isnan(_branch->At(jetIndex)) or std::isinf(_branch->At(jetIndex))){
+                        // hard-coded, remove this ASAP
+                        //
+                        if (strcmp(_branch->GetBranchName(), "legacyTag_median_trackSip2dSig") == 0)
+                        {
+                            return -6.;
+                        }
+                        std::cout << "Nan/inf entry found in branch " << _branch->GetBranchName() << std::endl;
+                        throw std::runtime_error("Aborting");
+                    }
+
                     return _branch->At(jetIndex);
                 }
                 
@@ -317,8 +326,6 @@ class TFEval
                                 }
                             }
                         }
-                        //data.assign(values.data(),values.data()+values.size());
-                        
                         
                         result._result[names[i]] = data;
                     }

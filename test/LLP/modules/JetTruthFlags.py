@@ -97,9 +97,9 @@ class JetTruthFlags(Module):
         '''
         self.out.fillBranch(self.outputName+"_nsv",nsv)
         self.out.fillBranch(self.outputName+"_svxysig",svxysig)
+        '''
                         
         for k in sorted(self.flags.keys()):
             self.out.fillBranch(self.outputName+"_"+k,flavors[k])
-        '''
         return True
         

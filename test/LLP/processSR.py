@@ -72,7 +72,7 @@ if not args.isData:
     analyzerChain.append(
         JetMetUncertainties(
             era="2016",
-            globalTag="Summer16_23Sep2016V4_MC"
+            globalTag="Summer16_07Aug2017_v11"
         )
     )
     for systName,collection in [
