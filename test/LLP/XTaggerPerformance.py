@@ -63,7 +63,7 @@ analyzerChain.append(
         outputName="selectedJets",
         jetMinPt = 30.,
         jetMaxEta = 2.4,
-        storeKinematics=['pt','eta', 'btagDeepB', 'btagDeepFlavB', 'btagCSVV2', 'chEmEF', 'chHEF', 'neEmEF', 'neHEF', 'nConstituents', 'nsv'],
+        storeKinematics=['pt','eta', 'btagDeepB', 'btagDeepFlavB', 'btagCSVV2', 'chEmEF', 'chHEF', 'neEmEF', 'neHEF', 'nConstituents', 'nsv', 'ncpf', 'nnpf'],
     )
 )
 
@@ -112,52 +112,45 @@ analyzerChain.append(
     )
 )
 
-
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/new_test_noda_lol.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/new_training_noda_test.pb",
         inputCollections=[
             lambda event: event.selectedJets
         ],
         taggerName="llpdnnx_noda",
-        #logctauValues = [0, 3],
-        #predictionLabels = ["LLP"],
     )
 )
-'''
+
+analyzerChain.append(
+    JetTaggerResult(
+        inputCollection = lambda event: event.selectedJets,
+        taggerName = "llpdnnx_noda",
+        logctauValues = [0, 3],
+        predictionLabels = ["LLP"],
+    )
+)
+
+
 
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/model_bothmuon_retrain.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/new_training_da_test.pb",
         inputCollections=[
             lambda event: event.selectedJets,
         ],
         taggerName="llpdnnx_da",
-        #logctauValues = [0, 3],
-        #predictionLabels = ["LLP"],
     )
 )
 
-'''
 analyzerChain.append(
     JetTaggerResult(
         inputCollection = lambda event: event.selectedJets,
-        taggerName = "llpdnnx_noda",
+        taggerName = "llpdnnx_da",
         logctauValues = [0, 3],
         predictionLabels = ["LLP"],
     )
 )
-
-'''
-analyzerChain.append(
-    JetTaggerResult(
-        inputCollection = lambda event: event.selectedJets,
-        taggerName = "llpdnnx_noda",
-        logctauValues = [0, 3],
-        predictionLabels = ["LLP"],
-    )
-)
-'''
 
 analyzerChain.append(
     LegacyTagger(

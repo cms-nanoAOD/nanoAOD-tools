@@ -16,13 +16,7 @@ class JetFeatures(Module):
         self,
         inputCollection = lambda event: Collection(event, "Jet"),
         outputName = "selectedJets",
-        features=[
-            
-        ],
-        globalOptions={"isData":False}
     ):
-        self.globalOptions = globalOptions
-        self.features = features
         self.outputName = outputName
         self.inputCollection = inputCollection
  
@@ -34,8 +28,6 @@ class JetFeatures(Module):
         
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        
-        self.out.branch(self.outputName+"_nsv","F",lenVar="n"+self.outputName)
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -56,22 +48,22 @@ class JetFeatures(Module):
         jetNNPF = Collection(event,"npflength")
         jetNPF = Collection(event,"npf")
 
-        #allocate output
-        jetFeatures = {}
-        for feature in self.features:
-            jetFeatures[feature] = [0 for _ in range(len(jets))]
-
         selectedJets = []
         nsvs = []
+        nnpfs = []
+        ncpfs = []
 
         for ijet,jet in enumerate(jets):
             if jet.pt < 30.:
                 continue
             selectedJets.append(jet)
             setattr(jet, "nsv", jetNSV[ijet].length)
+            setattr(jet, "nnpf", jetNNPF[ijet].length)
+            setattr(jet, "ncpf", jetNCPF[ijet].length)
             nsvs.append(jet.nsv)
+            nnpfs.append(jet.nnpf)
+            ncpfs.append(jet.ncpf)
 
-        self.out.fillBranch(self.outputName+"_nsv", nsvs)
         setattr(event, self.outputName, selectedJets)
                     
         return True

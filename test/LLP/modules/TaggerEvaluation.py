@@ -65,6 +65,7 @@ class TaggerEvaluation(Module):
                     lengthBranch
                 )
                 for branchName in featureCfg["branches"]:
+                    print branchName
                     featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
                 tfEval.addFeatureGroup(featureGroup)
             else:
@@ -74,6 +75,7 @@ class TaggerEvaluation(Module):
                     len(featureCfg["branches"])
                 )
                 for branchName in featureCfg["branches"]:
+                    print branchName
                     featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
                 tfEval.addFeatureGroup(featureGroup)
                 

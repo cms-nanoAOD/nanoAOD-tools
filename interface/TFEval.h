@@ -49,20 +49,19 @@ class TFEval
                 
                 virtual int64_t size() const
                 {
-                    if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
                     return _branch->GetSize();
                 }
                 
                 virtual float value(int64_t jetIndex, int64_t batchIndex) const
                 {
-                    if (not _branch or not _branch->IsValid()) throw std::runtime_error("Branch address invalid");
-                    if (std::isnan(_branch->At(jetIndex))){
-                        std::cout << "Nan entry found in branch " << _branch->GetBranchName() << std::endl;
-                        throw std::runtime_error("Aborting");
-                    }
-
-                    if (std::isinf(_branch->At(jetIndex))){
-                        std::cout << "Inf entry found in branch " << _branch->GetBranchName() << std::endl;
+                    if (std::isnan(_branch->At(jetIndex)) or std::isinf(_branch->At(jetIndex))){
+                        // hard-coded, remove this ASAP
+                        //
+                        if (strcmp(_branch->GetBranchName(), "legacyTag_median_trackSip2dSig") == 0)
+                        {
+                            return -6.;
+                        }
+                        std::cout << "Nan/inf entry found in branch " << _branch->GetBranchName() << std::endl;
                         throw std::runtime_error("Aborting");
                     }
 
@@ -320,7 +319,6 @@ class TFEval
                                 if (std::isnan(values(b,j)) or std::isinf(values(b,j)))
                                 {
                                     data[b][j] = 0;
-                                    throw std::runtime_error("Nan or Inf found");
                                 }
                                 else
                                 {
@@ -328,8 +326,6 @@ class TFEval
                                 }
                             }
                         }
-                        //data.assign(values.data(),values.data()+values.size()); !!!!! FIX
-                        
                         
                         result._result[names[i]] = data;
                     }

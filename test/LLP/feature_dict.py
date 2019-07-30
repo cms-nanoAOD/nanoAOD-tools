@@ -16,13 +16,12 @@ featureDict = {
             'csv_trackSip3dSigAboveCharm', 
             'csv_jetNSelectedTracks', 
             'csv_jetNTracksEtaRel',
-            'legacyTag_median_dxy',
-            'legacyTag_median_trackSip2dSig',
-            'legacyTag_alpha'
-        ],
+            #'legacyTag_median_dxy',
+            #'legacyTag_median_trackSip2dSig',
+            #'legacyTag_alpha',
+        ]
 
     },
-
 
     "cpf": {
         "branches": [

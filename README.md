@@ -7,8 +7,8 @@ Tools for working with NanoAOD (requiring only python + root, not CMSSW)
 
 Using recent CMSSW release which is shipped with all the required software (especially tensorflow C++ API v1.6).
 ```
-cmsrel CMSSW_10_2_0_pre2
-cd CMSSW_10_2_0_pre2/src
+cmsrel CMSSW_10_2_15
+cd CMSSW_10_2_15/src
 cmsenv
 git clone -b llp-analysis https://github.com/LLPDNNX/nanoAOD-tools.git PhysicsTools/NanoAODTools
 scram b
