@@ -345,7 +345,7 @@ class jetmetUncertaintiesProducer(Module):
                 jet_msdcorr_jesDown = {}
 
                 # Evaluate JMS and JMR scale factors and uncertainties
-                ( jet_msdcorr_jmrNomVal, jet_msdcorr_jmrUpVal, jet_msdcorr_jmrDownVal ) = self.jetSmearer.getSmearValsM(groomedP4, genGroomedJet) if groomedP4 != None and genGroomedJet != None else (0.,0.,0.)
+                ( jet_msdcorr_jmrNomVal, jet_msdcorr_jmrUpVal, jet_msdcorr_jmrDownVal ) = self.jetSmearer.getSmearValsM(groomedP4, genGroomedJet, rho) if groomedP4 != None and genGroomedJet != None else (0.,0.,0.)
                 jet_msdcorr_raw = groomedP4.M() if groomedP4 != None else 0.0
                 jets_msdcorr_corr_JMS.append(jmsNomVal)
                 jets_msdcorr_corr_JMR.append(jet_msdcorr_jmrNomVal)
