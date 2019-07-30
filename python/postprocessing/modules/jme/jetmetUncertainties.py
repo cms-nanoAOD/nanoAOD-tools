@@ -31,9 +31,11 @@ class jetmetUncertaintiesProducer(Module):
             self.jerUncertaintyInputFileName = "Fall17_V3_MC_SF_" + jetType + ".txt"
 
         #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
-        if self.era == "2016" or self.era == "2018": #update when 2018 values available
-            self.jmrVals = [1.0, 1.2, 0.8] #nominal, up, down
-        else: 
+        #2016 values
+        self.jmrVals = [1.0, 1.2, 0.8] #nominal, up, down
+
+        # Use 2017 values for 2018 until 2018 are released
+        if self.era in ["2017","2018"]:
             self.jmrVals = [1.09, 1.14, 1.04]
 
         self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName, self.jmrVals)
@@ -278,7 +280,7 @@ class jetmetUncertaintiesProducer(Module):
             jets_corr_JEC.append(jet_pt/jet_rawpt)
 
             genJet = pairs[jet]
-            if self.doGroomed and "AK8PFPuppi" in jetType:                
+            if self.doGroomed:                
                 genGroomedSubJets = genSubJetMatcher[genJet] if genJet != None else None
                 genGroomedJet = genGroomedSubJets[0].p4() + genGroomedSubJets[1].p4() if genGroomedSubJets != None and len(genGroomedSubJets) >= 2 else None
                 if jet.subJetIdx1 >= 0 and jet.subJetIdx2 >= 0 :
