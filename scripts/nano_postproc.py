@@ -40,11 +40,15 @@ if __name__ == "__main__":
         import_module(mod)
         obj = sys.modules[mod]
         selnames = names.split(",")
-        for name in dir(obj):
-            if name[0] == "_": continue
-            if name in selnames:
+        mods = dir(obj)
+        for name in selnames:
+            if name in mods:
                 print "Loading %s from %s " % (name, mod)
-                modules.append(getattr(obj,name)())
+                if type(getattr(obj,name)) == list:
+                    for mod in getattr(obj,name):
+                        modules.append( mod())
+                else:
+                    modules.append(getattr(obj,name)())
     if options.noOut:
         if len(modules) == 0: 
             raise RuntimeError("Running with --noout and no modules does nothing!")

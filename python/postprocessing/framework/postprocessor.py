@@ -131,12 +131,12 @@ class PostProcessor :
 	    # pre-skimming
 	    elist,jsonFilter = preSkim(inTree, self.json, self.cut, maxEntries = self.maxEntries, firstEntry = self.firstEntry)
 	    if self.justcount:
-		print 'Would select %d entries from %s'%(elist.GetN() if elist else nEntries, fname)
+		print 'Would select %d / %d entries from %s (%.2f%%)'%(elist.GetN() if elist else nEntries, nEntries, fname, (elist.GetN() if elist else nEntries)/(0.01*nEntries) if nEntries else 0)
 		if self.prefetch:
 		    if toBeDeleted: os.unlink(ftoread)
 		continue
 	    else:
-		print 'Pre-select %d entries out of %s '%(elist.GetN() if elist else nEntries,nEntries)
+		print 'Pre-select %d entries out of %s (%.2f%%)'%(elist.GetN() if elist else nEntries,nEntries,(elist.GetN() if elist else nEntries)/(0.01*nEntries) if nEntries else 0)
 		inAddFiles = []
 		inAddTrees = []
 	    for ffname in ffnames:
@@ -188,7 +188,7 @@ class PostProcessor :
 		print 'Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, nEntries, npass)
 	    else:
                 nall = nEntries
-		print 'Selected %d entries from %s' % (outTree.tree().GetEntries(), fname)
+		print 'Selected %d / %d entries from %s (%.2f%%)' % (outTree.tree().GetEntries(), nall, fname, outTree.tree().GetEntries()/(0.01*nall) if nall else 0)
 
 	    # now write the output
             if not self.noOut: 
