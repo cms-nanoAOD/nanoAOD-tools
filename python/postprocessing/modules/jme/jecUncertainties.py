@@ -148,19 +148,19 @@ allUncerts=[
 
 # python looper
 # you can re-use the uncertainty values in modules running after this one in the same event loop
-jecUncert = lambda : jecUncertProducer( "Summer16_23Sep2016V4_MC")
-jecUncertAll = lambda : jecUncertProducer( "Summer16_23Sep2016V4_MC",allUncerts)
+jecUncert = lambda : jecUncertProducer( "Summer16_07Aug2017_V11_MC")
+jecUncertAll = lambda : jecUncertProducer( "Summer16_07Aug2017_V11_MC",allUncerts)
 
 # python looper with C++ helper to calculate uncertainties, faster
 # you can re-use the uncertainty values in modules running after this one in the same event loop
-jecUncert_cpp = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC")
-jecUncertAll_cpp = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC",allUncerts)
+jecUncert_cpp = lambda : jecUncertProducerCpp( "Summer16_07Aug2017_V11_MC")
+jecUncertAll_cpp = lambda : jecUncertProducerCpp( "Summer16_07Aug2017_V11_MC",allUncerts)
 
 # python looper with C++ helper also writing the output, fastest
 # you cannot re-use the uncertainty values in modules running after this one in the same event loop
-jecUncert_cppOut = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC",doCppOutput=True)
-jecUncertAll_cppOut = lambda : jecUncertProducerCpp( "Summer16_23Sep2016V4_MC",allUncerts,doCppOutput=True)
+jecUncert_cppOut = lambda : jecUncertProducerCpp( "Summer16_07Aug2017_V11_MC",doCppOutput=True)
+jecUncertAll_cppOut = lambda : jecUncertProducerCpp( "Summer16_07Aug2017_V11_MC",allUncerts,doCppOutput=True)
 
 
-jecUncertAK4Puppi = lambda : jecUncertProducer( "Summer16_23Sep2016V4_MC", jetFlavour="AK4PFPuppi")
-jecUncertAK8Puppi = lambda : jecUncertProducer( "Summer16_23Sep2016V4_MC", jetFlavour="AK8PFPuppi", jetColl="FatJet" )
+jecUncertAK4Puppi = lambda : jecUncertProducer( "Summer16_07Aug2017_V11_MC", jetFlavour="AK4PFPuppi")
+jecUncertAK8Puppi = lambda : jecUncertProducer( "Summer16_07Aug2017_V11_MC", jetFlavour="AK8PFPuppi", jetColl="FatJet" )
