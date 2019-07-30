@@ -58,7 +58,7 @@ class jetSmearer(Module):
         
     
     def setSeed(self,event):
-        """Set seed deterministicly."""
+        """Set seed deterministically."""
         # (cf. https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/PatUtils/interface/SmearedJetProducerT.h)
         runnum  = event.run
         evtnum  = event.event << 10
