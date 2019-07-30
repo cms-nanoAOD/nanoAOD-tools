@@ -9,12 +9,12 @@ from PhysicsTools.NanoAODTools.postprocessing.tools import matchObjectCollection
 
 class jetSmearer(Module):
     def __init__(self, globalTag, jetType = "AK4PFchs", jerInputFileName = "Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt", jerUncertaintyInputFileName = "Spring16_25nsV10_MC_SF_AK4PFchs.txt", jmr_vals=[1.09, 1.14, 1.04]):
-
+        
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used, as there is no consistent set of txt files for
         #     JES uncertainties and JER scale factors and uncertainties yet
         #--------------------------------------------------------------------------------------------
-
+        
         # read jet energy resolution (JER) and JER scale factors and uncertainties
         # (the txt files were downloaded from https://github.com/cms-jet/JRDatabase/tree/master/textFiles/ )
         # Text files are now tarred so must extract first
@@ -25,39 +25,49 @@ class jetSmearer(Module):
         self.jerArchive.extractall(self.jerInputFilePath)
         self.jerInputFileName = jerInputFileName
         self.jerUncertaintyInputFileName = jerUncertaintyInputFileName
-
+        
         self.jmr_vals = jmr_vals
-
+        
         self.params_sf_and_uncertainty = ROOT.PyJetParametersWrapper()
         self.params_resolution = ROOT.PyJetParametersWrapper()
-
+        
         # initialize random number generator
         # (needed for jet pT smearing)
         self.rnd = ROOT.TRandom3(12345)
-
+        
         # load libraries for accessing JER scale factors and uncertainties from txt files
         for library in [ "libCondFormatsJetMETObjects", "libPhysicsToolsNanoAODTools" ]:
             if library not in ROOT.gSystem.GetLibraries():
                 print("Load Library '%s'" % library.replace("lib", ""))
                 ROOT.gSystem.Load(library)
-
+        
         self.puppiJMRFile = ROOT.TFile.Open(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/puppiSoftdropResol.root")
         self.puppisd_resolution_cen = self.puppiJMRFile.Get("massResolution_0eta1v3")
         self.puppisd_resolution_for = self.puppiJMRFile.Get("massResolution_1v3eta2v5")
-
+        
     def beginJob(self):
-
         # initialize JER scale factors and uncertainties
         # (cf. PhysicsTools/PatUtils/interface/SmearedJetProducerT.h )
         print("Loading jet energy resolutions (JER) from file '%s'" % os.path.join(self.jerInputFilePath, self.jerInputFileName))
         self.jer = ROOT.PyJetResolutionWrapper(os.path.join(self.jerInputFilePath, self.jerInputFileName))
         print("Loading JER scale factors and uncertainties from file '%s'" % os.path.join(self.jerInputFilePath, self.jerUncertaintyInputFileName))
         self.jerSF_and_Uncertainty = ROOT.PyJetResolutionScaleFactorWrapper(os.path.join(self.jerInputFilePath, self.jerUncertaintyInputFileName))
-
+        
     def endJob(self):
         pass
-
         
+    
+    def setSeed(self,event):
+        """Set seed deterministicly."""
+        # (cf. https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/PatUtils/interface/SmearedJetProducerT.h)
+        runnum  = event.run
+        evtnum  = event.event << 10
+        luminum = long(event.luminosityBlock) << 20
+        jet0eta = long(event.Jet_eta[0]/0.01 if event.nJet>0 else 0)
+        seed    = 1L + runnum + evtnum + luminum + jet0eta
+        self.rnd.SetSeed(seed)
+        
+    
     def getSmearedJetPt(self, jet, genJet, rho):
         ( jet_pt_nomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = self.getSmearValsPt( jet, genJet, rho )
         return ( jet_pt_nomVal*jet.pt, jet_pt_jerUpVal*jet.pt, jet_pt_jerDownVal*jet.pt )
@@ -67,11 +77,11 @@ class jetSmearer(Module):
 
         if hasattr( jetIn, "p4"):
             jet = jetIn.p4()
-        else :
+        else:
             jet = jetIn
         if hasattr( genJetIn, "p4"):
             genJet = genJetIn.p4()
-        else :
+        else:
             genJet = genJetIn
 
         #--------------------------------------------------------------------------------------------
@@ -120,6 +130,7 @@ class jetSmearer(Module):
           self.params_resolution.setJetEta(jet.Eta())
           self.params_resolution.setRho(rho)
           jet_pt_resolution = self.jer.getResolution(self.params_resolution)
+          
           rand = self.rnd.Gaus(0,jet_pt_resolution)
           for central_or_shift in [ enum_nominal, enum_shift_up, enum_shift_down ]:
             if jet_pt_sf_and_uncertainty[central_or_shift] > 1.:
