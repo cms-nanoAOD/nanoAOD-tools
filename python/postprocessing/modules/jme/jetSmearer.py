@@ -143,7 +143,7 @@ class jetSmearer(Module):
         return ( smear_vals[enum_nominal], smear_vals[enum_shift_up], smear_vals[enum_shift_down] )
         
     
-    def getSmearValsM(self, jetIn, genJetIn, rho):
+    def getSmearValsM(self, jetIn, genJetIn):
         
         #--------------------------------------------------------------------------------------------
         # LC: Procedure outline in https://twiki.cern.ch/twiki/bin/view/Sandbox/PUPPIJetMassScaleAndResolution
@@ -181,12 +181,6 @@ class jetSmearer(Module):
         
         jet_m_sf_and_uncertainty = dict( zip( [enum_nominal, enum_shift_up, enum_shift_down], self.jmr_vals ) )
         
-        # Get mass resolution
-        if abs(jet.Eta()) <= 1.3:
-            jet_m_resolution = self.puppisd_resolution_cen.Eval( jet.Pt() )
-        else:
-            jet_m_resolution = self.puppisd_resolution_for.Eval( jet.Pt() )
-        
         smear_vals = {}
         if genJet:
           for central_or_shift in [ enum_nominal, enum_shift_up, enum_shift_down ]:
@@ -202,11 +196,12 @@ class jetSmearer(Module):
                 smearFactor = 1.e-2
               smear_vals[central_or_shift] = smearFactor
             
-        else:
-          self.params_resolution.setJetPt(jet.Perp())
-          self.params_resolution.setJetEta(jet.Eta())
-          self.params_resolution.setRho(rho)
-          jet_m_resolution = self.jer.getResolution(self.params_resolution) # is this correct ?
+        else:        
+          # Get mass resolution
+          if abs(jet.Eta()) <= 1.3:
+            jet_m_resolution = self.puppisd_resolution_cen.Eval( jet.Pt() )
+          else:
+            jet_m_resolution = self.puppisd_resolution_for.Eval( jet.Pt() )
           rand = self.rnd.Gaus(0,jet_m_resolution)
           for central_or_shift in [ enum_nominal, enum_shift_up, enum_shift_down ]:
             if jet_m_sf_and_uncertainty[central_or_shift] > 1.:
