@@ -187,8 +187,7 @@ class jetmetUncertaintiesProducer(Module):
             genSubJets = Collection(event, self.genSubJetBranchName )
             genSubJetMatcher = matchObjectCollectionMultiple( genJets, genSubJets, dRmax=0.8 )
         
-        if genJets:
-          self.jetSmearer.setSeed(event)
+        self.jetSmearer.setSeed(event)
         
         jets_pt_raw = []
         jets_pt_nom = []
