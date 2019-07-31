@@ -183,28 +183,29 @@ class jetmetUncertaintiesProducer(Module):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         jets = Collection(event, self.jetBranchName )
         genJets = Collection(event, self.genJetBranchName )
-
+        
         if self.doGroomed :
             subJets = Collection(event, self.subJetBranchName )
             genSubJets = Collection(event, self.genSubJetBranchName )
             genSubJetMatcher = matchObjectCollectionMultiple( genJets, genSubJets, dRmax=0.8 )
-            
-
+        
+        self.jetSmearer.setSeed(event)
+        
         jets_pt_raw = []
         jets_pt_nom = []
         jets_mass_raw = []
         jets_mass_nom = []
-
+        
         jets_corr_JEC = []
         jets_corr_JER = []
         jets_corr_JMS = []
         jets_corr_JMR = []
-
+        
         jets_pt_jerUp   = []
         jets_pt_jerDown = []
         jets_pt_jesUp   = {}
         jets_pt_jesDown = {}
-
+        
         jets_mass_jerUp   = []
         jets_mass_jerDown = []
         jets_mass_jmrUp   = []
@@ -213,13 +214,13 @@ class jetmetUncertaintiesProducer(Module):
         jets_mass_jesDown = {}
         jets_mass_jmsUp   = []
         jets_mass_jmsDown = []
-
+        
         for jesUncertainty in self.jesUncertainties:
             jets_pt_jesUp[jesUncertainty]   = []
             jets_pt_jesDown[jesUncertainty] = []
             jets_mass_jesUp[jesUncertainty]   = []
             jets_mass_jesDown[jesUncertainty] = []
-
+        
         if self.corrMET :
             met = Object(event, self.metBranchName)
             ( met_px,         met_py         ) = ( met.pt*math.cos(met.phi), met.pt*math.sin(met.phi) )
@@ -233,7 +234,7 @@ class jetmetUncertaintiesProducer(Module):
                 met_py_jesUp[jesUncertainty]   = met_py
                 met_px_jesDown[jesUncertainty] = met_px
                 met_py_jesDown[jesUncertainty] = met_py
-
+        
         if self.doGroomed:
             jets_msdcorr_raw = []
             jets_msdcorr_nom = []
@@ -251,19 +252,18 @@ class jetmetUncertaintiesProducer(Module):
             for jesUncertainty in self.jesUncertainties:
                 jets_msdcorr_jesUp[jesUncertainty]   = []
                 jets_msdcorr_jesDown[jesUncertainty] = []
-
-                
+        
         rho = getattr(event, self.rhoBranchName)
-
+        
         # match reconstructed jets to generator level ones
         # (needed to evaluate JER scale factors and uncertainties)
         pairs = matchObjectCollection(jets, genJets)
- 
+        
         for jet in jets:
             #jet pt and mass corrections
             jet_pt=jet.pt
             jet_mass=jet.mass
-
+            
             #redo JECs if desired
             if hasattr(jet, "rawFactor"):
                 jet_rawpt = jet_pt * (1 - jet.rawFactor)
@@ -278,7 +278,7 @@ class jetmetUncertaintiesProducer(Module):
             jets_pt_raw.append(jet_rawpt)
             jets_mass_raw.append(jet_rawmass)
             jets_corr_JEC.append(jet_pt/jet_rawpt)
-
+            
             genJet = pairs[jet]
             if self.doGroomed:                
                 genGroomedSubJets = genSubJetMatcher[genJet] if genJet != None else None
@@ -287,19 +287,19 @@ class jetmetUncertaintiesProducer(Module):
                     groomedP4 = subJets[ jet.subJetIdx1 ].p4() + subJets[ jet.subJetIdx2].p4() #check subjet jecs
                 else :
                     groomedP4 = None
-
+                
                 # LC: Apply PUPPI SD mass correction https://github.com/cms-jet/PuppiSoftdropMassCorr/
                 puppisd_genCorr = self.puppisd_corrGEN.Eval(jet.pt)
                 if abs(jet.eta) <= 1.3:
                     puppisd_recoCorr = self.puppisd_corrRECO_cen.Eval(jet.pt)
                 else:
                     puppisd_recoCorr = self.puppisd_corrRECO_for.Eval(jet.pt)
-
+                
                 puppisd_total = puppisd_genCorr * puppisd_recoCorr
                 jets_msdcorr_corr_PUPPI.append(puppisd_total)
                 if groomedP4 != None:
                     groomedP4.SetPtEtaPhiM(groomedP4.Perp(), groomedP4.Eta(), groomedP4.Phi(), groomedP4.M()*puppisd_total)
-
+            
             # evaluate JER scale factors and uncertainties
             # (cf. https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution )
             ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
