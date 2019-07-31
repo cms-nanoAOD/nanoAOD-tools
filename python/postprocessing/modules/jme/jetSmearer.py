@@ -60,9 +60,9 @@ class jetSmearer(Module):
     def setSeed(self,event):
         """Set seed deterministically."""
         # (cf. https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/PatUtils/interface/SmearedJetProducerT.h)
-        runnum  = event.run
-        evtnum  = event.event << 10
-        luminum = long(event.luminosityBlock) << 20
+        runnum  = long(event.run) << 20
+        luminum = long(event.luminosityBlock) << 10
+        evtnum  = event.event
         jet0eta = long(event.Jet_eta[0]/0.01 if event.nJet>0 else 0)
         seed    = 1L + runnum + evtnum + luminum + jet0eta
         self.rnd.SetSeed(seed)
@@ -74,7 +74,7 @@ class jetSmearer(Module):
         
     
     def getSmearValsPt(self, jetIn, genJetIn, rho):
-
+        
         if hasattr( jetIn, "p4"):
             jet = jetIn.p4()
         else:
@@ -83,7 +83,7 @@ class jetSmearer(Module):
             genJet = genJetIn.p4()
         else:
             genJet = genJetIn
-
+        
         #--------------------------------------------------------------------------------------------
         # CV: Smear jet pT to account for measured difference in JER between data and simulation.
         #     The function computes the nominal smeared jet pT simultaneously with the JER up and down shifts,
