@@ -10,7 +10,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetS
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
 class jetmetUncertaintiesProducer(Module):
-    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False, jerTag=""):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False, jerTag="", jmrVals = []):
 
         self.era = era
         self.redoJEC = redoJEC
@@ -28,11 +28,7 @@ class jetmetUncertaintiesProducer(Module):
 
         #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
         #2016 values
-        self.jmrVals = [1.0, 1.2, 0.8] #nominal, up, down
-
-        # Use 2017 values for 2018 until 2018 are released
-        if self.era in ["2017","2018"]:
-            self.jmrVals = [1.09, 1.14, 1.04]
+        self.jmrVals = jmrVals 
 
         self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName, self.jmrVals)
 
@@ -77,6 +73,7 @@ class jetmetUncertaintiesProducer(Module):
         self.jesArchive = tarfile.open(self.jesInputArchivePath+globalTag+".tgz", "r:gz")
         self.jesInputFilePath = tempfile.mkdtemp()
         self.jesArchive.extractall(self.jesInputFilePath)
+        
         
         if len(jesUncertainties) == 1 and jesUncertainties[0] == "Total":
             self.jesUncertaintyInputFileName = globalTag + "_Uncertainty_" + jetType + ".txt"
