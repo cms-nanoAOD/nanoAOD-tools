@@ -74,7 +74,7 @@ class JetReCalibrator:
             try:
                 jet.jetEnergyCorrUncertainty = self.JetUncertainty.getUncertainty(True) 
             except RuntimeError as r:
-                print "Caught %s when getting uncertainty for jet of pt %.1f, eta %.2f\n" % (r,corr * jet.pt * jet.rawFactor,jet.eta)
+                print "Caught %s when getting uncertainty for jet of pt %.1f, eta %.2f\n" % (r,corr * jet.pt * (1.-jet.rawFactor),jet.eta)
                 jet.jetEnergyCorrUncertainty = 0.5
             corr *= max(0, 1+delta*jet.jetEnergyCorrUncertainty)
         return corr
