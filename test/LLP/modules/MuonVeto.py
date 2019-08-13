@@ -15,7 +15,7 @@ class MuonVeto(Module):
         inputCollection = lambda event: Collection(event, "Muon"),
         outputName = "vetoMuons",
         muonMinPt = 10.,
-        muonMaxEta = 2.5,
+        muonMaxEta = 2.4,
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
