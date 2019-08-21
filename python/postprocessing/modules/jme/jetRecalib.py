@@ -1,5 +1,5 @@
 import ROOT
-import math, os,re, tarfile, tempfile
+import math, os,re, tarfile, tempfile, shutil
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -46,7 +46,7 @@ class jetRecalib(Module):
 	pass
 
     def endJob(self):
-	pass
+	shutil.rmtree(self.jesInputFilePath)
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree

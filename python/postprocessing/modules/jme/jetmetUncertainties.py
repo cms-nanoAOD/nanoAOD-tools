@@ -1,5 +1,5 @@
 import ROOT
-import math, os,re, tarfile, tempfile
+import math, os,re, tarfile, tempfile, shutil
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -127,6 +127,7 @@ class jetmetUncertaintiesProducer(Module):
 
     def endJob(self):
         self.jetSmearer.endJob()
+        shutil.rmtree(self.jesInputFilePath)
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
