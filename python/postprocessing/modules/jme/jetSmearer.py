@@ -1,5 +1,5 @@
 import ROOT
-import math, os, tarfile, tempfile
+import math, os, tarfile, tempfile, shutil
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -54,9 +54,8 @@ class jetSmearer(Module):
         self.jerSF_and_Uncertainty = ROOT.PyJetResolutionScaleFactorWrapper(os.path.join(self.jerInputFilePath, self.jerUncertaintyInputFileName))
         
     def endJob(self):
-        pass
-        
-    
+        shutil.rmtree(self.jerInputFilePath)
+
     def setSeed(self,event):
         """Set seed deterministically."""
         # (cf. https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/PatUtils/interface/SmearedJetProducerT.h)
