@@ -377,35 +377,29 @@ class jetmetUncertaintiesProducer(Module):
                 jets_msdcorr_jmsDown.append(jet_pt_jerNomVal *jet_msdcorr_jmrNomVal *jmsDownVal *jet_msdcorr_raw)
 
                 #Also evaluated JMS&JMR SD corr in tau21DDT region: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetWtagging#tau21DDT_0_43
-                tmp_jmsVals = self.jmsVals
-                tmp_jmrVals = self.jmrVals
                 if self.era in ["2016"]:
-                    self.jmsVals = [1.014,1.007,1.021]
-                    self.jmrVals = [1.086,1.176,0.996]
-                elif self.era in ["2017"]:
-                    self.jmsVals = [0.983,0.976,0.99]
-                    self.jmrVals = [1.080,1.161,0.999]
-                jmsNomVal = self.jmsVals[0]
-                jmsDownVal = self.jmsVals[1]
-                jmsUpVal = self.jmsVals[2]
+                    jmstau21DDTNomVal = 1.014
+                    jmstau21DDTDownVal = 1.007
+                    jmstau21DDTUpVal = 1.021
+                    self.jetSmearer.jmr_vals = [1.086,1.176,0.996]
+                elif self.era in ["2017","2018"]:
+                    jmstau21DDTNomVal = 0.983
+                    jmstau21DDTDownVal = 0.976
+                    jmstau21DDTUpVal = 0.99
+                    self.jetSmearer.jmr_vals = [1.080,1.161,0.999]
 
                 ( jet_msdcorr_tau21DDT_jmrNomVal, jet_msdcorr_tau21DDT_jmrUpVal, jet_msdcorr_tau21DDT_jmrDownVal ) = self.jetSmearer.getSmearValsM(groomedP4, genGroomedJet) if groomedP4 != None and genGroomedJet != None else (0.,0.,0.)
-                jet_msdcorr_tau21DDT_nom           = jet_pt_jerNomVal*jet_msdcorr_tau21DDT_jmrNomVal*jmsNomVal*jet_msdcorr_raw
+                jet_msdcorr_tau21DDT_nom           = jet_pt_jerNomVal*jet_msdcorr_tau21DDT_jmrNomVal*jmstau21DDTNomVal*jet_msdcorr_raw
                 jets_msdcorr_tau21DDT_nom    .append(jet_msdcorr_tau21DDT_nom)
-                jets_msdcorr_tau21DDT_jerUp  .append(jet_pt_jerUpVal  *jet_msdcorr_tau21DDT_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_tau21DDT_jerDown.append(jet_pt_jerDownVal*jet_msdcorr_tau21DDT_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_tau21DDT_jmrUp  .append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrUpVal  *jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_tau21DDT_jmrDown.append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrDownVal*jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_tau21DDT_jmsUp  .append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrNomVal *jmsUpVal   *jet_msdcorr_raw)
-                jets_msdcorr_tau21DDT_jmsDown.append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrNomVal *jmsDownVal *jet_msdcorr_raw)
+                jets_msdcorr_tau21DDT_jerUp  .append(jet_pt_jerUpVal  *jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTNomVal  *jet_msdcorr_raw)
+                jets_msdcorr_tau21DDT_jerDown.append(jet_pt_jerDownVal*jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTNomVal  *jet_msdcorr_raw)
+                jets_msdcorr_tau21DDT_jmrUp  .append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrUpVal  *jmstau21DDTNomVal  *jet_msdcorr_raw)
+                jets_msdcorr_tau21DDT_jmrDown.append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrDownVal*jmstau21DDTNomVal  *jet_msdcorr_raw)
+                jets_msdcorr_tau21DDT_jmsUp  .append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTUpVal   *jet_msdcorr_raw)
+                jets_msdcorr_tau21DDT_jmsDown.append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTDownVal *jet_msdcorr_raw)
 
-                #Now restore the original values of self.jmsVals, self.jmrVals and jmsNomVal, jmsDownVal, jmsUpVal:
-                self.jmsVals = tmp_jmsVals
-                self.jmrVals = tmp_jmrVals
-                jmsNomVal = self.jmsVals[0]
-                jmsDownVal = self.jmsVals[1]
-                jmsUpVal = self.jmsVals[2]
-
+                #Restore original jmr_vals in jetSmearer
+                self.jetSmearer.jmr_vals = self.jmrVals
             
             for jesUncertainty in self.jesUncertainties:
                 # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties )
