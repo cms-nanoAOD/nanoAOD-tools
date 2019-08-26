@@ -10,7 +10,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetS
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
 class jetmetUncertaintiesProducer(Module):
-    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False, jerTag="", jmrVals = []):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False, jerTag="", jmrVals = [], , jmsVals = []):
 
         self.era = era
         self.redoJEC = redoJEC
@@ -59,12 +59,7 @@ class jetmetUncertaintiesProducer(Module):
         self.lenVar = "n" + self.jetBranchName
 
         #jet mass scale
-        #W-tagging PUPPI softdrop JMS values: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
-        #2016 values 
-        self.jmsVals = [1.00, 0.9906, 1.0094] #nominal, down, up
-        # Use 2017 values for 2018 until 2018 are released
-        if self.era in ["2017","2018"]:
-            self.jmsVals = [0.982, 0.978, 0.986]
+        self.jmsVals = jmsVals
 
         # read jet energy scale (JES) uncertainties
         # (downloaded from https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC )
