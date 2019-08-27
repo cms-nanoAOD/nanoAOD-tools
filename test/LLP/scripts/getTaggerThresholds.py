@@ -460,7 +460,7 @@ class Chain(object):
         return self._buffer[k][self._currentEntry]
 
 
-def createArray(fileName,processDict,processList,preselection):
+def createArray(fileName,processDict,processList,preselection,da=True):
     if os.path.exists(fileName):
         data = numpy.load(fileName)
         selectedEvents = {}
@@ -482,16 +482,28 @@ def createArray(fileName,processDict,processList,preselection):
             
             #if chain.selectedJets_nominal_pt[0]<100.:
             #    continue
-            selectedEvents["tagger"].append(numpy.array([
-                [chain.llpdnnx_da_nominal_0p001_LLP_min0,chain.llpdnnx_da_nominal_0p001_LLP_min1,chain.llpdnnx_da_nominal_0p001_LLP_min2,chain.llpdnnx_da_nominal_0p001_LLP_min3,chain.llpdnnx_da_nominal_0p001_LLP_min4],
-                [chain.llpdnnx_da_nominal_0p01_LLP_min0,chain.llpdnnx_da_nominal_0p01_LLP_min1,chain.llpdnnx_da_nominal_0p01_LLP_min2,chain.llpdnnx_da_nominal_0p01_LLP_min3,chain.llpdnnx_da_nominal_0p01_LLP_min4],
-                [chain.llpdnnx_da_nominal_0p1_LLP_min0,chain.llpdnnx_da_nominal_0p1_LLP_min1,chain.llpdnnx_da_nominal_0p1_LLP_min2,chain.llpdnnx_da_nominal_0p1_LLP_min3,chain.llpdnnx_da_nominal_0p1_LLP_min4],
-                [chain.llpdnnx_da_nominal_0_LLP_min0,chain.llpdnnx_da_nominal_0_LLP_min1,chain.llpdnnx_da_nominal_0_LLP_min2,chain.llpdnnx_da_nominal_0_LLP_min3,chain.llpdnnx_da_nominal_0_LLP_min4],
-                [chain.llpdnnx_da_nominal_10_LLP_min0,chain.llpdnnx_da_nominal_10_LLP_min1,chain.llpdnnx_da_nominal_10_LLP_min2,chain.llpdnnx_da_nominal_10_LLP_min3,chain.llpdnnx_da_nominal_10_LLP_min4],
-                [chain.llpdnnx_da_nominal_100_LLP_min0,chain.llpdnnx_da_nominal_100_LLP_min1,chain.llpdnnx_da_nominal_100_LLP_min2,chain.llpdnnx_da_nominal_100_LLP_min3,chain.llpdnnx_da_nominal_100_LLP_min4],
-                [chain.llpdnnx_da_nominal_1000_LLP_min0,chain.llpdnnx_da_nominal_1000_LLP_min1,chain.llpdnnx_da_nominal_1000_LLP_min2,chain.llpdnnx_da_nominal_1000_LLP_min3,chain.llpdnnx_da_nominal_1000_LLP_min4],
-                [chain.llpdnnx_da_nominal_10000_LLP_min0,chain.llpdnnx_da_nominal_10000_LLP_min1,chain.llpdnnx_da_nominal_10000_LLP_min2,chain.llpdnnx_da_nominal_10000_LLP_min3,chain.llpdnnx_da_nominal_10000_LLP_min4],
-            ]))
+            if da:
+                selectedEvents["tagger"].append(numpy.array([
+                    [chain.llpdnnx_da_nominal_0p01_LLP_min0,chain.llpdnnx_da_nominal_0p01_LLP_min1,chain.llpdnnx_da_nominal_0p01_LLP_min2,chain.llpdnnx_da_nominal_0p01_LLP_min3,chain.llpdnnx_da_nominal_0p01_LLP_min4],
+                    [chain.llpdnnx_da_nominal_0p1_LLP_min0,chain.llpdnnx_da_nominal_0p1_LLP_min1,chain.llpdnnx_da_nominal_0p1_LLP_min2,chain.llpdnnx_da_nominal_0p1_LLP_min3,chain.llpdnnx_da_nominal_0p1_LLP_min4],
+                    [chain.llpdnnx_da_nominal_0_LLP_min0,chain.llpdnnx_da_nominal_0_LLP_min1,chain.llpdnnx_da_nominal_0_LLP_min2,chain.llpdnnx_da_nominal_0_LLP_min3,chain.llpdnnx_da_nominal_0_LLP_min4],
+                    [chain.llpdnnx_da_nominal_10_LLP_min0,chain.llpdnnx_da_nominal_10_LLP_min1,chain.llpdnnx_da_nominal_10_LLP_min2,chain.llpdnnx_da_nominal_10_LLP_min3,chain.llpdnnx_da_nominal_10_LLP_min4],
+                    [chain.llpdnnx_da_nominal_100_LLP_min0,chain.llpdnnx_da_nominal_100_LLP_min1,chain.llpdnnx_da_nominal_100_LLP_min2,chain.llpdnnx_da_nominal_100_LLP_min3,chain.llpdnnx_da_nominal_100_LLP_min4],
+                    [chain.llpdnnx_da_nominal_1000_LLP_min0,chain.llpdnnx_da_nominal_1000_LLP_min1,chain.llpdnnx_da_nominal_1000_LLP_min2,chain.llpdnnx_da_nominal_1000_LLP_min3,chain.llpdnnx_da_nominal_1000_LLP_min4],
+                    [chain.llpdnnx_da_nominal_10000_LLP_min0,chain.llpdnnx_da_nominal_10000_LLP_min1,chain.llpdnnx_da_nominal_10000_LLP_min2,chain.llpdnnx_da_nominal_10000_LLP_min3,chain.llpdnnx_da_nominal_10000_LLP_min4],
+                ]))
+            else:
+                selectedEvents["tagger"].append(numpy.array([
+                    [chain.llpdnnx_noda_nominal_0p01_LLP_min0,chain.llpdnnx_noda_nominal_0p01_LLP_min1,chain.llpdnnx_noda_nominal_0p01_LLP_min2,chain.llpdnnx_noda_nominal_0p01_LLP_min3,chain.llpdnnx_noda_nominal_0p01_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_0p1_LLP_min0,chain.llpdnnx_noda_nominal_0p1_LLP_min1,chain.llpdnnx_noda_nominal_0p1_LLP_min2,chain.llpdnnx_noda_nominal_0p1_LLP_min3,chain.llpdnnx_noda_nominal_0p1_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_0_LLP_min0,chain.llpdnnx_noda_nominal_0_LLP_min1,chain.llpdnnx_noda_nominal_0_LLP_min2,chain.llpdnnx_noda_nominal_0_LLP_min3,chain.llpdnnx_noda_nominal_0_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_10_LLP_min0,chain.llpdnnx_noda_nominal_10_LLP_min1,chain.llpdnnx_noda_nominal_10_LLP_min2,chain.llpdnnx_noda_nominal_10_LLP_min3,chain.llpdnnx_noda_nominal_10_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_100_LLP_min0,chain.llpdnnx_noda_nominal_100_LLP_min1,chain.llpdnnx_noda_nominal_100_LLP_min2,chain.llpdnnx_noda_nominal_100_LLP_min3,chain.llpdnnx_noda_nominal_100_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_1000_LLP_min0,chain.llpdnnx_noda_nominal_1000_LLP_min1,chain.llpdnnx_noda_nominal_1000_LLP_min2,chain.llpdnnx_noda_nominal_1000_LLP_min3,chain.llpdnnx_noda_nominal_1000_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_10000_LLP_min0,chain.llpdnnx_noda_nominal_10000_LLP_min1,chain.llpdnnx_noda_nominal_10000_LLP_min2,chain.llpdnnx_noda_nominal_10000_LLP_min3,chain.llpdnnx_noda_nominal_10000_LLP_min4],
+                ]))
+            
+            
             selectedEvents["ht"].append(
                 chain.nominal_ht
             )
@@ -520,7 +532,7 @@ def createArray(fileName,processDict,processList,preselection):
     return selectedEvents
     
     
-def createArrayLL(fileName,processDict,llp,lsp,xsec,processList,preselection):
+def createArrayLL(fileName,processDict,llp,lsp,xsec,processList,preselection,da=True):
     if os.path.exists(fileName):
         data = numpy.load(fileName)
         selectedEvents = {}
@@ -549,16 +561,28 @@ def createArrayLL(fileName,processDict,llp,lsp,xsec,processList,preselection):
             
             #if chain.selectedJets_nominal_pt[0]<100.:
             #    continue
-            selectedEvents["tagger"].append(numpy.array([
-                [chain.llpdnnx_da_nominal_0p001_LLP_min0,chain.llpdnnx_da_nominal_0p001_LLP_min1,chain.llpdnnx_da_nominal_0p001_LLP_min2,chain.llpdnnx_da_nominal_0p001_LLP_min3,chain.llpdnnx_da_nominal_0p001_LLP_min4],
-                [chain.llpdnnx_da_nominal_0p01_LLP_min0,chain.llpdnnx_da_nominal_0p01_LLP_min1,chain.llpdnnx_da_nominal_0p01_LLP_min2,chain.llpdnnx_da_nominal_0p01_LLP_min3,chain.llpdnnx_da_nominal_0p01_LLP_min4],
-                [chain.llpdnnx_da_nominal_0p1_LLP_min0,chain.llpdnnx_da_nominal_0p1_LLP_min1,chain.llpdnnx_da_nominal_0p1_LLP_min2,chain.llpdnnx_da_nominal_0p1_LLP_min3,chain.llpdnnx_da_nominal_0p1_LLP_min4],
-                [chain.llpdnnx_da_nominal_0_LLP_min0,chain.llpdnnx_da_nominal_0_LLP_min1,chain.llpdnnx_da_nominal_0_LLP_min2,chain.llpdnnx_da_nominal_0_LLP_min3,chain.llpdnnx_da_nominal_0_LLP_min4],
-                [chain.llpdnnx_da_nominal_10_LLP_min0,chain.llpdnnx_da_nominal_10_LLP_min1,chain.llpdnnx_da_nominal_10_LLP_min2,chain.llpdnnx_da_nominal_10_LLP_min3,chain.llpdnnx_da_nominal_10_LLP_min4],
-                [chain.llpdnnx_da_nominal_100_LLP_min0,chain.llpdnnx_da_nominal_100_LLP_min1,chain.llpdnnx_da_nominal_100_LLP_min2,chain.llpdnnx_da_nominal_100_LLP_min3,chain.llpdnnx_da_nominal_100_LLP_min4],
-                [chain.llpdnnx_da_nominal_1000_LLP_min0,chain.llpdnnx_da_nominal_1000_LLP_min1,chain.llpdnnx_da_nominal_1000_LLP_min2,chain.llpdnnx_da_nominal_1000_LLP_min3,chain.llpdnnx_da_nominal_1000_LLP_min4],
-                [chain.llpdnnx_da_nominal_10000_LLP_min0,chain.llpdnnx_da_nominal_10000_LLP_min1,chain.llpdnnx_da_nominal_10000_LLP_min2,chain.llpdnnx_da_nominal_10000_LLP_min3,chain.llpdnnx_da_nominal_10000_LLP_min4],
-            ]))
+            
+            if da:
+                selectedEvents["tagger"].append(numpy.array([
+                    [chain.llpdnnx_da_nominal_0p01_LLP_min0,chain.llpdnnx_da_nominal_0p01_LLP_min1,chain.llpdnnx_da_nominal_0p01_LLP_min2,chain.llpdnnx_da_nominal_0p01_LLP_min3,chain.llpdnnx_da_nominal_0p01_LLP_min4],
+                    [chain.llpdnnx_da_nominal_0p1_LLP_min0,chain.llpdnnx_da_nominal_0p1_LLP_min1,chain.llpdnnx_da_nominal_0p1_LLP_min2,chain.llpdnnx_da_nominal_0p1_LLP_min3,chain.llpdnnx_da_nominal_0p1_LLP_min4],
+                    [chain.llpdnnx_da_nominal_0_LLP_min0,chain.llpdnnx_da_nominal_0_LLP_min1,chain.llpdnnx_da_nominal_0_LLP_min2,chain.llpdnnx_da_nominal_0_LLP_min3,chain.llpdnnx_da_nominal_0_LLP_min4],
+                    [chain.llpdnnx_da_nominal_10_LLP_min0,chain.llpdnnx_da_nominal_10_LLP_min1,chain.llpdnnx_da_nominal_10_LLP_min2,chain.llpdnnx_da_nominal_10_LLP_min3,chain.llpdnnx_da_nominal_10_LLP_min4],
+                    [chain.llpdnnx_da_nominal_100_LLP_min0,chain.llpdnnx_da_nominal_100_LLP_min1,chain.llpdnnx_da_nominal_100_LLP_min2,chain.llpdnnx_da_nominal_100_LLP_min3,chain.llpdnnx_da_nominal_100_LLP_min4],
+                    [chain.llpdnnx_da_nominal_1000_LLP_min0,chain.llpdnnx_da_nominal_1000_LLP_min1,chain.llpdnnx_da_nominal_1000_LLP_min2,chain.llpdnnx_da_nominal_1000_LLP_min3,chain.llpdnnx_da_nominal_1000_LLP_min4],
+                    [chain.llpdnnx_da_nominal_10000_LLP_min0,chain.llpdnnx_da_nominal_10000_LLP_min1,chain.llpdnnx_da_nominal_10000_LLP_min2,chain.llpdnnx_da_nominal_10000_LLP_min3,chain.llpdnnx_da_nominal_10000_LLP_min4],
+                ]))
+            else:
+                selectedEvents["tagger"].append(numpy.array([
+                    [chain.llpdnnx_noda_nominal_0p01_LLP_min0,chain.llpdnnx_noda_nominal_0p01_LLP_min1,chain.llpdnnx_noda_nominal_0p01_LLP_min2,chain.llpdnnx_noda_nominal_0p01_LLP_min3,chain.llpdnnx_noda_nominal_0p01_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_0p1_LLP_min0,chain.llpdnnx_noda_nominal_0p1_LLP_min1,chain.llpdnnx_noda_nominal_0p1_LLP_min2,chain.llpdnnx_noda_nominal_0p1_LLP_min3,chain.llpdnnx_noda_nominal_0p1_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_0_LLP_min0,chain.llpdnnx_noda_nominal_0_LLP_min1,chain.llpdnnx_noda_nominal_0_LLP_min2,chain.llpdnnx_noda_nominal_0_LLP_min3,chain.llpdnnx_noda_nominal_0_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_10_LLP_min0,chain.llpdnnx_noda_nominal_10_LLP_min1,chain.llpdnnx_noda_nominal_10_LLP_min2,chain.llpdnnx_noda_nominal_10_LLP_min3,chain.llpdnnx_noda_nominal_10_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_100_LLP_min0,chain.llpdnnx_noda_nominal_100_LLP_min1,chain.llpdnnx_noda_nominal_100_LLP_min2,chain.llpdnnx_noda_nominal_100_LLP_min3,chain.llpdnnx_noda_nominal_100_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_1000_LLP_min0,chain.llpdnnx_noda_nominal_1000_LLP_min1,chain.llpdnnx_noda_nominal_1000_LLP_min2,chain.llpdnnx_noda_nominal_1000_LLP_min3,chain.llpdnnx_noda_nominal_1000_LLP_min4],
+                    [chain.llpdnnx_noda_nominal_10000_LLP_min0,chain.llpdnnx_noda_nominal_10000_LLP_min1,chain.llpdnnx_noda_nominal_10000_LLP_min2,chain.llpdnnx_noda_nominal_10000_LLP_min3,chain.llpdnnx_noda_nominal_10000_LLP_min4],
+                ]))
+            
             selectedEvents["ht"].append(
                 chain.nominal_ht
             )
@@ -606,6 +630,18 @@ def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,pt=lambda x:x>-1,mht=la
         wp = taggerSelectedSorted[numpy.argmin(numpy.abs(weightsSortedCumu-weightsSortedCumu[-1]+nev))]+10**-5
         return wp
         
+    def getWpMax(sel,ntag,nev):
+        taggerSelected = array["tagger"][sel,varIndex,ntag]
+        taggerSelectedSortedIndices = numpy.argsort(taggerSelected)
+        taggerSelectedSorted = taggerSelected[taggerSelectedSortedIndices]  
+        return taggerSelectedSorted[-1]+(1.-taggerSelectedSorted[-1])*0.8
+        
+             
+        #weightsSortedCumu = numpy.cumsum((36000.*array["weights"][sel])[taggerSelectedSortedIndices])
+        #wp = taggerSelectedSorted[numpy.argmin(numpy.abs(weightsSortedCumu-weightsSortedCumu[-1]+nev))]+10**-5
+        #return wp
+        
+        
     def getWpByFrac(sel,ntag,frac):
         taggerSelected = array["tagger"][sel,varIndex,ntag]
         taggerSelectedSortedIndices = numpy.argsort(taggerSelected)
@@ -621,25 +657,21 @@ def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,pt=lambda x:x>-1,mht=la
     bestHt = -1
     wpM = -1
     bestDiff = 1000
-    '''
-    for htCut in range(500,1550,50):
-        nH = getWpByEv(cut*(array["ht"]>htCut)*(array["njets"]>5.5),2,3)
-        nL = getWpByEv(cut*(array["ht"]<htCut)*(array["njets"]>5.5),2,3)
-        diff = nH-nL
-        if diff**2<bestDiff**2:
-            bestDiff = diff
-            bestHt = htCut
-            wpM = min(nH,nL)
-    '''
+
+    nEv = 3.
+    
+    
     wpM = min(
-        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]<4.5),1,3),
-        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,3),
-        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]>5.5),2,3),
-        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]<4.5),1,3),
-        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,3),
-        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]>5.5),2,3)
+        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]<4.5),1,nEv),
+        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
+        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]>5.5),2,nEv),
+        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]<4.5),1,nEv),
+        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
+        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]>5.5),2,nEv)
     )
     
+    
+    #wpM = getWpMax(cut*(array["ht"]<htThres)*(array["njets"]>5.5),2,nEv)
     #wpM = getWpByEv((array["ht"]<htThres)*(array["njets"]>5.5),2,5)
     
     #wpM = getWpByFrac(cut,0,0.06)
@@ -882,20 +914,20 @@ processDictCR = getProcessDict("/vols/cms/mkomm/LLP/NANOX_CR")
 
 llArray = []
 
-for ctau in ["0p001","0p01","0p1","1","10","100","1000","10000"]:
+for ctau in ["0p01","0p1","1","10","100","1000","10000"]:
     llArray.append([
-        createArrayLL("thresholdDict_ll%s_uncompressed.npz"%ctau,processDictSR,2000,200,0.101e-02,[
+        createArrayLL("thresholdDict_ll%s_uncompressed_noda.npz"%ctau,processDictSR,2000,200,0.101e-02,[
             "SMS-T1qqqq_ctau-%s_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"%ctau,
             #"SMS-T1qqqq_ctau-%s_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extra"%ctau
-        ],preselection=selectionSR),
-        createArrayLL("thresholdDict_ll%s_compressed.npz"%ctau,processDictSR,1600,1400,0.157e-01,[
+        ],preselection=selectionSR,da=False),
+        createArrayLL("thresholdDict_ll%s_compressed_noda.npz"%ctau,processDictSR,1600,1400,0.157e-01,[
             "SMS-T1qqqq_ctau-%s_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"%ctau,
             #"SMS-T1qqqq_ctau-%s_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extra"%ctau
-        ],preselection=selectionSR)
+        ],preselection=selectionSR,da=False)
     ])
 
 
-signalArray = createArray("thresholdDict_SR.npz",processDictSR,[
+bkgArray = createArray("thresholdDict_SR_noda.npz",processDictSR,[
     "DYJetsToNuNu_PtZ-50To100_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
     "DYJetsToNuNu_PtZ-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
     "DYJetsToNuNu_PtZ-250To400_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
@@ -907,30 +939,8 @@ signalArray = createArray("thresholdDict_SR.npz",processDictSR,[
     "WToLNu_0J_13TeV-amcatnloFXFX-pythia8",
     "WToLNu_1J_13TeV-amcatnloFXFX-pythia8",
     "WToLNu_2J_13TeV-amcatnloFXFX-pythia8",
-],preselection=selectionSR)
-'''
-singleMuonArray = createArray("thresholdDict_singlemuon.npz",processDictCR,[
-    "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
-    "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
-    
-    "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8",
-    
-    "WToLNu_0J_13TeV-amcatnloFXFX-pythia8",
-    "WToLNu_1J_13TeV-amcatnloFXFX-pythia8",
-    "WToLNu_2J_13TeV-amcatnloFXFX-pythia8",
-],preselection=selectionSingleMuon)
+],preselection=selectionSR,da=False)
 
-diMuonArray = createArray("thresholdDict_dimuon.npz",processDictCR,[
-    "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
-    "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
-    
-    "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8",
-    
-    "WToLNu_0J_13TeV-amcatnloFXFX-pythia8",
-    "WToLNu_1J_13TeV-amcatnloFXFX-pythia8",
-    "WToLNu_2J_13TeV-amcatnloFXFX-pythia8",
-],preselection=selectionDiMuon)
-'''
 
 
     
@@ -944,7 +954,6 @@ rSymbol_lc = mhtSymbol+"#lower[0.05]{#scale[1.2]{/}}"+metSymbol_lc
 mzSymbol = "m#lower[0.3]{#scale[0.7]{#mu#mu}}"
 
 ctauSymbol=[
-    ["c#tau#kern[-0.5]{ }=#kern[-0.5]{ }1#kern[-0.5]{ }#mum","0p001"],
     ["c#tau#kern[-0.5]{ }=#kern[-0.5]{ }10#kern[-0.5]{ }#mum","0p01"],
     ["c#tau#kern[-0.5]{ }=#kern[-0.5]{ }100#kern[-0.5]{ }#mum","0p1"],
     ["c#tau#kern[-0.5]{ }=#kern[-0.5]{ }1#kern[-0.5]{ }mm","0"],
@@ -954,128 +963,37 @@ ctauSymbol=[
     ["c#tau#kern[-0.5]{ }=#kern[-0.5]{ }10#kern[-0.5]{ }m","10000"],
 ]
 
-for varIndex in range(signalArray["tagger"].shape[1]):
+for varIndex in range(bkgArray["tagger"].shape[1]):
     print "-"*60
     #print "var",i,"no ht"
     #getThreholds(i,ht=-1)
     
     htThres = 900.
-    mhtThresHigh = 400.
-    mhtThresLow = 500.
     
-    if varIndex>=6:
-        htThres = 800.
+    #if varIndex>=6:
+    #    htThres = 800.
     
-    print "var",varIndex,ctauSymbol[varIndex]#,"ht>%f, mht>%f"%(htThres,mhtThresHigh)
+    print "var",varIndex,ctauSymbol[varIndex]
     
-    thresholds = getThreholds(signalArray,varIndex,htThres)
-    #thresholds = getThreholds(signalArray,varIndex,ht=lambda x:x<htThres,njets=lambda x:x>5.5)
+    thresholds = getThreholds(bkgArray,varIndex,htThres)
     
     
     print "="*100
-    applyThreshold(signalArray,thresholds,varIndex)
+    applyThreshold(bkgArray,thresholds,varIndex)
     applyThreshold(llArray[varIndex][0],thresholds,varIndex)
     applyThreshold(llArray[varIndex][1],thresholds,varIndex)
     print "="*100
-    #thresholds = getThreholds(signalArray,varIndex,p1=[0.0],p2=[0.,0],ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    #thresholds = getThreholds(signalArray,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    #print thresholds
-    #applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    #print "-"*100
-    #applyThreshold(singleMuonArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    #applyThreshold(diMuonArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    
-    
-    applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x>htThres)
+        
+    applyThreshold(bkgArray,thresholds,varIndex,ht=lambda x:x>htThres)
     applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres)
     applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres)
     print "-"*100
     
-    #scanBin("scan_ctau%i_ht1000_mht600"%varIndex,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh,
-    #    title=(ctauSymbol[varIndex][0]+", "+htSymbol+"#kern[-0.7]{ }>#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV, "+mhtSymbol+"#kern[-0.7]{ }>#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV")%(htThres,mhtThresHigh)
-    #)
-    
-    #thresholds = getThreholds(signalArray,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
-    #print thresholds
-    #applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
-    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
-    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
-    #print "-"*100
-    #applyThreshold(singleMuonArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
-    #applyThreshold(diMuonArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
-    #scanBin("scan_ctau%i_ht1000_mht300"%varIndex,varIndex,ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh,
-    #    title=(ctauSymbol[varIndex][0]+", "+htSymbol+"#kern[-0.7]{ }>#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV, "+mhtSymbol+"#kern[-0.7]{ }<#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV")%(htThres,mhtThresHigh)
-    #)
-    
-    applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x<htThres)
+    applyThreshold(bkgArray,thresholds,varIndex,ht=lambda x:x<htThres)
     applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x<htThres)
     applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x<htThres)
     
-    #thresholds = getThreholds(signalArray,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
-    #print thresholds
-    #applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
-    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
-    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
-    #print "-"*100
-    #applyThreshold(singleMuonArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
-    #applyThreshold(diMuonArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
-    
-    #scanBin("scan_ctau%i_ht0_mht500"%varIndex,varIndex,ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow,
-    #    title=(ctauSymbol[varIndex][0]+", "+htSymbol+"#kern[-0.7]{ }<#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV, "+mhtSymbol+"#kern[-0.7]{ }>#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV")%(htThres,mhtThresLow)
-    #)
-    
-    #thresholds = getThreholds(signalArray,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
-    #print thresholds
-    #applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
-    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
-    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
-    #applyThreshold(singleMuonArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
-    #applyThreshold(diMuonArray,thresholds,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
-    
-    #scanBin("scan_ctau%i_ht0_mht300"%varIndex,varIndex,ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow,
-    #    title=(ctauSymbol[varIndex][0]+", "+htSymbol+"#kern[-0.7]{ }<#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV, "+mhtSymbol+"#kern[-0.7]{ }<#kern[-0.7]{ }%.0f#kern[-0.5]{ }GeV")%(htThres,mhtThresLow)
-    #)
-    '''
-    #print "var",i,"ht>%f, mht<%f"%(tThres,mhtThresHigh)
-    thresholds = getThreholds(signalArray,varIndex,p1=[0.5],p2=[0.,0.5,0.95],ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    applyThreshold(signalArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    applyThreshold(singleMuonArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    applyThreshold(diMuonArray,thresholds,varIndex,ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh)
-    
-    '''
-    #getThreholds(signalArray,varIndex,p1=[0.5],p2=[0.,0.7,0.97],ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh)
-    #getThreholds(signalArray,varIndex,p1=[0.95],p2=[0.,0.8,0.98],ht=lambda x:x<htThres,mht=lambda x:x>mhtThresLow)
-    #getThreholds(signalArray,varIndex,p1=[0.95],p2=[0.,0.8,0.98],ht=lambda x:x<htThres,mht=lambda x:x<mhtThresLow)
-    
-    '''
-    
-    getThreholds(i,p1=[0.5],p2=[0.,0.8],ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh,njets=lambda x:x>6.5)
-    #print "var",i,"ht>%f, mht<%f"%(tThres,mhtThresHigh)
-    getThreholds(i,p1=[0.95],p2=[0.,0.8],ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh,njets=lambda x:x>6.5)
-    #print "var",i,"ht<%f, mht>450"%(htThres)
-    getThreholds(i,p1=[0.5],p2=[0.,0.8],ht=lambda x:x<htThres,mht=lambda x:x>500.,njets=lambda x:x>6.5)
-    #print "var",i,"ht<%f, mht<450"%(htThres)
-    getThreholds(i,p1=[0.95],p2=[0.,0.8],ht=lambda x:x<htThres,mht=lambda x:x<500.,njets=lambda x:x>6.5)
-    
-    
-    getThreholds(i,p1=[0.95],p2=[0.,0.8],ht=lambda x:x>htThres,mht=lambda x:x>mhtThresHigh,njets=lambda x:x<6.5)
-    #print "var",i,"ht>%f, mht<%f"%(tThres,mhtThresHigh)
-    getThreholds(i,p1=[0.99],p2=[0.,0.8],ht=lambda x:x>htThres,mht=lambda x:x<mhtThresHigh,njets=lambda x:x<6.5)
-    #print "var",i,"ht<%f, mht>450"%(htThres)
-    getThreholds(i,p1=[0.99],p2=[0.,0.8],ht=lambda x:x<htThres,mht=lambda x:x>500.,njets=lambda x:x<6.5)
-    #print "var",i,"ht<%f, mht<450"%(htThres)
-    getThreholds(i,p1=[0.99],p2=[0.,0.98],ht=lambda x:x<htThres,mht=lambda x:x<500.,njets=lambda x:x<6.5)
-    '''
-    
-    '''
-    print "var",i,"ht>%f"%(htThres)
-    getThreholds(i,p1=[0.8,0.98],p2=[0.,0.9,0.99],ht=lambda x:x>htThres)
-    getThreholds(i,p1=[0.99,0.999],p2=[0.,0.9,0.99],ht=lambda x:x<htThres)
-    '''
+
     
     
     

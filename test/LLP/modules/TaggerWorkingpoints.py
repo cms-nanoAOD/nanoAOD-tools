@@ -18,7 +18,7 @@ class TaggerWorkingpoints(Module):
         taggerName = "llpdnnx",
         outputName = "llpdnnx",
         predictionLabels = ["B","C","UDS","G","LLP"],
-        logctauValues = range(-3,5),
+        logctauValues = range(-2,5),
         multiplicities = range(0,5),
         globalOptions={"isData":False}
     ):
@@ -61,9 +61,6 @@ class TaggerWorkingpoints(Module):
                     self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"True","I")
                     self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"TrueTaggedLLP","I")
                     
-                if self.saveAllLabels:
-                    self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label,"F", lenVar="nselectedJets")
-
                 for m in self.multiplicities:
                     self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),"F")
 
@@ -83,9 +80,7 @@ class TaggerWorkingpoints(Module):
             for ctau in self.logctauValues:
                 for label in self.predictionLabels:
                     predictionsPerCtauAndClass[ctau][label].append(predictions[ctau][label])
-                    if self.saveJetOutput!=None:
-                        taggerOutputsPerCtau[ctau][label][ijet] = predictions[ctau][label]
-                    
+
         if not self.globalOptions["isData"]:
             for ctau in self.logctauValues:
                 nTrue = {}
@@ -107,9 +102,6 @@ class TaggerWorkingpoints(Module):
                 
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
-                if self.saveAllLabels:
-                    self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label, predictionsPerCtauAndClass[ctau][label])
-
                 predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
 
                 for m in self.multiplicities:
@@ -118,10 +110,12 @@ class TaggerWorkingpoints(Module):
                     else:
                         self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
 
-                for label in ["LLP"]:
-                    self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"True",nTrue[label])
-                    self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"TrueTaggedLLP",nTrueTaggedLLP[label])
-                        
+
+                if not self.globalOptions['isData']:
+                    for label in ["LLP"]:
+                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"True",nTrue[label])
+                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"TrueTaggedLLP",nTrueTaggedLLP[label])
+                            
                     
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
