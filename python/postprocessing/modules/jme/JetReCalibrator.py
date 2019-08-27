@@ -16,7 +16,7 @@ class JetReCalibrator:
         self.doResidualJECs = doResidualJECs
         self.jecPath = jecPath
         self.upToLevel = upToLevel
-        self.calculateType1METCorr = calculateType1METCorrection
+        self.calculateType1METCorrection = calculateType1METCorrection
         self.calculateSeparateCorrections = calculateSeparateCorrections
         self.type1METParams  = type1METParams
         # Make base corrections
