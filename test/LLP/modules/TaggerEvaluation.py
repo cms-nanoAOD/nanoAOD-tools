@@ -20,7 +20,7 @@ class TaggerEvaluation(Module):
         modelPath,
         inputCollections = [lambda event: Collection(event, "Jet")],
         taggerName = "llpdnnx",
-        predictionLabels = ["B","C","UDS","G","LLP"],
+        predictionLabels = ["B","C","UDS","G","LLP"], #this is how the output array from TF is interpreted
         logctauValues = range(-3,5),
         globalOptions = {"isData":False},
         saveOutput = False
@@ -164,4 +164,5 @@ class TaggerEvaluation(Module):
                             taggerOutput[self.logctauValues[ictau]][classLabel] = -1
 
                 setattr(jet, self.taggerName, taggerOutput)
-            return True
+        return True
+            

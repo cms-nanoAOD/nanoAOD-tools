@@ -446,18 +446,24 @@ class Chain(object):
                     self._currentEntry = i-self._currentOffset
                     break
                 s+=self._fileEventPairs[e][1]
-                    
+                     
+    def getArray(self,k):
+        if k not in self._buffer:
+            if not hasattr(self._currentTree,k):
+                print "Branch '",k,"' not found"
+                return None
+            self._buffer[k] = self._currentTree[k].array()
+        return self._buffer[k]
+            
     def __getattr__(self,k):
         #print sorted(self._currentTree.keys())
         #if not self._currentTree.has_key(k):
         #    print "Error - cannot find element '"+k+"' in tree: ",sorted(self._currentTree.keys())
-        if k not in self._buffer:
-            self._buffer[k] = self._currentTree[k].array()
-            #print "loading branch ",k," with entries ",len(self._buffer[k])," and shape ",self._buffer[k][self._currentEntry].shape,", (tree len=",len(self._currentTree),")"
-        if self._currentEntry>=len(self._buffer[k]):
-            print "Error - buffer for branch '",k,"' only ",len(self._buffer[k])," but requested entry ",self._currentEntry," (tree len=",len(self._currentTree),")"
+        arr = self.getArray(k)
+        if self._currentEntry>=len(arr):
+            print "Error - buffer for branch '",k,"' only ",len(arr)," but requested entry ",self._currentEntry," (tree len=",len(self._currentTree),")"
             return 0
-        return self._buffer[k][self._currentEntry]
+        return arr[self._currentEntry]
 
 
 def createArray(fileName,processDict,processList,preselection,da=True):
@@ -520,7 +526,9 @@ def createArray(fileName,processDict,processList,preselection,da=True):
                 chain.genweight*weight
             )
 
-    selectedEvents["tagger"] = numpy.stack(selectedEvents["tagger"],axis=0)
+    if not numpy.isfinite(selectedEvents["tagger"]).all():
+        print "NOT FINITE"
+    selectedEvents["tagger"] = numpy.nan_to_num(numpy.stack(selectedEvents["tagger"],axis=0))
     selectedEvents["ht"] = numpy.array(selectedEvents["ht"],dtype=numpy.float64)
     selectedEvents["pt"] = numpy.array(selectedEvents["pt"],dtype=numpy.float64)
     selectedEvents["mht"] = numpy.array(selectedEvents["mht"],dtype=numpy.float64)
@@ -530,7 +538,87 @@ def createArray(fileName,processDict,processList,preselection,da=True):
     numpy.savez(fileName,**selectedEvents)
 
     return selectedEvents
+
+
+def createArrayFast(fileName,processDict,processList,preselection):
+    if os.path.exists(fileName):
+        data = numpy.load(fileName)
+        selectedEvents = {}
+        for k in data.keys():
+            selectedEvents[k] = numpy.copy(data[k])
+        return selectedEvents
+
+
+    selectedEvents = {"tagger_da":[],"tagger_noda":[],"weights":[],"ht":[],"mht":[], "njets":[]}
+
+    for backgroundSample in processList:
+        print "processing ... ",backgroundSample
+        weight = processDict[backgroundSample]['weight']
+        for inputFile in processDict[backgroundSample]["files"]:
+            f = uproot.open(inputFile,localsource=lambda p: uproot.source.file.FileSource(p,**uproot.FileSource.defaults))
+            tree = f['Friends']
+            if len(tree['nselectedJets_nominal'])==0:
+                continue
+            srSelection = selectionSRArray(tree)
+            if not srSelection.any():
+                continue
+            taggerResultsNoDA = []
+            taggerResultsDA = []
+            keysFound = True
+            for ctau in ["0p01","0p1","0","10","100","1000","10000"]:
+                taggerResultsPerCtauNoDA = []
+                taggerResultsPerCtauDA = []
+                for m in range(5):
+                    if "llpdnnx_noda_nominal_%s_LLP_min%i"%(ctau,m) in tree.keys():
+                        taggerResultsPerCtauNoDA.append(tree["llpdnnx_noda_nominal_%s_LLP_min%i"%(ctau,m)].array()[srSelection])
+                    else:
+                        print "key ","llpdnnx_noda_nominal_%s_LLP_min%i "%(ctau,m)," not found in file ",inputFile
+                        keysFound = False
+                    if "llpdnnx_da_nominal_%s_LLP_min%i"%(ctau,m) in tree.keys():
+                        taggerResultsPerCtauDA.append(tree["llpdnnx_da_nominal_%s_LLP_min%i"%(ctau,m)].array()[srSelection])
+                    else:
+                        keysFound = False
+                        print "key ","llpdnnx_da_nominal_%s_LLP_min%i "%(ctau,m)," not found in file ",inputFile
+                taggerResultsPerCtauNoDA = numpy.stack(taggerResultsPerCtauNoDA,axis=1)
+                taggerResultsPerCtauDA = numpy.stack(taggerResultsPerCtauDA,axis=1)
+                taggerResultsNoDA.append(taggerResultsPerCtauNoDA)
+                taggerResultsDA.append(taggerResultsPerCtauDA)
+            taggerResultsNoDA = numpy.stack(taggerResultsNoDA,axis=1)
+            taggerResultsDA = numpy.stack(taggerResultsDA,axis=1)
+
+            if not keysFound:
+                continue 
+            selectedEvents["tagger_noda"].append(taggerResultsNoDA)
+            selectedEvents["tagger_da"].append(taggerResultsDA)
+                
+            selectedEvents["ht"].append(
+                tree["nominal_ht"].array()[srSelection]
+            )
+            selectedEvents["njets"].append(
+                tree["nselectedJets_nominal"].array()[srSelection]
+            )
+            selectedEvents["mht"].append(
+                tree["nominal_mht"].array()[srSelection]
+            )
+            selectedEvents["weights"].append(
+                tree["genweight"].array()[srSelection]*tree['puweight'].array()[srSelection]*weight
+            )
+            #print " -> ",taggerResults.shape," events"
     
+    selectedEvents["tagger_noda"] = numpy.nan_to_num(numpy.concatenate(selectedEvents["tagger_noda"],axis=0))
+    selectedEvents["tagger_da"] = numpy.nan_to_num(numpy.concatenate(selectedEvents["tagger_da"],axis=0))
+    selectedEvents["ht"] = numpy.concatenate(selectedEvents["ht"],axis=0)
+    selectedEvents["mht"] = numpy.concatenate(selectedEvents["mht"],axis=0)
+    selectedEvents["njets"] = numpy.concatenate(selectedEvents["njets"],axis=0)
+    selectedEvents["weights"] = numpy.concatenate(selectedEvents["weights"],axis=0)
+
+    #print selectedEvents["tagger"].shape
+    #print selectedEvents["ht"].shape
+
+    numpy.savez(fileName,**selectedEvents)
+    
+    return selectedEvents
+
     
 def createArrayLL(fileName,processDict,llp,lsp,xsec,processList,preselection,da=True):
     if os.path.exists(fileName):
@@ -606,29 +694,109 @@ def createArrayLL(fileName,processDict,llp,lsp,xsec,processList,preselection,da=
     selectedEvents["njets"] = numpy.array(selectedEvents["njets"],dtype=numpy.float64)
     selectedEvents["weights"] = numpy.array(selectedEvents["weights"],dtype=numpy.float64)
 
-    numpy.savez(fileName,**selectedEvents)
+    #numpy.savez(fileName,**selectedEvents)
 
     return selectedEvents
     
 #selectedEvents["weights"] = numpy.ones(selectedEvents["weights"].shape)
     
+def makePlot(array,varIndex,htThres,ht=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
+    cv = ROOT.TCanvas("cv"+str(varIndex)+str(random.random()),"",800,600)
+    cv.Divide(2,3,0,0)
+    for i in range(6):
+        cv.GetPad(i+1).SetPad(0.,0.,1.,1.)
+        cv.GetPad(i+1).SetFillStyle(4000)
+        cv.GetPad(i+1).SetMargin(
+            0.1 if i<3 else 0.58, #left
+            0.55 if i<3 else 0.03, #right
+            0.12+0.32*(i%3), #bottom
+            1-(0.11+0.32*(i%3)+0.32) #top
+        )
+        cv.GetPad(i+1).SetLogy(1)
         
-def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,pt=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
-    cut = numpy.logical_and(numpy.logical_and(numpy.logical_and(ht(array["ht"]),pt(array["pt"])),mht(array["mht"])),njets(array["njets"]))
-    tagger1Selected = array["tagger"][cut,varIndex,0]
-    tagger2Selected = array["tagger"][cut,varIndex,1]
-    tagger3Selected = array["tagger"][cut,varIndex,2]
-    tagger4Selected = array["tagger"][cut,varIndex,3]
+    icv = 1
+    
+    rootObj = []
+    print varIndex,array["ht"].shape,min(array["ht"]),max(array["ht"])
+    for sel,tagger in [
+        ((array["ht"]>htThres)*(array["njets"]<4.5),array["tagger_noda"][:,varIndex,1]),
+        ((array["ht"]>htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),array["tagger_noda"][:,varIndex,1]),
+        ((array["ht"]>htThres)*(array["njets"]>5.5),array["tagger_noda"][:,varIndex,2]),
+        ((array["ht"]<htThres)*(array["njets"]<4.5),array["tagger_noda"][:,varIndex,1]),
+        ((array["ht"]<htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),array["tagger_noda"][:,varIndex,1]),
+        ((array["ht"]<htThres)*(array["njets"]>5.5),array["tagger_noda"][:,varIndex,2]),
+    ]:
+        #print sel.shape
+        cv.cd(icv)
+        
+        hist = ROOT.TH1F("hist"+str(icv)+str(random.random()),"",50,0,1)
+        
+        rootObj.append(hist)
+        val = tagger[sel]
+        print icv,len(val)
+        weight = array["weights"][sel]*36000.
+        for ival in range(val.shape[0]):
+            hist.Fill(val[ival],weight[ival])
+        #hist.Draw("HIST")
+        
+        s = 0.
+        histSum = ROOT.TH1F("histSum"+str(icv)+str(random.random()),"",50,0,1)
+        rootObj.append(histSum)
+        for ibin in reversed(range(hist.GetNbinsX())):
+            s+=hist.GetBinContent(ibin+1)
+            histSum.SetBinContent(ibin+1,s)
+        #histSum.Draw("L")
+        histSum.SetLineColor(ROOT.kOrange+7)
+        
+        axis = ROOT.TH2F("axis"+str(icv)+str(random.random()),"",50,0.,1.,50,0.1,400.)
+        if (icv%3)!=2:
+            axis.GetXaxis().SetLabelSize(0)
+            axis.GetXaxis().SetTitleSize(0)
+        rootObj.append(axis)
+        axis.Draw("AXIS")
+        histSum.Draw("SAMEL")
+        
+        
+        icv+=1
+        
+        
+    cv.Print("hist_"+str(varIndex)+".pdf")
+    
+        
+def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
+    cut = ht(array["ht"])*mht(array["mht"])*njets(array["njets"])
+    tagger1Selected = array["tagger_noda"][cut,varIndex,0]
+    tagger2Selected = array["tagger_noda"][cut,varIndex,1]
+    tagger3Selected = array["tagger_noda"][cut,varIndex,2]
+    tagger4Selected = array["tagger_noda"][cut,varIndex,3]
     
     njetsSelected = array["njets"][cut]
 
     def getWpByEv(sel,ntag,nev):
-        taggerSelected = array["tagger"][sel,varIndex,ntag]
+        taggerSelected = array["tagger_noda"][sel,varIndex,ntag]
         taggerSelectedSortedIndices = numpy.argsort(taggerSelected)
         taggerSelectedSorted = taggerSelected[taggerSelectedSortedIndices]       
-        weightsSortedCumu = numpy.cumsum((36000.*array["weights"][sel])[taggerSelectedSortedIndices])
-        wp = taggerSelectedSorted[numpy.argmin(numpy.abs(weightsSortedCumu-weightsSortedCumu[-1]+nev))]+10**-5
-        return wp
+        weightsSorted = (36000.*array["weights"][sel])[taggerSelectedSortedIndices]
+        '''
+        for i in reversed(range(len(weightsSorted))):
+            if i>0 and weightsSorted[i]<0:
+                weightsSorted[i-1] += weightsSorted[i]
+                weightsSorted[i] = 0.
+        '''
+        weightsSortedCumu = numpy.cumsum(weightsSorted)
+        weightsSortedCumuNorm = weightsSortedCumu[-1]-weightsSortedCumu
+        
+        foundThres = []
+        for i in range(len(weightsSortedCumuNorm)):
+            #if taggerSelectedSorted[i-1]<0.3:
+            #    continue
+            if i>1 and weightsSortedCumuNorm[i]<nev and weightsSortedCumuNorm[i-1]>nev:
+                foundThres.append(taggerSelectedSorted[i-1])
+        print foundThres
+        return foundThres[-1]
+                
+        #wp = taggerSelectedSorted[numpy.argmin(numpy.abs(weightsSortedCumu-weightsSortedCumu[-1]+nev))-1]#+10**-5
+        #return wp
         
     def getWpMax(sel,ntag,nev):
         taggerSelected = array["tagger"][sel,varIndex,ntag]
@@ -658,16 +826,16 @@ def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,pt=lambda x:x>-1,mht=la
     wpM = -1
     bestDiff = 1000
 
-    nEv = 3.
+    nEv = 5.
     
     
     wpM = min(
-        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]<4.5),1,nEv),
-        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
-        getWpByEv(cut*(array["ht"]>htThres)*(array["njets"]>5.5),2,nEv),
-        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]<4.5),1,nEv),
-        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
-        getWpByEv(cut*(array["ht"]<htThres)*(array["njets"]>5.5),2,nEv)
+        getWpByEv((array["ht"]>htThres)*(array["njets"]<4.5),1,nEv),
+        getWpByEv((array["ht"]>htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
+        getWpByEv((array["ht"]>htThres)*(array["njets"]>5.5),2,nEv),
+        getWpByEv((array["ht"]<htThres)*(array["njets"]<4.5),1,nEv),
+        getWpByEv((array["ht"]<htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
+        getWpByEv((array["ht"]<htThres)*(array["njets"]>5.5),2,nEv)
     )
     
     
@@ -776,12 +944,12 @@ def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,pt=lambda x:x>-1,mht=la
 
     
     
-def applyThreshold(array,thresholds,varIndex,ht=lambda x:x>-1,pt=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
-    cut = numpy.logical_and(numpy.logical_and(numpy.logical_and(ht(array["ht"]),pt(array["pt"])),mht(array["mht"])),njets(array["njets"]))
-    tagger1Selected = array["tagger"][cut,varIndex,0]
-    tagger2Selected = array["tagger"][cut,varIndex,1]
-    tagger3Selected = array["tagger"][cut,varIndex,2]
-    tagger4Selected = array["tagger"][cut,varIndex,3]
+def applyThreshold(array,thresholds,varIndex,ht=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
+    cut = numpy.logical_and(numpy.logical_and(ht(array["ht"]),mht(array["mht"])),njets(array["njets"]))
+    tagger1Selected = array["tagger_noda"][cut,varIndex,0]
+    tagger2Selected = array["tagger_noda"][cut,varIndex,1]
+    tagger3Selected = array["tagger_noda"][cut,varIndex,2]
+    tagger4Selected = array["tagger_noda"][cut,varIndex,3]
     
     njetsSelected = array["njets"][cut]
     
@@ -872,6 +1040,14 @@ def selectionSR(chain):
         return False
     return True
     
+def selectionSRArray(chain):
+    sel = (chain["nselectedJets_nominal"].array()>2.5)\
+          *(chain["nvetoFwdJets_nominal"].array()<0.5)\
+          *(chain["nominal_mht"].array()>300)\
+          *((chain["nominal_mht"].array()/chain["nominal_met"].array())<1.25)\
+          *(chain["nominal_minPhi"].array()>0.2)
+    return sel
+    
 def selectionSingleMuon(chain):
     if chain.nselectedJets_nominal<2:
         return False
@@ -909,11 +1085,12 @@ def selectionDiMuon(chain):
         return False
     return True
     
-processDictSR = getProcessDict("/vols/cms/mkomm/LLP/NANOX_SR")
-processDictCR = getProcessDict("/vols/cms/mkomm/LLP/NANOX_CR")
+processDictSR = getProcessDict("/vols/cms/mkomm/LLP/NANOX_MC_new_SR")
+#processDictCR = getProcessDict("/vols/cms/mkomm/LLP/NANOX_CR")
 
 llArray = []
 
+'''
 for ctau in ["0p01","0p1","1","10","100","1000","10000"]:
     llArray.append([
         createArrayLL("thresholdDict_ll%s_uncompressed_noda.npz"%ctau,processDictSR,2000,200,0.101e-02,[
@@ -925,9 +1102,9 @@ for ctau in ["0p01","0p1","1","10","100","1000","10000"]:
             #"SMS-T1qqqq_ctau-%s_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extra"%ctau
         ],preselection=selectionSR,da=False)
     ])
+'''
 
-
-bkgArray = createArray("thresholdDict_SR_noda.npz",processDictSR,[
+bkgArray = createArrayFast("thresholdDict_SR_new.npz",processDictSR,[
     "DYJetsToNuNu_PtZ-50To100_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
     "DYJetsToNuNu_PtZ-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
     "DYJetsToNuNu_PtZ-250To400_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
@@ -936,10 +1113,13 @@ bkgArray = createArray("thresholdDict_SR_noda.npz",processDictSR,[
     
     "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8",
     
+    "ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1",
+    "ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1",
+    
     "WToLNu_0J_13TeV-amcatnloFXFX-pythia8",
     "WToLNu_1J_13TeV-amcatnloFXFX-pythia8",
     "WToLNu_2J_13TeV-amcatnloFXFX-pythia8",
-],preselection=selectionSR,da=False)
+],preselection=selectionSR)
 
 
 
@@ -963,7 +1143,7 @@ ctauSymbol=[
     ["c#tau#kern[-0.5]{ }=#kern[-0.5]{ }10#kern[-0.5]{ }m","10000"],
 ]
 
-for varIndex in range(bkgArray["tagger"].shape[1]):
+for varIndex in range(bkgArray["tagger_noda"].shape[1]):
     print "-"*60
     #print "var",i,"no ht"
     #getThreholds(i,ht=-1)
@@ -973,25 +1153,26 @@ for varIndex in range(bkgArray["tagger"].shape[1]):
     #if varIndex>=6:
     #    htThres = 800.
     
-    print "var",varIndex,ctauSymbol[varIndex]
+    print "var",varIndex,ctauSymbol[varIndex][1]
     
     thresholds = getThreholds(bkgArray,varIndex,htThres)
     
+    makePlot(bkgArray,varIndex,htThres)
     
     print "="*100
     applyThreshold(bkgArray,thresholds,varIndex)
-    applyThreshold(llArray[varIndex][0],thresholds,varIndex)
-    applyThreshold(llArray[varIndex][1],thresholds,varIndex)
+    #applyThreshold(llArray[varIndex][0],thresholds,varIndex)
+    #applyThreshold(llArray[varIndex][1],thresholds,varIndex)
     print "="*100
         
     applyThreshold(bkgArray,thresholds,varIndex,ht=lambda x:x>htThres)
-    applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres)
-    applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres)
+    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres)
+    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres)
     print "-"*100
     
     applyThreshold(bkgArray,thresholds,varIndex,ht=lambda x:x<htThres)
-    applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x<htThres)
-    applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x<htThres)
+    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x<htThres)
+    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x<htThres)
     
 
     
