@@ -574,11 +574,13 @@ def createArrayFast(fileName,processDict,processList,preselection):
                     else:
                         print "key ","llpdnnx_noda_nominal_%s_LLP_min%i "%(ctau,m)," not found in file ",inputFile
                         keysFound = False
+                    
                     if "llpdnnx_da_nominal_%s_LLP_min%i"%(ctau,m) in tree.keys():
                         taggerResultsPerCtauDA.append(tree["llpdnnx_da_nominal_%s_LLP_min%i"%(ctau,m)].array()[srSelection])
                     else:
                         keysFound = False
                         print "key ","llpdnnx_da_nominal_%s_LLP_min%i "%(ctau,m)," not found in file ",inputFile
+                    
                 taggerResultsPerCtauNoDA = numpy.stack(taggerResultsPerCtauNoDA,axis=1)
                 taggerResultsPerCtauDA = numpy.stack(taggerResultsPerCtauDA,axis=1)
                 taggerResultsNoDA.append(taggerResultsPerCtauNoDA)
@@ -709,19 +711,19 @@ def makePlot(array,varIndex,htThres,ht=lambda x:x>-1,mht=lambda x:x>-1,njets=lam
         cv.GetPad(i+1).SetMargin(
             0.1 if i<3 else 0.58, #left
             0.55 if i<3 else 0.03, #right
-            0.12+0.32*(i%3), #bottom
-            1-(0.11+0.32*(i%3)+0.32) #top
+            0.12+0.25*(i%3), #bottom
+            1-(0.11+0.25*(i%3)+0.25) #top
         )
         cv.GetPad(i+1).SetLogy(1)
         
     icv = 1
     
     rootObj = []
-    print varIndex,array["ht"].shape,min(array["ht"]),max(array["ht"])
+    #print varIndex,array["ht"].shape,min(array["ht"]),max(array["ht"])
     for sel,tagger in [
         ((array["ht"]>htThres)*(array["njets"]<4.5),array["tagger_noda"][:,varIndex,1]),
         ((array["ht"]>htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),array["tagger_noda"][:,varIndex,1]),
-        ((array["ht"]>htThres)*(array["njets"]>5.5),array["tagger_noda"][:,varIndex,2]),
+        ((array["ht"]>htThres)*(array["njets"]>5.5),array["tagger_noda"][:,varIndex,1]),
         ((array["ht"]<htThres)*(array["njets"]<4.5),array["tagger_noda"][:,varIndex,1]),
         ((array["ht"]<htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),array["tagger_noda"][:,varIndex,1]),
         ((array["ht"]<htThres)*(array["njets"]>5.5),array["tagger_noda"][:,varIndex,2]),
@@ -733,7 +735,7 @@ def makePlot(array,varIndex,htThres,ht=lambda x:x>-1,mht=lambda x:x>-1,njets=lam
         
         rootObj.append(hist)
         val = tagger[sel]
-        print icv,len(val)
+        #print icv,len(val)
         weight = array["weights"][sel]*36000.
         for ival in range(val.shape[0]):
             hist.Fill(val[ival],weight[ival])
@@ -748,7 +750,7 @@ def makePlot(array,varIndex,htThres,ht=lambda x:x>-1,mht=lambda x:x>-1,njets=lam
         #histSum.Draw("L")
         histSum.SetLineColor(ROOT.kOrange+7)
         
-        axis = ROOT.TH2F("axis"+str(icv)+str(random.random()),"",50,0.,1.,50,0.1,400.)
+        axis = ROOT.TH2F("axis"+str(icv)+str(random.random()),"",50,0.,1.,50,0.1,40.)
         if (icv%3)!=2:
             axis.GetXaxis().SetLabelSize(0)
             axis.GetXaxis().SetTitleSize(0)
@@ -826,16 +828,16 @@ def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,mht=lambda x:x>-1,njets
     wpM = -1
     bestDiff = 1000
 
-    nEv = 5.
+    nEv = 3.
     
     
     wpM = min(
-        getWpByEv((array["ht"]>htThres)*(array["njets"]<4.5),1,nEv),
-        getWpByEv((array["ht"]>htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
-        getWpByEv((array["ht"]>htThres)*(array["njets"]>5.5),2,nEv),
-        getWpByEv((array["ht"]<htThres)*(array["njets"]<4.5),1,nEv),
-        getWpByEv((array["ht"]<htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
-        getWpByEv((array["ht"]<htThres)*(array["njets"]>5.5),2,nEv)
+        getWpByEv((array["ht"]>1000.)*(array["njets"]<4.5),0,nEv),
+        getWpByEv((array["ht"]>1000.)*(array["njets"]<5.5)*(array["njets"]>4.5),0,nEv),
+        getWpByEv((array["ht"]>1000.)*(array["njets"]>5.5),1,nEv),
+        getWpByEv((array["ht"]<1000.)*(array["njets"]<4.5),1,nEv),
+        getWpByEv((array["ht"]<1000.)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
+        getWpByEv((array["ht"]<1000.)*(array["njets"]>5.5),2,nEv)
     )
     
     
@@ -853,7 +855,7 @@ def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,mht=lambda x:x>-1,njets
     
     N = 0
     
-    
+    '''
     for t in [3,5,6]:
         if t==3:
             for m in [2]:
@@ -886,56 +888,8 @@ def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,mht=lambda x:x>-1,njets
                 ),
     
                   
-            '''
-            if t==0:
-                cutTagger=(selectedWeights[2]<wpT)*(selectedWeights[1]<wpT)
-                if m==0:
-                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)*(selectedWeights[1]<wpM)
-                elif m==1:
-                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)*(selectedWeights[1]>wpM)
-                elif m==2:
-                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]>wpM)
-                elif m==3:
-                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]>wpM)
-                elif m==4:
-                    cutTagger*=(selectedWeights[4]>wpM)
             
-            elif t==1:
-                cutTagger=(selectedWeights[2]<wpT)*(selectedWeights[1]>wpT)
-                if m==0:
-                    cutTagger*=(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)
-                elif m==1:
-                    cutTagger*=(selectedWeights[3]<wpM)*(selectedWeights[2]>wpM)
-                elif m==2:
-                    cutTagger*=(selectedWeights[3]>wpM)
-                    
-            elif t==2:
-                cutTagger=(selectedWeights[2]>wpT)
-                if m==0:
-                    cutTagger*=(selectedWeights[3]<wpM)
-                elif m==1:
-                    cutTagger*=(selectedWeights[3]>wpM)
-            '''
-            '''
-            sel = selectedWeights[:,cutTagger]
-            n = sel.shape[1]
-            #if n==0:
-            #    #print "%1im%1it: empty"%(m,t)
-            #    continue
-            N+=n
-            '''
-            '''
-            print "%1im%1it: t1=[%5.2f;%5.2f], t2=[%5.2f;%5.2f], t3=[%5.2f;%5.2f], N=%i"%(
-                m,t,
-                numpy.min(sel[1,:]),numpy.max(sel[1,:]),
-                numpy.min(sel[2,:]),numpy.max(sel[2,:]),
-                numpy.min(sel[3,:]),numpy.max(sel[3,:]),
-                n
-            )
-            '''
-            
-           
-    print
+    '''
         
     #print selectedWeights.shape[1],N
 
@@ -952,79 +906,29 @@ def applyThreshold(array,thresholds,varIndex,ht=lambda x:x>-1,mht=lambda x:x>-1,
     tagger4Selected = array["tagger_noda"][cut,varIndex,3]
     
     njetsSelected = array["njets"][cut]
+    htSelected = array["ht"][cut]
     
-    wpM = thresholds["m"]
-    wpT = thresholds["t"]
-    
-    
-    selectedWeights = numpy.stack([array["weights"][cut],tagger1Selected,tagger2Selected,tagger3Selected,tagger4Selected],axis=0)
-    
-    N = 0
+    selectedWeights = 36000.*array["weights"][cut] #numpy.stack([,tagger1Selected,tagger2Selected,tagger3Selected,tagger4Selected],axis=0)
     
     
-    for t in [3,5,6]:
-        if t==3:
-            for m in [2]:
-                cutTagger=(njetsSelected>2.5)*(njetsSelected<4.5)
-                if m==2:
-                    cutTagger*=(selectedWeights[2]>wpM)
-                #elif m==3:
-                #    cutTagger*=(selectedWeights[3]>wpM)
-                sel = 36000.*selectedWeights[0,cutTagger]
-                print "%8.1f (%8i)  "%(
-                    numpy.sum(sel),len(sel)
-                ),
-        elif t==5:
-            for m in [2]:
-                cutTagger=(njetsSelected>4.5)*(njetsSelected<5.5)
-                if m==2:
-                    cutTagger*=(selectedWeights[2]>wpM)
-                sel = 36000.*selectedWeights[0,cutTagger]
-                print "%8.1f (%8i)  "%(
-                    numpy.sum(sel),len(sel)
-                ),
-        elif t==6:
-            for m in [3]:
-                cutTagger=(njetsSelected>5.5)
-                if m==3:
-                    cutTagger*=(selectedWeights[3]>wpM)
-                sel = 36000.*selectedWeights[0,cutTagger]
-                print "%8.1f (%8i)  "%(
-                    numpy.sum(sel),len(sel)
-                ),
-
-            '''
-            if t==0:
-                cutTagger=(selectedWeights[2]<wpT)*(selectedWeights[1]<wpT)
-                if m==0:
-                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)*(selectedWeights[1]<wpM)
-                elif m==1:
-                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)*(selectedWeights[1]>wpM)
-                elif m==2:
-                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]<wpM)*(selectedWeights[2]>wpM)
-                elif m==3:
-                    cutTagger*=(selectedWeights[4]<wpM)*(selectedWeights[3]>wpM)
-                elif m==4:
-                    cutTagger*=(selectedWeights[4]>wpM)
-                    
-            elif t==1:
-                cutTagger=(selectedWeights[2]<wpT)*(selectedWeights[1]>wpT)
-                if m==0:
-                    cutTagger*=(selectedWeights[3]<wpM)*(selectedWeights[2]<wpM)
-                elif m==1:
-                    cutTagger*=(selectedWeights[3]<wpM)*(selectedWeights[2]>wpM)
-                elif m==2:
-                    cutTagger*=(selectedWeights[3]>wpM)
-                    
-            elif t==2:
-                cutTagger=(selectedWeights[2]>wpT)
-                if m==0:
-                    cutTagger*=(selectedWeights[3]<wpM)
-                elif m==1:
-                    cutTagger*=(selectedWeights[3]>wpM)
-            '''
-                
-            
+    for sel in [
+        (htSelected>1000.)*(njetsSelected>2.5)*(njetsSelected<4.5)*(tagger1Selected>thresholds['m']),
+        (htSelected>1000.)*(njetsSelected>3.5)*(njetsSelected<5.5)*(tagger1Selected>thresholds['m']),
+        (htSelected>1000.)*(njetsSelected>5.5)*(tagger2Selected>thresholds['m'])
+    ]:
+        print "%8.1f (%8i)  "%(
+            numpy.sum(selectedWeights[sel]),len(selectedWeights[sel])
+        ),
+    print
+    
+    for sel in [
+        (htSelected<1000.)*(njetsSelected>2.5)*(njetsSelected<4.5)*(tagger2Selected>thresholds['m']),
+        (htSelected<1000.)*(njetsSelected>3.5)*(njetsSelected<5.5)*(tagger2Selected>thresholds['m']),
+        (htSelected<1000.)*(njetsSelected>5.5)*(tagger3Selected>thresholds['m'])
+    ]:
+        print "%8.1f (%8i)  "%(
+            numpy.sum(selectedWeights[sel]),len(selectedWeights[sel])
+        ),
     print
      
         
@@ -1163,6 +1067,7 @@ for varIndex in range(bkgArray["tagger_noda"].shape[1]):
     applyThreshold(bkgArray,thresholds,varIndex)
     #applyThreshold(llArray[varIndex][0],thresholds,varIndex)
     #applyThreshold(llArray[varIndex][1],thresholds,varIndex)
+    '''
     print "="*100
         
     applyThreshold(bkgArray,thresholds,varIndex,ht=lambda x:x>htThres)
@@ -1173,7 +1078,7 @@ for varIndex in range(bkgArray["tagger_noda"].shape[1]):
     applyThreshold(bkgArray,thresholds,varIndex,ht=lambda x:x<htThres)
     #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x<htThres)
     #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x<htThres)
-    
+    '''
 
     
     
