@@ -269,7 +269,7 @@ if not args.isData:
 
     analyzerChain.append(
         TaggerEvaluation(
-            modelPath="PhysicsTools/NanoAODTools/data/nn/MC_new_preproc_noda.pb",
+            modelPath="PhysicsTools/NanoAODTools/data/nn/retraining_no_da.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal,
                 lambda event: event.selectedJets_jerUp,
@@ -284,7 +284,7 @@ if not args.isData:
     
     analyzerChain.append(
         TaggerEvaluation(
-            modelPath="PhysicsTools/NanoAODTools/data/nn/MC_new_preproc_da.pb",
+            modelPath="PhysicsTools/NanoAODTools/data/nn/retraining_da.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal,
                 lambda event: event.selectedJets_jerUp,

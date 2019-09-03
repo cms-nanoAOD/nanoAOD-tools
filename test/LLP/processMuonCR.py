@@ -339,7 +339,7 @@ else:
 
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/MC_new_model_noda.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/retraining_no_da.pb",
         inputCollections=[
             lambda event: event.selectedJets_nominal
         ],
@@ -360,8 +360,21 @@ analyzerChain.append(
     )
 )
 analyzerChain.append(
+    JetTaggerResult(
+        inputCollection = lambda event: event.selectedJets_nominal,
+        taggerName = "llpdnnx_noda",
+        outputName = "selectedJets_nominal",
+        logctauValues = range(-2,5),
+        predictionLabels = ["LLP"],
+        globalOptions=globalOptions
+    )
+
+)
+
+
+analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/da_retraining_alpha.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/retraining_da.pb",
         inputCollections=[
             lambda event: event.selectedJets_nominal
         ],
@@ -379,6 +392,17 @@ analyzerChain.append(
         predictionLabels = ["LLP"],
         globalOptions=globalOptions
     )
+)
+analyzerChain.append(
+    JetTaggerResult(
+        inputCollection = lambda event: event.selectedJets_nominal,
+        taggerName = "llpdnnx_da",
+        outputName = "selectedJets_nominal",
+        logctauValues = range(-2,5),
+        predictionLabels = ["LLP"],
+        globalOptions=globalOptions
+    )
+
 )
 
 p=PostProcessor(

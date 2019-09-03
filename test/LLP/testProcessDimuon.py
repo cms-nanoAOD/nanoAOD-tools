@@ -76,11 +76,11 @@ muonSelection = [
     
     InvariantSystem(
         inputCollection = lambda event: event.tightMuons,
-        outputName = "dimuon",
+        outputName = "muonsys",
     ),
     
-    EventSkim(selection=lambda event: event.dimuon_mass>=50. and math.fabs(event.dimuon_mass-90.)>15),
-    
+    EventSkim(selection=lambda event: event.muonsys_mass>=10.),
+    EventSkim(selection=lambda event: event.muonsys_pt<100.),
 ]
 
 analyzerChain = []

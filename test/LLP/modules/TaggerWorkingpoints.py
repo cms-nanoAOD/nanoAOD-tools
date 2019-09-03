@@ -131,14 +131,4 @@ class TaggerWorkingpoints(Module):
                         self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"True",nTrue[label])
                         self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"TrueTaggedLLP",nTrueTaggedLLP[label])
                             
-                    
-        for ctau in self.logctauValues:
-            for label in self.predictionLabels:
-                predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
-                for m in self.multiplicities:
-                    if m<len(predictionsPerCtauAndClass[ctau][label]):
-                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),predictionsPerCtauAndClass[ctau][label][m])
-                    else:
-                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
-        
         return True

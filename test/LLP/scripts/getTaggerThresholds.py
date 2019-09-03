@@ -397,150 +397,9 @@ def getProcessDict(filePath):
         #print processName,len(processDict[processName]["files"]),processDict[processName]["weight"]
     return processDict
     
-class Chain(object):
-    def __init__(self,fileList,treeName="Friends"):
-        self._fileList = fileList
-        self._treeName = treeName
-        self._nEvents = []
-        
-        self._currentFile = None
-        self._currentTree = None
-        self._currentEntry = 0
-        self._currentOffset = 0
-        self._buffer = {}
-        
-        self._fileEventPairs = []
-        for i,f in enumerate(self._fileList):
-            
-            #print i,'/',len(self._fileList),'...',f
-            rootFile = uproot.open(f)#,localsource=uproot.FileSource.defaults)
-            tree = rootFile[self._treeName]
-            nevents = len(tree)
-            self._fileEventPairs.append([f,nevents])
-            
-                
-        self._sumEvents = sum(map(lambda x:x[1],self._fileEventPairs))
-            
-    def GetEntries(self):
-        return self._sumEvents
-            
-    def GetEntry(self,i):
-        if i<0:
-            print "Error - event entry negative: ",i
-            i=0
-        if self._currentTree!=None and (i-self._currentOffset)<len(self._currentTree) and (i-self._currentOffset)>=0:
-            self._currentEntry = i-self._currentOffset
-        else:
-            del self._currentTree
-            self._currentTree = None
-            del self._buffer
-            self._buffer = {}
-            s = 0
-            i = i%self._sumEvents #loop
-            for e in range(len(self._fileEventPairs)):
-                if s<=i and (s+self._fileEventPairs[e][1])>i:
-                    #print "opening",self._fileEventPairs[e][0]
-                    self._currentFile = uproot.open(self._fileEventPairs[e][0])#,localsource=uproot.FileSource.defaults)
-                    self._currentTree = self._currentFile[self._treeName]
-                    self._currentOffset = s
-                    self._currentEntry = i-self._currentOffset
-                    break
-                s+=self._fileEventPairs[e][1]
-                     
-    def getArray(self,k):
-        if k not in self._buffer:
-            if not hasattr(self._currentTree,k):
-                print "Branch '",k,"' not found"
-                return None
-            self._buffer[k] = self._currentTree[k].array()
-        return self._buffer[k]
-            
-    def __getattr__(self,k):
-        #print sorted(self._currentTree.keys())
-        #if not self._currentTree.has_key(k):
-        #    print "Error - cannot find element '"+k+"' in tree: ",sorted(self._currentTree.keys())
-        arr = self.getArray(k)
-        if self._currentEntry>=len(arr):
-            print "Error - buffer for branch '",k,"' only ",len(arr)," but requested entry ",self._currentEntry," (tree len=",len(self._currentTree),")"
-            return 0
-        return arr[self._currentEntry]
 
 
-def createArray(fileName,processDict,processList,preselection,da=True):
-    if os.path.exists(fileName):
-        data = numpy.load(fileName)
-        selectedEvents = {}
-        for k in data.keys():
-            selectedEvents[k] = numpy.copy(data[k])
-        return selectedEvents
-
-
-    selectedEvents = {"tagger":[],"weights":[],"ht":[],"pt":[],"mht":[], "njets":[]}
-
-    for backgroundSample in processList:
-        chain = Chain(processDict[backgroundSample]["files"])
-        weight = processDict[backgroundSample]["weight"]
-        print "processing ... ",backgroundSample
-        for entry in range(0,chain.GetEntries(),1):
-            chain.GetEntry(entry)
-            if (not preselection(chain)):
-                continue
-            
-            #if chain.selectedJets_nominal_pt[0]<100.:
-            #    continue
-            if da:
-                selectedEvents["tagger"].append(numpy.array([
-                    [chain.llpdnnx_da_nominal_0p01_LLP_min0,chain.llpdnnx_da_nominal_0p01_LLP_min1,chain.llpdnnx_da_nominal_0p01_LLP_min2,chain.llpdnnx_da_nominal_0p01_LLP_min3,chain.llpdnnx_da_nominal_0p01_LLP_min4],
-                    [chain.llpdnnx_da_nominal_0p1_LLP_min0,chain.llpdnnx_da_nominal_0p1_LLP_min1,chain.llpdnnx_da_nominal_0p1_LLP_min2,chain.llpdnnx_da_nominal_0p1_LLP_min3,chain.llpdnnx_da_nominal_0p1_LLP_min4],
-                    [chain.llpdnnx_da_nominal_0_LLP_min0,chain.llpdnnx_da_nominal_0_LLP_min1,chain.llpdnnx_da_nominal_0_LLP_min2,chain.llpdnnx_da_nominal_0_LLP_min3,chain.llpdnnx_da_nominal_0_LLP_min4],
-                    [chain.llpdnnx_da_nominal_10_LLP_min0,chain.llpdnnx_da_nominal_10_LLP_min1,chain.llpdnnx_da_nominal_10_LLP_min2,chain.llpdnnx_da_nominal_10_LLP_min3,chain.llpdnnx_da_nominal_10_LLP_min4],
-                    [chain.llpdnnx_da_nominal_100_LLP_min0,chain.llpdnnx_da_nominal_100_LLP_min1,chain.llpdnnx_da_nominal_100_LLP_min2,chain.llpdnnx_da_nominal_100_LLP_min3,chain.llpdnnx_da_nominal_100_LLP_min4],
-                    [chain.llpdnnx_da_nominal_1000_LLP_min0,chain.llpdnnx_da_nominal_1000_LLP_min1,chain.llpdnnx_da_nominal_1000_LLP_min2,chain.llpdnnx_da_nominal_1000_LLP_min3,chain.llpdnnx_da_nominal_1000_LLP_min4],
-                    [chain.llpdnnx_da_nominal_10000_LLP_min0,chain.llpdnnx_da_nominal_10000_LLP_min1,chain.llpdnnx_da_nominal_10000_LLP_min2,chain.llpdnnx_da_nominal_10000_LLP_min3,chain.llpdnnx_da_nominal_10000_LLP_min4],
-                ]))
-            else:
-                selectedEvents["tagger"].append(numpy.array([
-                    [chain.llpdnnx_noda_nominal_0p01_LLP_min0,chain.llpdnnx_noda_nominal_0p01_LLP_min1,chain.llpdnnx_noda_nominal_0p01_LLP_min2,chain.llpdnnx_noda_nominal_0p01_LLP_min3,chain.llpdnnx_noda_nominal_0p01_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_0p1_LLP_min0,chain.llpdnnx_noda_nominal_0p1_LLP_min1,chain.llpdnnx_noda_nominal_0p1_LLP_min2,chain.llpdnnx_noda_nominal_0p1_LLP_min3,chain.llpdnnx_noda_nominal_0p1_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_0_LLP_min0,chain.llpdnnx_noda_nominal_0_LLP_min1,chain.llpdnnx_noda_nominal_0_LLP_min2,chain.llpdnnx_noda_nominal_0_LLP_min3,chain.llpdnnx_noda_nominal_0_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_10_LLP_min0,chain.llpdnnx_noda_nominal_10_LLP_min1,chain.llpdnnx_noda_nominal_10_LLP_min2,chain.llpdnnx_noda_nominal_10_LLP_min3,chain.llpdnnx_noda_nominal_10_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_100_LLP_min0,chain.llpdnnx_noda_nominal_100_LLP_min1,chain.llpdnnx_noda_nominal_100_LLP_min2,chain.llpdnnx_noda_nominal_100_LLP_min3,chain.llpdnnx_noda_nominal_100_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_1000_LLP_min0,chain.llpdnnx_noda_nominal_1000_LLP_min1,chain.llpdnnx_noda_nominal_1000_LLP_min2,chain.llpdnnx_noda_nominal_1000_LLP_min3,chain.llpdnnx_noda_nominal_1000_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_10000_LLP_min0,chain.llpdnnx_noda_nominal_10000_LLP_min1,chain.llpdnnx_noda_nominal_10000_LLP_min2,chain.llpdnnx_noda_nominal_10000_LLP_min3,chain.llpdnnx_noda_nominal_10000_LLP_min4],
-                ]))
-            
-            
-            selectedEvents["ht"].append(
-                chain.nominal_ht
-            )
-            selectedEvents["pt"].append(
-                chain.selectedJets_nominal_pt[0]
-            )
-            selectedEvents["njets"].append(
-                chain.nselectedJets_nominal
-            )
-            selectedEvents["mht"].append(
-                chain.nominal_mht
-            )
-            selectedEvents["weights"].append(
-                chain.genweight*weight
-            )
-
-    if not numpy.isfinite(selectedEvents["tagger"]).all():
-        print "NOT FINITE"
-    selectedEvents["tagger"] = numpy.nan_to_num(numpy.stack(selectedEvents["tagger"],axis=0))
-    selectedEvents["ht"] = numpy.array(selectedEvents["ht"],dtype=numpy.float64)
-    selectedEvents["pt"] = numpy.array(selectedEvents["pt"],dtype=numpy.float64)
-    selectedEvents["mht"] = numpy.array(selectedEvents["mht"],dtype=numpy.float64)
-    selectedEvents["njets"] = numpy.array(selectedEvents["njets"],dtype=numpy.float64)
-    selectedEvents["weights"] = numpy.array(selectedEvents["weights"],dtype=numpy.float64)
-
-    numpy.savez(fileName,**selectedEvents)
-
-    return selectedEvents
-
-
-def createArrayFast(fileName,processDict,processList,preselection):
+def createArrayFast(fileName,processDict,processList,preselection,isData=False):
     if os.path.exists(fileName):
         data = numpy.load(fileName)
         selectedEvents = {}
@@ -602,10 +461,10 @@ def createArrayFast(fileName,processDict,processList,preselection):
             selectedEvents["mht"].append(
                 tree["nominal_mht"].array()[srSelection]
             )
-            selectedEvents["weights"].append(
-                tree["genweight"].array()[srSelection]*tree['puweight'].array()[srSelection]*weight
-            )
-            #print " -> ",taggerResults.shape," events"
+            if not isData:
+                selectedEvents["weights"].append(
+                    tree["genweight"].array()[srSelection]*tree['puweight'].array()[srSelection]*weight
+                )
     
     selectedEvents["tagger_noda"] = numpy.nan_to_num(numpy.concatenate(selectedEvents["tagger_noda"],axis=0))
     selectedEvents["tagger_da"] = numpy.nan_to_num(numpy.concatenate(selectedEvents["tagger_da"],axis=0))
@@ -622,315 +481,85 @@ def createArrayFast(fileName,processDict,processList,preselection):
     return selectedEvents
 
     
-def createArrayLL(fileName,processDict,llp,lsp,xsec,processList,preselection,da=True):
-    if os.path.exists(fileName):
-        data = numpy.load(fileName)
-        selectedEvents = {}
-        for k in data.keys():
-            selectedEvents[k] = numpy.copy(data[k])
-        return selectedEvents
-
-
-    selectedEvents = {"tagger":[],"weights":[],"ht":[],"pt":[],"mht":[], "njets":[]}
-
-    for backgroundSample in processList:
-        #if not processDict[backgroundSample].has_key(str(llp)) or not processDict[backgroundSample][str(llp)].has_key(str(lsp)):
-        #    continue
-        #print backgroundSample,genweights[backgroundSample].keys()
-        chain = Chain(processDict[backgroundSample]["files"])
-        weight = xsec/genweights[backgroundSample][str(llp)][str(lsp)]["weighted"]
-        print "processing ... ",backgroundSample
-        for entry in range(0,chain.GetEntries(),1):
-            chain.GetEntry(entry)
-            if (not preselection(chain)):
-                continue
-            if (chain.llp!=llp):
-                continue
-            if (chain.lsp!=lsp):
-                continue
-            
-            #if chain.selectedJets_nominal_pt[0]<100.:
-            #    continue
-            
-            if da:
-                selectedEvents["tagger"].append(numpy.array([
-                    [chain.llpdnnx_da_nominal_0p01_LLP_min0,chain.llpdnnx_da_nominal_0p01_LLP_min1,chain.llpdnnx_da_nominal_0p01_LLP_min2,chain.llpdnnx_da_nominal_0p01_LLP_min3,chain.llpdnnx_da_nominal_0p01_LLP_min4],
-                    [chain.llpdnnx_da_nominal_0p1_LLP_min0,chain.llpdnnx_da_nominal_0p1_LLP_min1,chain.llpdnnx_da_nominal_0p1_LLP_min2,chain.llpdnnx_da_nominal_0p1_LLP_min3,chain.llpdnnx_da_nominal_0p1_LLP_min4],
-                    [chain.llpdnnx_da_nominal_0_LLP_min0,chain.llpdnnx_da_nominal_0_LLP_min1,chain.llpdnnx_da_nominal_0_LLP_min2,chain.llpdnnx_da_nominal_0_LLP_min3,chain.llpdnnx_da_nominal_0_LLP_min4],
-                    [chain.llpdnnx_da_nominal_10_LLP_min0,chain.llpdnnx_da_nominal_10_LLP_min1,chain.llpdnnx_da_nominal_10_LLP_min2,chain.llpdnnx_da_nominal_10_LLP_min3,chain.llpdnnx_da_nominal_10_LLP_min4],
-                    [chain.llpdnnx_da_nominal_100_LLP_min0,chain.llpdnnx_da_nominal_100_LLP_min1,chain.llpdnnx_da_nominal_100_LLP_min2,chain.llpdnnx_da_nominal_100_LLP_min3,chain.llpdnnx_da_nominal_100_LLP_min4],
-                    [chain.llpdnnx_da_nominal_1000_LLP_min0,chain.llpdnnx_da_nominal_1000_LLP_min1,chain.llpdnnx_da_nominal_1000_LLP_min2,chain.llpdnnx_da_nominal_1000_LLP_min3,chain.llpdnnx_da_nominal_1000_LLP_min4],
-                    [chain.llpdnnx_da_nominal_10000_LLP_min0,chain.llpdnnx_da_nominal_10000_LLP_min1,chain.llpdnnx_da_nominal_10000_LLP_min2,chain.llpdnnx_da_nominal_10000_LLP_min3,chain.llpdnnx_da_nominal_10000_LLP_min4],
-                ]))
-            else:
-                selectedEvents["tagger"].append(numpy.array([
-                    [chain.llpdnnx_noda_nominal_0p01_LLP_min0,chain.llpdnnx_noda_nominal_0p01_LLP_min1,chain.llpdnnx_noda_nominal_0p01_LLP_min2,chain.llpdnnx_noda_nominal_0p01_LLP_min3,chain.llpdnnx_noda_nominal_0p01_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_0p1_LLP_min0,chain.llpdnnx_noda_nominal_0p1_LLP_min1,chain.llpdnnx_noda_nominal_0p1_LLP_min2,chain.llpdnnx_noda_nominal_0p1_LLP_min3,chain.llpdnnx_noda_nominal_0p1_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_0_LLP_min0,chain.llpdnnx_noda_nominal_0_LLP_min1,chain.llpdnnx_noda_nominal_0_LLP_min2,chain.llpdnnx_noda_nominal_0_LLP_min3,chain.llpdnnx_noda_nominal_0_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_10_LLP_min0,chain.llpdnnx_noda_nominal_10_LLP_min1,chain.llpdnnx_noda_nominal_10_LLP_min2,chain.llpdnnx_noda_nominal_10_LLP_min3,chain.llpdnnx_noda_nominal_10_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_100_LLP_min0,chain.llpdnnx_noda_nominal_100_LLP_min1,chain.llpdnnx_noda_nominal_100_LLP_min2,chain.llpdnnx_noda_nominal_100_LLP_min3,chain.llpdnnx_noda_nominal_100_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_1000_LLP_min0,chain.llpdnnx_noda_nominal_1000_LLP_min1,chain.llpdnnx_noda_nominal_1000_LLP_min2,chain.llpdnnx_noda_nominal_1000_LLP_min3,chain.llpdnnx_noda_nominal_1000_LLP_min4],
-                    [chain.llpdnnx_noda_nominal_10000_LLP_min0,chain.llpdnnx_noda_nominal_10000_LLP_min1,chain.llpdnnx_noda_nominal_10000_LLP_min2,chain.llpdnnx_noda_nominal_10000_LLP_min3,chain.llpdnnx_noda_nominal_10000_LLP_min4],
-                ]))
-            
-            selectedEvents["ht"].append(
-                chain.nominal_ht
-            )
-            selectedEvents["pt"].append(
-                chain.selectedJets_nominal_pt[0]
-            )
-            selectedEvents["njets"].append(
-                chain.nselectedJets_nominal
-            )
-            selectedEvents["mht"].append(
-                chain.nominal_mht
-            )
-            selectedEvents["weights"].append(
-                chain.genweight*weight
-            )
-
-    selectedEvents["tagger"] = numpy.stack(selectedEvents["tagger"],axis=0)
-    selectedEvents["ht"] = numpy.array(selectedEvents["ht"],dtype=numpy.float64)
-    selectedEvents["pt"] = numpy.array(selectedEvents["pt"],dtype=numpy.float64)
-    selectedEvents["mht"] = numpy.array(selectedEvents["mht"],dtype=numpy.float64)
-    selectedEvents["njets"] = numpy.array(selectedEvents["njets"],dtype=numpy.float64)
-    selectedEvents["weights"] = numpy.array(selectedEvents["weights"],dtype=numpy.float64)
-
-    #numpy.savez(fileName,**selectedEvents)
-
-    return selectedEvents
-    
-#selectedEvents["weights"] = numpy.ones(selectedEvents["weights"].shape)
-    
-def makePlot(array,varIndex,htThres,ht=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
-    cv = ROOT.TCanvas("cv"+str(varIndex)+str(random.random()),"",800,600)
-    cv.Divide(2,3,0,0)
-    for i in range(6):
-        cv.GetPad(i+1).SetPad(0.,0.,1.,1.)
-        cv.GetPad(i+1).SetFillStyle(4000)
-        cv.GetPad(i+1).SetMargin(
-            0.1 if i<3 else 0.58, #left
-            0.55 if i<3 else 0.03, #right
-            0.12+0.25*(i%3), #bottom
-            1-(0.11+0.25*(i%3)+0.25) #top
-        )
-        cv.GetPad(i+1).SetLogy(1)
-        
-    icv = 1
-    
-    rootObj = []
-    #print varIndex,array["ht"].shape,min(array["ht"]),max(array["ht"])
-    for sel,tagger in [
-        ((array["ht"]>htThres)*(array["njets"]<4.5),array["tagger_noda"][:,varIndex,1]),
-        ((array["ht"]>htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),array["tagger_noda"][:,varIndex,1]),
-        ((array["ht"]>htThres)*(array["njets"]>5.5),array["tagger_noda"][:,varIndex,1]),
-        ((array["ht"]<htThres)*(array["njets"]<4.5),array["tagger_noda"][:,varIndex,1]),
-        ((array["ht"]<htThres)*(array["njets"]<5.5)*(array["njets"]>4.5),array["tagger_noda"][:,varIndex,1]),
-        ((array["ht"]<htThres)*(array["njets"]>5.5),array["tagger_noda"][:,varIndex,2]),
-    ]:
-        #print sel.shape
-        cv.cd(icv)
-        
-        hist = ROOT.TH1F("hist"+str(icv)+str(random.random()),"",50,0,1)
-        
-        rootObj.append(hist)
-        val = tagger[sel]
-        #print icv,len(val)
-        weight = array["weights"][sel]*36000.
-        for ival in range(val.shape[0]):
-            hist.Fill(val[ival],weight[ival])
-        #hist.Draw("HIST")
-        
-        s = 0.
-        histSum = ROOT.TH1F("histSum"+str(icv)+str(random.random()),"",50,0,1)
-        rootObj.append(histSum)
-        for ibin in reversed(range(hist.GetNbinsX())):
-            s+=hist.GetBinContent(ibin+1)
-            histSum.SetBinContent(ibin+1,s)
-        #histSum.Draw("L")
-        histSum.SetLineColor(ROOT.kOrange+7)
-        
-        axis = ROOT.TH2F("axis"+str(icv)+str(random.random()),"",50,0.,1.,50,0.1,40.)
-        if (icv%3)!=2:
-            axis.GetXaxis().SetLabelSize(0)
-            axis.GetXaxis().SetTitleSize(0)
-        rootObj.append(axis)
-        axis.Draw("AXIS")
-        histSum.Draw("SAMEL")
-        
-        
-        icv+=1
-        
-        
-    cv.Print("hist_"+str(varIndex)+".pdf")
-    
         
 def getThreholds(array,varIndex,htThres,ht=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
-    cut = ht(array["ht"])*mht(array["mht"])*njets(array["njets"])
-    tagger1Selected = array["tagger_noda"][cut,varIndex,0]
-    tagger2Selected = array["tagger_noda"][cut,varIndex,1]
-    tagger3Selected = array["tagger_noda"][cut,varIndex,2]
-    tagger4Selected = array["tagger_noda"][cut,varIndex,3]
     
-    njetsSelected = array["njets"][cut]
+    njetsSelected = array["njets"]
 
     def getWpByEv(sel,ntag,nev):
-        taggerSelected = array["tagger_noda"][sel,varIndex,ntag]
-        taggerSelectedSortedIndices = numpy.argsort(taggerSelected)
-        taggerSelectedSorted = taggerSelected[taggerSelectedSortedIndices]       
-        weightsSorted = (36000.*array["weights"][sel])[taggerSelectedSortedIndices]
-        '''
-        for i in reversed(range(len(weightsSorted))):
-            if i>0 and weightsSorted[i]<0:
-                weightsSorted[i-1] += weightsSorted[i]
-                weightsSorted[i] = 0.
-        '''
-        weightsSortedCumu = numpy.cumsum(weightsSorted)
-        weightsSortedCumuNorm = weightsSortedCumu[-1]-weightsSortedCumu
+        tagger = array["tagger_noda"][sel,varIndex,ntag]
+        weight = 36000.*array["weights"][sel] 
+        taggerSortIndices = numpy.argsort(tagger)
+        taggerSorted = tagger[taggerSortIndices]
+        weightSorted = weight[taggerSortIndices]
+        weightSortedCumSum = numpy.cumsum(weightSorted)
+        weightSortedCumSum = weightSortedCumSum[-1]-weightSortedCumSum
         
-        foundThres = []
-        for i in range(len(weightsSortedCumuNorm)):
-            #if taggerSelectedSorted[i-1]<0.3:
-            #    continue
-            if i>1 and weightsSortedCumuNorm[i]<nev and weightsSortedCumuNorm[i-1]>nev:
-                foundThres.append(taggerSelectedSorted[i-1])
-        print foundThres
-        return foundThres[-1]
+        thresholds = []
+        for i in range(len(taggerSorted)):
+            if weightSortedCumSum[i]<nev and weightSortedCumSum[i-1]>nev:
+                print "[",taggerSorted[i],weightSortedCumSum[i],"]",
+                thresholds.append(taggerSorted[i-1])
+        print 
+        return thresholds[-1]
                 
-        #wp = taggerSelectedSorted[numpy.argmin(numpy.abs(weightsSortedCumu-weightsSortedCumu[-1]+nev))-1]#+10**-5
-        #return wp
         
-    def getWpMax(sel,ntag,nev):
-        taggerSelected = array["tagger"][sel,varIndex,ntag]
-        taggerSelectedSortedIndices = numpy.argsort(taggerSelected)
-        taggerSelectedSorted = taggerSelected[taggerSelectedSortedIndices]  
-        return taggerSelectedSorted[-1]+(1.-taggerSelectedSorted[-1])*0.8
-        
-             
-        #weightsSortedCumu = numpy.cumsum((36000.*array["weights"][sel])[taggerSelectedSortedIndices])
-        #wp = taggerSelectedSorted[numpy.argmin(numpy.abs(weightsSortedCumu-weightsSortedCumu[-1]+nev))]+10**-5
-        #return wp
-        
-        
-    def getWpByFrac(sel,ntag,frac):
-        taggerSelected = array["tagger"][sel,varIndex,ntag]
-        taggerSelectedSortedIndices = numpy.argsort(taggerSelected)
-        taggerSelectedSorted = taggerSelected[taggerSelectedSortedIndices]       
-        weightsSortedCumu = numpy.cumsum((36000.*array["weights"][sel])[taggerSelectedSortedIndices])
-        wp = taggerSelectedSorted[numpy.argmin(numpy.abs(weightsSortedCumu-weightsSortedCumu[-1]*(1-frac)))]+10**-5
-        return wp
-    
-    
-        
-    wpT = 1.#tagger2SelectedSorted[numpy.argmin(numpy.abs(weights2SortedCumu-weights2SortedCumu[-1]+200))]+10**-5
-    
-    bestHt = -1
-    wpM = -1
-    bestDiff = 1000
+    def getEvByWp(sel,ntag,thres):
+        tagger = array["tagger_noda"][sel,varIndex,ntag]
+        weight = 36000.*array["weights"][sel] 
+        weightSelected = weight[tagger>thres]
+        weightSum = numpy.sum(weightSelected)
+        return weightSum,len(weightSelected)
+
 
     nEv = 3.
+    print "="*100
+    wpM = min([
+        getWpByEv((array["ht"]>800.)*(array["njets"]<4.5),1,nEv),
+        getWpByEv((array["ht"]>800.)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
+        getWpByEv((array["ht"]>800.)*(array["njets"]>5.5),2,nEv),
+        getWpByEv((array["ht"]<800.)*(array["njets"]<4.5),1,nEv),
+        getWpByEv((array["ht"]<800.)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
+        getWpByEv((array["ht"]<800.)*(array["njets"]>5.5),2,nEv)
+    ])
+    print "-"*100
+    print "%1.4f"%wpM
+    print "-"*100 
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]>800.)*(array["njets"]<4.5),1,wpM)),
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]>800.)*(array["njets"]<5.5)*(array["njets"]>4.5),1,wpM)),
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]>800.)*(array["njets"]>5.5),2,wpM))
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]<800.)*(array["njets"]<4.5),1,wpM)),
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]<800.)*(array["njets"]<5.5)*(array["njets"]>4.5),1,wpM)),
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]<800.)*(array["njets"]>5.5),2,wpM))
+    print
     
-    
-    wpM = min(
-        getWpByEv((array["ht"]>1000.)*(array["njets"]<4.5),0,nEv),
-        getWpByEv((array["ht"]>1000.)*(array["njets"]<5.5)*(array["njets"]>4.5),0,nEv),
-        getWpByEv((array["ht"]>1000.)*(array["njets"]>5.5),1,nEv),
-        getWpByEv((array["ht"]<1000.)*(array["njets"]<4.5),1,nEv),
-        getWpByEv((array["ht"]<1000.)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
-        getWpByEv((array["ht"]<1000.)*(array["njets"]>5.5),2,nEv)
-    )
-    
-    
-    #wpM = getWpMax(cut*(array["ht"]<htThres)*(array["njets"]>5.5),2,nEv)
-    #wpM = getWpByEv((array["ht"]<htThres)*(array["njets"]>5.5),2,5)
-    
-    #wpM = getWpByFrac(cut,0,0.06)
-    #wpM = getWpByEv(cut,3,5)
-    
-    
-   
-    print bestHt,wpM#,numpy.sum(array["weights"][cut*(array["tagger"][cut,varIndex,0]>wpM)])/numpy.sum(array["weights"][cut])
-    
-    selectedWeights = numpy.stack([36000.*array["weights"][cut],tagger1Selected,tagger2Selected,tagger3Selected,tagger4Selected],axis=0)
-    
-    N = 0
     
     '''
-    for t in [3,5,6]:
-        if t==3:
-            for m in [2]:
-                cutTagger=(njetsSelected>=2.5)*(njetsSelected<4.5)
-                if m==2:
-                    cutTagger*=(selectedWeights[2]>wpM)
-                #elif m==3:
-                #    cutTagger*=(selectedWeights[3]>wpM)
-                sel = 36000.*selectedWeights[0,cutTagger]
-                print "%8s  %8s   "%(
-                    str(m)+"m"+str(t)+"t",""
-                ),
-        elif t==5:
-            for m in [2]:
-                cutTagger=(njetsSelected>4.5)*(njetsSelected<5.5)
-                if m==2:
-                    cutTagger*=(selectedWeights[2]>wpM)
-                sel = 36000.*selectedWeights[0,cutTagger]
-                print "%8s  %8s   "%(
-                    str(m)+"m"+str(t)+"t",""
-                ),
-        elif t==6:
-            for m in [3]:
-                cutTagger=(njetsSelected>5.5)
-                if m==3:
-                    cutTagger*=(selectedWeights[3]>wpM)
-                sel = 36000.*selectedWeights[0,cutTagger]
-                print "%8s  %8s   "%(
-                    str(m)+"m"+str(t)+"t",""
-                ),
-    
-                  
-            
+    wpM = min([
+        getWpByEv((array["ht"]>800.)*(array["njets"]<4.5),1,nEv),
+        getWpByEv((array["ht"]>800.)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
+        getWpByEv((array["ht"]>800.)*(array["njets"]>5.5),2,nEv),
+        getWpByEv((array["ht"]<800.)*(array["njets"]<4.5),1,nEv),
+        getWpByEv((array["ht"]<800.)*(array["njets"]<5.5)*(array["njets"]>4.5),1,nEv),
+        getWpByEv((array["ht"]<800.)*(array["njets"]>5.5),2,nEv)
+    ])
+    print "-"*100
+    print "%1.4f"%wpM
+    print "-"*100 
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]>800.)*(array["njets"]<4.5),1,wpM)),
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]>800.)*(array["njets"]<5.5)*(array["njets"]>4.5),1,wpM)),
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]>800.)*(array["njets"]>5.5),2,wpM))
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]<800.)*(array["njets"]<4.5),1,wpM)),
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]<800.)*(array["njets"]<5.5)*(array["njets"]>4.5),1,wpM)),
+    print "%6.1f (%6.1f)  "%(getEvByWp((array["ht"]<800.)*(array["njets"]>5.5),2,wpM))
+    print
     '''
-        
-    #print selectedWeights.shape[1],N
 
-    return {"m":wpM,"t":wpT}
+    return wpM
     
 
     
     
-def applyThreshold(array,thresholds,varIndex,ht=lambda x:x>-1,mht=lambda x:x>-1,njets=lambda x:x>-1):
-    cut = numpy.logical_and(numpy.logical_and(ht(array["ht"]),mht(array["mht"])),njets(array["njets"]))
-    tagger1Selected = array["tagger_noda"][cut,varIndex,0]
-    tagger2Selected = array["tagger_noda"][cut,varIndex,1]
-    tagger3Selected = array["tagger_noda"][cut,varIndex,2]
-    tagger4Selected = array["tagger_noda"][cut,varIndex,3]
-    
-    njetsSelected = array["njets"][cut]
-    htSelected = array["ht"][cut]
-    
-    selectedWeights = 36000.*array["weights"][cut] #numpy.stack([,tagger1Selected,tagger2Selected,tagger3Selected,tagger4Selected],axis=0)
-    
-    
-    for sel in [
-        (htSelected>1000.)*(njetsSelected>2.5)*(njetsSelected<4.5)*(tagger1Selected>thresholds['m']),
-        (htSelected>1000.)*(njetsSelected>3.5)*(njetsSelected<5.5)*(tagger1Selected>thresholds['m']),
-        (htSelected>1000.)*(njetsSelected>5.5)*(tagger2Selected>thresholds['m'])
-    ]:
-        print "%8.1f (%8i)  "%(
-            numpy.sum(selectedWeights[sel]),len(selectedWeights[sel])
-        ),
-    print
-    
-    for sel in [
-        (htSelected<1000.)*(njetsSelected>2.5)*(njetsSelected<4.5)*(tagger2Selected>thresholds['m']),
-        (htSelected<1000.)*(njetsSelected>3.5)*(njetsSelected<5.5)*(tagger2Selected>thresholds['m']),
-        (htSelected<1000.)*(njetsSelected>5.5)*(tagger3Selected>thresholds['m'])
-    ]:
-        print "%8.1f (%8i)  "%(
-            numpy.sum(selectedWeights[sel]),len(selectedWeights[sel])
-        ),
-    print
-     
         
     
 def selectionSR(chain):
@@ -951,64 +580,22 @@ def selectionSRArray(chain):
           *((chain["nominal_mht"].array()/chain["nominal_met"].array())<1.25)\
           *(chain["nominal_minPhi"].array()>0.2)
     return sel
-    
-def selectionSingleMuon(chain):
-    if chain.nselectedJets_nominal<2:
-        return False
-    if chain.nominal_mht<300:
-        return False
-    #if chain.nominal_mht/chain.nominal_met>1.25:
-    #    return False
-    #if chain.nominal_minPhi<0.2:
-    #    return False
-    
-    if chain.nvetoElectrons>0 or chain.nvetoMuons>0:
-        return False
-    if chain.nominal_met<150.:
-        return False
-    if chain.ntightMuons!=1:
-        return False
-    return True
-    
-def selectionDiMuon(chain):
-    if chain.nselectedJets_nominal<2:
-        return False
-    if chain.nominal_mht<300:
-        return False
-    
-    #if chain.nominal_mht/chain.nominal_met>1.25:
-    #    return False
-    #if chain.nominal_minPhi<0.2:
-    #    return False
-    
-    if chain.nvetoElectrons>0 or chain.nvetoMuons>0:
-        return False
-    if chain.ntightMuons!=2:
-        return False
-    if chain.muonsys_mass<10:
-        return False
-    return True
+
+def selectionDimuonCR(chain):
+    return (chain["nselectedJets_nominal"].array()>1.5)\
+           *(chain["nvetoFwdJets_nominal"].array()<0.5)\
+           *(chain["IsoMuTrigger_flag"].array()>0.5)\
+           *(chain["nvetoElectrons"].array()>0.5)\
+           *(chain["nvetoMuons"].array()>0.5)\
+           *(chain["ntightMuons"].array()==2)\
+           *(chain["nvetoMuons"].array()>0.5)\
+           *(chain["muonsys_mass"].array()>10.)
     
 processDictSR = getProcessDict("/vols/cms/mkomm/LLP/NANOX_MC_new_SR")
-#processDictCR = getProcessDict("/vols/cms/mkomm/LLP/NANOX_CR")
+processDictCR = getProcessDict("/vols/cms/mkomm/LLP/NANOX_MC_new_CR")
 
-llArray = []
 
-'''
-for ctau in ["0p01","0p1","1","10","100","1000","10000"]:
-    llArray.append([
-        createArrayLL("thresholdDict_ll%s_uncompressed_noda.npz"%ctau,processDictSR,2000,200,0.101e-02,[
-            "SMS-T1qqqq_ctau-%s_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"%ctau,
-            #"SMS-T1qqqq_ctau-%s_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extra"%ctau
-        ],preselection=selectionSR,da=False),
-        createArrayLL("thresholdDict_ll%s_compressed_noda.npz"%ctau,processDictSR,1600,1400,0.157e-01,[
-            "SMS-T1qqqq_ctau-%s_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"%ctau,
-            #"SMS-T1qqqq_ctau-%s_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_extra"%ctau
-        ],preselection=selectionSR,da=False)
-    ])
-'''
-
-bkgArray = createArrayFast("thresholdDict_SR_new.npz",processDictSR,[
+mcArraySR = createArrayFast("thresholdDict_SR_new.npz",processDictSR,[
     "DYJetsToNuNu_PtZ-50To100_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
     "DYJetsToNuNu_PtZ-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
     "DYJetsToNuNu_PtZ-250To400_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
@@ -1025,6 +612,23 @@ bkgArray = createArrayFast("thresholdDict_SR_new.npz",processDictSR,[
     "WToLNu_2J_13TeV-amcatnloFXFX-pythia8",
 ],preselection=selectionSR)
 
+mcArrayDimuonCR = createArrayFast("thresholdDict_dimuonCR_mc_new.npz",processDictCR,[
+    "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
+    "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
+    "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8",
+],preselection=selectionDimuonCR)
+
+dataArrayDimuonCR = createArrayFast("thresholdDict_dimuonCR_data_new.npz",processDictCR,[
+    "SingleMuon_Run2016B-03Feb2017_ver2-v2",
+    "SingleMuon_Run2016C-03Feb2017-v1",
+    "SingleMuon_Run2016D-03Feb2017-v1",
+    "SingleMuon_Run2016D-03Feb2017-v1",
+    "SingleMuon_Run2016E-03Feb2017-v1",
+    "SingleMuon_Run2016F-03Feb2017-v1",
+    "SingleMuon_Run2016G-03Feb2017-v1",
+    "SingleMuon_Run2016H-03Feb2017_ver2-v1",
+    "SingleMuon_Run2016H-03Feb2017_ver3-v1"
+],preselection=selectionDimuonCR,isData=True)
 
 
     
@@ -1047,38 +651,12 @@ ctauSymbol=[
     ["c#tau#kern[-0.5]{ }=#kern[-0.5]{ }10#kern[-0.5]{ }m","10000"],
 ]
 
-for varIndex in range(bkgArray["tagger_noda"].shape[1]):
-    print "-"*60
-    #print "var",i,"no ht"
-    #getThreholds(i,ht=-1)
-    
-    htThres = 900.
-    
-    #if varIndex>=6:
-    #    htThres = 800.
-    
+for varIndex in range(mcArraySR["tagger_noda"].shape[1]):
+    print "-"*60.
     print "var",varIndex,ctauSymbol[varIndex][1]
     
-    thresholds = getThreholds(bkgArray,varIndex,htThres)
-    
-    makePlot(bkgArray,varIndex,htThres)
-    
-    print "="*100
-    applyThreshold(bkgArray,thresholds,varIndex)
-    #applyThreshold(llArray[varIndex][0],thresholds,varIndex)
-    #applyThreshold(llArray[varIndex][1],thresholds,varIndex)
-    '''
-    print "="*100
-        
-    applyThreshold(bkgArray,thresholds,varIndex,ht=lambda x:x>htThres)
-    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x>htThres)
-    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x>htThres)
-    print "-"*100
-    
-    applyThreshold(bkgArray,thresholds,varIndex,ht=lambda x:x<htThres)
-    #applyThreshold(llArray[varIndex][0],thresholds,varIndex,ht=lambda x:x<htThres)
-    #applyThreshold(llArray[varIndex][1],thresholds,varIndex,ht=lambda x:x<htThres)
-    '''
+    thresholds = getThreholds(mcArraySR,varIndex,htThres)
+
 
     
     

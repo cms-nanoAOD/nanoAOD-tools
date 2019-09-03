@@ -23,7 +23,6 @@ class TaggerEvaluation(Module):
         predictionLabels = ["B","C","UDS","G","LLP"], #this is how the output array from TF is interpreted
         logctauValues = range(-3,5),
         globalOptions = {"isData":False},
-        saveOutput = False
     ):
         self.globalOptions = globalOptions
         self.inputCollections = inputCollections
@@ -33,7 +32,6 @@ class TaggerEvaluation(Module):
         
         self.modelPath = modelPath
         self.taggerName = taggerName
-        self.saveOutput = saveOutput
  
     def beginJob(self):
         pass
@@ -44,6 +42,7 @@ class TaggerEvaluation(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
         self.setup(inputTree)
+                
 
     def setupTFEval(self,tree,modelFile,featureDict):
         print "Building TFEval object"
