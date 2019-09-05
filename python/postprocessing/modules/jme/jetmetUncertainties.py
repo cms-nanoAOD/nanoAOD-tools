@@ -35,10 +35,9 @@ class jetmetUncertaintiesProducer(Module):
                 self.jerUncertaintyInputFileName = "Fall17_V3_MC_SF_" + jetType + ".txt"
 
         #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
-        if jmrVals != "":
-            self.jmrVals = jmrVals
-        else:
-            print "WARNING: jmrVals is empty!!! This module will soon be deprecated! Please use jetmetHelperRun2 in the future."
+        self.jmrVals = jmrVals
+        if not self.jmrVals:
+            print "WARNING: jmrVals is empty!!! Using default values. This module will soon be deprecated! Please use jetmetHelperRun2 in the future."
             self.jmrVals = [1.0, 1.2, 0.8] #nominal, up, down
             # Use 2017 values for 2018 until 2018 are released
             if self.era in ["2017","2018"]:
@@ -73,10 +72,9 @@ class jetmetUncertaintiesProducer(Module):
         self.lenVar = "n" + self.jetBranchName
 
         #jet mass scale
-        if jmsVals != "":
-            self.jmsVals = jmsVals
-        else:
-            print "WARNING: jmsVals is empty!!! This module will soon be deprecated! Please use jetmetHelperRun2 in the future."
+        self.jmsVals = jmsVals
+        if not self.jmsVals:
+            print "WARNING: jmsVals is empty!!! Using default values! This module will soon be deprecated! Please use jetmetHelperRun2 in the future."
             #2016 values 
             self.jmsVals = [1.00, 0.9906, 1.0094] #nominal, down, up
             # Use 2017 values for 2018 until 2018 are released
