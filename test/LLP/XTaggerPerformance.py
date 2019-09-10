@@ -114,7 +114,7 @@ analyzerChain.append(
 
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/retraining_no_da.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/noda_nominal_nopp.pb",
         inputCollections=[
             lambda event: event.selectedJets
         ],
@@ -129,12 +129,9 @@ analyzerChain.append(
         predictionLabels = ["LLP", "B"],
     )
 )
-
-
-
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/retraining_da.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/da_nominal_noexp_nopp.pb",
         inputCollections=[
             lambda event: event.selectedJets,
         ],

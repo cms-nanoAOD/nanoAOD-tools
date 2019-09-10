@@ -126,8 +126,8 @@ analyzerChain.append(
 
 analyzerChain.append(
     EventSkim(selection=lambda event: 
-        #event.nominal_met>150. and event.nominal_met<250.
-        event.nominal_met>150.
+        event.nominal_met>150. and event.nominal_met<250.
+        #event.nominal_met>150.
     )
 )
 
@@ -145,7 +145,7 @@ analyzerChain.append(
     )
 )
 
-    
+
 
 
 p=PostProcessor(

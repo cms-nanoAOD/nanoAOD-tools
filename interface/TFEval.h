@@ -55,14 +55,7 @@ class TFEval
                 virtual float value(int64_t jetIndex, int64_t batchIndex) const
                 {
                     if (std::isnan(_branch->At(jetIndex)) or std::isinf(_branch->At(jetIndex))){
-                        // hard-coded, remove this ASAP
-                        //
-                        if (strcmp(_branch->GetBranchName(), "legacyTag_median_trackSip2dSig") == 0)
-                        {
-                            return -6.;
-                        }
-                        std::cout << "Nan/inf entry found in branch " << _branch->GetBranchName() << std::endl;
-                        throw std::runtime_error("Aborting");
+                        return 0.;
                     }
 
                     return _branch->At(jetIndex);

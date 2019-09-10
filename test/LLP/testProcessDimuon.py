@@ -74,12 +74,14 @@ muonSelection = [
     EventSkim(selection=lambda event: event.nvetoElectrons==0),
     EventSkim(selection=lambda event: event.IsoMuTrigger_flag==1),
     
+    '''
     InvariantSystem(
         inputCollection = lambda event: event.tightMuons,
         outputName = "dimuon",
     ),
     
     EventSkim(selection=lambda event: event.dimuon_mass>=50. and math.fabs(event.dimuon_mass-90.)>15),
+    '''
     
 ]
 
@@ -126,7 +128,7 @@ analyzerChain.append(
 
 analyzerChain.append(
     EventObservables(
-        jetInputCollection = lambda event: event.selectedJets_nominal,
+        jetCollection = lambda event: event.selectedJets_nominal,
         metInput = lambda event: Object(event,"MET"),
         outputName = "nominal",
     )
