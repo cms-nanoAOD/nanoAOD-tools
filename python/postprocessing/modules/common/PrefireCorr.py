@@ -121,3 +121,7 @@ class PrefCorr(Module):
         pref_prob = max(pref_prob - math.sqrt(stat*stat + syst*syst), 0.0)
       return pref_prob
 
+
+
+PrefCorr2016 = lambda : PrefCorr(jetroot="L1prefiring_jetpt_2016BtoH.root", jetmapname="L1prefiring_jetpt_2016BtoH", photonroot="L1prefiring_photonpt_2016BtoH.root", photonmapname="L1prefiring_photonpt_2016BtoH")
+PrefCorr2017 = lambda : PrefCorr()

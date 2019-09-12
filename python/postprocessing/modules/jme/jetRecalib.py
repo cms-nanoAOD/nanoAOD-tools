@@ -136,10 +136,10 @@ jetRecalib2017CAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017C_V32_DATA","Fall
 jetRecalib2017DEAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017DE_V32_DATA","Fall17_17Nov2017_V32_DATA", jetType="AK8PFPuppi")
 jetRecalib2017FAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017F_V32_DATA","Fall17_17Nov2017_V32_DATA",jetType="AK8PFPuppi")
 
-jetRecalib2018A = lambda : jetRecalib("Autumn18_RunA_V8_DATA","Autumn18_V8_DATA",redoJEC = True)
-jetRecalib2018B = lambda : jetRecalib("Autumn18_RunB_V8_DATA","Autumn18_V8_DATA",redoJEC = True)
-jetRecalib2018C = lambda : jetRecalib("Autumn18_RunC_V8_DATA","Autumn18_V8_DATA",redoJEC = True)
-jetRecalib2018D = lambda : jetRecalib("Autumn18_RunD_V8_DATA","Autumn18_V8_DATA",redoJEC = True)
+jetRecalib2018A = lambda : jetRecalib("Autumn18_RunA_V16_DATA","Autumn18_RunA_V16_DATA",redoJEC = True)
+jetRecalib2018B = lambda : jetRecalib("Autumn18_RunB_V16_DATA","Autumn18_RunB_V16_DATA",redoJEC = True)
+jetRecalib2018C = lambda : jetRecalib("Autumn18_RunC_V16_DATA","Autumn18_RunC_V16_DATA",redoJEC = True)
+jetRecalib2018D = lambda : jetRecalib("Autumn18_RunD_V16_DATA","Autumn18_RunD_V16_DATA",redoJEC = True)
 
 jetRecalib2018AAK8Puppi = lambda : jetRecalib("Autumn18_RunA_V8_DATA","Autumn18_V8_DATA",jetType="AK8PFPuppi",redoJEC = True)
 jetRecalib2018BAK8Puppi = lambda : jetRecalib("Autumn18_RunB_V8_DATA","Autumn18_V8_DATA",jetType="AK8PFPuppi",redoJEC = True)

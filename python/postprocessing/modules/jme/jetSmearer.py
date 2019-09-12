@@ -185,6 +185,7 @@ class jetSmearer(Module):
                 #
                 # Case 2: we don't have a generator level jet. Smear jet m using a random Gaussian variation
                 #
+                jet_m_resolution = self.jer.getResolution(self.params_resolution)
                 sigma = jet_m_resolution*math.sqrt(jet_m_sf_and_uncertainty[central_or_shift]**2 - 1.)
                 smearFactor = self.rnd.Gaus(1., sigma)
             else:

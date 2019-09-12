@@ -79,6 +79,15 @@ class btagSFProducer(Module):
                     },
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 },
+                '2016' : {
+                    'inputFileName' : "DeepCSV_2016LegacySF_V1.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
                 '2017' : {
                     'inputFileName' : "DeepCSV_94XSF_V2_B_F.csv",
                     'measurement_types' : {
@@ -335,5 +344,6 @@ class btagSFProducer(Module):
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-btagSF2016 = lambda : btagSFProducer("2016")
+btagSF2016 = lambda : btagSFProducer("2016", 'deepcsv')
 btagSF2017 = lambda : btagSFProducer("2017")
+btagSF2018 = lambda : btagSFProducer("2018", 'deepcsv')

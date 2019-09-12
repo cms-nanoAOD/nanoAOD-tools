@@ -13,6 +13,7 @@ class puWeightProducer(Module):
             self.targeth_plus = self.loadHisto(targetfile,targethist+"_plus")
             self.targeth_minus = self.loadHisto(targetfile,targethist+"_minus")
         self.fixLargeWeights = True # temporary fix
+        #self.fixLargeWeights = False # temporary fix
 	if myfile != "auto" :
 		self.autoPU=False
 	        self.myh = self.loadHisto(myfile,myhist)
@@ -78,6 +79,7 @@ class puWeightProducer(Module):
                 weight_plus = self._worker_plus.getWeight(nvtx) if nvtx < self.myh.GetNbinsX() else 1
                 weight_minus = self._worker_minus.getWeight(nvtx) if nvtx < self.myh.GetNbinsX() else 1
         else: weight = 1
+        #print "fill branch", nvtx, self.myh.GetNbinsX(), weight, self._worker.getWeight(nvtx)#, weight_plus, weight_minus
         self.out.fillBranch(self.name,weight)
         if self.doSysVar:
             self.out.fillBranch(self.name+"Up",weight_plus)
@@ -93,7 +95,7 @@ puAutoWeight_2016 = lambda : puWeightProducer("auto", pufile_data2016,"pu_mc","p
 
 pufile_data2017="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/puData2017_withVar.root" % os.environ['CMSSW_BASE']
 pufile_mc2017="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/mcPileup2017.root" % os.environ['CMSSW_BASE']
-puWeight_2017 = lambda : puWeightProducer(pufile_mc2017,pufile_data2017,"pu_mc","pileup",verbose=False, doSysVar=True)
+puWeight_2017 = lambda : puWeightProducer(pufile_mc2017,pufile_data2017,"pu_mc","pileup",verbose=False, doSysVar=True) 
 puAutoWeight_2017 = lambda : puWeightProducer("auto",pufile_data2017,"pu_mc","pileup",verbose=False)
 
 pufile_data2018="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/puData2018_withVar.root" % os.environ['CMSSW_BASE']

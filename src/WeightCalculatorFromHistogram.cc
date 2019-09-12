@@ -13,19 +13,24 @@ WeightCalculatorFromHistogram::WeightCalculatorFromHistogram(TH1 *hist, TH1* tar
     }
     histogram_ = ratio(hist,targethist,fixLargeWeights);
   }
+
 }
 
 float WeightCalculatorFromHistogram::getWeight(float x, float y) const {
+    if(verbose_)std::cout << "DEBUG  getWeight 1 "<< " \t " << x<< " \t " << y<< std::endl;
   if(histogram_==NULL) {
     std::cout << "ERROR! The weights input histogram is not loaded. Returning weight 0!" << std::endl;
     return 0.;
   }
   if(!histogram_->InheritsFrom("TH2")) {
     int bin = std::max(1, std::min(histogram_->GetNbinsX(), histogram_->GetXaxis()->FindBin(x)));
+     if(verbose_) std::cout << "DEBUG  getWeight 2 "<< " \t " << x<< " \t " << y<< " \t " << histogram_->Integral() << " \t " << histogram_->GetName()<< " \t " << histogram_  << " \t " << histogram_->GetBinContent(bin)<< std::endl;
     return histogram_->GetBinContent(bin);
   } else {
+      
     int binx = std::max(1, std::min(histogram_->GetNbinsX(), histogram_->GetXaxis()->FindBin(x)));
     int biny = std::max(1, std::min(histogram_->GetNbinsY(), histogram_->GetYaxis()->FindBin(y)));
+    if(verbose_)std::cout << "DEBUG  getWeight 3 "<< x << " \t " <<  y << " \t " << histogram_->GetName()<< " \t " << histogram_  << histogram_->Integral() << " \t " << histogram_->GetBinContent(binx,biny)<< std::endl;
     return histogram_->GetBinContent(binx,biny);
   }
 }
@@ -58,6 +63,7 @@ std::vector<float> WeightCalculatorFromHistogram::loadVals(TH1 *hist, bool norm)
     float scale = 1.0/hist->Integral();
     for(int i=0; i<nbins; ++i) vals[i] *= scale;
   }
+  if(verbose_) std::cout << "DEBUG Normalization of " << hist->GetName() << ": " << vals[0]  << std::endl;
   return vals;
 }
 
@@ -90,6 +96,7 @@ float WeightCalculatorFromHistogram::checkIntegral(std::vector<float> wgt1, std:
   float myint=0;
   float refint=0;
   for(int i=0; i<(int)wgt1.size(); ++i) {
+    if(verbose_) std::cout << "i " << i << " \t " << myint << " \t " << refint << std::endl;
     myint += wgt1[i]*refvals_[i];
     refint += wgt2[i]*refvals_[i];
   }
@@ -98,9 +105,12 @@ float WeightCalculatorFromHistogram::checkIntegral(std::vector<float> wgt1, std:
 
 void WeightCalculatorFromHistogram::fixLargeWeights(std::vector<float> &weights, float maxshift,float hardmax) {
   float maxw = std::min(*(std::max_element(weights.begin(),weights.end())),float(5.));
+  if(verbose_) std::cout << "DEBUG fixLargeWeights 1  " << maxshift << " \t " << hardmax << " \t" << maxw << std::endl;
   std::vector<float> cropped;
   while (maxw > hardmax) {
+    cropped.clear();
     for(int i=0; i<(int)weights.size(); ++i) cropped.push_back(std::min(maxw,weights[i]));
+//     if(verbose_) std::cout << "DEBUG fixLargeWeights 2  " << maxshift << " \t " << hardmax << " \t" << maxw << std::endl;
     float shift = checkIntegral(cropped,weights);
     if(verbose_) std::cout << "For maximum weight " << maxw << ": integral relative change: " << shift << std::endl;
     if(fabs(shift) > maxshift) break;
