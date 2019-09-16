@@ -18,10 +18,10 @@ Tools for working with NanoAOD (requiring only python + root, not CMSSW)
     - [ ] MET maker (MET cleaner) (SiewYan)
     - [ ] Derived/analysis-specific Variable compute (need to declare in variables.py) (SiewYan + Matteo)
     - [ ] Trigger maker ? (SiewYan+Matteo)
-    - [ ] Data folder hosting variable, SF, WP (SiewYan)
-    - [ ] Plotting (kinda taking care of...) (SiewYan)
-    - [ ] Making datacard (Matteo)
-    - [ ] Using combine limit (SiewYan)
+ - [ ] Data folder hosting variable, SF, WP (SiewYan)
+ - [ ] Plotting (kinda taking care of...) (SiewYan)
+ - [ ] Making datacard (Matteo)
+ - [ ] Using combine limit (SiewYan)
 
 ## Checkout instructions: standalone
 
