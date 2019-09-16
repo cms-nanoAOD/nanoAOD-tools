@@ -74,6 +74,8 @@ class FullOutput(OutputTree):
             branchSelection=None,
             outputbranchSelection=None,
             fullClone=False,
+            maxEntries=None,
+            firstEntry=0,
             provenance=False,
             jsonFilter=None
     ):
@@ -85,7 +87,7 @@ class FullOutput(OutputTree):
             outputbranchSelection.selectBranches(inputTree)
 
         if fullClone:
-            outputTree = inputTree.CopyTree('1')
+            outputTree = inputTree.CopyTree('1', "", maxEntries if maxEntries else ROOT.TVirtualTreePlayer.kMaxEntries, firstEntry)
         else:            
             outputTree = inputTree.CloneTree(0)
             
@@ -104,11 +106,10 @@ class FullOutput(OutputTree):
             if kn == "Events":
                 continue # this we are doing
             elif kn in ("MetaData", "ParameterSets"):
-                print "provenance = ", provenance
-                if provenance: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1')
+                if provenance: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1' if firstEntry == 0 else '0') # treat content of other trees as if associated to event 0
             elif kn in ("LuminosityBlocks", "Runs"):
-                if not jsonFilter: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1')
-                else:
+                if not jsonFilter: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1' if firstEntry == 0 else '0')
+                elif firstEntry == 0:
                     _isRun = (kn=="Runs")
                     _it = inputFile.Get(kn)
                     _ot = _it.CloneTree(0)
