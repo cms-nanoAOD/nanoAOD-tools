@@ -53,7 +53,14 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer_v2 im
 #p=PostProcessor(".",["root://cms-xrd-global.cern.ch//store/mc/RunIIFall17NanoAODv5/GluGluHToMuMu_M125_TuneCP5_PSweights_13TeV_amcatnloFXFX_pythia8/NANOAODSIM/PU2017_12Apr2018_Nano1June2019_102X_mc2017_realistic_v7-v1/60000/C8F6A654-D0BC-1A41-A375-6836E9A6D580.root"],"Jet_pt>25 && Muon_pt > 9 && Entry$ < 100",modules=[jetmetUncertainties2017AK4PuppiAll(), btagSF2017(), muonScaleRes2017(), PrefCorr2017(), puWeight_2017(), lepSFTrig2017(), lepSFID2017(), lepSFISO2017(), vbfhmmModule2017()],provenance=True)
 
 
-p=PostProcessor(".",["/afs/cern.ch/user/g/gimandor/public/Hmumu/nanoAODtest/CMSSW_9_4_6/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_nanoV5_2017.root"],"Jet_pt>25 && Muon_pt > 9 && Entry$ < 100",modules=[jetmetUncertainties2017AK4PuppiAll(), btagSF2017(), muonScaleRes2017(), PrefCorr2017(), puAutoWeight_2017(), lepSFTrig2017(), lepSFID2017(), lepSFISO2017(), vbfhmmModule2017()],provenance=True)
+#p=PostProcessor(".",["/afs/cern.ch/user/g/gimandor/public/Hmumu/nanoAODtest/CMSSW_9_4_6/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_nanoV5_2017.root"],"Jet_pt>25 && Muon_pt > 9 && Entry$ < 10000",modules=[jetmetUncertainties2017All(), btagSF2017(), muonScaleRes2017(), PrefCorr2017(), puAutoWeight_2017(), lepSFTrig2017(), lepSFID2017(), lepSFISO2017(), vbfhmmModule2017()],provenance=True)
+
+
+#p=PostProcessor(".",["/afs/cern.ch/user/g/gimandor/private/Hmumu/nanoAODtest/CMSSW_9_4_6/WWTo2L2Nu_DoubleScattering_2017_part1_nanoV4.root"],"Jet_pt>25 && Muon_pt > 9 && Entry$ < 100000",modules=[jetmetUncertainties2017All(), btagSF2017(), muonScaleRes2017(), PrefCorr2017(), puWeight_2017(), lepSFTrig2017(), lepSFID2017(), lepSFISO2017(), vbfhmmModule2017()],provenance=True)
+p=PostProcessor(".",["/afs/cern.ch/user/g/gimandor/public/Hmumu/nanoAODtest/CMSSW_9_4_6/WWTo2L2Nu_DoubleScattering_2017_nanoV5.root"],"Jet_pt>25 && Muon_pt > 9 && Entry$ < 100000",modules=[jetmetUncertainties2017All(), btagSF2017(), muonScaleRes2017(), PrefCorr2017(), puWeight_2017(), lepSFTrig2017(), lepSFID2017(), lepSFISO2017(), vbfhmmModule2017()],provenance=True)
+
+
+#p=PostProcessor(".",["/afs/cern.ch/user/g/gimandor/public/Hmumu/nanoAODtest/CMSSW_9_4_6/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_nanoV5_2017.root"],"Jet_pt>25 && Muon_pt > 9 && Entry$ < 10000",modules=[jetmetUncertainties2017AK4PuppiAll(), btagSF2017(), muonScaleRes2017(), PrefCorr2017(), puAutoWeight_2017(), lepSFTrig2017(), lepSFID2017(), lepSFISO2017(), vbfhmmModule2017()],provenance=True)
 #p=PostProcessor(".",["/afs/cern.ch/user/g/gimandor/public/Hmumu/nanoAODtest/CMSSW_9_4_6/EWK_LLJJ_MLL-50_MJJ-120_TuneCH3_PSweights_13TeV-madgraph-herwig7_nanoV4_2017.root"],"Jet_pt>25 && Muon_pt > 9",modules=[jetmetUncertainties2017AK4PuppiAll(), btagSF2017(), muonScaleRes2017(), PrefCorr2017(), puAutoWeight_2017(), lepSFTrig2017(), lepSFID2017(), lepSFISO2017(), vbfhmmModule2017()],provenance=True)
 
 

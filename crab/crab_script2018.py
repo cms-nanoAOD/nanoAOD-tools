@@ -19,7 +19,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.PrefireCorr import 
 
 
 
-p=PostProcessor(".",inputFiles(), "Jet_pt>15 && Muon_pt > 9", modules=[jetmetUncertainties2018AK4PuppiAll(), btagSF2018(), muonScaleRes2018(), puAutoWeight_2018(), lepSFTrig2018(), lepSFID2018(), lepSFISO2018(), vbfhmmModule2018()], provenance=True,fwkJobReport=True,jsonInput=runsAndLumis()) 
+p=PostProcessor(".",inputFiles(), "Jet_pt>15 && Muon_pt > 9", modules=[jetmetUncertainties2018All(), btagSF2018(), muonScaleRes2018(), puAutoWeight_2018(), lepSFTrig2018(), lepSFID2018(), lepSFISO2018(), vbfhmmModule2018()], provenance=True,fwkJobReport=True,jsonInput=runsAndLumis()) 
 
 #p=PostProcessor(".",inputFiles(), "Jet_pt>15 && Muon_pt > 9", modules=[jetRecalib2018A(), muonScaleRes2018(), vbfhmmModuleDATA()], provenance=True,fwkJobReport=True,jsonInput=runsAndLumis()) 
 #p=PostProcessor(".",inputFiles(), "Jet_pt>15 && Muon_pt > 9", modules=[jetRecalib2018B(), muonScaleRes2018(), vbfhmmModuleDATA()], provenance=True,fwkJobReport=True,jsonInput=runsAndLumis()) 
