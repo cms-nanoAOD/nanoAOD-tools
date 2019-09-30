@@ -10,7 +10,7 @@ from PhysicsTools.NanoAODTools.postprocessing.tools import matchObjectCollection
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetSmearer
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
-class slimmed_jetmetUncertaintiesProducer(Module):
+class jetmetUncertaintiesProducer(Module):
     def __init__(self, era, globalTag, archive=None, globalTagProd=None,  jesUncertainties = [ "Total" ], jetType = "AK4PFchs", metBranchName="MET", redoJEC=False, noGroom=False, jerTag="", jmrVals = [], jmsVals = [], isData=False):
 
         # globalTagProd only needs to be defined if METFixEE2017 is to be recorrected, and should be the GT that was used for the production of the nanoAOD files
