@@ -4,8 +4,6 @@ import numpy as np
 import itertools
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
-from termcolor import colored
-
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.tools import matchObjectCollection, matchObjectCollectionMultiple
@@ -172,7 +170,6 @@ class slimmed_jetmetUncertaintiesProducer(Module):
     
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
-        print colored(("Next event:", event.event, event.luminosityBlock), 'green')
         jets      = Collection(event, self.jetBranchName )
         nJet      = event.nJet
         lowPtJets = Collection(event, "CorrT1METJet" ) if self.isV5NanoAOD else []
