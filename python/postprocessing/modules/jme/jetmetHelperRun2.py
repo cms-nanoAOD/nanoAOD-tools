@@ -8,11 +8,11 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetRecalib import *
 # JEC dict
 jecTagsMC = {'2016' : 'Summer16_07Aug2017_V11_MC', 
              '2017' : 'Fall17_17Nov2017_V32_MC', 
-             '2018' : 'Autumn18_V8_MC'}
+             '2018' : 'Autumn18_V19_MC'}
 
 archiveTagsDATA = {'2016' : 'Summer16_07Aug2017_V11_DATA', 
                    '2017' : 'Fall17_17Nov2017_V32_DATA', 
-                   '2018' : 'Autumn18_V8_DATA'
+                   '2018' : 'Autumn18_V19_DATA'
                   }
 
 jecTagsDATA = { '2016B' : 'Summer16_07Aug2017BCD_V11_DATA', 
@@ -27,15 +27,15 @@ jecTagsDATA = { '2016B' : 'Summer16_07Aug2017BCD_V11_DATA',
                 '2017D' : 'Fall17_17Nov2017DE_V32_DATA', 
                 '2017E' : 'Fall17_17Nov2017DE_V32_DATA', 
                 '2017F' : 'Fall17_17Nov2017F_V32_DATA', 
-                '2018A' : 'Autumn18_RunA_V8_DATA',
-                '2018B' : 'Autumn18_RunB_V8_DATA',
-                '2018C' : 'Autumn18_RunC_V8_DATA',
-                '2018D' : 'Autumn18_RunD_V8_DATA',
+                '2018A' : 'Autumn18_RunA_V19_DATA',
+                '2018B' : 'Autumn18_RunB_V19_DATA',
+                '2018C' : 'Autumn18_RunC_V19_DATA',
+                '2018D' : 'Autumn18_RunD_V19_DATA',
                 } 
 
 jerTagsMC = {'2016' : 'Summer16_25nsV1_MC',
              '2017' : 'Fall17_V3_MC',
-             '2018' : 'Fall17_V3_MC'
+             '2018' : 'Autumn18_V7_MC'
             }
 
 #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
@@ -53,7 +53,15 @@ jmsValues = { '2016' : [1.00, 0.9906, 1.0094], #nominal, down, up
               '2018' : [0.982, 0.978, 0.986] # Use 2017 values for 2018 until 2018 are released
             }
 
-def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total", redojec=False, jetType = "AK4PFchs", noGroom=False):
+def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total", redojec=False, jetType = "AK4PFchs", noGroom=False, doPUPPIMassCorr=False, doWTagMassRes=False):
+
+    # Remove once updated!
+    if (doPUPPIMassCorr or doWTagMassRes) and dataYear == 2018:
+        print "========================================"
+        print "========================================"
+        print "WARNING: VALUES ARE NOT UPDATED FOR 2018"
+        print "========================================"
+        print "========================================"
     
     jecTag_ = jecTagsMC[dataYear] if isMC else jecTagsDATA[dataYear + runPeriod]
 
@@ -70,9 +78,9 @@ def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total
     jmeCorrections = None
     #jme corrections
     if isMC:
-        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jerTag=jerTag_, jetType = jetType, noGroom = noGroom, jmrVals = jmrValues_, jmsVals = jmsValues_)
+        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jerTag=jerTag_, jetType = jetType, noGroom = noGroom, jmrVals = jmrValues_, jmsVals = jmsValues_, doWTagMassRes=doWTagMassRes)
     else:
-        jmeCorrections = lambda : jetRecalib(globalTag=jecTag_, archive=archiveTag[dataYear], jetType=jetType, redojec=redojec)
+        jmeCorrections = lambda : jetRecalib(globalTag=jecTag_, archive=archiveTagsDATA[dataYear], jetType=jetType, redoJEC=redojec, doPUPPIMassCorr=doPUPPIMassCorr)
     return jmeCorrections
 
 

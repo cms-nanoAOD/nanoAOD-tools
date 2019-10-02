@@ -10,11 +10,13 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetS
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
 class jetmetUncertaintiesProducer(Module):
-    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False, jerTag="", jmrVals = [], jmsVals = []):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False, doWTagMassRes=False, jerTag="", jmrVals = [], jmsVals = []):
 
         self.era = era
         self.redoJEC = redoJEC
         self.noGroom = noGroom
+        self.doWTagMassRes = doWTagMassRes
+        
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used in the jet smearer, as there is no consistent set of 
         #     txt files for JES uncertainties and JER scale factors and uncertainties yet
@@ -30,9 +32,12 @@ class jetmetUncertaintiesProducer(Module):
             if era == "2016":
                 self.jerInputFileName = "Summer16_25nsV1_MC_PtResolution_" + jetType + ".txt"
                 self.jerUncertaintyInputFileName = "Summer16_25nsV1_MC_SF_" + jetType + ".txt"
-            elif era == "2017" or era == "2018": # use Fall17 as temporary placeholder until post-Moriond 2019 JERs are out
+            elif era == "2017": 
                 self.jerInputFileName = "Fall17_V3_MC_PtResolution_" + jetType + ".txt"
                 self.jerUncertaintyInputFileName = "Fall17_V3_MC_SF_" + jetType + ".txt"
+            elif era == "2018": 
+                self.jerInputFileName = "Autumn18_V7_MC_PtResolution_" + jetType + ".txt"
+                self.jerUncertaintyInputFileName = "Autumn18_V7_MC_SF_" + jetType + ".txt"
 
         #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
         self.jmrVals = jmrVals
@@ -347,7 +352,12 @@ class jetmetUncertaintiesProducer(Module):
             jmsNomVal = self.jmsVals[0]
             jmsDownVal = self.jmsVals[1]
             jmsUpVal = self.jmsVals[2]
-            ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = self.jetSmearer.getSmearValsM(jet, genJet)
+            if self.doWTagMassRes:
+                # Only do this correction if WTagging is used
+                ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = self.jetSmearer.getSmearValsM(jet, genJet)
+            else:
+                # For all standard application use the previously derived pt factors for the mass
+                ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal )
             jets_corr_JMS   .append(jmsNomVal)
             jets_corr_JMR   .append(jet_mass_jmrNomVal)
 
@@ -549,8 +559,8 @@ jetmetUncertainties2016All = lambda : jetmetUncertaintiesProducer("2016", "Summe
 jetmetUncertainties2017 = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "Total" ])
 jetmetUncertainties2017All = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "All" ], redoJEC=True)
 
-jetmetUncertainties2018 = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ])
-jetmetUncertainties2018All = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "All" ], redoJEC=True)
+jetmetUncertainties2018 = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC", [ "Total" ])
+jetmetUncertainties2018All = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC", [ "All" ], redoJEC=True)
 
 jetmetUncertainties2016AK4Puppi = lambda : jetmetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", [ "Total" ], jetType="AK4PFPuppi")
 jetmetUncertainties2016AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC",  [ "All" ], jetType="AK4PFPuppi")
@@ -558,8 +568,8 @@ jetmetUncertainties2016AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2016"
 jetmetUncertainties2017AK4Puppi = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "Total" ], jetType="AK4PFPuppi")
 jetmetUncertainties2017AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC",  [ "All" ], jetType="AK4PFPuppi")
 
-jetmetUncertainties2018AK4Puppi = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ], jetType="AK4PFPuppi")
-jetmetUncertainties2018AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC",  [ "All" ], jetType="AK4PFPuppi")
+jetmetUncertainties2018AK4Puppi = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC", [ "Total" ], jetType="AK4PFPuppi")
+jetmetUncertainties2018AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC",  [ "All" ], jetType="AK4PFPuppi")
 
 
 jetmetUncertainties2016AK8Puppi = lambda : jetmetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", [ "Total" ], jetType="AK8PFPuppi")
@@ -570,5 +580,5 @@ jetmetUncertainties2016AK8PuppiAllNoGroom = lambda : jetmetUncertaintiesProducer
 jetmetUncertainties2017AK8Puppi = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "Total" ], jetType="AK8PFPuppi")
 jetmetUncertainties2017AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", ["All"], jetType="AK8PFPuppi")
 
-jetmetUncertainties2018AK8Puppi = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ], jetType="AK8PFPuppi")
-jetmetUncertainties2018AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", ["All"], jetType="AK8PFPuppi",redoJEC = True)
+jetmetUncertainties2018AK8Puppi = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC", [ "Total" ], jetType="AK8PFPuppi")
+jetmetUncertainties2018AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC", ["All"], jetType="AK8PFPuppi",redoJEC = True)

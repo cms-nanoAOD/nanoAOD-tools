@@ -9,12 +9,14 @@ from PhysicsTools.NanoAODTools.postprocessing.tools import matchObjectCollection
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
 class jetRecalib(Module):
-    def __init__(self,  globalTag, archive, jetType = "AK4PFchs", redoJEC=False):
-
+    def __init__(self,  globalTag, archive, jetType = "AK4PFchs", redoJEC=False, doPUPPIMassCorr=False):
+        
+        self.doPUPPIMassCorr = doPUPPIMassCorr
         self.redoJEC = redoJEC
 
         if "AK4" in jetType : 
             self.jetBranchName = "Jet"
+            self.subJetBranchName = None
         elif "AK8" in jetType :
             self.jetBranchName = "FatJet"
             self.subJetBranchName = "SubJet"
@@ -23,12 +25,17 @@ class jetRecalib(Module):
         self.rhoBranchName = "fixedGridRhoFastjetAll"
         self.lenVar = "n" + self.jetBranchName        
 
+        if self.subJetBranchName is None:
+            self.doSubJetCorrection = False
+        else:
+            self.doSubJetCorrection = True
+        
         self.jesInputArchivePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
         # Text files are now tarred so must extract first into temporary directory (gets deleted during python memory management at script exit)
         self.jesArchive = tarfile.open(self.jesInputArchivePath+archive+".tgz", "r:gz")
         self.jesInputFilePath = tempfile.mkdtemp()
-        self.jesArchive.extractall(self.jesInputFilePath)
 
+        self.jesArchive.extractall(self.jesInputFilePath)
         self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
 	
         # load libraries for accessing JES scale factors and uncertainties from txt files
@@ -37,10 +44,13 @@ class jetRecalib(Module):
                 print("Load Library '%s'" % library.replace("lib", ""))
                 ROOT.gSystem.Load(library)
 
-        self.puppiCorrFile = ROOT.TFile.Open(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/puppiCorr.root")
-        self.puppisd_corrGEN = self.puppiCorrFile.Get("puppiJECcorr_gen")
-        self.puppisd_corrRECO_cen = self.puppiCorrFile.Get("puppiJECcorr_reco_0eta1v3")
-        self.puppisd_corrRECO_for = self.puppiCorrFile.Get("puppiJECcorr_reco_1v3eta2v5")
+        if self.doPUPPIMassCorr:
+            self.puppiCorrFile = ROOT.TFile.Open(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/puppiCorr.root")
+            self.puppisd_corrGEN = self.puppiCorrFile.Get("puppiJECcorr_gen")
+            self.puppisd_corrRECO_cen = self.puppiCorrFile.Get("puppiJECcorr_reco_0eta1v3")
+            self.puppisd_corrRECO_for = self.puppiCorrFile.Get("puppiJECcorr_reco_1v3eta2v5")
+        else:
+            self.puppiCorrFile, self.puppisd_corrGEN, self.puppisd_corrRECO_cen, self.puppisd_corrRECO_for = None, None, None, None
 
     def beginJob(self):
 	pass
@@ -67,9 +77,13 @@ class jetRecalib(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         jets = Collection(event, self.jetBranchName )
-        subJets = Collection(event, self.subJetBranchName )
         met = Object(event, "MET") 
 
+        if self.doSubJetCorrection:
+            subJets = Collection(event, self.subJetBranchName )
+
+
+            
         jets_pt_raw = []
         jets_pt_nom = []
         jets_mass_raw = []
@@ -120,35 +134,44 @@ class jetRecalib(Module):
                 met_py_nom = met_py_nom - (jet_pt_nom - jet.pt)*jet_sinPhi
 
             # Do PUPPI SD mass correction
-            if jet.subJetIdx1 >= 0 and jet.subJetIdx2 >= 0 :
-                groomedP4 = subJets[ jet.subJetIdx1 ].p4() + subJets[ jet.subJetIdx2].p4() #check subjet jecs
-            else : groomedP4 = None
+            if self.doPUPPIMassCorr:
+                if jet.subJetIdx1 >= 0 and jet.subJetIdx2 >= 0 :
+                    groomedP4 = subJets[ jet.subJetIdx1 ].p4() + subJets[ jet.subJetIdx2].p4() #check subjet jecs
+                else : groomedP4 = None
 
-            jets_msoftdrop_raw.append(0.0) if groomedP4 == None else jets_msoftdrop_raw.append(groomedP4.M())
+                jets_msoftdrop_raw.append(0.0) if groomedP4 == None else jets_msoftdrop_raw.append(groomedP4.M())
 
-            puppisd_genCorr = self.puppisd_corrGEN.Eval(jet.pt)
-            if abs(jet.eta) <= 1.3: puppisd_recoCorr = self.puppisd_corrRECO_cen.Eval(jet.pt)
-            else: puppisd_recoCorr = self.puppisd_corrRECO_for.Eval(jet.pt)
+                puppisd_genCorr = self.puppisd_corrGEN.Eval(jet.pt)
+                if abs(jet.eta) <= 1.3: puppisd_recoCorr = self.puppisd_corrRECO_cen.Eval(jet.pt)
+                else: puppisd_recoCorr = self.puppisd_corrRECO_for.Eval(jet.pt)
 
-            puppisd_total = puppisd_genCorr * puppisd_recoCorr
-            if groomedP4 != None:
-                groomedP4.SetPtEtaPhiM(groomedP4.Perp(), groomedP4.Eta(), groomedP4.Phi(), groomedP4.M()*puppisd_total)
+                puppisd_total = puppisd_genCorr * puppisd_recoCorr
+                if groomedP4 != None:
+                    groomedP4.SetPtEtaPhiM(groomedP4.Perp(), groomedP4.Eta(), groomedP4.Phi(), groomedP4.M()*puppisd_total)
 
-            jets_groomed_corr_PUPPI.append(puppisd_total)
-            jets_msoftdrop_nom.append(0.0) if groomedP4 == None else jets_msoftdrop_nom.append(groomedP4.M())
-
-
+                jets_groomed_corr_PUPPI.append(puppisd_total)
+                jets_msoftdrop_nom.append(0.0) if groomedP4 == None else jets_msoftdrop_nom.append(groomedP4.M())
+            else:
+                jets_groomed_corr_PUPPI.append(-1.0)
+                jets_msoftdrop_raw.append(-1.0)
+                jets_msoftdrop_nom.append(-1.0)
+                
+        #Fill regular Jet output branches
         self.out.fillBranch("%s_pt_raw" % self.jetBranchName, jets_pt_raw)
         self.out.fillBranch("%s_pt_nom" % self.jetBranchName, jets_pt_nom)
         self.out.fillBranch("%s_mass_raw" % self.jetBranchName, jets_mass_raw)
         self.out.fillBranch("%s_mass_nom" % self.jetBranchName, jets_mass_nom)
+        self.out.fillBranch("%s_corr_JEC" % self.jetBranchName, jets_corr_JEC)
+
+        # Fill PUPPI branches
         self.out.fillBranch("%s_groomed_corr_PUPPI" % self.jetBranchName, jets_groomed_corr_PUPPI)
         self.out.fillBranch("%s_msoftdrop_raw" % self.jetBranchName, jets_msoftdrop_raw)
         self.out.fillBranch("%s_msoftdrop_nom" % self.jetBranchName, jets_msoftdrop_nom)
+
+        #Fill MET output branches
         self.out.fillBranch("MET_pt_nom", math.sqrt(met_px_nom**2 + met_py_nom**2))
         self.out.fillBranch("MET_phi_nom", math.atan2(met_py_nom, met_px_nom))        
-        self.out.fillBranch("%s_corr_JEC" % self.jetBranchName, jets_corr_JEC)
-
+        
         return True
 
 
@@ -157,26 +180,26 @@ jetRecalib2016BCD = lambda : jetRecalib("Summer16_07Aug2017BCD_V11_DATA","Summer
 jetRecalib2016EF = lambda : jetRecalib("Summer16_07Aug2017EF_V11_DATA","Summer16_07Aug2017_V11_DATA")
 jetRecalib2016GH = lambda : jetRecalib("Summer16_07Aug2017GH_V11_DATA","Summer16_07Aug2017_V11_DATA")
 
-jetRecalib2016BCDAK8Puppi = lambda : jetRecalib("Summer16_07Aug2017BCD_V11_DATA","Summer16_07Aug2017_V11_DATA", jetType="AK8PFPuppi")
-jetRecalib2016EFAK8Puppi = lambda : jetRecalib("Summer16_07Aug2017EF_V11_DATA","Summer16_07Aug2017_V11_DATA", jetType="AK8PFPuppi")
-jetRecalib2016GHAK8Puppi = lambda : jetRecalib("Summer16_07Aug2017GH_V11_DATA","Summer16_07Aug2017_V11_DATA",jetType="AK8PFPuppi")
+jetRecalib2016BCDAK8Puppi = lambda : jetRecalib("Summer16_07Aug2017BCD_V11_DATA","Summer16_07Aug2017_V11_DATA", jetType="AK8PFPuppi", doPUPPIMassCorr=True)
+jetRecalib2016EFAK8Puppi = lambda : jetRecalib("Summer16_07Aug2017EF_V11_DATA","Summer16_07Aug2017_V11_DATA", jetType="AK8PFPuppi", doPUPPIMassCorr=True)
+jetRecalib2016GHAK8Puppi = lambda : jetRecalib("Summer16_07Aug2017GH_V11_DATA","Summer16_07Aug2017_V11_DATA",jetType="AK8PFPuppi", doPUPPIMassCorr=True)
 
 jetRecalib2017B = lambda : jetRecalib("Fall17_17Nov2017B_V32_DATA","Fall17_17Nov2017_V32_DATA")
 jetRecalib2017C = lambda : jetRecalib("Fall17_17Nov2017C_V32_DATA","Fall17_17Nov2017_V32_DATA")
 jetRecalib2017DE = lambda : jetRecalib("Fall17_17Nov2017DE_V32_DATA","Fall17_17Nov2017_V32_DATA")
 jetRecalib2017F = lambda : jetRecalib("Fall17_17Nov2017F_V32_DATA","Fall17_17Nov2017_V32_DATA")
 
-jetRecalib2017BAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017B_V32_DATA","Fall17_17Nov2017_V32_DATA",jetType="AK8PFPuppi")
-jetRecalib2017CAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017C_V32_DATA","Fall17_17Nov2017_V32_DATA",jetType="AK8PFPuppi")
-jetRecalib2017DEAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017DE_V32_DATA","Fall17_17Nov2017_V32_DATA", jetType="AK8PFPuppi")
-jetRecalib2017FAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017F_V32_DATA","Fall17_17Nov2017_V32_DATA",jetType="AK8PFPuppi")
+jetRecalib2017BAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017B_V32_DATA","Fall17_17Nov2017_V32_DATA",jetType="AK8PFPuppi", doPUPPIMassCorr=True)
+jetRecalib2017CAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017C_V32_DATA","Fall17_17Nov2017_V32_DATA",jetType="AK8PFPuppi", doPUPPIMassCorr=True)
+jetRecalib2017DEAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017DE_V32_DATA","Fall17_17Nov2017_V32_DATA", jetType="AK8PFPuppi", doPUPPIMassCorr=True)
+jetRecalib2017FAK8Puppi = lambda : jetRecalib("Fall17_17Nov2017F_V32_DATA","Fall17_17Nov2017_V32_DATA",jetType="AK8PFPuppi", doPUPPIMassCorr=True)
 
-jetRecalib2018A = lambda : jetRecalib("Autumn18_RunA_V8_DATA","Autumn18_V8_DATA",redoJEC = True)
-jetRecalib2018B = lambda : jetRecalib("Autumn18_RunB_V8_DATA","Autumn18_V8_DATA",redoJEC = True)
-jetRecalib2018C = lambda : jetRecalib("Autumn18_RunC_V8_DATA","Autumn18_V8_DATA",redoJEC = True)
-jetRecalib2018D = lambda : jetRecalib("Autumn18_RunD_V8_DATA","Autumn18_V8_DATA",redoJEC = True)
+jetRecalib2018A = lambda : jetRecalib("Autumn18_RunA_V19_DATA","Autumn18_V19_DATA",redoJEC = True)
+jetRecalib2018B = lambda : jetRecalib("Autumn18_RunB_V19_DATA","Autumn18_V19_DATA",redoJEC = True)
+jetRecalib2018C = lambda : jetRecalib("Autumn18_RunC_V19_DATA","Autumn18_V19_DATA",redoJEC = True)
+jetRecalib2018D = lambda : jetRecalib("Autumn18_RunD_V19_DATA","Autumn18_V19_DATA",redoJEC = True)
 
-jetRecalib2018AAK8Puppi = lambda : jetRecalib("Autumn18_RunA_V8_DATA","Autumn18_V8_DATA",jetType="AK8PFPuppi",redoJEC = True)
-jetRecalib2018BAK8Puppi = lambda : jetRecalib("Autumn18_RunB_V8_DATA","Autumn18_V8_DATA",jetType="AK8PFPuppi",redoJEC = True)
-jetRecalib2018CAK8Puppi = lambda : jetRecalib("Autumn18_RunC_V8_DATA","Autumn18_V8_DATA",jetType="AK8PFPuppi",redoJEC = True)
-jetRecalib2018DAK8Puppi = lambda : jetRecalib("Autumn18_RunD_V8_DATA","Autumn18_V8_DATA",jetType="AK8PFPuppi",redoJEC = True)
+jetRecalib2018AAK8Puppi = lambda : jetRecalib("Autumn18_RunA_V19_DATA","Autumn18_V19_DATA",jetType="AK8PFPuppi",redoJEC = True, doPUPPIMassCorr=True)
+jetRecalib2018BAK8Puppi = lambda : jetRecalib("Autumn18_RunB_V19_DATA","Autumn18_V19_DATA",jetType="AK8PFPuppi",redoJEC = True, doPUPPIMassCorr=True)
+jetRecalib2018CAK8Puppi = lambda : jetRecalib("Autumn18_RunC_V19_DATA","Autumn18_V19_DATA",jetType="AK8PFPuppi",redoJEC = True, doPUPPIMassCorr=True)
+jetRecalib2018DAK8Puppi = lambda : jetRecalib("Autumn18_RunD_V19_DATA","Autumn18_V19_DATA",jetType="AK8PFPuppi",redoJEC = True, doPUPPIMassCorr=True)
