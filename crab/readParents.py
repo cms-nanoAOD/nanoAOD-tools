@@ -1,6 +1,7 @@
 import sys
 from WMCore.Configuration import Configuration
 from CRABClient.UserUtilities import config, getUsernameFromSiteDB
+import subprocess
 
 config = Configuration()
 
@@ -100,35 +101,41 @@ if __name__ == '__main__':
         
         if not (dataset[0].startswith("/"))  : continue
         ext = ""
-        prod = str(dataset.split('/')[-1])
-        if prod.startswith("NANO")  : config.Data.inputDBS = 'global'
-        if prod == "USER" :           config.Data.inputDBS = 'phys03'
-        config.Data.inputDataset = dataset
-        config.Data.unitsPerJob = 1
+        
+        samples = subprocess.check_output('dasgoclient -query="parent dataset='+dataset+'"', shell=True).split('\n')
+        samples.pop()
+        for x in samples : 
+            print x
+        
+        #prod = str(dataset.split('/')[-1])
+        #if prod.startswith("NANO")  : config.Data.inputDBS = 'global'
+        #if prod == "USER" :           config.Data.inputDBS = 'phys03'
+        #config.Data.inputDataset = dataset
+        #config.Data.unitsPerJob = 1
 
 
-        requestName = dataset.split('/')[1]+"_"+version
-        if oldRequestName.startswith(requestName) :
-            ext = extentionPostname.pop()
-            requestName = requestName + ext
-            #print requestName
-        else :
-            extentionPostname = ["_ext10", "_ext9", "_ext8", "_ext7", "_ext6", "_ext5", "_ext4", "_ext3", "_ext2", "_ext1"]
-        oldRequestName = requestName
+        #requestName = dataset.split('/')[1]+"_"+version
+        #if oldRequestName.startswith(requestName) :
+            #ext = extentionPostname.pop()
+            #requestName = requestName + ext
+            ##print requestName
+        #else :
+            #extentionPostname = ["_ext10", "_ext9", "_ext8", "_ext7", "_ext6", "_ext5", "_ext4", "_ext3", "_ext2", "_ext1"]
+        #oldRequestName = requestName
         
-        if requestName.startswith("SingleMuon") : 
-            if era == "2016" : config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt'
-            if era == "2017" : config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'
-            if era == "2018" : config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt'
+        #if requestName.startswith("SingleMuon") : 
+            #if era == "2016" : config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt'
+            #if era == "2017" : config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'
+            #if era == "2018" : config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt'
         
 
-        #if requestName.startswith("SingleMuon") : data = "data"
-        #else : data = "MC"
-        #config.JobType.scriptArgs = [data, era]
+        ##if requestName.startswith("SingleMuon") : data = "data"
+        ##else : data = "MC"
+        ##config.JobType.scriptArgs = [data, era]
         
-        config.General.requestName = requestName
-        config.Data.outputDatasetTag = dataset.split('/')[2][:30]+"_"+version + ext
-        crabCommand('submit', config = config)
+        #config.General.requestName = requestName
+        #config.Data.outputDatasetTag = dataset.split('/')[2][:30]+"_"+version + ext
+        #crabCommand('submit', config = config)
         
         
         
