@@ -21,14 +21,17 @@ class jetmetUncertaintiesProducer(Module):
         #--------------------------------------------------------------------------------------------
 
         self.jesUncertainties = jesUncertainties
-
+        
         # smear jet pT to account for measured difference in JER between data and simulation.
         if era == "2016":
             self.jerInputFileName = "Summer16_25nsV1_MC_PtResolution_" + jetType + ".txt"
             self.jerUncertaintyInputFileName = "Summer16_25nsV1_MC_SF_" + jetType + ".txt"
-        elif era == "2017" or era == "2018": # use Fall17 as temporary placeholder until post-Moriond 2019 JERs are out
+        elif era == "2017": # use Fall17 as temporary placeholder until post-Moriond 2019 JERs are out
             self.jerInputFileName = "Fall17_V3_MC_PtResolution_" + jetType + ".txt"
             self.jerUncertaintyInputFileName = "Fall17_V3_MC_SF_" + jetType + ".txt"
+        elif era == "2018": ## (see https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1994.html)
+            self.jerInputFileName = "Autumn18_V7_MC_PtResolution_" + jetType + ".txt"
+            self.jerUncertaintyInputFileName = "Autumn18_V7_MC_SF_" + jetType + ".txt"
 
         #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
         if self.era == "2016" or self.era == "2018": #update when 2018 values available
@@ -81,7 +84,7 @@ class jetmetUncertaintiesProducer(Module):
             elif self.era == "2017":
                 self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V32_MC_Uncertainty_" + jetType + ".txt"
             elif self.era == "2018":
-                self.jesUncertaintyInputFileName = "Autumn18_V8_MC_Uncertainty_" + jetType + ".txt"
+                self.jesUncertaintyInputFileName = "Autumn18_V19_MC_Uncertainty_" + jetType + ".txt"
             else:
                 raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
         else:
@@ -90,7 +93,7 @@ class jetmetUncertaintiesProducer(Module):
             elif self.era == "2017":
                 self.jesUncertaintyInputFileName = "Fall17_17Nov2017_V32_MC_UncertaintySources_" + jetType + ".txt"
             elif self.era == "2018":
-                self.jesUncertaintyInputFileName = "Autumn18_V8_MC_UncertaintySources_" + jetType + ".txt"
+                self.jesUncertaintyInputFileName = "Autumn18_V19_MC_UncertaintySources_" + jetType + ".txt"
             else:
                 raise ValueError("ERROR: Invalid era = '%s'!" % self.era)
 
@@ -139,6 +142,7 @@ class jetmetUncertaintiesProducer(Module):
         self.out = wrappedOutputTree
         self.out.branch("%s_pt_raw" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_pt_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
+        self.out.branch("%s_pt_newJEC" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_mass_raw" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_mass_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_corr_JEC" % self.jetBranchName, "F", lenVar=self.lenVar)
@@ -196,6 +200,7 @@ class jetmetUncertaintiesProducer(Module):
             genSubJetMatcher = matchObjectCollectionMultiple( genJets, genSubJets, dRmax=0.8 )
             
 
+        jets_pt_newJEC = []
         jets_pt_raw = []
         jets_pt_nom = []
         jets_mass_raw = []
@@ -292,6 +297,7 @@ class jetmetUncertaintiesProducer(Module):
             jets_pt_raw.append(jet_rawpt)
             jets_mass_raw.append(jet_rawmass)
             jets_corr_JEC.append(jet_pt/jet_rawpt)
+            jets_pt_newJEC.append(jet_pt)
 
             # evaluate JER scale factors and uncertainties
             # (cf. https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution )
@@ -423,6 +429,7 @@ class jetmetUncertaintiesProducer(Module):
 
         self.out.fillBranch("%s_pt_raw" % self.jetBranchName, jets_pt_raw)
         self.out.fillBranch("%s_pt_nom" % self.jetBranchName, jets_pt_nom)
+        self.out.fillBranch("%s_pt_newJEC" % self.jetBranchName, jets_pt_newJEC)
         self.out.fillBranch("%s_corr_JEC" % self.jetBranchName, jets_corr_JEC)
         self.out.fillBranch("%s_corr_JER" % self.jetBranchName, jets_corr_JER)
         self.out.fillBranch("%s_pt_jerUp" % self.jetBranchName, jets_pt_jerUp)
@@ -490,8 +497,8 @@ jetmetUncertainties2016All = lambda : jetmetUncertaintiesProducer("2016", "Summe
 jetmetUncertainties2017 = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "Total" ])
 jetmetUncertainties2017All = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "All" ])
 
-jetmetUncertainties2018 = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ])
-jetmetUncertainties2018All = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "All" ])
+jetmetUncertainties2018 = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC", [ "Total" ], redoJEC=True)
+jetmetUncertainties2018All = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC", [ "All" ], redoJEC=True)
 
 jetmetUncertainties2016AK4Puppi = lambda : jetmetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", [ "Total" ], jetType="AK4PFPuppi")
 jetmetUncertainties2016AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC",  [ "All" ], jetType="AK4PFPuppi")
@@ -499,8 +506,8 @@ jetmetUncertainties2016AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2016"
 jetmetUncertainties2017AK4Puppi = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "Total" ], jetType="AK4PFPuppi")
 jetmetUncertainties2017AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC",  [ "All" ], jetType="AK4PFPuppi")
 
-jetmetUncertainties2018AK4Puppi = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ], jetType="AK4PFPuppi")
-jetmetUncertainties2018AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC",  [ "All" ], jetType="AK4PFPuppi")
+jetmetUncertainties2018AK4Puppi = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC", [ "Total" ], jetType="AK4PFPuppi", redoJEC=True)
+jetmetUncertainties2018AK4PuppiAll = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC",  [ "All" ], jetType="AK4PFPuppi", redoJEC=True)
 
 
 jetmetUncertainties2016AK8Puppi = lambda : jetmetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", [ "Total" ], jetType="AK8PFPuppi")
@@ -511,5 +518,5 @@ jetmetUncertainties2016AK8PuppiAllNoGroom = lambda : jetmetUncertaintiesProducer
 jetmetUncertainties2017AK8Puppi = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "Total" ], jetType="AK8PFPuppi")
 jetmetUncertainties2017AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", ["All"], jetType="AK8PFPuppi")
 
-jetmetUncertainties2018AK8Puppi = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ], jetType="AK8PFPuppi")
-jetmetUncertainties2018AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC", ["All"], jetType="AK8PFPuppi",redoJEC = True)
+jetmetUncertainties2018AK8Puppi = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC", [ "Total" ], jetType="AK8PFPuppi", redoJEC=True)
+jetmetUncertainties2018AK8PuppiAll = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V19_MC", ["All"], jetType="AK8PFPuppi", redoJEC = True)
