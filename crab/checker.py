@@ -33,7 +33,7 @@ def checkModuleSettings(moduleSettings,datamc,year,era):
     if len(year_) == 5:
         era_ = year_[4]
         year_ = year_[0:4]
-    if datamc_ == datamc and year_ == str(year) and era_ == era:
+    if datamc_ == datamc and year_ == str(year) and (era_ == era or era_ ==''):
         return True
     else:
         raise Exception("ERROR in checkModuleSettings(%s, %s, %s, %s)"%(moduleSettings,datamc,year,era))

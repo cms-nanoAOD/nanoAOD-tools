@@ -5,7 +5,7 @@ from CRABClient.UserUtilities import config, getUsernameFromSiteDB
 
 config = Configuration()
 
-version = "PROD_1_0"
+version = "PROD_1_1"
 
 datasetToTest = [] ## if empty, run on all datasets
 #datasetToTest = ['/DYJetsToLL_M-105To160_TuneCP5_PSweights_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM']
@@ -51,6 +51,7 @@ checkDatasets(["data2016", "mc2016", "data2017", "mc2017", "data2018", "mc2018"]
 
 from CRABAPI.RawCommand import crabCommand
 
+requestNames = set()
 if __name__ == '__main__':
     for datasets in [data2016, mc2016, data2017, mc2017, data2018, mc2018]:
         samples = datasets.keys()
@@ -65,10 +66,13 @@ if __name__ == '__main__':
                     config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'
                 if dataset == data2018 : 
                     config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt'
-                ext = ''
+		ext = ''
                 if "_ext" in dataset: 
                     ext = '_ext' + dataset.split("_ext")[1][0]
-                config.General.requestName = version + "_" + sample +  ext
+		requestName = version + "_" + sample +  ext
+		while requestName in requestNames:
+		    requestName = requestName+"_"	
+		config.General.requestName = requestName
                 config.Data.outputDatasetTag = version
                 print
                 print config.Data.inputDataset
