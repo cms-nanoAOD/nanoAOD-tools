@@ -1,6 +1,6 @@
 #!/bin/env python
 import ROOT
-from array import array
+import numpy
 import sys
 
 if len(sys.argv) < 3 :
