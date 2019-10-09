@@ -70,9 +70,9 @@ def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total
     jmeCorrections = None
     #jme corrections
     if isMC:
-        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jerTag=jerTag_, jetType = jetType, noGroom = noGroom, jmrVals = jmrValues_, jmsVals = jmsValues_)
+        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType)
     else:
-        jmeCorrections = lambda : jetRecalib(globalTag=jecTag_, archive=archiveTag[dataYear], jetType=jetType, redojec=redojec)
+        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, archive=archiveTag[dataYear], globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, isData=True)
     return jmeCorrections
 
 
