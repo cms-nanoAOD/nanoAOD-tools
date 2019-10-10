@@ -55,6 +55,7 @@ jmsValues = { '2016' : [1.00, 0.9906, 1.0094], #nominal, down, up
 
 def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total", redojec=False, jetType = "AK4PFchs", noGroom=False):
     
+    dataYear = str(dataYear)
     jecTag_ = jecTagsMC[dataYear] if isMC else jecTagsDATA[dataYear + runPeriod]
 
     jmeUncert_ = [x for x in jesUncert.split(",")]
@@ -65,6 +66,8 @@ def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total
 
     jmsValues_ = jmsValues[dataYear]
 
+    archiveTag_ = archiveTagsDATA[dataYear]
+  
     print 'JEC=', jecTag_, '\t JER=', jerTag_
 
     jmeCorrections = None
@@ -72,7 +75,7 @@ def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total
     if isMC:
         jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType)
     else:
-        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, archive=archiveTag[dataYear], globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, isData=True)
+        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, archive=archiveTag_, globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, isData=True)
     return jmeCorrections
 
 
