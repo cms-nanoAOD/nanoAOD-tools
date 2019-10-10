@@ -18,7 +18,7 @@ def checkDatasets(datasetsNames, variableDict):
                         if run in dataset: ok = True
                 elif datasetsName.startswith("mc"):
                     year = datasetsName[len("mc"):]
-                    if mcproduction[year] in dataset: ok = True
+                    if year in sample and mcproduction[year] in dataset: ok = True
                 if not ok: failures.append((datasetsName,sample,dataset))
     if len(failures)==0: 
         return True
