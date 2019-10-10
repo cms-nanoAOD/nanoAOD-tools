@@ -3,16 +3,16 @@ import os, sys
 import subprocess
 
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import *
-from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetRecalib import *
+from PhysicsTools.NanoAODTools.postprocessing.modules.jme.fatJetUncertainties import *
 
 # JEC dict
 jecTagsMC = {'2016' : 'Summer16_07Aug2017_V11_MC', 
              '2017' : 'Fall17_17Nov2017_V32_MC', 
-             '2018' : 'Autumn18_V8_MC'}
+             '2018' : 'Autumn18_V19_MC'}
 
 archiveTagsDATA = {'2016' : 'Summer16_07Aug2017_V11_DATA', 
                    '2017' : 'Fall17_17Nov2017_V32_DATA', 
-                   '2018' : 'Autumn18_V8_DATA'
+                   '2018' : 'Autumn18_V19_DATA'
                   }
 
 jecTagsDATA = { '2016B' : 'Summer16_07Aug2017BCD_V11_DATA', 
@@ -27,15 +27,16 @@ jecTagsDATA = { '2016B' : 'Summer16_07Aug2017BCD_V11_DATA',
                 '2017D' : 'Fall17_17Nov2017DE_V32_DATA', 
                 '2017E' : 'Fall17_17Nov2017DE_V32_DATA', 
                 '2017F' : 'Fall17_17Nov2017F_V32_DATA', 
-                '2018A' : 'Autumn18_RunA_V8_DATA',
-                '2018B' : 'Autumn18_RunB_V8_DATA',
-                '2018C' : 'Autumn18_RunC_V8_DATA',
-                '2018D' : 'Autumn18_RunD_V8_DATA',
+                '2018A' : 'Autumn18_RunA_V19_DATA',
+                '2018B' : 'Autumn18_RunB_V19_DATA',
+                '2018C' : 'Autumn18_RunC_V19_DATA',
+                '2018D' : 'Autumn18_RunD_V19_DATA',
                 } 
 
 jerTagsMC = {'2016' : 'Summer16_25nsV1_MC',
              '2017' : 'Fall17_V3_MC',
              '2018' : 'Fall17_V3_MC'
+             #'2018' : 'Autumn18_V7_MC' # new pt dependent JERs not yet working
             }
 
 #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
@@ -72,10 +73,19 @@ def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total
 
     jmeCorrections = None
     #jme corrections
-    if isMC:
-        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType)
+
+    if 'AK4' in jetType:
+      if isMC:
+          jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType)
+      else:
+          jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, archive=archiveTag_, globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, isData=True)
+    # no MET variations calculated
     else:
-        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, archive=archiveTag_, globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, isData=True)
+      if isMC:
+          jmeCorrections = lambda : fatJetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jetType = jetType, jerTag=jerTag_, jmrVals = jmrValues_, jmsVals = jmsValues_)
+      else:
+          jmeCorrections = lambda : fatJetUncertaintiesProducer(era=dataYear, archive=archiveTag_, globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jetType = jetType, isData=True)
+
     return jmeCorrections
 
 

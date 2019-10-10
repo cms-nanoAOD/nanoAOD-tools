@@ -9,12 +9,13 @@ from PhysicsTools.NanoAODTools.postprocessing.tools import matchObjectCollection
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetSmearer
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
-class jetUncertaintiesProducer(Module):
-    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], jetType = "AK4PFchs", redoJEC=False, noGroom=False, jerTag="", jmrVals = [], jmsVals = []):
+class fatJetUncertaintiesProducer(Module):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], archive=None, jetType = "AK4PFchs", redoJEC=False, noGroom=False, jerTag="", jmrVals = [], jmsVals = [], isData=False):
 
         self.era = era
         self.redoJEC = redoJEC
         self.noGroom = noGroom
+        self.isData = isData
         #--------------------------------------------------------------------------------------------
         # CV: globalTag and jetType not yet used in the jet smearer, as there is no consistent set of 
         #     txt files for JES uncertainties and JER scale factors and uncertainties yet
@@ -82,11 +83,10 @@ class jetUncertaintiesProducer(Module):
         # (downloaded from https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC )
         self.jesInputArchivePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/"
         # Text files are now tarred so must extract first into temporary directory (gets deleted during python memory management at script exit)
-        self.jesArchive = tarfile.open(self.jesInputArchivePath+globalTag+".tgz", "r:gz")
+        self.jesArchive = tarfile.open(self.jesInputArchivePath+globalTag+".tgz", "r:gz") if not archive else tarfile.open(self.jesInputArchivePath+archive+".tgz", "r:gz")
         self.jesInputFilePath = tempfile.mkdtemp()
         self.jesArchive.extractall(self.jesInputFilePath)
-        
-        
+
         if len(jesUncertainties) == 1 and jesUncertainties[0] == "Total":
             self.jesUncertaintyInputFileName = globalTag + "_Uncertainty_" + jetType + ".txt"
         else:
@@ -176,12 +176,14 @@ class jetUncertaintiesProducer(Module):
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
         jets = Collection(event, self.jetBranchName )
-        genJets = Collection(event, self.genJetBranchName )
+        if not self.isData:
+          genJets = Collection(event, self.genJetBranchName )
         
         if self.doGroomed :
             subJets = Collection(event, self.subJetBranchName )
-            genSubJets = Collection(event, self.genSubJetBranchName )
-            genSubJetMatcher = matchObjectCollectionMultiple( genJets, genSubJets, dRmax=0.8 )
+            if not self.isData:
+              genSubJets = Collection(event, self.genSubJetBranchName )
+              genSubJetMatcher = matchObjectCollectionMultiple( genJets, genSubJets, dRmax=0.8 )
         
         self.jetSmearer.setSeed(event)
         
@@ -244,7 +246,8 @@ class jetUncertaintiesProducer(Module):
         
         # match reconstructed jets to generator level ones
         # (needed to evaluate JER scale factors and uncertainties)
-        pairs = matchObjectCollection(jets, genJets)
+        if not self.isData:
+            pairs = matchObjectCollection(jets, genJets)
         
         for jet in jets:
             #jet pt and mass corrections
@@ -266,10 +269,13 @@ class jetUncertaintiesProducer(Module):
             jets_mass_raw.append(jet_rawmass)
             jets_corr_JEC.append(jet_pt/jet_rawpt)
             
-            genJet = pairs[jet]
-            if self.doGroomed:                
-                genGroomedSubJets = genSubJetMatcher[genJet] if genJet != None else None
-                genGroomedJet = genGroomedSubJets[0].p4() + genGroomedSubJets[1].p4() if genGroomedSubJets != None and len(genGroomedSubJets) >= 2 else None
+            if not self.isData:
+                genJet = pairs[jet]
+
+            if self.doGroomed:   
+                if not self.isData:
+                    genGroomedSubJets = genSubJetMatcher[genJet] if genJet != None else None
+                    genGroomedJet = genGroomedSubJets[0].p4() + genGroomedSubJets[1].p4() if genGroomedSubJets != None and len(genGroomedSubJets) >= 2 else None
                 if jet.subJetIdx1 >= 0 and jet.subJetIdx2 >= 0 :
                     groomedP4 = subJets[ jet.subJetIdx1 ].p4() + subJets[ jet.subJetIdx2].p4() #check subjet jecs
                 else :
@@ -289,7 +295,11 @@ class jetUncertaintiesProducer(Module):
             
             # evaluate JER scale factors and uncertainties
             # (cf. https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution )
-            ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
+            if not self.isData:
+                ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
+            else:
+                # set values to 1 for data so that jet_pt_nom is not smeared
+                ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = (1, 1, 1)
             jets_corr_JER.append(jet_pt_jerNomVal)
             
             jet_pt_nom           = jet_pt_jerNomVal *jet_pt
@@ -313,7 +323,11 @@ class jetUncertaintiesProducer(Module):
             jmsNomVal = self.jmsVals[0]
             jmsDownVal = self.jmsVals[1]
             jmsUpVal = self.jmsVals[2]
-            ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = self.jetSmearer.getSmearValsM(jet, genJet)
+            if not self.isData:
+                ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = self.jetSmearer.getSmearValsM(jet, genJet)
+            else:
+                # set values to 1 for data so that jet_mass_nom is not smeared
+                ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = (1, 1, 1)
             jets_corr_JMS   .append(jmsNomVal)
             jets_corr_JMR   .append(jet_mass_jmrNomVal)
 
@@ -329,121 +343,127 @@ class jetUncertaintiesProducer(Module):
             jets_mass_jmsDown.append(jet_pt_jerNomVal *jet_mass_jmrNomVal *jmsDownVal *jet_mass)
 
             if self.doGroomed :
-                # evaluate JES uncertainties
-                jet_msdcorr_jesUp   = {}
-                jet_msdcorr_jesDown = {}
-
-                # Evaluate JMS and JMR scale factors and uncertainties
-                ( jet_msdcorr_jmrNomVal, jet_msdcorr_jmrUpVal, jet_msdcorr_jmrDownVal ) = self.jetSmearer.getSmearValsM(groomedP4, genGroomedJet) if groomedP4 != None and genGroomedJet != None else (0.,0.,0.)
                 jet_msdcorr_raw = groomedP4.M() if groomedP4 != None else 0.0
-                jets_msdcorr_corr_JMS.append(jmsNomVal)
-                jets_msdcorr_corr_JMR.append(jet_msdcorr_jmrNomVal)
-
                 if jet_msdcorr_raw < 0.0:
                     jet_msdcorr_raw *= -1.0
-                jet_msdcorr_nom           = jet_pt_jerNomVal*jet_msdcorr_jmrNomVal*jmsNomVal*jet_msdcorr_raw
                 jets_msdcorr_raw    .append(jet_msdcorr_raw) #fix later so jec's not applied - LC: Current PUPPI SD mass correction implementation needs the JECs applied before looking up the correction so make sure that's accounted for if this is changed.
-                jets_msdcorr_nom    .append(jet_msdcorr_nom)
-                jets_msdcorr_jerUp  .append(jet_pt_jerUpVal  *jet_msdcorr_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_jerDown.append(jet_pt_jerDownVal*jet_msdcorr_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_jmrUp  .append(jet_pt_jerNomVal *jet_msdcorr_jmrUpVal  *jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_jmrDown.append(jet_pt_jerNomVal *jet_msdcorr_jmrDownVal*jmsNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_jmsUp  .append(jet_pt_jerNomVal *jet_msdcorr_jmrNomVal *jmsUpVal   *jet_msdcorr_raw)
-                jets_msdcorr_jmsDown.append(jet_pt_jerNomVal *jet_msdcorr_jmrNomVal *jmsDownVal *jet_msdcorr_raw)
 
-                #Also evaluated JMS&JMR SD corr in tau21DDT region: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetWtagging#tau21DDT_0_43
-                if self.era in ["2016"]:
-                    jmstau21DDTNomVal = 1.014
-                    jmstau21DDTDownVal = 1.007
-                    jmstau21DDTUpVal = 1.021
-                    self.jetSmearer.jmr_vals = [1.086,1.176,0.996]
-                elif self.era in ["2017","2018"]:
-                    jmstau21DDTNomVal = 0.983
-                    jmstau21DDTDownVal = 0.976
-                    jmstau21DDTUpVal = 0.99
-                    self.jetSmearer.jmr_vals = [1.080,1.161,0.999]
+                # evaluate JES uncertainties
+                if not self.isData:
+                    jet_msdcorr_jesUp   = {}
+                    jet_msdcorr_jesDown = {}
 
-                ( jet_msdcorr_tau21DDT_jmrNomVal, jet_msdcorr_tau21DDT_jmrUpVal, jet_msdcorr_tau21DDT_jmrDownVal ) = self.jetSmearer.getSmearValsM(groomedP4, genGroomedJet) if groomedP4 != None and genGroomedJet != None else (0.,0.,0.)
-                jet_msdcorr_tau21DDT_nom           = jet_pt_jerNomVal*jet_msdcorr_tau21DDT_jmrNomVal*jmstau21DDTNomVal*jet_msdcorr_raw
-                jets_msdcorr_tau21DDT_nom    .append(jet_msdcorr_tau21DDT_nom)
-                jets_msdcorr_tau21DDT_jerUp  .append(jet_pt_jerUpVal  *jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_tau21DDT_jerDown.append(jet_pt_jerDownVal*jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_tau21DDT_jmrUp  .append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrUpVal  *jmstau21DDTNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_tau21DDT_jmrDown.append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrDownVal*jmstau21DDTNomVal  *jet_msdcorr_raw)
-                jets_msdcorr_tau21DDT_jmsUp  .append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTUpVal   *jet_msdcorr_raw)
-                jets_msdcorr_tau21DDT_jmsDown.append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTDownVal *jet_msdcorr_raw)
+                    # Evaluate JMS and JMR scale factors and uncertainties
+                    ( jet_msdcorr_jmrNomVal, jet_msdcorr_jmrUpVal, jet_msdcorr_jmrDownVal ) = self.jetSmearer.getSmearValsM(groomedP4, genGroomedJet) if groomedP4 != None and genGroomedJet != None else (0.,0.,0.)
+                    jets_msdcorr_corr_JMS.append(jmsNomVal)
+                    jets_msdcorr_corr_JMR.append(jet_msdcorr_jmrNomVal)
 
-                #Restore original jmr_vals in jetSmearer
-                self.jetSmearer.jmr_vals = self.jmrVals
+                    jet_msdcorr_nom           = jet_pt_jerNomVal*jet_msdcorr_jmrNomVal*jmsNomVal*jet_msdcorr_raw
+                    jets_msdcorr_nom    .append(jet_msdcorr_nom)
+                    jets_msdcorr_jerUp  .append(jet_pt_jerUpVal  *jet_msdcorr_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
+                    jets_msdcorr_jerDown.append(jet_pt_jerDownVal*jet_msdcorr_jmrNomVal *jmsNomVal  *jet_msdcorr_raw)
+                    jets_msdcorr_jmrUp  .append(jet_pt_jerNomVal *jet_msdcorr_jmrUpVal  *jmsNomVal  *jet_msdcorr_raw)
+                    jets_msdcorr_jmrDown.append(jet_pt_jerNomVal *jet_msdcorr_jmrDownVal*jmsNomVal  *jet_msdcorr_raw)
+                    jets_msdcorr_jmsUp  .append(jet_pt_jerNomVal *jet_msdcorr_jmrNomVal *jmsUpVal   *jet_msdcorr_raw)
+                    jets_msdcorr_jmsDown.append(jet_pt_jerNomVal *jet_msdcorr_jmrNomVal *jmsDownVal *jet_msdcorr_raw)
+
+                    #Also evaluated JMS&JMR SD corr in tau21DDT region: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetWtagging#tau21DDT_0_43
+                    if self.era in ["2016"]:
+                        jmstau21DDTNomVal = 1.014
+                        jmstau21DDTDownVal = 1.007
+                        jmstau21DDTUpVal = 1.021
+                        self.jetSmearer.jmr_vals = [1.086,1.176,0.996]
+                    elif self.era in ["2017","2018"]:
+                        jmstau21DDTNomVal = 0.983
+                        jmstau21DDTDownVal = 0.976
+                        jmstau21DDTUpVal = 0.99
+                        self.jetSmearer.jmr_vals = [1.080,1.161,0.999]
+
+                    ( jet_msdcorr_tau21DDT_jmrNomVal, jet_msdcorr_tau21DDT_jmrUpVal, jet_msdcorr_tau21DDT_jmrDownVal ) = self.jetSmearer.getSmearValsM(groomedP4, genGroomedJet) if groomedP4 != None and genGroomedJet != None else (0.,0.,0.)
+                    jet_msdcorr_tau21DDT_nom           = jet_pt_jerNomVal*jet_msdcorr_tau21DDT_jmrNomVal*jmstau21DDTNomVal*jet_msdcorr_raw
+                    jets_msdcorr_tau21DDT_nom    .append(jet_msdcorr_tau21DDT_nom)
+                    jets_msdcorr_tau21DDT_jerUp  .append(jet_pt_jerUpVal  *jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTNomVal  *jet_msdcorr_raw)
+                    jets_msdcorr_tau21DDT_jerDown.append(jet_pt_jerDownVal*jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTNomVal  *jet_msdcorr_raw)
+                    jets_msdcorr_tau21DDT_jmrUp  .append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrUpVal  *jmstau21DDTNomVal  *jet_msdcorr_raw)
+                    jets_msdcorr_tau21DDT_jmrDown.append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrDownVal*jmstau21DDTNomVal  *jet_msdcorr_raw)
+                    jets_msdcorr_tau21DDT_jmsUp  .append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTUpVal   *jet_msdcorr_raw)
+                    jets_msdcorr_tau21DDT_jmsDown.append(jet_pt_jerNomVal *jet_msdcorr_tau21DDT_jmrNomVal *jmstau21DDTDownVal *jet_msdcorr_raw)
+
+                    #Restore original jmr_vals in jetSmearer
+                    self.jetSmearer.jmr_vals = self.jmrVals
             
-            for jesUncertainty in self.jesUncertainties:
-                # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties )
-                self.jesUncertainty[jesUncertainty].setJetPt(jet_pt_nom)
-                self.jesUncertainty[jesUncertainty].setJetEta(jet.eta)
-                delta = self.jesUncertainty[jesUncertainty].getUncertainty(True)
-                jet_pt_jesUp[jesUncertainty]   = jet_pt_nom*(1. + delta)
-                jet_pt_jesDown[jesUncertainty] = jet_pt_nom*(1. - delta)
-                jets_pt_jesUp[jesUncertainty].append(jet_pt_jesUp[jesUncertainty])
-                jets_pt_jesDown[jesUncertainty].append(jet_pt_jesDown[jesUncertainty])
-                jet_mass_jesUp   [jesUncertainty] = jet_mass_nom*(1. + delta)
-                jet_mass_jesDown [jesUncertainty] = jet_mass_nom*(1. - delta)
-                jets_mass_jesUp  [jesUncertainty].append(jet_mass_jesUp[jesUncertainty])
-                jets_mass_jesDown[jesUncertainty].append(jet_mass_jesDown[jesUncertainty])
-                if self.doGroomed :
-                    jet_msdcorr_jesUp   [jesUncertainty] = jet_msdcorr_nom*(1. + delta)
-                    jet_msdcorr_jesDown [jesUncertainty] = jet_msdcorr_nom*(1. - delta)
-                    jets_msdcorr_jesUp  [jesUncertainty].append(jet_msdcorr_jesUp[jesUncertainty])
-                    jets_msdcorr_jesDown[jesUncertainty].append(jet_msdcorr_jesDown[jesUncertainty])
+            if not self.isData:
+                for jesUncertainty in self.jesUncertainties:
+                    # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties )
+                    self.jesUncertainty[jesUncertainty].setJetPt(jet_pt_nom)
+                    self.jesUncertainty[jesUncertainty].setJetEta(jet.eta)
+                    delta = self.jesUncertainty[jesUncertainty].getUncertainty(True)
+                    jet_pt_jesUp[jesUncertainty]   = jet_pt_nom*(1. + delta)
+                    jet_pt_jesDown[jesUncertainty] = jet_pt_nom*(1. - delta)
+                    jets_pt_jesUp[jesUncertainty].append(jet_pt_jesUp[jesUncertainty])
+                    jets_pt_jesDown[jesUncertainty].append(jet_pt_jesDown[jesUncertainty])
+                    jet_mass_jesUp   [jesUncertainty] = jet_mass_nom*(1. + delta)
+                    jet_mass_jesDown [jesUncertainty] = jet_mass_nom*(1. - delta)
+                    jets_mass_jesUp  [jesUncertainty].append(jet_mass_jesUp[jesUncertainty])
+                    jets_mass_jesDown[jesUncertainty].append(jet_mass_jesDown[jesUncertainty])
+                    if self.doGroomed :
+                        jet_msdcorr_jesUp   [jesUncertainty] = jet_msdcorr_nom*(1. + delta)
+                        jet_msdcorr_jesDown [jesUncertainty] = jet_msdcorr_nom*(1. - delta)
+                        jets_msdcorr_jesUp  [jesUncertainty].append(jet_msdcorr_jesUp[jesUncertainty])
+                        jets_msdcorr_jesDown[jesUncertainty].append(jet_msdcorr_jesDown[jesUncertainty])
 
 
 
         self.out.fillBranch("%s_pt_raw" % self.jetBranchName, jets_pt_raw)
         self.out.fillBranch("%s_pt_nom" % self.jetBranchName, jets_pt_nom)
         self.out.fillBranch("%s_corr_JEC" % self.jetBranchName, jets_corr_JEC)
-        self.out.fillBranch("%s_corr_JER" % self.jetBranchName, jets_corr_JER)
-        self.out.fillBranch("%s_pt_jerUp" % self.jetBranchName, jets_pt_jerUp)
-        self.out.fillBranch("%s_pt_jerDown" % self.jetBranchName, jets_pt_jerDown)
         self.out.fillBranch("%s_mass_raw" % self.jetBranchName, jets_mass_raw)
         self.out.fillBranch("%s_mass_nom" % self.jetBranchName, jets_mass_nom)
-        self.out.fillBranch("%s_corr_JMS" % self.jetBranchName, jets_corr_JMS)
-        self.out.fillBranch("%s_corr_JMR" % self.jetBranchName, jets_corr_JMR)
-        self.out.fillBranch("%s_mass_jerUp" % self.jetBranchName, jets_mass_jerUp)
-        self.out.fillBranch("%s_mass_jerDown" % self.jetBranchName, jets_mass_jerDown)
-        self.out.fillBranch("%s_mass_jmrUp" % self.jetBranchName, jets_mass_jmrUp)
-        self.out.fillBranch("%s_mass_jmrDown" % self.jetBranchName, jets_mass_jmrDown)
-        self.out.fillBranch("%s_mass_jmsUp" % self.jetBranchName, jets_mass_jmsUp)
-        self.out.fillBranch("%s_mass_jmsDown" % self.jetBranchName, jets_mass_jmsDown)
+
+        if not self.isData:
+            self.out.fillBranch("%s_corr_JER" % self.jetBranchName, jets_corr_JER)
+            self.out.fillBranch("%s_corr_JMS" % self.jetBranchName, jets_corr_JMS)
+            self.out.fillBranch("%s_corr_JMR" % self.jetBranchName, jets_corr_JMR)
+            self.out.fillBranch("%s_pt_jerUp" % self.jetBranchName, jets_pt_jerUp)
+            self.out.fillBranch("%s_pt_jerDown" % self.jetBranchName, jets_pt_jerDown)
+            self.out.fillBranch("%s_mass_jerUp" % self.jetBranchName, jets_mass_jerUp)
+            self.out.fillBranch("%s_mass_jerDown" % self.jetBranchName, jets_mass_jerDown)
+            self.out.fillBranch("%s_mass_jmrUp" % self.jetBranchName, jets_mass_jmrUp)
+            self.out.fillBranch("%s_mass_jmrDown" % self.jetBranchName, jets_mass_jmrDown)
+            self.out.fillBranch("%s_mass_jmsUp" % self.jetBranchName, jets_mass_jmsUp)
+            self.out.fillBranch("%s_mass_jmsDown" % self.jetBranchName, jets_mass_jmsDown)
             
         if self.doGroomed :
             self.out.fillBranch("%s_msoftdrop_raw" % self.jetBranchName, jets_msdcorr_raw)
             self.out.fillBranch("%s_msoftdrop_nom" % self.jetBranchName, jets_msdcorr_nom)
             self.out.fillBranch("%s_msoftdrop_corr_JMS" % self.jetBranchName, jets_msdcorr_corr_JMS)
             self.out.fillBranch("%s_msoftdrop_corr_JMR" % self.jetBranchName, jets_msdcorr_corr_JMR)
-            self.out.fillBranch("%s_msoftdrop_jerUp" % self.jetBranchName, jets_msdcorr_jerUp)
-            self.out.fillBranch("%s_msoftdrop_jerDown" % self.jetBranchName, jets_msdcorr_jerDown)
             self.out.fillBranch("%s_msoftdrop_corr_PUPPI" % self.jetBranchName, jets_msdcorr_corr_PUPPI)
-            self.out.fillBranch("%s_msoftdrop_jmrUp" % self.jetBranchName, jets_msdcorr_jmrUp)
-            self.out.fillBranch("%s_msoftdrop_jmrDown" % self.jetBranchName, jets_msdcorr_jmrDown)
-            self.out.fillBranch("%s_msoftdrop_jmsUp" % self.jetBranchName, jets_msdcorr_jmsUp)
-            self.out.fillBranch("%s_msoftdrop_jmsDown" % self.jetBranchName, jets_msdcorr_jmsDown)
-            self.out.fillBranch("%s_msoftdrop_tau21DDT_nom" % self.jetBranchName, jets_msdcorr_tau21DDT_nom)
-            self.out.fillBranch("%s_msoftdrop_tau21DDT_jerUp" % self.jetBranchName, jets_msdcorr_tau21DDT_jerUp)
-            self.out.fillBranch("%s_msoftdrop_tau21DDT_jerDown" % self.jetBranchName, jets_msdcorr_tau21DDT_jerDown)
-            self.out.fillBranch("%s_msoftdrop_tau21DDT_jmrUp" % self.jetBranchName, jets_msdcorr_tau21DDT_jmrUp)
-            self.out.fillBranch("%s_msoftdrop_tau21DDT_jmrDown" % self.jetBranchName, jets_msdcorr_tau21DDT_jmrDown)
-            self.out.fillBranch("%s_msoftdrop_tau21DDT_jmsUp" % self.jetBranchName, jets_msdcorr_tau21DDT_jmsUp)
-            self.out.fillBranch("%s_msoftdrop_tau21DDT_jmsDown" % self.jetBranchName, jets_msdcorr_tau21DDT_jmsDown)
+            if not self.isData:
+                self.out.fillBranch("%s_msoftdrop_tau21DDT_nom" % self.jetBranchName, jets_msdcorr_tau21DDT_nom)
+                self.out.fillBranch("%s_msoftdrop_jerUp" % self.jetBranchName, jets_msdcorr_jerUp)
+                self.out.fillBranch("%s_msoftdrop_jerDown" % self.jetBranchName, jets_msdcorr_jerDown)
+                self.out.fillBranch("%s_msoftdrop_jmrUp" % self.jetBranchName, jets_msdcorr_jmrUp)
+                self.out.fillBranch("%s_msoftdrop_jmrDown" % self.jetBranchName, jets_msdcorr_jmrDown)
+                self.out.fillBranch("%s_msoftdrop_jmsUp" % self.jetBranchName, jets_msdcorr_jmsUp)
+                self.out.fillBranch("%s_msoftdrop_jmsDown" % self.jetBranchName, jets_msdcorr_jmsDown)
+                self.out.fillBranch("%s_msoftdrop_tau21DDT_jerUp" % self.jetBranchName, jets_msdcorr_tau21DDT_jerUp)
+                self.out.fillBranch("%s_msoftdrop_tau21DDT_jerDown" % self.jetBranchName, jets_msdcorr_tau21DDT_jerDown)
+                self.out.fillBranch("%s_msoftdrop_tau21DDT_jmrUp" % self.jetBranchName, jets_msdcorr_tau21DDT_jmrUp)
+                self.out.fillBranch("%s_msoftdrop_tau21DDT_jmrDown" % self.jetBranchName, jets_msdcorr_tau21DDT_jmrDown)
+                self.out.fillBranch("%s_msoftdrop_tau21DDT_jmsUp" % self.jetBranchName, jets_msdcorr_tau21DDT_jmsUp)
+                self.out.fillBranch("%s_msoftdrop_tau21DDT_jmsDown" % self.jetBranchName, jets_msdcorr_tau21DDT_jmsDown)
 
-            
-        for jesUncertainty in self.jesUncertainties:
-            self.out.fillBranch("%s_pt_jes%sUp" % (self.jetBranchName, jesUncertainty), jets_pt_jesUp[jesUncertainty])
-            self.out.fillBranch("%s_pt_jes%sDown" % (self.jetBranchName, jesUncertainty), jets_pt_jesDown[jesUncertainty])
-            self.out.fillBranch("%s_mass_jes%sUp" % (self.jetBranchName, jesUncertainty), jets_mass_jesUp[jesUncertainty])
-            self.out.fillBranch("%s_mass_jes%sDown" % (self.jetBranchName, jesUncertainty), jets_mass_jesDown[jesUncertainty])
-            
-            if self.doGroomed : 
-                self.out.fillBranch("%s_msoftdrop_jes%sUp" % (self.jetBranchName, jesUncertainty), jets_msdcorr_jesUp[jesUncertainty])
-                self.out.fillBranch("%s_msoftdrop_jes%sDown" % (self.jetBranchName, jesUncertainty), jets_msdcorr_jesDown[jesUncertainty])
+        if not self.isData:    
+          for jesUncertainty in self.jesUncertainties:
+              self.out.fillBranch("%s_pt_jes%sUp" % (self.jetBranchName, jesUncertainty), jets_pt_jesUp[jesUncertainty])
+              self.out.fillBranch("%s_pt_jes%sDown" % (self.jetBranchName, jesUncertainty), jets_pt_jesDown[jesUncertainty])
+              self.out.fillBranch("%s_mass_jes%sUp" % (self.jetBranchName, jesUncertainty), jets_mass_jesUp[jesUncertainty])
+              self.out.fillBranch("%s_mass_jes%sDown" % (self.jetBranchName, jesUncertainty), jets_mass_jesDown[jesUncertainty])
+              
+              if self.doGroomed : 
+                  self.out.fillBranch("%s_msoftdrop_jes%sUp" % (self.jetBranchName, jesUncertainty), jets_msdcorr_jesUp[jesUncertainty])
+                  self.out.fillBranch("%s_msoftdrop_jes%sDown" % (self.jetBranchName, jesUncertainty), jets_msdcorr_jesDown[jesUncertainty])
                 
             
 
