@@ -51,7 +51,11 @@ def haddSample((sample, datasets)):
                 #script.write("rm -f %s && xrdcp %s %s\n"%(outputFile, xrootdFileName, outputFile))
                 script.write("xrdcp %s %s\n"%(xrootdFileName, outputFile))
     outputFile = "%s.root"%(sample)
-    script.write('rm -f %s && python %s %s *.root\n && mv %s ..'%(outputFile, haddPath, outputFile, outputFile))
+    script.write('''
+if [ `find -cmin -120 | grep root | wc -l` != '0' ]
+    then rm -f %s && python %s %s *.root\n && mv %s ..
+fi
+'''%(outputFile, haddPath, outputFile, outputFile))
 #        script.write('rm %s/%s/*root\n'%(outputFolder, sample))
     script.close()
     script = open(scriptPath,'r')
@@ -70,15 +74,20 @@ def haddSample((sample, datasets)):
     print
 
 allSamples = []
+
 for datasetsName in datasetsNames:
     datasets = globals()[datasetsName]
     samples = datasets.keys()
     for sample in samples:
-#        if not sample in ["SingleMuonRun2018A","SingleMuonRun2018B","SingleMuonRun2018C"]: continue
+#        if not sample in [
+#    "EWKZ_2017MGHERWIG",
+#    "WWJJlnln_2017MGPY",
+#    "EWKZ105_2016MGHERWIG",]: continue
         if not sample in allSamples:
             allSamples.append((sample, datasets[sample]))
         else:
             raise Exception("Repeated sample in two set of datasets! %s %s"%(sample, datasetsName))
+
 
 if nprocesses<=1:
     for (sample, datasets) in allSamples:
