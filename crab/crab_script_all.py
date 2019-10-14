@@ -22,7 +22,7 @@ def getEra():
     year = 0
     era = ''
     if datamc == 'data':
-        if len(run)==8:
+        if run.startswith("Run201"):
             year = int(run[3:7])
             era = run[7:8]
             return 'data', year, era
@@ -34,7 +34,11 @@ def getEra():
     return 1
 
 
-datamc, year, era = getEra()
+if "file:" in PSet.process.source.fileNames[0]:
+    datamc, year, era = "mc", 2017, '' ## for local test (read file from PSet.py)
+else:
+    datamc, year, era = getEra() ## for CRAB
+
 
 modulesToBeCalled = {
 "data2016"    : ["muonScaleRes2016", "vbfhmmModuleDATA"],
