@@ -34,10 +34,10 @@ def getEra():
     return 1
 
 
-if "file:" in PSet.process.source.fileNames[0]:
-    datamc, year, era = "mc", 2017, '' ## for local test (read file from PSet.py)
-else:
+if "/store/" in PSet.process.source.fileNames[0]:
     datamc, year, era = getEra() ## for CRAB
+else:
+    datamc, year, era = "mc", 2017, '' ## for local test (read file from PSet.py)
 
 
 modulesToBeCalled = {
