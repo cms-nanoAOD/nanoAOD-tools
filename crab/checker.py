@@ -6,11 +6,16 @@ mcproduction ={
 
 def checkDatasets(datasetsNames, variableDict):
     failures = []
+    alldatasets = set()
     for datasetsName in datasetsNames:
         datasets = variableDict[datasetsName]
         for sample in datasets.keys():
             for dataset in datasets[sample]:
                 ok = False
+                if dataset in alldatasets:
+                    failures.append(dataset)
+                else:
+                    alldatasets.add(dataset)
                 if datasetsName.startswith("data"):
                     year = datasetsName[len("data"):]
                     if year in sample:

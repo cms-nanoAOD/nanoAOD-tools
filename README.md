@@ -1,15 +1,43 @@
-# nanoAOD-tools
-Tools for working with NanoAOD (requiring only python + root, not CMSSW)
+# Run Skim for Pisa Hmumu using nanoAOD-tools
 
-
-## Checkout instructions: CMSSW
+## Checkout instructions
 
     cmsrel CMSSW_10_2_6
     cd CMSSW_10_2_6/src
     git clone https://github.com/gmandorl/nanoAOD-tools.git PhysicsTools/NanoAODTools
     cd PhysicsTools/NanoAODTools
     cmsenv
-    scram b
+    scram b -j8
+
+## Local run
+
+    cd $CMSSW_BASE/src/PhysicsTools/NanoAODTools/crab
+    
+    # edit PSet.py, with your favourite file
+    
+    # if you use a local file (file:....), 
+    # edit crab_script_all.py to run the proper configuration
+    
+    # Run locally the skim
+    python crab_script_all.py 0
+
+
+## Multicrab
+
+    cd $CMSSW_BASE/src/PhysicsTools/NanoAODTools/crab
+    
+    # edit crab_cfg_all.py (replace 'sdonato', update version, ...)
+    
+    ## use datasetToTest to submit few datasets
+    ## use requestsToTest to resubmit failed crab jobs
+    ## if both datasetToTest and requestsToTest are empty, all datasets*.py will be submitted
+
+    # Submit jobs
+    python crab_cfg_all.py
+
+
+
+# Outdated
 
 ## Checkout instructions: standalone
 
