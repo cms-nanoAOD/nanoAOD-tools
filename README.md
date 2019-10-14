@@ -1,6 +1,4 @@
-# nanoAOD-tools for Pisa Hmumu
-Tools for working with NanoAOD (requiring only python + root, not CMSSW)
-
+# Run Skim for Pisa Hmumu using nanoAOD-tools
 
 ## Checkout instructions
 
