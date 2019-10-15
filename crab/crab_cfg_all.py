@@ -5,7 +5,7 @@ from CRABClient.UserUtilities import config, getUsernameFromSiteDB
 
 config = Configuration()
 
-version = "PROD_2_0"
+version = "PROD_3_0"
 
 datasetToTest = [] ## if empty, run on all datasets
 #datasetToTest = ['/DYJetsToLL_M-105To160_TuneCP5_PSweights_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM']
@@ -14,26 +14,24 @@ requestsToSkip = [
 ]
 
 requestsToTest = [ ## if empty, run on all datasets
-#    "PROD_2_0_WWJJlnlnNoT_2018MGPY_ext1",
-#    "PROD_2_0_ggHmm_2017AMCPY",
 #    "PROD_2_0_EWKZ_2017MGHERWIG",
-#    "PROD_2_0_WZ1l3n_2017AMCPY",
-#    "PROD_2_0_WZ3l1n_2016POWPY_ext1",
-
-#    "PROD_2_0_SingleMuonRun2016B",
-#    "PROD_2_0_WZ3l1n_2016POWPY_ext1",
+#    "PROD_2_0_WWJJlnln_2017MGPY",
 #    "PROD_2_0_EWKZ105_2016MGHERWIG",
-    #"PROD_2_0_EWKZ105VBF_2017MGHERWIG",
-    #"PROD_2_0_WWJJlnlnNoT_2017MGPY",
-    #"PROD_2_0_DY105VBF_2017AMCPY",
-    #"PROD_2_0_zHmm_2017POWPY",
-    #"PROD_2_0_W0J_2017AMCPY",
-    #"PROD_2_0_STwtbar_2017POWPY",
-    #"PROD_2_0_WZ_2017AMCPY",
-    #"PROD_2_0_WW2l2n_2017POWPY",
-    #"PROD_2_0_WZ2l2q_2017AMC_MADSPIN_PY",
-    #"PROD_2_0_DYTau_2017AMCPY",
 ] ## if empty, run on all datasets
+
+
+def getModuleSettingsFromDataset(dataset):
+    datasetTag = dataset.split("/")[2]
+    if "RunIIAutumn18" in datasetTag: return 'mc2018'
+    elif "RunIIFall17" in datasetTag: return 'mc2017'
+    elif "RunIISummer16" in datasetTag: return 'mc2016'
+    elif "Run2016" in datasetTag: return 'data2016'
+    elif "Run2017" in datasetTag: return 'data2017'
+    elif "Run2018A" in datasetTag: return 'data2018A'
+    elif "Run2018B" in datasetTag: return 'data2018B'
+    elif "Run2018C" in datasetTag: return 'data2018C'
+    elif "Run2018D" in datasetTag: return 'data2018D'
+    else: raise Exception("Unable to find module settings for %s"%dataset)
 
 
 config.section_("General")
@@ -43,7 +41,6 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
 
-config.JobType.scriptExe = 'crab_script_all.sh'
 config.JobType.inputFiles = ['crab_script_all.py','checker.py','../scripts/haddnano.py']
 
 print "inputFiles ", config.JobType.inputFiles
@@ -71,6 +68,7 @@ config.JobType.allowUndistributedCMSSW = True
 from datasets2016 import data2016, mc2016
 from datasets2017 import data2017, mc2017
 from datasets2018 import data2018, mc2018
+#from datasetsTest import data2018, mc2018
 
 datasetsNames = ["data2018", "mc2018", "data2017", "mc2017", "data2016", "mc2016"]
 
@@ -107,6 +105,7 @@ if __name__ == '__main__':
                 if requestsToTest and not requestName in requestsToTest: continue ## run only requestsToTest, if filled 
                 config.General.requestName = requestName
                 config.Data.outputDatasetTag = version+"_"+dataset.split("/")[-2]
+                config.JobType.scriptExe = 'crab_script_%s.sh'%getModuleSettingsFromDataset(dataset)
                 print
                 print config
                 print
