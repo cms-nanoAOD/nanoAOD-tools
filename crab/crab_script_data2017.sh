@@ -24,5 +24,5 @@ mv module $CMSSW_BASE/module
 mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
-python crab_script_all.py $1 
+python crab_script_all.py $1 data2017
 fi

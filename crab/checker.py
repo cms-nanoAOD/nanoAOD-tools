@@ -1,7 +1,7 @@
 mcproduction ={
-    '2016':'RunIISummer16NanoAODv5',
-    '2017':'RunIIFall17NanoAODv5',
-    '2018':'RunIIAutumn18NanoAODv5',
+    '2016':'RunIISummer16',
+    '2017':'RunIIFall17',
+    '2018':'RunIIAutumn18',
 }
 
 def checkDatasets(datasetsNames, variableDict):
@@ -55,3 +55,18 @@ def checkModulesToBeCalled(modulesToBeCalled):
                 module = module.replace("All","")
                 if specialWord.lower() in module.lower() and not specialWord.lower() in run.lower(): raise Exception("ERROR in checkModulesToBeCalled(%s).\nProblems with %s %s %s"%(modulesToBeCalled, run, module, specialWord))
     return True
+
+def checkModuleSettingsFromFileName(filename, modulesettings):
+    modulesettingsFile = ''
+    if "RunIIAutumn18" in filename: modulesettingsFile =  'mc2018'
+    elif "RunIIFall17" in filename: modulesettingsFile =  'mc2017'
+    elif "RunIISummer16" in filename: modulesettingsFile =  'mc2016'
+    elif "Run2016" in filename: modulesettingsFile =  'data2016'
+    elif "Run2017" in filename: modulesettingsFile =  'data2017'
+    elif "Run2018A" in filename: modulesettingsFile =  'data2018A'
+    elif "Run2018B" in filename: modulesettingsFile =  'data2018B'
+    elif "Run2018C" in filename: modulesettingsFile =  'data2018C'
+    elif "Run2018D" in filename: modulesettingsFile =  'data2018D'
+    if modulesettingsFile and modulesettingsFile!=modulesettings:
+        raise Exception("ERROR in checkModuleSettingsFromFileName(%s, %s). modulesettingsFile is %s"%(filename, modulesettings, modulesettingsFile))
+    print ("checkModuleSettingsFromFileName - Warning: Unable to find module settings for %s"%filename)

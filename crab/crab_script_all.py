@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os,PSet
+import os,PSet, sys
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import * 
 
 #this takes care of converting the input files from CRAB
@@ -15,30 +15,6 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer_v2 im
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.PrefireCorr import *
 
 
-def getEra():
-    fileName = PSet.process.source.fileNames[0]
-    datamc, run, sample = fileName.split("/store/")[1].split("/NANOAOD")[0].split("/")
-    #eg. data, Run2018D, SingleMuon or mc, RunIIAutumn18NanoAODv5, DYJetsToLL_M-105To160_VBFFilter_TuneCP5_PSweights_13TeV-amcatnloFXFX-pythia8
-    year = 0
-    era = ''
-    if datamc == 'data':
-        if run.startswith("Run201"):
-            year = int(run[3:7])
-            era = run[7:8]
-            return 'data', year, era
-    elif datamc == 'mc':
-        if 'RunIIAutumn18' in run: return 'mc', 2018, ''
-        elif 'RunIIFall17' in run: return 'mc', 2017, ''
-        elif 'RunIISummer16' in run: return 'mc', 2016, ''
-    print "ERROR in getEra(). fileName = %s"%(fileName)
-    return 1
-
-
-if "file:" in PSet.process.source.fileNames[0]:
-    datamc, year, era = "mc", 2017, '' ## for local test (read file from PSet.py)
-else:
-    datamc, year, era = getEra() ## for CRAB
-
 
 modulesToBeCalled = {
 "data2016"    : ["muonScaleRes2016", "vbfhmmModuleDATA"],
@@ -53,37 +29,16 @@ modulesToBeCalled = {
 "mc2018"      : ["jetmetUncertainties2018All", "btagSF2018", "muonScaleRes2018",                 "puAutoWeight_2018", "lepSFTrig2018",   "lepSFID2018",   "lepSFISO2018",   "vbfhmmModule2018"],
 }
 
-moduleSettings = ''
+if len(sys.argv) != 3:
+    raise Exception("Launch crab_script_all.py specifying two options: job numbers (eg. 0) and configuration (eg. mc2016). \n\nExample: python crab_script_all.py 0 data2018C\n")
 
-if datamc == 'data':
-    if year == 2018:
-        if era == 'A':
-            moduleSettings = 'data2018A'
-        elif era == "B":
-            moduleSettings = 'data2018B'
-        elif era == "C":
-            moduleSettings = 'data2018C'
-        elif era == "D":
-            moduleSettings = 'data2018D'
-    elif year == 2017:
-        moduleSettings = 'data2017'
-    elif year == 2016:
-        moduleSettings = 'data2016'
-elif datamc == 'mc':
-    if year == 2018:
-        moduleSettings = 'mc2018'
-    elif year == 2017:
-        moduleSettings = 'mc2017'
-    elif year == 2016:
-        moduleSettings = 'mc2016'
-
-from checker import checkModuleSettings
-checkModuleSettings(moduleSettings,datamc,year,era)
+moduleSettings = sys.argv[2]
 
 from checker import checkModulesToBeCalled
 checkModulesToBeCalled(modulesToBeCalled)
 
-print "I'm using the configuration for %s %s %s "%(datamc, year, era)
+from checker import checkModuleSettingsFromFileName
+checkModuleSettingsFromFileName(PSet.process.source.fileNames[0], moduleSettings)
 
 print "I'm using the configuration %s: %s"%(moduleSettings, modulesToBeCalled[moduleSettings])
 
