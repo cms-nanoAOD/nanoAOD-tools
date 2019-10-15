@@ -89,9 +89,17 @@ class vbfhmmProducer(Module):
             return False
         muonNumber = len(filter(self.muSel,muons))
         for lep in muons :
+            muon_correctedFSR_p4 = ROOT.TLorentzVector()
+            lep.FSR_p4 = ROOT.TLorentzVector()
+            muon_correctedFSR_p4.SetPtEtaPhiM(lep.corrected_pt , lep.eta, lep.phi, lep.mass)
+            lep.iso = lep.pfRelIso04_all
+            if lep.iso_FSR < 0.8 : 
+                lep.FSR_p4.SetPtEtaPhiM(lep.pt_FSR , lep.eta_FSR, lep.phi_FSR, 0)
+                #mu_correctedFSR_pt = (muon_correctedFSR_p4 + lep.FSR_p4).Pt()
+                lep.iso = (lep.pfRelIso04_all*lep.pt-lep.pt_FSR)/(muon_correctedFSR_p4 + lep.FSR_p4).Pt()
 
             eventSum += lep.p4()
-            if lep.pfRelIso04_all<0.25 and abs(lep.pdgId)==13 and abs(lep.dz) < 0.2 and abs(lep.dxy) < 0.05 and not dimuonSelection :
+            if lep.iso<0.25 and abs(lep.pdgId)==13 and lep.mediumId and (muon_correctedFSR_p4 + lep.FSR_p4).Pt() and not dimuonSelection :
 
                 if count_mu == 1 and (lep.charge*mu1_charge)<0: # and lep.mediumId 
                     mu2.SetPtEtaPhiM(lep.corrected_pt,lep.eta, lep.phi, 0.105658375)
@@ -101,31 +109,32 @@ class vbfhmmProducer(Module):
                     mu1_charge = lep.charge
                     count_mu +=1
         
-        if not dimuonSelection : return False           
-        if max(mu1.Pt(), mu2.Pt())<28 : return False # muons are ordered in lep.pt, not in lep.pt_corrected
-        if min(mu1.Pt(), mu2.Pt())<9  : return False # muons are ordered in lep.pt, not in lep.pt_corrected
+        #if not dimuonSelection : return False           
+        #if max(mu1.Pt(), mu2.Pt())<28 : return False # muons are ordered in lep.pt, not in lep.pt_corrected
+        #if min(mu1.Pt(), mu2.Pt())<9  : return False # muons are ordered in lep.pt, not in lep.pt_corrected
     
 
               
-        dimuon = mu1 + mu2
-        dimuonMass = dimuon.M()
+        #dimuon = mu1 + mu2
+        dimuonMass = 0
+        if dimuonSelection : dimuonMass = (mu1 + mu2).M()
         #if dimuon.M()<70 or dimuon.M()>110 :
-        if dimuon.M()<70  :
-            return False
+        #if dimuon.M()<70  :
+            #return False
                 
         
 
 
 
-        muonfilter = lambda j : (j.muonIdx1==-1 or muons[j.muonIdx1].pfRelIso04_all>0.25 or abs(muons[j.muonIdx1].dz) > 0.2 or abs(muons[j.muonIdx1].dxy) > 0.05) and (j.muonIdx2==-1 or muons[j.muonIdx2].pfRelIso04_all>0.25 or abs(muons[j.muonIdx2].dz) > 0.2 or abs(muons[j.muonIdx2].dxy) > 0.05)
-        electronfilter = lambda j : (j.electronIdx1==-1 or electrons[j.electronIdx1].pfRelIso03_all>0.25 or abs(electrons[j.electronIdx1].dz) > 0.2 or abs(electrons[j.electronIdx1].dxy) > 0.05) and(j.electronIdx2==-1 or electrons[j.electronIdx2].pfRelIso03_all>0.25 or abs(electrons[j.electronIdx2].dz) > 0.2 or abs(electrons[j.electronIdx2].dxy) > 0.05)
+        muonfilter = lambda j : (j.muonIdx1==-1 or muons[j.muonIdx1].iso>0.25 or muons[j.muonIdx1].mediumId) and (j.muonIdx2==-1 or muons[j.muonIdx2].iso>0.25 or muons[j.muonIdx2].mediumId )
+        #electronfilter = lambda j : (j.electronIdx1==-1 or electrons[j.electronIdx1].pfRelIso03_all>0.25 or abs(electrons[j.electronIdx1].dz) > 0.2 or abs(electrons[j.electronIdx1].dxy) > 0.05) and(j.electronIdx2==-1 or electrons[j.electronIdx2].pfRelIso03_all>0.25 or abs(electrons[j.electronIdx2].dz) > 0.2 or abs(electrons[j.electronIdx2].dxy) > 0.05)
         
         
         jetFilter1    = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0) and abs(j.eta)<4.7 and (abs(j.eta)<2.5 or j.puId>6 or j.pt>50))
         jetFilter2    = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0) and abs(j.eta)<4.7 )
                 
                 
-        jetsNolep = [j for j in jets if muonfilter(j) and electronfilter(j)]
+        jetsNolep = [j for j in jets if muonfilter(j)]
         if len(jetsNolep) < 2:
             return False
         passAtLeastOne_Criteria1=False
@@ -150,7 +159,7 @@ class vbfhmmProducer(Module):
         if not passAtLeastOne_Criteria1 and not passAtLeastOne_Criteria2 : return False
 
 
-        self.out.fillBranch("EventMass",eventSum.M())
+        #self.out.fillBranch("EventMass",eventSum.M())
         self.out.fillBranch("MuonMass",dimuonMass)
         self.out.fillBranch("qqMass",dijetMass)
         #self.out.fillBranch("jetIdx1",jetIdx1)

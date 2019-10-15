@@ -15,7 +15,6 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer_v2 im
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.PrefireCorr import *
 
 
-
 modulesToBeCalled = {
 "data2016"    : ["muonScaleRes2016", "vbfhmmModuleDATA"],
 "data2017"    : ["muonScaleRes2017", "vbfhmmModuleDATA"],
