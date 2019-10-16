@@ -16,12 +16,14 @@ class JetTaggerResult(Module):
         self,
         inputCollection = lambda event: Collection(event, "Jet"),
         taggerName = "llpdnnx",
+        outputName = "selectedJets",
         predictionLabels = ["B","C","UDS","G","LLP"],
         logctauValues = range(-3,5),
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
         self.taggerName = taggerName
+        self.outputName = outputName
         self.inputCollection = inputCollection
         self.predictionLabels = predictionLabels
         self.logctauValues = logctauValues
@@ -37,7 +39,7 @@ class JetTaggerResult(Module):
         
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
-                self.out.branch(self.taggerName+"_"+getCtauLabel(ctau)+"_"+label,"F",lenVar="n"+self.taggerName)
+                self.out.branch(self.outputName+"_"+self.taggerName+"_"+getCtauLabel(ctau)+"_"+label,"F",lenVar="n"+self.outputName)
         
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -60,7 +62,7 @@ class JetTaggerResult(Module):
                     
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
-                self.out.fillBranch(self.taggerName+"_"+getCtauLabel(ctau)+"_"+label,taggerResults[ctau][label])
+                self.out.fillBranch(self.outputName+"_"+self.taggerName+"_"+getCtauLabel(ctau)+"_"+label,taggerResults[ctau][label])
         
         
         return True

@@ -94,7 +94,7 @@ if not args.isData:
     analyzerChain.append(
         JetMetUncertainties(
             era="2016",
-            globalTag="Summer16_07Aug2017_v11"
+            globalTag="Summer16_07Aug2017_V11_MC"
         )
     )
     for systName,collection in [
@@ -222,13 +222,14 @@ if not args.isData:
             [lambda tree: tree.branch("lsp","I"),lambda tree,event: tree.fillBranch("lsp",int(round(Collection(event,"llpinfo")[0].lsp_mass/100.))*100)],
         ])
         
+    '''
     if args.inputFiles[0].find("madgraph")>=0 and \
     (args.inputFiles[0].find("DYJetsToLL")>=0 or \
     args.inputFiles[0].find("ZJetsToNuNu")>=0):
         analyzerChain.append(
             ZNLOWeights()
         )
-        
+    ''' 
     if args.inputFiles[0].find("DYJetsToLL")>=0 or \
     args.inputFiles[0].find("TTJets")>=0 or \
     args.inputFiles[0].find("TT_")>=0 or \
@@ -335,14 +336,15 @@ else:
         )
     )
     
+
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/model_noda_retrain.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/retraining_no_da.pb",
         inputCollections=[
             lambda event: event.selectedJets_nominal
         ],
         taggerName="llpdnnx_noda",
-        logctauValues = range(-3,5)
+        logctauValues = range(-2,5)
     )
 )
 
@@ -351,20 +353,33 @@ analyzerChain.append(
         inputCollection = lambda event: event.selectedJets_nominal,
         taggerName = "llpdnnx_noda",
         outputName = "llpdnnx_noda_nominal",
-        logctauValues = range(-3,5),
+        logctauValues = range(-2,5),
+        noda = True,
         predictionLabels = ["LLP"],
         globalOptions=globalOptions
     )
 )
+analyzerChain.append(
+    JetTaggerResult(
+        inputCollection = lambda event: event.selectedJets_nominal,
+        taggerName = "llpdnnx_noda",
+        outputName = "selectedJets_nominal",
+        logctauValues = range(-2,5),
+        predictionLabels = ["LLP"],
+        globalOptions=globalOptions
+    )
+
+)
+
 
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/model_singlemuon_retrain.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/retraining_da.pb",
         inputCollections=[
             lambda event: event.selectedJets_nominal
         ],
         taggerName="llpdnnx_da",
-        logctauValues = range(-3,5)
+        logctauValues = range(-2,5)
     )
 )
 
@@ -373,16 +388,27 @@ analyzerChain.append(
         inputCollection = lambda event: event.selectedJets_nominal,
         taggerName = "llpdnnx_da",
         outputName = "llpdnnx_da_nominal",
-        logctauValues = range(-3,5),
+        logctauValues = range(-2,5),
         predictionLabels = ["LLP"],
         globalOptions=globalOptions
     )
+)
+analyzerChain.append(
+    JetTaggerResult(
+        inputCollection = lambda event: event.selectedJets_nominal,
+        taggerName = "llpdnnx_da",
+        outputName = "selectedJets_nominal",
+        logctauValues = range(-2,5),
+        predictionLabels = ["LLP"],
+        globalOptions=globalOptions
+    )
+
 )
 
 p=PostProcessor(
     args.output[0],
     [args.inputFiles],
-    cut="(nJet>1)",
+    cut="(nJet>1)*(nMuon>0)",
     branchsel=None,
     maxEvents=-1,
     modules=analyzerChain,
