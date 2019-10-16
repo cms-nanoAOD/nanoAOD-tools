@@ -54,10 +54,8 @@ class TFEval
                 
                 virtual float value(int64_t jetIndex, int64_t batchIndex) const
                 {
-                    if (std::isnan(_branch->At(jetIndex)) or std::isinf(_branch->At(jetIndex)))
-                    {
-                        std::cout << "Nan/inf entry found in branch " << _branch->GetBranchName() << std::endl;
-                        return 0;
+                    if (std::isnan(_branch->At(jetIndex)) or std::isinf(_branch->At(jetIndex))){
+                        return 0.;
                     }
 
                     return _branch->At(jetIndex);
