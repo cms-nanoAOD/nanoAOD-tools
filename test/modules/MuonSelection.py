@@ -21,7 +21,7 @@ class MuonSelection(Module):
         outputName = "tightMuons",
         muonID = TIGHT,
         muonIso = TIGHT,
-        muonMinPt = 26.,
+        muonMinPt = 29.,
         muonMaxEta = 2.4,
         storeKinematics=['pt','eta'],
         storeWeights=False,
