@@ -14,7 +14,7 @@ class vbfhmmProducer(Module):
         self.muSel = muSelection
         self.data = data
         self.year = year
-        self.jesVariation = ['pt_nom', 'pt_jesAbsoluteStatDown', 'pt_jesAbsoluteScaleDown', 'pt_jesAbsoluteFlavMapDown', 'pt_jesAbsoluteMPFBiasDown', 'pt_jesFragmentationDown', 'pt_jesSinglePionECALDown', 'pt_jesSinglePionHCALDown', 'pt_jesFlavorQCDDown', 'pt_jesTimePtEtaDown', 'pt_jesRelativeJEREC1Down', 'pt_jesRelativeJEREC2Down', 'pt_jesRelativeJERHFDown', 'pt_jesRelativePtBBDown', 'pt_jesRelativePtEC1Down', 'pt_jesRelativePtEC2Down', 'pt_jesRelativePtHFDown', 'pt_jesRelativeBalDown', 'pt_jesRelativeSampleDown', 'pt_jesRelativeFSRDown', 'pt_jesRelativeStatFSRDown', 'pt_jesRelativeStatECDown', 'pt_jesRelativeStatHFDown', 'pt_jesPileUpDataMCDown', 'pt_jesPileUpPtRefDown', 'pt_jesPileUpPtBBDown', 'pt_jesPileUpPtEC1Down', 'pt_jesPileUpPtEC2Down', 'pt_jesPileUpPtHFDown', 'pt_jesPileUpMuZeroDown', 'pt_jesPileUpEnvelopeDown', 'pt_jesSubTotalPileUpDown', 'pt_jesSubTotalRelativeDown', 'pt_jesSubTotalPtDown', 'pt_jesSubTotalScaleDown', 'pt_jesSubTotalAbsoluteDown', 'pt_jesSubTotalMCDown', 'pt_jesTotalDown', 'pt_jesTotalNoFlavorDown', 'pt_jesTotalNoTimeDown', 'pt_jesTotalNoFlavorNoTimeDown', 'pt_jesFlavorZJetDown', 'pt_jesFlavorPhotonJetDown', 'pt_jesFlavorPureGluonDown', 'pt_jesFlavorPureQuarkDown', 'pt_jesFlavorPureCharmDown', 'pt_jesFlavorPureBottomDown', 'pt_jesCorrelationGroupMPFInSituDown', 'pt_jesCorrelationGroupIntercalibrationDown', 'pt_jesCorrelationGroupbJESDown', 'pt_jesCorrelationGroupFlavorDown', 'pt_jesCorrelationGroupUncorrelatedDown', 'pt_jesAbsoluteStatUp', 'pt_jesAbsoluteScaleUp', 'pt_jesAbsoluteFlavMapUp', 'pt_jesAbsoluteMPFBiasUp', 'pt_jesFragmentationUp', 'pt_jesSinglePionECALUp', 'pt_jesSinglePionHCALUp', 'pt_jesFlavorQCDUp', 'pt_jesTimePtEtaUp', 'pt_jesRelativeJEREC1Up', 'pt_jesRelativeJEREC2Up', 'pt_jesRelativeJERHFUp', 'pt_jesRelativePtBBUp', 'pt_jesRelativePtEC1Up', 'pt_jesRelativePtEC2Up', 'pt_jesRelativePtHFUp', 'pt_jesRelativeBalUp', 'pt_jesRelativeSampleUp', 'pt_jesRelativeFSRUp', 'pt_jesRelativeStatFSRUp', 'pt_jesRelativeStatECUp', 'pt_jesRelativeStatHFUp', 'pt_jesPileUpDataMCUp', 'pt_jesPileUpPtRefUp', 'pt_jesPileUpPtBBUp', 'pt_jesPileUpPtEC1Up', 'pt_jesPileUpPtEC2Up', 'pt_jesPileUpPtHFUp', 'pt_jesPileUpMuZeroUp', 'pt_jesPileUpEnvelopeUp', 'pt_jesSubTotalPileUpUp', 'pt_jesSubTotalRelativeUp', 'pt_jesSubTotalPtUp', 'pt_jesSubTotalScaleUp', 'pt_jesSubTotalAbsoluteUp', 'pt_jesSubTotalMCUp', 'pt_jesTotalUp', 'pt_jesTotalNoFlavorUp', 'pt_jesTotalNoTimeUp', 'pt_jesTotalNoFlavorNoTimeUp', 'pt_jesFlavorZJetUp', 'pt_jesFlavorPhotonJetUp', 'pt_jesFlavorPureGluonUp', 'pt_jesFlavorPureQuarkUp', 'pt_jesFlavorPureCharmUp', 'pt_jesFlavorPureBottomUp', 'pt_jesCorrelationGroupMPFInSituUp', 'pt_jesCorrelationGroupIntercalibrationUp', 'pt_jesCorrelationGroupbJESUp', 'pt_jesCorrelationGroupFlavorUp', 'pt_jesCorrelationGroupUncorrelatedUp']
+        self.jesVariation = ['pt', 'pt_nom', 'pt_jesAbsoluteStatDown', 'pt_jesAbsoluteScaleDown', 'pt_jesAbsoluteFlavMapDown', 'pt_jesAbsoluteMPFBiasDown', 'pt_jesFragmentationDown', 'pt_jesSinglePionECALDown', 'pt_jesSinglePionHCALDown', 'pt_jesFlavorQCDDown', 'pt_jesTimePtEtaDown', 'pt_jesRelativeJEREC1Down', 'pt_jesRelativeJEREC2Down', 'pt_jesRelativeJERHFDown', 'pt_jesRelativePtBBDown', 'pt_jesRelativePtEC1Down', 'pt_jesRelativePtEC2Down', 'pt_jesRelativePtHFDown', 'pt_jesRelativeBalDown', 'pt_jesRelativeSampleDown', 'pt_jesRelativeFSRDown', 'pt_jesRelativeStatFSRDown', 'pt_jesRelativeStatECDown', 'pt_jesRelativeStatHFDown', 'pt_jesPileUpDataMCDown', 'pt_jesPileUpPtRefDown', 'pt_jesPileUpPtBBDown', 'pt_jesPileUpPtEC1Down', 'pt_jesPileUpPtEC2Down', 'pt_jesPileUpPtHFDown', 'pt_jesPileUpMuZeroDown', 'pt_jesPileUpEnvelopeDown', 'pt_jesSubTotalPileUpDown', 'pt_jesSubTotalRelativeDown', 'pt_jesSubTotalPtDown', 'pt_jesSubTotalScaleDown', 'pt_jesSubTotalAbsoluteDown', 'pt_jesSubTotalMCDown', 'pt_jesTotalDown', 'pt_jesTotalNoFlavorDown', 'pt_jesTotalNoTimeDown', 'pt_jesTotalNoFlavorNoTimeDown', 'pt_jesFlavorZJetDown', 'pt_jesFlavorPhotonJetDown', 'pt_jesFlavorPureGluonDown', 'pt_jesFlavorPureQuarkDown', 'pt_jesFlavorPureCharmDown', 'pt_jesFlavorPureBottomDown', 'pt_jesCorrelationGroupMPFInSituDown', 'pt_jesCorrelationGroupIntercalibrationDown', 'pt_jesCorrelationGroupbJESDown', 'pt_jesCorrelationGroupFlavorDown', 'pt_jesCorrelationGroupUncorrelatedDown', 'pt_jesAbsoluteStatUp', 'pt_jesAbsoluteScaleUp', 'pt_jesAbsoluteFlavMapUp', 'pt_jesAbsoluteMPFBiasUp', 'pt_jesFragmentationUp', 'pt_jesSinglePionECALUp', 'pt_jesSinglePionHCALUp', 'pt_jesFlavorQCDUp', 'pt_jesTimePtEtaUp', 'pt_jesRelativeJEREC1Up', 'pt_jesRelativeJEREC2Up', 'pt_jesRelativeJERHFUp', 'pt_jesRelativePtBBUp', 'pt_jesRelativePtEC1Up', 'pt_jesRelativePtEC2Up', 'pt_jesRelativePtHFUp', 'pt_jesRelativeBalUp', 'pt_jesRelativeSampleUp', 'pt_jesRelativeFSRUp', 'pt_jesRelativeStatFSRUp', 'pt_jesRelativeStatECUp', 'pt_jesRelativeStatHFUp', 'pt_jesPileUpDataMCUp', 'pt_jesPileUpPtRefUp', 'pt_jesPileUpPtBBUp', 'pt_jesPileUpPtEC1Up', 'pt_jesPileUpPtEC2Up', 'pt_jesPileUpPtHFUp', 'pt_jesPileUpMuZeroUp', 'pt_jesPileUpEnvelopeUp', 'pt_jesSubTotalPileUpUp', 'pt_jesSubTotalRelativeUp', 'pt_jesSubTotalPtUp', 'pt_jesSubTotalScaleUp', 'pt_jesSubTotalAbsoluteUp', 'pt_jesSubTotalMCUp', 'pt_jesTotalUp', 'pt_jesTotalNoFlavorUp', 'pt_jesTotalNoTimeUp', 'pt_jesTotalNoFlavorNoTimeUp', 'pt_jesFlavorZJetUp', 'pt_jesFlavorPhotonJetUp', 'pt_jesFlavorPureGluonUp', 'pt_jesFlavorPureQuarkUp', 'pt_jesFlavorPureCharmUp', 'pt_jesFlavorPureBottomUp', 'pt_jesCorrelationGroupMPFInSituUp', 'pt_jesCorrelationGroupIntercalibrationUp', 'pt_jesCorrelationGroupbJESUp', 'pt_jesCorrelationGroupFlavorUp', 'pt_jesCorrelationGroupUncorrelatedUp']
         if year == "2016" : self.jesVariation = self.jesVariation + ['pt_jesTimeRunBCDDown', 'pt_jesTimeRunEFDown', 'pt_jesTimeRunGHDown', 'pt_jesTimeRunBCDUp', 'pt_jesTimeRunEFUp', 'pt_jesTimeRunGHUp']
         if year == "2017" : self.jesVariation = self.jesVariation + ['pt_jesTimeRunBDown', 'pt_jesTimeRunCDown', 'pt_jesTimeRunDEDown', 'pt_jesTimeRunFDown', 'pt_jesTimeRunBUp', 'pt_jesTimeRunCUp', 'pt_jesTimeRunDEUp', 'pt_jesTimeRunFUp']
         pass
@@ -89,17 +89,18 @@ class vbfhmmProducer(Module):
             return False
         muonNumber = len(filter(self.muSel,muons))
         for lep in muons :
-            muon_correctedFSR_p4 = ROOT.TLorentzVector()
+            muon_corrected_p4 = ROOT.TLorentzVector()
             lep.FSR_p4 = ROOT.TLorentzVector()
-            muon_correctedFSR_p4.SetPtEtaPhiM(lep.corrected_pt , lep.eta, lep.phi, lep.mass)
+            muon_corrected_p4.SetPtEtaPhiM(lep.corrected_pt , lep.eta, lep.phi, lep.mass)
             lep.iso = lep.pfRelIso04_all
+            lep.correctedROC_pt = lep.corrected_pt
             if lep.iso_FSR < 0.8 : 
                 lep.FSR_p4.SetPtEtaPhiM(lep.pt_FSR , lep.eta_FSR, lep.phi_FSR, 0)
-                #mu_correctedFSR_pt = (muon_correctedFSR_p4 + lep.FSR_p4).Pt()
-                lep.iso = (lep.pfRelIso04_all*lep.pt-lep.pt_FSR)/(muon_correctedFSR_p4 + lep.FSR_p4).Pt()
-
+                lep.correctedROC_pt = (muon_corrected_p4 + lep.FSR_p4).Pt()
+                lep.iso = (lep.pfRelIso04_all*lep.pt-lep.pt_FSR)/lep.correctedROC_pt
+                
             eventSum += lep.p4()
-            if lep.iso<0.25 and abs(lep.pdgId)==13 and lep.mediumId and (muon_correctedFSR_p4 + lep.FSR_p4).Pt() and not dimuonSelection :
+            if lep.iso<0.25 and abs(lep.pdgId)==13 and lep.mediumId and lep.correctedROC_pt>20 and not dimuonSelection :
 
                 if count_mu == 1 and (lep.charge*mu1_charge)<0: # and lep.mediumId 
                     mu2.SetPtEtaPhiM(lep.corrected_pt,lep.eta, lep.phi, 0.105658375)
@@ -126,15 +127,16 @@ class vbfhmmProducer(Module):
 
 
 
-        muonfilter = lambda j : (j.muonIdx1==-1 or muons[j.muonIdx1].iso>0.25 or muons[j.muonIdx1].mediumId) and (j.muonIdx2==-1 or muons[j.muonIdx2].iso>0.25 or muons[j.muonIdx2].mediumId )
+        muonfilter = lambda j : (j.muonIdx1==-1 or muons[j.muonIdx1].iso>0.25 or not muons[j.muonIdx1].mediumId or muons[j.muonIdx1].correctedROC_pt<20) and (j.muonIdx2==-1 or muons[j.muonIdx2].iso>0.25 or not muons[j.muonIdx2].mediumId or muons[j.muonIdx2].correctedROC_pt<20)
         #electronfilter = lambda j : (j.electronIdx1==-1 or electrons[j.electronIdx1].pfRelIso03_all>0.25 or abs(electrons[j.electronIdx1].dz) > 0.2 or abs(electrons[j.electronIdx1].dxy) > 0.05) and(j.electronIdx2==-1 or electrons[j.electronIdx2].pfRelIso03_all>0.25 or abs(electrons[j.electronIdx2].dz) > 0.2 or abs(electrons[j.electronIdx2].dxy) > 0.05)
-        
         
         jetFilter1    = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0) and abs(j.eta)<4.7 and (abs(j.eta)<2.5 or j.puId>6 or j.pt>50))
         jetFilter2    = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0) and abs(j.eta)<4.7 )
                 
                 
         jetsNolep = [j for j in jets if muonfilter(j)]
+
+        
         if len(jetsNolep) < 2:
             return False
         passAtLeastOne_Criteria1=False
@@ -146,12 +148,11 @@ class vbfhmmProducer(Module):
             jetsCriteria1=[j for j in sortedJets if jetFilter1(j)]
             jetsCriteria2=[j for j in sortedJets if jetFilter2(j)]
             if ( len(jetsCriteria1)>=2 and jetsCriteria1[0].PT > 25 and jetsCriteria1[1].PT > 20 and self.mqq(jetsCriteria1) > 250 ) : passAtLeastOne_Criteria1=True
-            if ( len(jetsCriteria2)>=2 and jetsCriteria2[0].PT > 30 and jetsCriteria2[1].PT > 30 and self.mqq(jetsCriteria2) > 250 ) : passAtLeastOne_Criteria2=True
+            if ( len(jetsCriteria2)>=2 and jetsCriteria2[0].PT > 35 and jetsCriteria2[1].PT > 25 and self.mqq(jetsCriteria2) > 250 ) : passAtLeastOne_Criteria2=True
             #if passAtLeastOne_Criteria1 or passAtLeastOne_Criteria2 : break
 
 
 
-        
         
         
         dijetMass = 0    
