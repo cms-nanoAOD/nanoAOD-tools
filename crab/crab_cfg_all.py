@@ -5,7 +5,7 @@ from CRABClient.UserUtilities import config, getUsernameFromSiteDB
 
 config = Configuration()
 
-version = "PROD_2_0"
+version = "PROD_4_0"
 
 datasetToTest = [] ## if empty, run on all datasets
 #datasetToTest = ['/DYJetsToLL_M-105To160_TuneCP5_PSweights_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM']
@@ -14,7 +14,7 @@ requestsToSkip = [
 ]
 
 requestsToTest = [ ## if empty, run on all datasets
-    "PROD_2_0_EWKZ_2018MGHERWIG",
+#    "PROD_2_0_EWKZ_2018MGHERWIG",
 #    "PROD_2_0_WWJJlnln_2017MGPY",
 #    "PROD_2_0_EWKZ105_2016MGHERWIG",
 ] ## if empty, run on all datasets
