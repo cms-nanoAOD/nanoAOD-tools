@@ -1,23 +1,11 @@
 data2016 = {
-"SingleMuonRun2016B"     : [
+"SingleMuonRun2016"     : [
     "/SingleMuon/Run2016B_ver2-Nano1June2019_ver2-v1/NANOAOD", 
-],
-"SingleMuonRun2016C"     : [
     "/SingleMuon/Run2016C-Nano1June2019-v1/NANOAOD", 
-],
-"SingleMuonRun2016D"     : [
     "/SingleMuon/Run2016D-Nano1June2019-v1/NANOAOD", 
-],
-"SingleMuonRun2016E"     : [
     "/SingleMuon/Run2016E-Nano1June2019-v1/NANOAOD", 
-],
-"SingleMuonRun2016F"     : [
     "/SingleMuon/Run2016F-Nano1June2019-v1/NANOAOD", 
-],
-"SingleMuonRun2016G"     : [
     "/SingleMuon/Run2016G-Nano1June2019-v1/NANOAOD", 
-],
-"SingleMuonRun2016H"     : [
     "/SingleMuon/Run2016H-Nano1June2019-v1/NANOAOD"
 ],
 }

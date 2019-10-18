@@ -54,6 +54,7 @@ class vbfhmmProducer(Module):
         muons = Collection(event, "Muon")
         jets = Collection(event, "Jet")
         photons = Collection(event, "Photon")
+        fsrPhoton = Collection(event, "FsrPhoton")
 
         eventSum = ROOT.TLorentzVector()
         
@@ -94,10 +95,15 @@ class vbfhmmProducer(Module):
             muon_corrected_p4.SetPtEtaPhiM(lep.corrected_pt , lep.eta, lep.phi, lep.mass)
             lep.iso = lep.pfRelIso04_all
             lep.correctedROC_pt = lep.corrected_pt
-            if lep.iso_FSR < 0.8 : 
-                lep.FSR_p4.SetPtEtaPhiM(lep.pt_FSR , lep.eta_FSR, lep.phi_FSR, 0)
+            #if lep.iso_FSR < 0.8 : 
+                #lep.FSR_p4.SetPtEtaPhiM(lep.pt_FSR , lep.eta_FSR, lep.phi_FSR, 0)
+                #lep.correctedROC_pt = (muon_corrected_p4 + lep.FSR_p4).Pt()
+                #lep.iso = (lep.pfRelIso04_all*lep.pt-lep.pt_FSR)/lep.correctedROC_pt
+            if lep.fsrPhotonIdx!=-1 and fsrPhoton[ lep.fsrPhotonIdx].relIso03 <0.8 and fsrPhoton[ lep.fsrPhotonIdx].dROverEt2 < 0.019 :
+                lep.FSR_p4.SetPtEtaPhiM(fsrPhoton[ lep.fsrPhotonIdx].pt,fsrPhoton[
+                lep.fsrPhotonIdx].eta,fsrPhoton[ lep.fsrPhotonIdx].phi, 0)
                 lep.correctedROC_pt = (muon_corrected_p4 + lep.FSR_p4).Pt()
-                lep.iso = (lep.pfRelIso04_all*lep.pt-lep.pt_FSR)/lep.correctedROC_pt
+                lep.iso = (lep.pfRelIso04_all*lep.pt-lep.FSR_p4.Pt())/lep.correctedROC_pt
                 
             eventSum += lep.p4()
             if lep.iso<0.25 and abs(lep.pdgId)==13 and lep.mediumId and lep.correctedROC_pt>20 and not dimuonSelection :
@@ -130,8 +136,9 @@ class vbfhmmProducer(Module):
         muonfilter = lambda j : (j.muonIdx1==-1 or muons[j.muonIdx1].iso>0.25 or not muons[j.muonIdx1].mediumId or muons[j.muonIdx1].correctedROC_pt<20) and (j.muonIdx2==-1 or muons[j.muonIdx2].iso>0.25 or not muons[j.muonIdx2].mediumId or muons[j.muonIdx2].correctedROC_pt<20)
         #electronfilter = lambda j : (j.electronIdx1==-1 or electrons[j.electronIdx1].pfRelIso03_all>0.25 or abs(electrons[j.electronIdx1].dz) > 0.2 or abs(electrons[j.electronIdx1].dxy) > 0.05) and(j.electronIdx2==-1 or electrons[j.electronIdx2].pfRelIso03_all>0.25 or abs(electrons[j.electronIdx2].dz) > 0.2 or abs(electrons[j.electronIdx2].dxy) > 0.05)
         
-        jetFilter1    = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0) and abs(j.eta)<4.7 and (abs(j.eta)<2.5 or j.puId>6 or j.pt>50))
-        jetFilter2    = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0) and abs(j.eta)<4.7 )
+        jetFilter1      = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0  ) and abs(j.eta)<4.7 and (abs(j.eta)<2.5 or j.puId>6 or j.pt>50))
+        jetFilter2      = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0  ) and abs(j.eta)<4.7 )
+        jetFilter2_2017 = lambda j : (j.jetId>0 and (j.pt>50 or j.puId17>0) and abs(j.eta)<4.7 )
                 
                 
         jetsNolep = [j for j in jets if muonfilter(j)]
@@ -139,25 +146,21 @@ class vbfhmmProducer(Module):
         
         if len(jetsNolep) < 2:
             return False
-        passAtLeastOne_Criteria1=False
-        passAtLeastOne_Criteria2=False
+        passAtLeastOne=False
         for vn in self.jesVariation:
             for j in jetsNolep:
                 j.PT=getattr(j, vn)
             sortedJets=sorted(jetsNolep,key=lambda j : j.PT, reverse=True)
             jetsCriteria1=[j for j in sortedJets if jetFilter1(j)]
             jetsCriteria2=[j for j in sortedJets if jetFilter2(j)]
-            if ( len(jetsCriteria1)>=2 and jetsCriteria1[0].PT > 25 and jetsCriteria1[1].PT > 20 and self.mqq(jetsCriteria1) > 250 ) : passAtLeastOne_Criteria1=True
-            if ( len(jetsCriteria2)>=2 and jetsCriteria2[0].PT > 35 and jetsCriteria2[1].PT > 25 and self.mqq(jetsCriteria2) > 250 ) : passAtLeastOne_Criteria2=True
-            #if passAtLeastOne_Criteria1 or passAtLeastOne_Criteria2 : break
-
-
-
-        
+            jetsCriteria2_2017=[j for j in sortedJets if jetFilter2_2017(j)]
+            if ( len(jetsCriteria1)>=2 and jetsCriteria1[0].PT > 35 and jetsCriteria1[1].PT > 25 and self.mqq(jetsCriteria1) > 250 ) : passAtLeastOne=True
+            if ( len(jetsCriteria2)>=2 and jetsCriteria2[0].PT > 35 and jetsCriteria2[1].PT > 25 and self.mqq(jetsCriteria2) > 250 ) : passAtLeastOne=True
+            if ( len(jetsCriteria2_2017)>=2 and jetsCriteria2_2017[0].PT > 35 and jetsCriteria2_2017[1].PT > 25 and self.mqq(jetsCriteria2_2017) > 250 ) : passAtLeastOne=True
         
         dijetMass = 0    
  
-        if not passAtLeastOne_Criteria1 and not passAtLeastOne_Criteria2 : return False
+        if not passAtLeastOne : return False
 
 
         #self.out.fillBranch("EventMass",eventSum.M())
@@ -165,8 +168,6 @@ class vbfhmmProducer(Module):
         self.out.fillBranch("qqMass",dijetMass)
         #self.out.fillBranch("jetIdx1",jetIdx1)
         #self.out.fillBranch("jetIdx2",jetIdx2)
-        self.out.fillBranch("selectionVBF",passAtLeastOne_Criteria1)
-        self.out.fillBranch("selectionInclusive",passAtLeastOne_Criteria2)
         #self.out.fillBranch("jetNumber",jetNumber)
         #self.out.fillBranch("bjetNumber",bjetNumber)
         self.out.fillBranch("muonNumber",muonNumber)

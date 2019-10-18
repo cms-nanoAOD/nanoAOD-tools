@@ -53,7 +53,7 @@ def haddSample((sample, datasets)):
     outputFile = "%s.root"%(sample)
     script.write('''
 if [ `find -cmin -120 | grep root | wc -l` != '0' ]
-    then rm -f %s && python %s %s *.root\n && mv %s ..
+    then rm -f %s && python %s %s *.root && mv %s ..
 fi
 '''%(outputFile, haddPath, outputFile, outputFile))
 #        script.write('rm %s/%s/*root\n'%(outputFolder, sample))

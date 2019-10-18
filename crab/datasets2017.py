@@ -1,17 +1,9 @@
 data2017 = {
-"SingleMuonRun2017B"     : [
+"SingleMuonRun2017"     : [
     "/SingleMuon/Run2017B-Nano1June2019-v1/NANOAOD", 
-],
-"SingleMuonRun2017C"     : [
     "/SingleMuon/Run2017C-Nano1June2019-v1/NANOAOD", 
-],
-"SingleMuonRun2017D"     : [
     "/SingleMuon/Run2017D-Nano1June2019-v1/NANOAOD", 
-],
-"SingleMuonRun2017E"     : [
     "/SingleMuon/Run2017E-Nano1June2019-v1/NANOAOD", 
-],
-"SingleMuonRun2017F"     : [
     "/SingleMuon/Run2017F-Nano1June2019-v1/NANOAOD", 
 ],
 }
