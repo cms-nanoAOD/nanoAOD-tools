@@ -42,15 +42,12 @@ mc2018 = {
     "/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19_ext2-v1/NANOAODSIM"
 ],
 
-#"EWKZ_2018MGHERWIG"         : [
-    #""
-#],
+"EWKZ_2018MGHERWIG"         : [
+    "/EWK_LLJJ_MLL-50_MJJ-120_TuneCH3_PSweights_13TeV-madgraph-herwig7/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v2/NANOAODSIM"
+],
 "EWKZ_2018MGPY"             : [
     "/EWK_LLJJ_MLL-50_MJJ-120_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM"
 ],
-#"EWKZ105_2018MGHERWIG"      : [
-    #""
-#],
 "EWKZint_2018MGPY"          : [
     "/LLJJ_INT_SM_5f_LO_TuneCP5_PSweights_13TeV_madgraph-pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM"
 ],
