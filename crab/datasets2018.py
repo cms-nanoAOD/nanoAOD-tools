@@ -184,3 +184,35 @@ mc2018 = {
     "/VBFHToTauTau_M125_13TeV_powheg_pythia8/RunIIAutumn18NanoAODv5-Nano1June2019_102X_upgrade2018_realistic_v19_ext1-v1/NANOAODSIM"
 ],
 }
+
+
+
+from andreaDatasets import mc2018 as datasetsAndrea
+
+samples = mc2018
+
+for sample in samples:
+    for i, dataset in enumerate(samples[sample]):
+        primaryDataset = dataset.split("/")[1]
+        datasetTag = dataset.split("/")[2]
+        datasetMatched = [ds for ds in datasetsAndrea if primaryDataset in ds ]
+        if not "ext" in datasetTag: datasetMatched=[ds for ds in datasetMatched if not "ext" in ds.split("/")[2] ]
+        if "ext1" in datasetTag: datasetMatched=[ds for ds in datasetMatched if "ext1" in ds.split("/")[2] ]
+        if "ext2" in datasetTag: datasetMatched=[ds for ds in datasetMatched if "ext2" in ds.split("/")[2] ]
+        if "ext3" in datasetTag: datasetMatched=[ds for ds in datasetMatched if "ext3" in ds.split("/")[2] ]
+        if len(datasetMatched)==0: 
+            samples[sample][i] = None
+        elif len(datasetMatched)==1: 
+            samples[sample][i] = datasetMatched[0]
+            datasetsAndrea.remove(datasetMatched[0])
+        else: 
+            print "WARNING!", primaryDataset, datasetMatched
+samples["Unmatched"] = datasetsAndrea
+
+print 
+print datasetsAndrea
+print 
+
+import pprint
+
+pprint.pprint(samples)

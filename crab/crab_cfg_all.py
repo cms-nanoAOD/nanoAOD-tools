@@ -20,19 +20,30 @@ requestsToTest = [ ## if empty, run on all datasets
 ] ## if empty, run on all datasets
 
 
-def getModuleSettingsFromDataset(dataset):
-    datasetTag = dataset.split("/")[2]
-    if "RunIIAutumn18" in datasetTag: return 'mc2018'
-    elif "RunIIFall17" in datasetTag: return 'mc2017'
-    elif "RunIISummer16" in datasetTag: return 'mc2016'
-    elif "Run2016" in datasetTag: return 'data2016'
-    elif "Run2017" in datasetTag: return 'data2017'
-    elif "Run2018A" in datasetTag: return 'data2018A'
-    elif "Run2018B" in datasetTag: return 'data2018B'
-    elif "Run2018C" in datasetTag: return 'data2018C'
-    elif "Run2018D" in datasetTag: return 'data2018D'
-    else: raise Exception("Unable to find module settings for %s"%dataset)
+#def getModuleSettingsFromDataset(dataset):
+    #datasetTag = dataset.split("/")[2]
+    #if "RunIIAutumn18" in datasetTag: return 'mc2018'
+    #elif "RunIIFall17" in datasetTag: return 'mc2017'
+    #elif "RunIISummer16" in datasetTag: return 'mc2016'
+    #elif "Run2016" in datasetTag: return 'data2016'
+    #elif "Run2017" in datasetTag: return 'data2017'
+    #elif "Run2018A" in datasetTag: return 'data2018A'
+    #elif "Run2018B" in datasetTag: return 'data2018B'
+    #elif "Run2018C" in datasetTag: return 'data2018C'
+    #elif "Run2018D" in datasetTag: return 'data2018D'
+    #else: raise Exception("Unable to find module settings for %s"%dataset)
 
+def getModuleSettingsFromSampleName(sample):
+    if   "_2018" in sample: return 'mc2018'
+    elif "_2017" in sample: return 'mc2017'
+    elif "_2016" in sample: return 'mc2016'
+    elif "Run2016" in sample: return 'data2016'
+    elif "Run2017" in sample: return 'data2017'
+    elif "Run2018A" in sample: return 'data2018A'
+    elif "Run2018B" in sample: return 'data2018B'
+    elif "Run2018C" in sample: return 'data2018C'
+    elif "Run2018D" in sample: return 'data2018D'
+    else: raise Exception("Unable to find module settings for %s"%dataset)
 
 config.section_("General")
 config.General.transferLogs=True
@@ -66,14 +77,14 @@ config.Site.storageSite = "T2_IT_Legnaro"
 config.JobType.allowUndistributedCMSSW = True
 
 from datasets2016 import data2016, mc2016
-from datasets2017 import data2017, mc2017
-from datasets2018 import data2018, mc2018
+from datasets2017Andrea import data2017, mc2017
+from datasets2018Andrea import data2018, mc2018
 #from datasetsTest import data2018, mc2018
 
-datasetsNames = ["data2018", "mc2018", "data2017", "mc2017", "data2016", "mc2016"]
+datasetsNames = ["data2018", "mc2018", "data2017", "mc2017"]
 
 from checker import checkDatasets
-checkDatasets(datasetsNames, globals())
+#checkDatasets(datasetsNames, globals())
 
 from CRABAPI.RawCommand import crabCommand
 
@@ -84,6 +95,7 @@ if __name__ == '__main__':
         samples = datasets.keys()
         for sample in samples:
             for dataset in datasets[sample]:
+                if type(dataset) != str: continue
                 print "New job"
                 if datasetToTest and not dataset in datasetToTest: continue ## run only datasetToTest, if filled 
                 config.Data.inputDataset = dataset
@@ -105,7 +117,8 @@ if __name__ == '__main__':
                 if requestsToTest and not requestName in requestsToTest: continue ## run only requestsToTest, if filled 
                 config.General.requestName = requestName
                 config.Data.outputDatasetTag = version+"_"+dataset.split("/")[-2]
-                config.JobType.scriptExe = 'crab_script_%s.sh'%getModuleSettingsFromDataset(dataset)
+#                config.JobType.scriptExe = 'crab_script_%s.sh'%getModuleSettingsFromDataset(dataset)
+                config.JobType.scriptExe = 'crab_script_%s.sh'%getModuleSettingsFromSampleName(sample)
                 print
                 print config
                 print
@@ -113,4 +126,4 @@ if __name__ == '__main__':
                     crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
                     print "DONE"
                 except:
-                    print('crab submission failed. Move the the next job')
+                    print('crab submission failed. Move the the next job. %s'%requestName)

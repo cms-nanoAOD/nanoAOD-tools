@@ -161,9 +161,7 @@ mc2017 = {
 ],
 "ZZ4l_2017POWPY": [
     "/ZZTo4L_13TeV_powheg_pythia8/RunIIFall17NanoAODv5-PU2017_12Apr2018_Nano1June2019_102X_mc2017_realistic_v7-v1/NANOAODSIM", 
-    "/ZZTo4L_13TeV_powheg_pythia8/RunIIFall17NanoAODv5-PU2017_12Apr2018_Nano1June2019_102X_mc2017_realistic_v7_ext1-v1/NANOAODSIM"
-],
-"ZZ4l_2017AMCPY": [
+    "/ZZTo4L_13TeV_powheg_pythia8/RunIIFall17NanoAODv5-PU2017_12Apr2018_Nano1June2019_102X_mc2017_realistic_v7_ext1-v1/NANOAODSIM",
     "/ZZTo4L_13TeV_powheg_pythia8/RunIIFall17NanoAODv5-PU2017_12Apr2018_Nano1June2019_new_pmx_102X_mc2017_realistic_v7-v1/NANOAODSIM"
 ],
 
@@ -223,5 +221,32 @@ mc2017 = {
 
 
 
+from andreaDatasets import mc2017 as datasetsAndrea
 
+samples = mc2017
 
+for sample in samples:
+    for i, dataset in enumerate(samples[sample]):
+        primaryDataset = dataset.split("/")[1]
+        datasetTag = dataset.split("/")[2]
+        datasetMatched = [ds for ds in datasetsAndrea if primaryDataset in ds ]
+        if not "ext" in datasetTag: datasetMatched=[ds for ds in datasetMatched if not "ext" in ds.split("/")[2] ]
+        if "ext1" in datasetTag: datasetMatched=[ds for ds in datasetMatched if "ext1" in ds.split("/")[2] ]
+        if "ext2" in datasetTag: datasetMatched=[ds for ds in datasetMatched if "ext2" in ds.split("/")[2] ]
+        if "ext3" in datasetTag: datasetMatched=[ds for ds in datasetMatched if "ext3" in ds.split("/")[2] ]
+        if len(datasetMatched)==0: 
+            samples[sample][i] = None
+        elif len(datasetMatched)==1: 
+            samples[sample][i] = datasetMatched[0]
+            datasetsAndrea.remove(datasetMatched[0])
+        else: 
+            print "WARNING!", primaryDataset, datasetMatched
+samples["Unmatched"] = datasetsAndrea
+
+print 
+print datasetsAndrea
+print 
+
+import pprint
+
+pprint.pprint(samples)
