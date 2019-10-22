@@ -62,6 +62,7 @@ class JetReCalibrator:
     def getCorrection(self,jet,rho,delta=0,corrector=None):
         if not corrector: corrector = self.JetCorrector
         if corrector != self.JetCorrector and delta!=0: raise RuntimeError('Configuration not supported')
+        corrector.setJetPhi(jet.phi)
         corrector.setJetEta(jet.eta)
         corrector.setJetPt(jet.pt*(1.-jet.rawFactor))
         corrector.setJetA(jet.area)
@@ -69,6 +70,7 @@ class JetReCalibrator:
         corr = corrector.getCorrection()
         if delta != 0:
             if not self.JetUncertainty: raise RuntimeError("Jet energy scale uncertainty shifts requested, but not available")
+            self.JetUncertainty.setJetPhi(jet.phi)
             self.JetUncertainty.setJetEta(jet.eta)
             self.JetUncertainty.setJetPt(corr * jet.pt * (1.-jet.rawFactor))
             try:
