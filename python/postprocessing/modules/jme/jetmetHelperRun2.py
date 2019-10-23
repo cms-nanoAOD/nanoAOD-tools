@@ -53,7 +53,7 @@ jmsValues = { '2016' : [1.00, 0.9906, 1.0094], #nominal, down, up
               '2018' : [0.982, 0.978, 0.986] # Use 2017 values for 2018 until 2018 are released
             }
 
-def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total", redojec=False, jetType = "AK4PFchs", noGroom=False, metBranchName="MET"):
+def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total", redojec=False, jetType = "AK4PFchs", noGroom=False, metBranchName="MET", applySmearing=True):
     
     dataYear = str(dataYear)
     jecTag_ = jecTagsMC[dataYear] if isMC else jecTagsDATA[dataYear + runPeriod]
@@ -78,7 +78,7 @@ def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total
 
     if 'AK4' in jetType:
       if isMC:
-          jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, metBranchName=met_)
+          jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, metBranchName=met_, jmrVals = jmrValues_, jmsVals = jmsValues_, applySmearing = applySmearing)
       else:
           jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, archive=archiveTag_, globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, metBranchName=met_, isData=True)
     # no MET variations calculated
