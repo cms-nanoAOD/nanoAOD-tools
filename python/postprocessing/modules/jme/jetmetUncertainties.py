@@ -136,10 +136,12 @@ class jetmetUncertaintiesProducer(Module):
             pars = ROOT.JetCorrectorParameters(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName),jesUncertainty_label)
             self.jesUncertainty[jesUncertainty] = ROOT.JetCorrectionUncertainty(pars)    
 
-        self.jetSmearer.beginJob()
+        if not self.isData:
+            self.jetSmearer.beginJob()
 
     def endJob(self):
-        self.jetSmearer.endJob()
+        if not self.isData:
+            self.jetSmearer.endJob()
         shutil.rmtree(self.jesInputFilePath)
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -202,7 +204,8 @@ class jetmetUncertaintiesProducer(Module):
           jet.neEmEF    = 0
           jet.chEmEF    = 0
 
-        self.jetSmearer.setSeed(event)
+        if not self.isData:
+            self.jetSmearer.setSeed(event)
         
         jets_pt_raw = []
         jets_pt_jer = []
@@ -365,22 +368,33 @@ class jetmetUncertaintiesProducer(Module):
                     delta_x_rawJet += jet_pt_raw * math.cos(jet.phi)
                     delta_y_rawJet += jet_pt_raw * math.sin(jet.phi)
 
+
+
             # don't store the low pt jets in the Jet_pt_nom branch
             if iJet < nJet:
-              jets_pt_raw     .append(jet_pt_raw)
-              jets_pt_nom     .append(jet_pt_nom)
-              jets_mass_raw   .append(jet_rawmass)
-              jets_corr_JEC   .append(jet_pt/jet_pt_raw)
-              jets_corr_JER   .append(jet_pt_jerNomVal)  # can be used to undo JER
+                # Evaluate JMS and JMR scale factors and uncertainties
+                jmsNomVal, jmsDownVal, jmsUpVal  = self.jmsVals if not self.isData else (1,1,1)
+                if not self.isData:
+                    ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = self.jetSmearer.getSmearValsM(jet, genJet)
+                else:
+                    ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = (1, 1, 1)
+                jets_pt_raw     .append(jet_pt_raw)
+                jets_pt_nom     .append(jet_pt_nom)
+                jets_mass_raw   .append(jet_rawmass)
+                jets_corr_JEC   .append(jet_pt/jet_pt_raw)
+                jets_corr_JER   .append(jet_pt_jerNomVal)  # can be used to undo JER
+                jets_corr_JMS   .append(jmsNomVal)
+                jets_corr_JMR   .append(jet_mass_jmrNomVal)
+
+                # no need to do this for low pt jets
+                jet_mass_nom           = jet_pt_jerNomVal*jet_mass_jmrNomVal*jmsNomVal*jet_mass if self.applySmearing else jet_mass
+                if jet_mass_nom < 0.0:
+                    jet_mass_nom *= -1.0
+                jets_mass_nom    .append(jet_mass_nom)
 
             if not self.isData:
               jet_pt_jerUp         = jet_pt_jerUpVal  *jet_pt
               jet_pt_jerDown       = jet_pt_jerDownVal*jet_pt
-
-              # don't store the low pt jets in the Jet_pt_nom branch
-              if iJet < nJet:
-                jets_pt_jerUp   .append(jet_pt_jerUpVal*jet_pt)
-                jets_pt_jerDown .append(jet_pt_jerDownVal*jet_pt)
 
               # evaluate JES uncertainties
               jet_pt_jesUp     = {}
@@ -393,18 +407,10 @@ class jetmetUncertaintiesProducer(Module):
               jet_mass_jmsUp   = []
               jet_mass_jmsDown = []
 
-              # Evaluate JMS and JMR scale factors and uncertainties
-              jmsNomVal, jmsDownVal, jmsUpVal  = self.jmsVals
-
+              # don't store the low pt jets in the Jet_pt_nom branch
               if iJet < nJet:
-                  ( jet_mass_jmrNomVal, jet_mass_jmrUpVal, jet_mass_jmrDownVal ) = self.jetSmearer.getSmearValsM(jet, genJet)
-                  jets_corr_JMS   .append(jmsNomVal)
-                  jets_corr_JMR   .append(jet_mass_jmrNomVal)
-
-                  jet_mass_nom           = jet_pt_jerNomVal*jet_mass_jmrNomVal*jmsNomVal*jet_mass if self.applySmearing else jet_mass
-                  if jet_mass_nom < 0.0:
-                      jet_mass_nom *= -1.0
-                  jets_mass_nom    .append(jet_mass_nom)
+                  jets_pt_jerUp    .append(jet_pt_jerUpVal*jet_pt)
+                  jets_pt_jerDown  .append(jet_pt_jerDownVal*jet_pt)
                   jets_mass_jerUp  .append(jet_pt_jerUpVal  *jet_mass_jmrNomVal *jmsNomVal  *jet_mass)
                   jets_mass_jerDown.append(jet_pt_jerDownVal*jet_mass_jmrNomVal *jmsNomVal  *jet_mass)
                   jets_mass_jmrUp  .append(jet_pt_jerNomVal *jet_mass_jmrUpVal  *jmsNomVal  *jet_mass)
