@@ -52,7 +52,7 @@ class jetmetUncertaintiesProducer(Module):
             if self.era in ["2017","2018"]:
                 self.jmrVals = [1.09, 1.14, 1.04] 
 
-        self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName)
+        self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName, self.jmrVals)
 
         if "AK4" in jetType : 
             self.jetBranchName = "Jet"
@@ -285,7 +285,7 @@ class jetmetUncertaintiesProducer(Module):
                 jet_rawmass = -1.0 * jet_mass #If factor not present factor will be saved as -1
 
             (jet_pt, jet_mass)    = self.jetReCalibrator.correct(jet,rho)
-            (jet_pt_l1, jet_mass) = self.jetReCalibratorL1.correct(jet,rho)
+            (jet_pt_l1, jet_mass_l1) = self.jetReCalibratorL1.correct(jet,rho)
             jet.pt = jet_pt
             jet.mass = jet_mass
 
