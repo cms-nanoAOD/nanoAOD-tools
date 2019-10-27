@@ -27,6 +27,7 @@ class collectionMerger(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         _brlist = inputTree.GetListOfBranches()
         branches = [_brlist.At(i) for i in xrange(_brlist.GetEntries())]
+        branches = filter(lambda x: inputTree.GetBranchStatus(x.GetName()), branches)
         self.brlist_sep = [self.filterBranchNames(branches,x) for x in self.input]
         self.brlist_all = set(itertools.chain(*(self.brlist_sep)))
 
