@@ -37,7 +37,7 @@ from checker import checkModulesToBeCalled
 checkModulesToBeCalled(modulesToBeCalled)
 
 from checker import checkModuleSettingsFromFileName
-checkModuleSettingsFromFileName(PSet.process.source.fileNames[0], moduleSettings)
+#checkModuleSettingsFromFileName(PSet.process.source.fileNames[0], moduleSettings)
 
 print "I'm using the configuration %s: %s"%(moduleSettings, modulesToBeCalled[moduleSettings])
 
