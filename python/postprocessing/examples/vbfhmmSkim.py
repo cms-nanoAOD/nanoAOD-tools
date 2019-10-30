@@ -139,6 +139,7 @@ class vbfhmmProducer(Module):
         jetFilter1      = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0  ) and abs(j.eta)<4.7 and (abs(j.eta)<2.5 or j.puId>6 or j.pt>50))
         jetFilter2      = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0  ) and abs(j.eta)<4.7 )
         jetFilter2_2017 = lambda j : (j.jetId>0 and (j.pt>50 or j.puId17>0) and abs(j.eta)<4.7 )
+        jetFilter3_2017 = lambda j : (j.jetId>0 and (j.pt>50 or j.puId17>0) and abs(j.eta)<4.7 ) and (j.puId17 > 6 or abs(j.eta) < 2.65 or abs(j.eta) > 3.1 ))
                 
                 
         jetsNolep = [j for j in jets if muonfilter(j)]
@@ -154,9 +155,11 @@ class vbfhmmProducer(Module):
             jetsCriteria1=[j for j in sortedJets if jetFilter1(j)]
             jetsCriteria2=[j for j in sortedJets if jetFilter2(j)]
             jetsCriteria2_2017=[j for j in sortedJets if jetFilter2_2017(j)]
+            jetsCriteria3_2017=[j for j in sortedJets if jetFilter3_2017(j)]
             if ( len(jetsCriteria1)>=2 and jetsCriteria1[0].PT > 35 and jetsCriteria1[1].PT > 25 and self.mqq(jetsCriteria1) > 250 ) : passAtLeastOne=True
             if ( len(jetsCriteria2)>=2 and jetsCriteria2[0].PT > 35 and jetsCriteria2[1].PT > 25 and self.mqq(jetsCriteria2) > 250 ) : passAtLeastOne=True
             if ( len(jetsCriteria2_2017)>=2 and jetsCriteria2_2017[0].PT > 35 and jetsCriteria2_2017[1].PT > 25 and self.mqq(jetsCriteria2_2017) > 250 ) : passAtLeastOne=True
+            if ( len(jetsCriteria3_2017)>=2 and jetsCriteria3_2017[0].PT > 35 and jetsCriteria3_2017[1].PT > 25 and self.mqq(jetsCriteria3_2017) > 250 ) : passAtLeastOne=True
         
         dijetMass = 0    
  
