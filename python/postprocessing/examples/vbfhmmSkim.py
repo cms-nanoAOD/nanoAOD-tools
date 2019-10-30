@@ -139,7 +139,7 @@ class vbfhmmProducer(Module):
         jetFilter1      = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0  ) and abs(j.eta)<4.7 and (abs(j.eta)<2.5 or j.puId>6 or j.pt>50))
         jetFilter2      = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0  ) and abs(j.eta)<4.7 )
         jetFilter2_2017 = lambda j : (j.jetId>0 and (j.pt>50 or j.puId17>0) and abs(j.eta)<4.7 )
-        jetFilter3_2017 = lambda j : (j.jetId>0 and (j.pt>50 or j.puId17>0) and abs(j.eta)<4.7 ) and (j.puId17 > 6 or abs(j.eta) < 2.65 or abs(j.eta) > 3.1 ))
+        jetFilter3_2017 = lambda j : (j.jetId>0 and (j.pt>50 or j.puId17>0) and abs(j.eta)<4.7 ) and (j.puId17 > 6 or abs(j.eta) < 2.65 or abs(j.eta) > 3.1 )
                 
                 
         jetsNolep = [j for j in jets if muonfilter(j)]
