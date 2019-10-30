@@ -1,22 +1,20 @@
+nprocesses = 32
+version = "PROD_4_1_d"
+folder = "/home/users/sdonato/scratchssd/fileSkimFromNanoAOD"
+server = "t2-xrdcms.lnl.infn.it:7070"
+haddPath = "/home/users/sdonato/scratchssd/Skim/CMSSW_10_2_6/src/PhysicsTools/NanoAODTools/scripts/haddnano.py"
+datasetsNames = ["data2018", "mc2018", "data2017", "mc2017", "data2016", "mc2016"]
+
 import subprocess
 import os
 
-nprocesses = 10
-
-from datasets2016 import data2016, mc2016
-from datasets2017 import data2017, mc2017
-from datasets2018 import data2018, mc2018
-
-datasetsNames = ["data2018", "mc2018", "data2017", "mc2017", "data2016", "mc2016"]
+from datasets2016Andrea import data2016, mc2016
+from datasets2017Andrea import data2017, mc2017
+from datasets2018Andrea import data2018, mc2018
 
 from checker import checkDatasets
-checkDatasets(datasetsNames, globals())
+#checkDatasets(datasetsNames, globals())
 
-server = "t2-xrdcms.lnl.infn.it:7070"
-haddPath = "/home/users/sdonato/scratchssd/Skim/CMSSW_10_2_6/src/PhysicsTools/NanoAODTools/scripts/haddnano.py"
-
-version = "PROD_2_0"
-folder = "/home/users/sdonato/scratchssd/fileSkimFromNanoAOD"
 #suffix = "_nano"+Y+".root"
 #year = "_" + Y
 #suffix = ".root"
@@ -36,10 +34,12 @@ def haddSample((sample, datasets)):
     print "Creating script.sh in %s"%(scriptPath)
     script.write("cd %s\n"%folderSample)
     for dataset in datasets:
+        if not dataset: continue
         script.write("\n### DATASET: %s ###\n"%dataset)
         datasetPrimary = dataset.split("/")[1]
         datasetTag = dataset.split("/")[2]
         command = "xrdfs %s ls -u -R /store/user/sdonato/%s/%s/%s_%s | grep tree | grep -v failed "%(server, version,datasetPrimary,version,datasetTag)
+        script.write("# %s \n"%command)
         try:
             xrootdFileNames = os.popen ( command ).read().split("\n")
 #            xrootdFileNames = xrootdFileNames[:2]
@@ -82,7 +82,7 @@ for datasetsName in datasetsNames:
 #        if not sample in [
 #    "EWKZ_2017MGHERWIG",
 #    "WWJJlnln_2017MGPY",
-#    "EWKZ105_2016MGHERWIG",]: continue
+#    "WWJJlnln_2016MGPY",]: continue
         if not sample in allSamples:
             allSamples.append((sample, datasets[sample]))
         else:
