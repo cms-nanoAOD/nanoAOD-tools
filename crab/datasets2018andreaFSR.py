@@ -1,17 +1,18 @@
 data2018 = {
 "SingleMuonRun2018A"     : [
-    "/SingleMuon/Run2018A-Nano1June2019-v1/NANOAOD", 
+    '/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2018ABC_NANOV4d_un2018A-17Sep2018-v2-c62fa4eac878db7eaebfd84006f0e75e/USER'
 ],
 "SingleMuonRun2018B"     : [
-    "/SingleMuon/Run2018B-Nano1June2019-v1/NANOAOD", 
+    '/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2018ABC_NANOV4d_un2018B-17Sep2018-v1-c62fa4eac878db7eaebfd84006f0e75e/USER'
 ],
 "SingleMuonRun2018C"     : [
-    "/SingleMuon/Run2018C-Nano1June2019-v1/NANOAOD", 
+    '/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2018ABC_NANOV4d_un2018C-17Sep2018-v1-c62fa4eac878db7eaebfd84006f0e75e/USER'
 ],
 "SingleMuonRun2018D"     : [
-    "/SingleMuon/Run2018D-Nano1June2019-v1/NANOAOD", 
+    '/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2018D_NANOV4d_un2018D-22Jan2019-v2-7a3e88d5f53fe32949a96cea99d3e905/USER'
 ],
 }
+
 
 mc2018 = {
 "DY105_2018AMCPY"     : [
