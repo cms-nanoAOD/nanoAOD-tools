@@ -11,7 +11,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetS
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
 class jetmetUncertaintiesProducer(Module):
-    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], archive=None, globalTagProd=None, jetType = "AK4PFchs", metBranchName="MET", jerTag="", isData=False, jmrVals = [], applySmearing=True):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], archive=None, globalTagProd=None, jetType = "AK4PFchs", metBranchName="MET", jerTag="", isData=False, applySmearing=True):
 
         # globalTagProd only needs to be defined if METFixEE2017 is to be recorrected, and should be the GT that was used for the production of the nanoAOD files
         self.era = era
@@ -43,16 +43,7 @@ class jetmetUncertaintiesProducer(Module):
                 self.jerInputFileName = "Autumn18_V7_MC_PtResolution_" + jetType + ".txt"
                 self.jerUncertaintyInputFileName = "Autumn18_V7_MC_SF_" + jetType + ".txt"
 
-        #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
-        self.jmrVals = jmrVals
-        if not self.jmrVals:
-            print "WARNING: jmrVals is empty!!! Using default values. This module will soon be deprecated! Please use jetmetHelperRun2 in the future."
-            self.jmrVals = [1.0, 1.2, 0.8] #nominal, up, down
-            # Use 2017 values for 2018 until 2018 are released
-            if self.era in ["2017","2018"]:
-                self.jmrVals = [1.09, 1.14, 1.04] 
-
-        self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName, self.jmrVals)
+        self.jetSmearer = jetSmearer(globalTag, jetType, self.jerInputFileName, self.jerUncertaintyInputFileName)
 
         if "AK4" in jetType : 
             self.jetBranchName = "Jet"
@@ -135,7 +126,7 @@ class jetmetUncertaintiesProducer(Module):
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.out.branch("%s_rawpt" % self.jetBranchName, "F", lenVar=self.lenVar)
+        self.out.branch("%s_pt_raw" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_pt_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_mass_raw" % self.jetBranchName, "F", lenVar=self.lenVar)
         self.out.branch("%s_mass_nom" % self.jetBranchName, "F", lenVar=self.lenVar)
@@ -260,10 +251,10 @@ class jetmetUncertaintiesProducer(Module):
 
             #redo JECs if desired
             if hasattr(jet, "rawFactor"):
-                jet_pt_raw = jet_pt * (1 - jet.rawFactor)
+                jet_rawpt = jet_pt * (1 - jet.rawFactor)
                 jet_rawmass = jet_mass * (1 - jet.rawFactor)
             else:
-                jet_pt_raw = -1.0 * jet_pt #If factor not present factor will be saved as -1
+                jet_rawpt = -1.0 * jet_pt #If factor not present factor will be saved as -1
                 jet_rawmass = -1.0 * jet_mass #If factor not present factor will be saved as -1
 
             (jet_pt, jet_mass)    = self.jetReCalibrator.correct(jet,rho)
@@ -272,11 +263,11 @@ class jetmetUncertaintiesProducer(Module):
             jet.mass = jet_mass
 
             # Get the JEC factors
-            jec   = jet_pt/jet_pt_raw
-            jecL1 = jet_pt_l1/jet_pt_raw
+            jec   = jet_pt/jet_rawpt
+            jecL1 = jet_pt_l1/jet_rawpt
             if self.jetReCalibratorProd:
-              jecProd = self.jetReCalibratorProd.correct(jet,rho)[0]/jet_pt_raw
-              jecL1Prod = self.jetReCalibratorProdL1.correct(jet,rho)[0]/jet_pt_raw
+              jecProd = self.jetReCalibratorProd.correct(jet,rho)[0]/jet_rawpt
+              jecL1Prod = self.jetReCalibratorProdL1.correct(jet,rho)[0]/jet_rawpt
 
             if not self.isData:
               genJet = pairs[jet]
@@ -338,23 +329,23 @@ class jetmetUncertaintiesProducer(Module):
 
             if self.metBranchName == 'METFixEE2017':
                 # get the delta for removing L1L2L3-L1 corrected jets (corrected with GT from nanoAOD production!!) in the EE region from the default MET branch.
-                if jet_pt_prodL1L2L3 > self.unclEnThreshold and 2.65<abs(jet.eta)<3.14 and jet_pt_raw < 50:
-                    delta_x_T1Jet  += (jet_pt_prodL1L2L3-jet_pt_prodL1) * math.cos(jet.phi) + jet_pt_raw * math.cos(jet.phi)
-                    delta_y_T1Jet  += (jet_pt_prodL1L2L3-jet_pt_prodL1) * math.sin(jet.phi) + jet_pt_raw * math.sin(jet.phi)
+                if jet_pt_prodL1L2L3 > self.unclEnThreshold and 2.65<abs(jet.eta)<3.14 and jet_rawpt < 50:
+                    delta_x_T1Jet  += (jet_pt_prodL1L2L3-jet_pt_prodL1) * math.cos(jet.phi) + jet_rawpt * math.cos(jet.phi)
+                    delta_y_T1Jet  += (jet_pt_prodL1L2L3-jet_pt_prodL1) * math.sin(jet.phi) + jet_rawpt * math.sin(jet.phi)
 
                 # get the delta for removing raw jets in the EE region from the raw MET
-                if jet_pt_prodL1L2L3 > self.unclEnThreshold and 2.65<abs(jet.eta)<3.14 and jet_pt_raw < 50:
-                    delta_x_rawJet += jet_pt_raw * math.cos(jet.phi)
-                    delta_y_rawJet += jet_pt_raw * math.sin(jet.phi)
+                if jet_pt_prodL1L2L3 > self.unclEnThreshold and 2.65<abs(jet.eta)<3.14 and jet_rawpt < 50:
+                    delta_x_rawJet += jet_rawpt * math.cos(jet.phi)
+                    delta_y_rawJet += jet_rawpt * math.sin(jet.phi)
 
 
 
             # don't store the low pt jets in the Jet_pt_nom branch
             if iJet < nJet:
-                jets_pt_raw     .append(jet_pt_raw)
+                jets_pt_raw     .append(jet_rawpt)
                 jets_pt_nom     .append(jet_pt_nom)
                 jets_mass_raw   .append(jet_rawmass)
-                jets_corr_JEC   .append(jet_pt/jet_pt_raw)
+                jets_corr_JEC   .append(jet_pt/jet_rawpt)
                 jets_corr_JER   .append(jet_pt_jerNomVal)  # can be used to undo JER
 
                 # no need to do this for low pt jets
@@ -464,7 +455,7 @@ class jetmetUncertaintiesProducer(Module):
           met_py_unclEnDown  = met_py_unclEnDown - met_deltaPy_unclEn
 
 
-        self.out.fillBranch("%s_rawpt" % self.jetBranchName, jets_pt_raw)
+        self.out.fillBranch("%s_pt_raw" % self.jetBranchName, jets_pt_raw)
         self.out.fillBranch("%s_pt_nom" % self.jetBranchName, jets_pt_nom)
         self.out.fillBranch("%s_corr_JEC" % self.jetBranchName, jets_corr_JEC)
         self.out.fillBranch("%s_corr_JER" % self.jetBranchName, jets_corr_JER)
