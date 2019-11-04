@@ -80,7 +80,7 @@ class btagSFProducer(Module):
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 },
                 '2017' : {
-                    'inputFileName' : "DeepCSV_94XSF_V2_B_F.csv",
+                    'inputFileName' : "DeepCSV_94XSF_V4_B_F.csv",
                     'measurement_types' : {
                         0 : "comb",  # b
                         1 : "comb",  # c
@@ -109,7 +109,7 @@ class btagSFProducer(Module):
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 },
                 '2017' : {
-                    'inputFileName' : "DeepFlavour_94XSF_V2_B_F.csv",
+                    'inputFileName' : "DeepFlavour_94XSF_V3_B_F.csv",
                     'measurement_types' : {
                         0 : "comb",  # b
                         1 : "comb",  # c
