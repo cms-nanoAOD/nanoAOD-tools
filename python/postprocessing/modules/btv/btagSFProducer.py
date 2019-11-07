@@ -162,6 +162,8 @@ class btagSFProducer(Module):
             algoLabel = "deep-CSV (b)"
         elif self.algo == "cmva":
             algoLabel = "cMVA"
+        elif self.algo == "deepjet":
+            algoLabel = "DeepJet"
         else:
             raise ValueError("ERROR: Algorithm '%s' not supported for era = '%s'! Please choose among { %s }." % (self.algo, self.era, supported_algos))
         print("Loading btagSF weights for %s algorithm from file '%s'" % (algoLabel, os.path.join(self.inputFilePath, self.inputFileName)))
@@ -315,6 +317,8 @@ class btagSFProducer(Module):
             discr = "btagDeepB"
         elif self.algo == "cmva":
             discr = "btagCMVA"
+        elif self.algo == "deepjet":
+            discr = "btagDeepFlavB"
         else:
             raise ValueError("ERROR: Invalid algorithm '%s'! Please choose either 'csvv2' or 'cmva'." % self.algo)
 
