@@ -26,12 +26,15 @@ class TauCorrectionsProducer(Module):
         antiJetSFs = [ ]
         antiEleSFs = [ ]
         antiMuSFs  = [ ]
-        for wp in antiJetWPs:
-          antiJetSFs.append(TauIDSFTool(year,antiJetID,wp,dm=antiJetPerDM,path=datapath))
-        for wp in antiEleWPs:
-          antiEleSFs.append(TauIDSFTool(year,antiEleID,wp,path=datapath))
-        for wp in antiMuWPs:
-          antiMuSFs.append(TauIDSFTool(year,antiMuID,wp,path=datapath))
+        if antiJetID:
+          for wp in antiJetWPs:
+            antiJetSFs.append(TauIDSFTool(year,antiJetID,wp,dm=antiJetPerDM,path=datapath))
+        if antiEleID:
+          for wp in antiEleWPs:
+            antiEleSFs.append(TauIDSFTool(year,antiEleID,wp,path=datapath))
+        if antiMuID:
+          for wp in antiMuWPs:
+            antiMuSFs.append(TauIDSFTool(year,antiMuID,wp,path=datapath))
         
         # TAU ENERGY SCALE
         testool = None
