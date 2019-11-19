@@ -15,7 +15,7 @@ class TauCorrectionsProducer(Module):
                              antiEleID='antiEleMVA6',    antiEleWPs=['VLoose','Tight'],
                              antiMuID='antiMu3',         antiMuWPs=['Loose','Tight'],
                              antiJetPerDM=False, sys=True,
-                             tes=True, tesSys=True, verbose=True):
+                             tes=True, tesSys=True, verbose=False):
         """Choose the IDs and WPs for SFs. For available tau IDs, WPs and corrections, check
         https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html#Tau"""
         
