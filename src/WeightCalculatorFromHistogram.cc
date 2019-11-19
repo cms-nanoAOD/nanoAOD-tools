@@ -100,6 +100,7 @@ void WeightCalculatorFromHistogram::fixLargeWeights(std::vector<float> &weights,
   float maxw = std::min(*(std::max_element(weights.begin(),weights.end())),float(5.));
   std::vector<float> cropped;
   while (maxw > hardmax) {
+    cropped.clear();  
     for(int i=0; i<(int)weights.size(); ++i) cropped.push_back(std::min(maxw,weights[i]));
     float shift = checkIntegral(cropped,weights);
     if(verbose_) std::cout << "For maximum weight " << maxw << ": integral relative change: " << shift << std::endl;
