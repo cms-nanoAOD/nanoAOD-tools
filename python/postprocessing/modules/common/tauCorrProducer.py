@@ -14,7 +14,8 @@ class TauCorrectionsProducer(Module):
     def __init__(self, year, antiJetID='MVAoldDM2017v2', antiJetWPs=['Tight'],
                              antiEleID='antiEleMVA6',    antiEleWPs=['VLoose','Tight'],
                              antiMuID='antiMu3',         antiMuWPs=['Loose','Tight'],
-                             tes=True, tesSys=True, antiJetPerDM=False):
+                             antiJetPerDM=False, sys=True,
+                             tes=True, tesSys=True, verbose=True):
         """Choose the IDs and WPs for SFs. For available tau IDs, WPs and corrections, check
         https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html#Tau"""
         
@@ -28,13 +29,13 @@ class TauCorrectionsProducer(Module):
         antiMuSFs  = [ ]
         if antiJetID:
           for wp in antiJetWPs:
-            antiJetSFs.append(TauIDSFTool(year,antiJetID,wp,dm=antiJetPerDM,path=datapath))
+            antiJetSFs.append(TauIDSFTool(year,antiJetID,wp,dm=antiJetPerDM,path=datapath,verbose=verbose))
         if antiEleID:
           for wp in antiEleWPs:
-            antiEleSFs.append(TauIDSFTool(year,antiEleID,wp,path=datapath))
+            antiEleSFs.append(TauIDSFTool(year,antiEleID,wp,path=datapath,verbose=verbose))
         if antiMuID:
           for wp in antiMuWPs:
-            antiMuSFs.append(TauIDSFTool(year,antiMuID,wp,path=datapath))
+            antiMuSFs.append(TauIDSFTool(year,antiMuID,wp,path=datapath,verbose=verbose))
         
         # TAU ENERGY SCALE
         testool = None
@@ -47,9 +48,11 @@ class TauCorrectionsProducer(Module):
         self.antiEleSFs = antiEleSFs
         self.antiMuID   = antiMuID
         self.antiMuSFs  = antiMuSFs
+        self.doSys      = sys
         self.doTES      = tes
         self.doTESSys   = tes and tesSys
         self.testool    = testool
+        self.verbose    = verbose
     
     def beginJob(self):
         pass
@@ -62,15 +65,12 @@ class TauCorrectionsProducer(Module):
         self.out = wrappedOutputTree
         
         cap = lambda s: s[0].upper()+s[1:]
-        for tool in self.antiJetSFs:
+        for tool in self.antiJetSFs+self.antiEleSFs+self.antiMuSFs:
           tool.branchname = "Tau_sf%s_%s"%(cap(tool.ID),tool.WP)
           self.out.branch(tool.branchname,'F',lenVar='nTau',title="scale factor for the %s WP of the %s discriminator"%(tool.WP,tool.ID))
-        for tool in self.antiEleSFs+self.antiMuSFs:
-          tool.branchname = "Tau_sf%s_%s"%(cap(tool.ID),tool.WP)
-          self.out.branch(tool.branchname,'F',lenVar='nTau',title="scale factor for the %s WP of the %s discriminator"%(tool.WP,tool.ID))
-        for tool in self.antiMuSFs:
-          tool.branchname = "Tau_sf%s_%s"%(cap(tool.ID),tool.WP)
-          self.out.branch(tool.branchname,'F',lenVar='nTau',title="scale factor for the %s WP of the %s discriminator"%(tool.WP,tool.ID))
+          if self.doSys:
+            self.out.branch(tool.branchname+'Up',  'F',lenVar='nTau',title="scale factor for the %s WP of the %s discriminator, up variation"%(tool.WP,tool.ID))
+            self.out.branch(tool.branchname+'Down','F',lenVar='nTau',title="scale factor for the %s WP of the %s discriminator, down variation"%(tool.WP,tool.ID))
         
         if self.doTES:
           self.out.branch("Tau_pt_corr",         'F', lenVar='nTau', title="tau pT, corrected with the tau energy scale")
@@ -88,9 +88,18 @@ class TauCorrectionsProducer(Module):
         """Process event, return True (pass, go to next module) or False (fail, go to next event)."""
         
         # BRANCH VALUES
-        taus_antiJetSFs         = { t: [ 1. ]*event.nTau for t in self.antiJetSFs }
-        taus_antiEleSFs         = { t: [ 1. ]*event.nTau for t in self.antiEleSFs }
-        taus_antiMuSFs          = { t: [ 1. ]*event.nTau for t in self.antiMuSFs  }
+        if self.doSys:
+          tau_sfs = {
+            'antiJet': { t: ([1.]*event.nTau,[1.]*event.nTau,[1.]*event.nTau) for t in self.antiJetSFs },
+            'antiEle': { t: ([1.]*event.nTau,[1.]*event.nTau,[1.]*event.nTau) for t in self.antiEleSFs },
+            'antiMu':  { t: ([1.]*event.nTau,[1.]*event.nTau,[1.]*event.nTau) for t in self.antiMuSFs  },
+          }      
+        else:
+          tau_sfs = {
+            'antiJet': { t: [1.]*event.nTau for t in self.antiJetSFs },
+            'antiEle': { t: [1.]*event.nTau for t in self.antiEleSFs },
+            'antiMu':  { t: [1.]*event.nTau for t in self.antiMuSFs  },
+          }
         if self.doTES:
           taus_pt_corr         = [ ]
           taus_mass_corr       = [ ]
@@ -117,36 +126,55 @@ class TauCorrectionsProducer(Module):
           # REAL TAU
           if tau.genPartFlav==5:
             dm = tau.decayMode
-            for tool in taus_antiJetSFs:
-              taus_antiJetSFs[tool][i] = tool.getSFvsPT(tau.pt)
+            for tool in tau_sfs['antiJet']:
+              if self.doSys:
+                tau_sfs['antiJet'][tool][0][i], tau_sfs['antiJet'][tool][1][i], tau_sfs['antiJet'][tool][2][i] \
+                                            = tool.getSFvsPT(tau.pt,unc='All')
+              else:
+                tau_sfs['antiJet'][tool][i] = tool.getSFvsPT(tau.pt)
             if self.doTES:
-              tes                      = self.testool.getTES(dm)
-              taus_pt_corr[i]         *= tes
-              taus_mass_corr[i]       *= tes
               if self.doTESSys:
-                tesUp, tesDown         = self.testool.getTES(dm,'Up'), self.testool.getTES(dm,'Down')
+                tesDown, tes, tesUp    = self.testool.getTES(dm,unc='All')
+                taus_pt_corr[i]       *= tes
                 taus_pt_corrUp[i]     *= tesUp
                 taus_pt_corrDown[i]   *= tesDown
+                taus_mass_corr[i]     *= tes
                 taus_mass_corrUp[i]   *= tesUp
                 taus_mass_corrDown[i] *= tesDown
+              else:
+                tes                    = self.testool.getTES(dm)
+                taus_pt_corr[i]       *= tes
+                taus_mass_corr[i]     *= tes
           
           # ELECTRON -> TAU
           elif tau.genPartFlav in [1,3]:
-            for tool in taus_antiEleSFs:
-              taus_antiEleSFs[tool][i] = tool.getSFvsEta(tau.eta,tau.genPartFlav)
+            for tool in tau_sfs['antiEle']:
+              if self.doSys:
+                tau_sfs['antiEle'][tool][0][i], tau_sfs['antiEle'][tool][1][i], tau_sfs['antiEle'][tool][2][i] \
+                                            = tool.getSFvsEta(tau.eta,tau.genPartFlav,unc='All')
+              else:
+                tau_sfs['antiEle'][tool][i] = tool.getSFvsEta(tau.eta,tau.genPartFlav)
           
           # MUON -> TAU
           elif tau.genPartFlav in [2,4]:
-            for tool in taus_antiMuSFs:
-              taus_antiMuSFs[tool][i] = tool.getSFvsEta(tau.eta,tau.genPartFlav)
+            for tool in tau_sfs['antiMu']:
+              if self.doSys:
+                tau_sfs['antiMu'][tool][0][i], tau_sfs['antiMu'][tool][1][i], tau_sfs['antiMu'][tool][2][i] \
+                                           = tool.getSFvsEta(tau.eta,tau.genPartFlav,unc='All')
+              else:
+                tau_sfs['antiMu'][tool][i] = tool.getSFvsEta(tau.eta,tau.genPartFlav)
         
         # FILL BRANCHES
-        for tool in taus_antiJetSFs:
-          self.out.fillBranch(tool.branchname,taus_antiJetSFs[tool])
-        for tool in taus_antiEleSFs:
-          self.out.fillBranch(tool.branchname,taus_antiEleSFs[tool])
-        for tool in taus_antiMuSFs:
-          self.out.fillBranch(tool.branchname,taus_antiMuSFs[tool])
+        if self.doSys:
+          for key, toolSFs in tau_sfs.iteritems():
+            for tool, sfs in toolSFs.iteritems():
+              self.out.fillBranch(tool.branchname+'Down',sfs[0])
+              self.out.fillBranch(tool.branchname,       sfs[1])
+              self.out.fillBranch(tool.branchname+'Up',  sfs[2])
+        else:
+          for key, toolSFs in tau_sfs.iteritems():
+            for tool, sfs in toolSFs.iteritems():
+              self.out.fillBranch(tool.branchname,sfs)
         if self.doTES:
           self.out.fillBranch("Tau_pt_corr",         taus_pt_corr)
           self.out.fillBranch("Tau_mass_corr",       taus_mass_corr)
