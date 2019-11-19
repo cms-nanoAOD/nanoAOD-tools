@@ -1,5 +1,20 @@
 # this is a comment
-drop * # start with all
+drop HTXS*
+drop GenVisTau*
+drop IsoTrack*
+drop Photon*
+drop GenDressedLepton*
+drop fixedGridRho*
+drop SoftActivity*
+drop Tau*
+drop TrigObj*
+drop L1*
+drop Flag*
 keep Electron*
 keep Muon*
 keep Jet*
+keep FatJet*
+keep LHE*
+keep HLT*
+keep btag*
+keep PV*

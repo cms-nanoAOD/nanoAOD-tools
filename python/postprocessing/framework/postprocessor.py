@@ -13,9 +13,8 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.preskimming import preSk
 from PhysicsTools.NanoAODTools.postprocessing.framework.jobreport import JobReport
 
 class PostProcessor :
-    def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None,
-		 jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,firstEntry=0,
-		 prefetch=False,longTermCache=False):
+    def __init__(self,outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression="LZMA:9",friend=False,postfix=None, jsonInput=None,noOut=False,justcount=False,provenance=False,
+                 haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,firstEntry=0, prefetch=False,longTermCache=False):
 	self.outputDir=outputDir
 	self.inputFiles=inputFiles
 	self.cut=cut
@@ -111,17 +110,21 @@ class PostProcessor :
         t0 = time.clock()
 	totEntriesRead=0
 	for fname in self.inputFiles:
+            print self.inputFiles, " ", fname
 	    ffnames = []
+            #print "," in fname
 	    if "," in fname:
 	        fnames = fname.split(',')
 	        fname, ffnames = fnames[0], fnames[1:]
-
+            #else:
+            #fname = self.inputFiles
 	    # open input file
 	    if self.prefetch:
 	        ftoread, toBeDeleted = self.prefetchFile(fname)
 	        inFile = ROOT.TFile.Open(ftoread)
 	    else:
 	        inFile = ROOT.TFile.Open(fname)
+            print "Opening ", fname
 
 	    #get input tree
 	    inTree = inFile.Get("Events")
