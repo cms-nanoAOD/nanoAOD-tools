@@ -16,12 +16,14 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--isData', dest='isData', action='store_true',default=False)
+parser.add_argument('--year', dest='year', action='store_true',default=2016)
 parser.add_argument('--input', dest='inputFiles', action='append',default=[])
 parser.add_argument('output', nargs=1)
 
 args = parser.parse_args()
 
 print "isData:",args.isData
+print "year:",args.year
 print "inputs:",len(args.inputFiles)
 for inputFile in args.inputFiles:
     rootFile = ROOT.TFile.Open(inputFile)
@@ -37,7 +39,8 @@ for inputFile in args.inputFiles:
 print "output directory:",args.output[0]
 
 globalOptions = {
-    "isData":args.isData
+    "isData":args.isData,
+    "year":args.year
 }
 
 

@@ -17,12 +17,14 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--isData', dest='isData', action='store_true',default=False)
+parser.add_argument('--year', dest='year', action='store',type=int, default=2016)
 parser.add_argument('--input', dest='inputFiles', action='append',default=[])
 parser.add_argument('output', nargs=1)
 
 args = parser.parse_args()
 
 print "isData:",args.isData
+print "year:",args.year
 print "inputs:",len(args.inputFiles)
 for inputFile in args.inputFiles:
     rootFile = ROOT.TFile.Open(inputFile)
@@ -38,7 +40,8 @@ for inputFile in args.inputFiles:
 print "output directory:",args.output[0]
 
 globalOptions = {
-    "isData":args.isData
+    "isData":args.isData,
+    "year":args.year
 }
 
 
@@ -337,7 +340,7 @@ else:
     
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/model_noda_retrain.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/noda.pb",
         inputCollections=[
             lambda event: event.selectedJets_nominal
         ],
@@ -359,7 +362,7 @@ analyzerChain.append(
 
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/model_singlemuon_retrain.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/da.pb",
         inputCollections=[
             lambda event: event.selectedJets_nominal
         ],
