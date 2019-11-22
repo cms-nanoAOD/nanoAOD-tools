@@ -125,10 +125,10 @@ class TaggerWorkingpoints(Module):
                     else:
                         self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
 
-
-                if not self.globalOptions['isData']:
-                    for label in ["LLP"]:
-                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"True",nTrue[label])
-                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"TrueTaggedLLP",nTrueTaggedLLP[label])
-                            
+            if not self.globalOptions["isData"]:
+                 for label in ["LLP"]:
+                    self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"True",nTrue[label])
+                    self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"TrueTaggedLLP",nTrueTaggedLLP[label])
+                        
+                    
         return True

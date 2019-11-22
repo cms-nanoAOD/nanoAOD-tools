@@ -6,8 +6,7 @@ import ROOT
 import random
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 from importlib import import_module
-from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
+from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 from modules import *

@@ -28,7 +28,7 @@ class MetFilter(Module):
         pass
         
     def passFilters(self,event):
-        #https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2#2016_data
+        #https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
         if event.Flag_goodVertices==0:
             return False
         if event.Flag_globalSuperTightHalo2016Filter==0:

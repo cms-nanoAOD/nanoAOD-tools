@@ -23,9 +23,10 @@ class SingleMuonTriggerSelection(Module):
         self.outputName = outputName
         self.storeWeights = storeWeights
         
+        '''
         if not self.globalOptions["isData"]:
             triggerSFBToF = getHist(
-                "PhysicsTools/NanoAODTools/data/muon/trigger_EfficienciesAndSF_RunBtoF.root",
+                "PhysicsTools/NanoAODTools/data/muon/2016/trigger_EfficienciesAndSF_RunBtoF.root",
                 "IsoMu24_OR_IsoTkMu24_PtEtaBins/pt_abseta_ratio"
             )
             triggerSFGToH = getHist(
@@ -38,6 +39,7 @@ class SingleMuonTriggerSelection(Module):
                 1.-16226.5/35916.4,
                 16226.5/35916.4
             )
+        '''
             
     def beginJob(self):
         pass

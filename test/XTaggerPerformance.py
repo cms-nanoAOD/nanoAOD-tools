@@ -16,14 +16,14 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--isData', dest='isData', action='store_true',default=False)
+parser.add_argument('--year', dest='year', action='store',default=2016, type=int)
 parser.add_argument('--input', dest='inputFiles', action='append',default=[])
 parser.add_argument('output', nargs=1)
 
 args = parser.parse_args()
 
-globalOptions = {"isData":False}
-
 print "isData:",args.isData
+print "year:",args.year
 print "inputs:",len(args.inputFiles)
 for inputFile in args.inputFiles:
     rootFile = ROOT.TFile.Open(inputFile)
@@ -37,6 +37,11 @@ for inputFile in args.inputFiles:
     print " - ",inputFile,", events=",tree.GetEntries()
     
 print "output directory:",args.output[0]
+
+globalOptions = {
+    "isData":False,
+    "year":args.year
+}
 
 leptonSelection = [
     MuonSelection(
@@ -114,7 +119,7 @@ analyzerChain.append(
 
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/noda_nominal_nopp.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/noda.pb",
         inputCollections=[
             lambda event: event.selectedJets
         ],
@@ -131,7 +136,7 @@ analyzerChain.append(
 )
 analyzerChain.append(
     TaggerEvaluation(
-        modelPath="PhysicsTools/NanoAODTools/data/nn/da_nominal_noexp_nopp.pb",
+        modelPath="PhysicsTools/NanoAODTools/data/nn/da.pb",
         inputCollections=[
             lambda event: event.selectedJets,
         ],

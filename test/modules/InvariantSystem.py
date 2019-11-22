@@ -29,6 +29,7 @@ class InvariantSystem(Module):
         self.out.branch(self.outputName+"_mass","F")
         self.out.branch(self.outputName+"_pt","F")
         self.out.branch(self.outputName+"_eta","F")
+        self.out.branch(self.outputName+"_deltaR","F")
         
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -38,6 +39,8 @@ class InvariantSystem(Module):
         vec = ROOT.TLorentzVector()
         for obj in collection:
             vec+=obj.p4()
+
+        self.out.fillBranch(self.outputName+"_deltaR", collection[0].p4().DeltaR(collection[1].p4()))
         self.out.fillBranch(self.outputName+"_mass",vec.M())
         self.out.fillBranch(self.outputName+"_pt",vec.Pt())
         self.out.fillBranch(self.outputName+"_eta",vec.Eta())
