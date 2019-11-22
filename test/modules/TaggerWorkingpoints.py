@@ -83,8 +83,6 @@ class TaggerWorkingpoints(Module):
             for ctau in self.logctauValues:
                 for label in self.predictionLabels:
                     predictionsPerCtauAndClass[ctau][label].append(predictions[ctau][label])
-                    if self.saveJetOutput!=None:
-                        taggerOutputsPerCtau[ctau][label][ijet] = predictions[ctau][label]
                     
         if not self.globalOptions["isData"]:
             for ctau in self.logctauValues:
@@ -107,8 +105,6 @@ class TaggerWorkingpoints(Module):
                 
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
-                if self.saveAllLabels:
-                    self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label, predictionsPerCtauAndClass[ctau][label])
 
                 predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
 
@@ -118,7 +114,8 @@ class TaggerWorkingpoints(Module):
                     else:
                         self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
 
-                for label in ["LLP"]:
+            if not self.globalOptions["isData"]:
+                 for label in ["LLP"]:
                     self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"True",nTrue[label])
                     self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"TrueTaggedLLP",nTrueTaggedLLP[label])
                         
