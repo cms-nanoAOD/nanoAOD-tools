@@ -18,8 +18,9 @@ class TaggerWorkingpoints(Module):
         taggerName = "llpdnnx",
         outputName = "llpdnnx",
         predictionLabels = ["B","C","UDS","G","LLP"],
-        logctauValues = range(-3,5),
+        logctauValues = range(-2,5),
         multiplicities = range(0,5),
+        noda = False,
         globalOptions={"isData":False}
     ):
         self.globalOptions = globalOptions
@@ -31,16 +32,30 @@ class TaggerWorkingpoints(Module):
         self.logctauLabels = map(lambda ctau: getCtauLabel(ctau),logctauValues)
         self.taggerName = taggerName
 
-        self.thresholds = {      
-            -3: 0.37245617939,
-            -2: 0.368606702814,
-            -1: 0.343856976757,
-            0: 0.436759756336,
-            1: 0.557319806347,
-            2: 0.64487092329,
-            3: 0.565088437328,
-            4: 0.590826915035
+
+        self.thresholds_noda = {      
+            -2: 0.40729648,
+            -1: 0.43665537,
+            0: 0.5383792,
+            1: 0.40745798,
+            2: 0.30898362,
+            3: 0.37710842,
+            4: 0.30710152
         }
+        
+        self.thresholds = {      
+            -2: 0.40729648,
+            -1: 0.43665537,
+            0: 0.5383792,
+            1: 0.40745798,
+            2: 0.30898362,
+            3: 0.37710842,
+            4: 0.30710152
+        }
+        
+        if noda:
+            self.thresholds = self.thresholds_noda
+            
         
  
     def beginJob(self):
@@ -61,9 +76,6 @@ class TaggerWorkingpoints(Module):
                     self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"True","I")
                     self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"TrueTaggedLLP","I")
                     
-                if self.saveAllLabels:
-                    self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label,"F", lenVar="nselectedJets")
-
                 for m in self.multiplicities:
                     self.out.branch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),"F")
 
@@ -77,13 +89,13 @@ class TaggerWorkingpoints(Module):
         predictionsPerCtauAndClass = {ctau: {className: [] for className in self.predictionLabels} for ctau in self.logctauValues}
         for ijet,jet in enumerate(jets):
             if not hasattr(jet,self.taggerName):
-                print "WARNING - jet ",jet," has no ",self.taggerName," result stored -> skip"
+                print "WARNING - jet ",jet," has no ",self.taggerName," result stored for ",self.outputName," -> skip"
                 continue
             predictions = getattr(jet,self.taggerName)
             for ctau in self.logctauValues:
                 for label in self.predictionLabels:
                     predictionsPerCtauAndClass[ctau][label].append(predictions[ctau][label])
-                    
+
         if not self.globalOptions["isData"]:
             for ctau in self.logctauValues:
                 nTrue = {}
@@ -105,7 +117,6 @@ class TaggerWorkingpoints(Module):
                 
         for ctau in self.logctauValues:
             for label in self.predictionLabels:
-
                 predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
 
                 for m in self.multiplicities:
@@ -120,13 +131,4 @@ class TaggerWorkingpoints(Module):
                     self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_n"+label+"TrueTaggedLLP",nTrueTaggedLLP[label])
                         
                     
-        for ctau in self.logctauValues:
-            for label in self.predictionLabels:
-                predictionsPerCtauAndClass[ctau][label] = sorted(predictionsPerCtauAndClass[ctau][label],reverse=True)
-                for m in self.multiplicities:
-                    if m<len(predictionsPerCtauAndClass[ctau][label]):
-                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),predictionsPerCtauAndClass[ctau][label][m])
-                    else:
-                        self.out.fillBranch(self.outputName+"_"+getCtauLabel(ctau)+"_"+label+"_min"+str(m),0)
-        
         return True

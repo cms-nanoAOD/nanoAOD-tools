@@ -75,7 +75,7 @@ if not args.isData:
     analyzerChain.append(
         JetMetUncertainties(
             era="2016",
-            globalTag="Summer16_07Aug2017_v11"
+            globalTag="Summer16_07Aug2017_V11_MC"
         )
     )
     for systName,collection in [
@@ -109,11 +109,11 @@ if not args.isData:
     
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=2 or \
-            len(event.selectedJets_jerUp)>=2 or \
-            len(event.selectedJets_jerDown)>=2 or \
-            len(event.selectedJets_jesTotalUp)>=2 or \
-            len(event.selectedJets_jesTotalDown)>=2
+            len(event.selectedJets_nominal)>2 or \
+            len(event.selectedJets_jerUp)>2 or \
+            len(event.selectedJets_jerDown)>2 or \
+            len(event.selectedJets_jesTotalUp)>2 or \
+            len(event.selectedJets_jesTotalDown)>2
         )
     )
     
@@ -138,13 +138,13 @@ if not args.isData:
     #loose skim on mht/met
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            event.nominal_mht>200. or \
-            event.jerUp_mht>200. or \
-            event.jerDown_mht>200. or \
-            event.jesTotalUp_mht>200. or \
-            event.jesTotalDown_mht>200. or \
-            event.unclEnUp_mht>200. or \
-            event.unclEnDown_mht>200.
+            event.nominal_mht>250. or \
+            event.jerUp_mht>250. or \
+            event.jerDown_mht>250. or \
+            event.jesTotalUp_mht>250. or \
+            event.jesTotalDown_mht>250. or \
+            event.unclEnUp_mht>250. or \
+            event.unclEnDown_mht>250.
         )
     )
     
@@ -241,6 +241,7 @@ if not args.isData:
     args.inputFiles[0].find("WJetsToLNu")>=0:
         storeVariables.append([lambda tree: tree.branch("genVpt","F"),lambda tree,event: tree.fillBranch("genVpt",event.LHE_Vpt)])
 
+    '''
     if args.inputFiles[0].find("SMS-T1qqqq_ctau")<0 and args.inputFiles[0].find("QCD")<0:
         for i in range(0,101):
             storeVariables.append([lambda tree,i=i: tree.branch("lheweight_%i"%i,"F"),lambda tree,event,i=i: tree.fillBranch("lheweight_%i"%i,event.LHEPdfWeight[i])])
@@ -253,7 +254,7 @@ if not args.isData:
                 members=101
             )
         )
-        
+    '''
     storeVariables.append([lambda tree: tree.branch("genx1","F"),lambda tree,event: tree.fillBranch("genx1",event.Generator_x1)])
     storeVariables.append([lambda tree: tree.branch("genx2","F"),lambda tree,event: tree.fillBranch("genx2",event.Generator_x2)])
     storeVariables.append([lambda tree: tree.branch("genid1","F"),lambda tree,event: tree.fillBranch("genid1",event.Generator_id1)])
@@ -268,39 +269,25 @@ if not args.isData:
         )
     )
 
+
     analyzerChain.append(
         TaggerEvaluation(
-            modelPath="PhysicsTools/NanoAODTools/data/nn/model_noda_retrain.pb",
+            modelPath="PhysicsTools/NanoAODTools/data/nn/retraining_no_da.pb",
             inputCollections=[
-                lambda event: event.selectedJets_nominal
+                lambda event: event.selectedJets_nominal,
+                lambda event: event.selectedJets_jerUp,
+                lambda event: event.selectedJets_jerDown,
+                lambda event: event.selectedJets_jesTotalUp,
+                lambda event: event.selectedJets_jesTotalDown,
             ],
             taggerName="llpdnnx_noda",
-            logctauValues = range(-3,5)
+            logctauValues = range(-2,5)
         )
     )
     
     analyzerChain.append(
-        JetTruthFlags(
-            inputCollection=lambda event: event.selectedJets_nominal,
-            outputName="llpdnnx_noda",
-            globalOptions=globalOptions
-        )
-    )
-
-    analyzerChain.append(
-        TaggerWorkingpoints(
-            inputCollection = lambda event: event.selectedJets_nominal,
-            taggerName = "llpdnnx_noda",
-            outputName = "llpdnnx_noda_nominal",
-            logctauValues = range(-3,5),
-            predictionLabels = ["LLP"],
-            globalOptions=globalOptions
-        )
-    )
-
-    analyzerChain.append(
         TaggerEvaluation(
-            modelPath="PhysicsTools/NanoAODTools/data/nn/model_singlemuon_retrain.pb",
+            modelPath="PhysicsTools/NanoAODTools/data/nn/retraining_da.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal,
                 lambda event: event.selectedJets_jerUp,
@@ -309,9 +296,10 @@ if not args.isData:
                 lambda event: event.selectedJets_jesTotalDown,
             ],
             taggerName="llpdnnx_da",
-            logctauValues = range(-3,5)
+            logctauValues = range(-2,5)
         )
     )
+    
     for systName,jetCollection,metObject in [
         ("nominal",lambda event: event.selectedJets_nominal,lambda event: event.met_nominal),
         ("jerUp",lambda event: event.selectedJets_jerUp,lambda event: event.met_jerUp),
@@ -324,6 +312,25 @@ if not args.isData:
         analyzerChain.append(
             JetTruthFlags(
                 inputCollection=jetCollection,
+                outputName="llpdnnx_noda_"+systName,
+                globalOptions=globalOptions
+            )
+        )
+        analyzerChain.append(
+            TaggerWorkingpoints(
+                inputCollection = jetCollection,
+                taggerName = "llpdnnx_noda",
+                outputName = "llpdnnx_noda_"+systName,
+                logctauValues = range(-2,5),
+                noda = True,
+                predictionLabels = ["LLP"],
+                globalOptions=globalOptions
+            )
+        )
+        
+        analyzerChain.append(
+            JetTruthFlags(
+                inputCollection=jetCollection,
                 outputName="llpdnnx_da_"+systName,
                 globalOptions=globalOptions
             )
@@ -333,11 +340,12 @@ if not args.isData:
                 inputCollection = jetCollection,
                 taggerName = "llpdnnx_da",
                 outputName = "llpdnnx_da_"+systName,
-                logctauValues = range(-3,5),
+                logctauValues = range(-2,5),
                 predictionLabels = ["LLP"],
                 globalOptions=globalOptions
             )
         )
+        
     
 else:
     analyzerChain.append(
@@ -363,7 +371,7 @@ else:
          
     analyzerChain.append(
         EventSkim(selection=lambda event: 
-            len(event.selectedJets_nominal)>=2
+            len(event.selectedJets_nominal)>2
         )
     )
     
@@ -400,12 +408,12 @@ else:
     
     analyzerChain.append(
         TaggerEvaluation(
-            modelPath="PhysicsTools/NanoAODTools/data/nn/model_noda_retrain.pb",
+            modelPath="PhysicsTools/NanoAODTools/data/nn/MC_new_model_noda.pb",
             inputCollections=[
                 lambda event: event.selectedJets_nominal
             ],
             taggerName="llpdnnx_noda",
-            logctauValues = range(-3,5)
+            logctauValues = range(-2,5)
         )
     )
 
@@ -414,12 +422,12 @@ else:
             inputCollection = lambda event: event.selectedJets_nominal,
             taggerName = "llpdnnx_noda",
             outputName = "llpdnnx_noda_nominal",
-            logctauValues = range(-3,5),
+            logctauValues = range(-2,5),
             predictionLabels = ["LLP"],
             globalOptions=globalOptions
         )
     )
-
+    '''
     analyzerChain.append(
         TaggerEvaluation(
             modelPath="PhysicsTools/NanoAODTools/data/nn/model_singlemuon_retrain.pb",
@@ -427,7 +435,7 @@ else:
                 lambda event: event.selectedJets_nominal
             ],
             taggerName="llpdnnx_da",
-            logctauValues = range(-3,5)
+            logctauValues = range(-2,5)
         )
     )
 
@@ -436,12 +444,12 @@ else:
             inputCollection = lambda event: event.selectedJets_nominal,
             taggerName = "llpdnnx_da",
             outputName = "llpdnnx_da_nominal",
-            logctauValues = range(-3,5),
+            logctauValues = range(-2,5),
             predictionLabels = ["LLP"],
             globalOptions=globalOptions
         )
     )
-
+    '''
 analyzerChain.append(
 SignalTriggerSelection(
     globalOptions=globalOptions
@@ -457,7 +465,7 @@ analyzerChain.append(
 p=PostProcessor(
     args.output[0],
     [args.inputFiles],
-    cut="(nJet>1)",
+    cut="(nJet>2)",
     branchsel=None,
     maxEvents=-1,
     #maxEvents=15000,

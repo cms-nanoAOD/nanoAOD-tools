@@ -1,5 +1,4 @@
 featureDict = {
-   
     "globalvars": {
         "branches": [
             'global_pt',
@@ -18,8 +17,8 @@ featureDict = {
             'csv_jetNTracksEtaRel',
             #'legacyTag_median_dxy',
             #'legacyTag_median_trackSip2dSig',
-            #'legacyTag_alpha',
-        ]
+            #'legacyTag_alpha'
+        ],
 
     },
 
@@ -35,7 +34,6 @@ featureDict = {
             'cpf_trackSip3dVal',
             'cpf_trackSip3dSig',
             'cpf_trackJetDistVal',
-
             'cpf_ptrel', 
             'cpf_drminsv',
             'cpf_vertex_association',
@@ -43,10 +41,15 @@ featureDict = {
             'cpf_puppi_weight',
             'cpf_track_chi2',
             'cpf_track_ndof',
-            'cpf_track_quality'
+            'cpf_track_quality',
+            #'cpf_jetmassdroprel',
+            #'cpf_relIso01',
+            #'cpf_isLepton',
+            #'cpf_lostInnerHits'
+
         ],
+        "max":25,
         "length":"cpflength_length",
-        "max":25
     },
     
     "npf": {
@@ -56,10 +59,13 @@ featureDict = {
             'npf_isGamma',
             'npf_hcal_fraction',
             'npf_drminsv',
-            'npf_puppi_weight'
+            'npf_puppi_weight',
+            #'npf_jetmassdroprel',
+            #'npf_relIso01'
+
         ],
+        "max":25,
         "length":"npflength_length",
-        "max":25
     },
 
      "sv" : {
@@ -77,8 +83,10 @@ featureDict = {
             'sv_costhetasvpv',
             'sv_enratio',
         ],
+        "max":4,
         "length":"svlength_length",
-        "max":4
     },
- 
+
 }
+
+
