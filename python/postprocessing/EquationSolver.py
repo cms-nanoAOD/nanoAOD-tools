@@ -40,13 +40,22 @@ def eqsolv(a1, a2, a3, a4):
         x2 = (s+t)*complex(-0.5, 0) - complex(rpar, 0) + (s-t)*(1j)*complex((3**(0.5))/2, 0)
         x3 = (s+t)*complex(-0.5, 0) - complex(rpar, 0) - (s-t)*(1j)*complex((3**(0.5))/2, 0)
 
-        if abs(x1.imag)<0.0001 and abs(x2.imag)<0.0001 and abs(x3.imag<0.0001):
+        if abs(x1.imag)<0.0001:
             if type(a1)==dict:
-                result = {'x1': x1, 'x2': x2, 'x3': x3}
+                result.update({'x1': x1})
             else:
-                result = [x1, x2, x3]
-        else:
-            result = None
+                result.append(x1)
+        if abs(x2.imag)<0.0001:
+            if type(a1)==dict:
+                result.update({'x2': x2})
+            else:
+                result.append(x2)
+        if abs(x3.imag)<0.0001:
+            if type(a1)==dict:
+                result.update({'x3': x3})
+            else:
+                result.append(x3)            
+
         return result
     
     else:
