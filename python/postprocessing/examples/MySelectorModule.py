@@ -4,6 +4,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
+from PhysicsTools.NanoAODTools.postprocessing.tools import *
 
 class MySelectorModule(Module):
     def __init__(self):
@@ -51,7 +52,7 @@ class MySelectorModule(Module):
             eventSum += lep.p4()        
 
         for j in jets:
-            if abs(j.eta)<2.4:# and j.pt>30:
+            if abs(j.eta)<2.4 and j.pt>25:
                 goodJet.append(j)
                 eventSum += j.p4()
 
