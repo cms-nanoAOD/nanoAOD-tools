@@ -40,17 +40,16 @@ def eqsolv(a1, a2, a3, a4):
         x2 = (s+t)*complex(-0.5, 0) - complex(rpar, 0) + (s-t)*(1j)*complex((3**(0.5))/2, 0)
         x3 = (s+t)*complex(-0.5, 0) - complex(rpar, 0) - (s-t)*(1j)*complex((3**(0.5))/2, 0)
 
-        if type(a1)==dict:
-            if(abs(x1.imag)<0.0001 and abs(x2.imag)<0.0001 and abs(x3.imag<0.0001):
-               result = {'x1': x1, 'x2': x2, 'x3': x3}
-        else:
-            if(abs(x1.imag)<0.0001 and abs(x2.imag)<0.0001 and abs(x3.imag<0.0001):
-               result = [x1, x2, x3]
+        if abs(x1.imag)<0.0001 and abs(x2.imag)<0.0001 and abs(x3.imag<0.0001):
+            if type(a1)==dict:
+                result = {'x1': x1, 'x2': x2, 'x3': x3}
+            else:
+                result = [x1, x2, x3]
 
         return result
     
     else:
-        result = [0., 0., 0.]
+        result = None
         return result
                
 
