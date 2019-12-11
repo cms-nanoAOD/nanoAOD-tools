@@ -52,8 +52,3 @@ def eqsolv(a1, a2, a3, a4):
         result = None
         return result
                
-
-
-w = {'a': .2, 'b': 2.8, 'c': 5, 'd': -4.7}
-#TT = EQSOLV(3.2, 4.8, 5, -6.7)
-tt = eqsolv(w,'','','')
