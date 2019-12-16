@@ -10,16 +10,19 @@ def eqsolv(a1, a2, a3, a4):
             b = a1[1]
             c = a1[2]
             d = a1[3]
+            result = []
         elif type(a1) == dict:
             a = a1['a']
             b = a1['b']
             c = a1['c']
             d = a1['d']
+            result = {}
     else:
         a = a1
         b = a2
         c = a3
         d = a4
+        result = []
 
     if a != 0:
         q = (3*a*c - b*b)/(9*a*a)
@@ -39,6 +42,8 @@ def eqsolv(a1, a2, a3, a4):
         x1 = s + t + complex(-rpar, 0)
         x2 = (s+t)*complex(-0.5, 0) - complex(rpar, 0) + (s-t)*(1j)*complex((3**(0.5))/2, 0)
         x3 = (s+t)*complex(-0.5, 0) - complex(rpar, 0) - (s-t)*(1j)*complex((3**(0.5))/2, 0)
+
+    
 
         if abs(x1.imag)<0.0001:
             if type(a1)==dict:
@@ -61,4 +66,7 @@ def eqsolv(a1, a2, a3, a4):
     else:
         result = None
         return result
-               
+
+#top = {'a': -1.56, 'b': 10.9, 'c': -5.87, 'd': 9.7}
+#top = eqsolv(top,'' ,'' ,'')
+#print top
