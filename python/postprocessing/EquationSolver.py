@@ -3,7 +3,7 @@ import cmath
 import string
 import io
 
-def eqsolv(a1, a2, a3, a4):
+def EqSolv(a1, a2, a3, a4):
     if type(a1) != float and type(a1) != int:
         if type(a1) == list:
             a = a1[0]
