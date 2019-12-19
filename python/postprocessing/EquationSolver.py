@@ -47,19 +47,19 @@ def EqSolv(a1, a2, a3, a4):
 
         if abs(x1.imag)<0.0001:
             if type(a1)==dict:
-                result.update({'x1': x1})
+                result.update({'x1': x1.real})
             else:
-                result.append(x1)
+                result.append(x1.real)
         if abs(x2.imag)<0.0001:
             if type(a1)==dict:
-                result.update({'x2': x2})
+                result.update({'x2': x2.real})
             else:
-                result.append(x2)
+                result.append(x2.real)
         if abs(x3.imag)<0.0001:
             if type(a1)==dict:
-                result.update({'x3': x3})
+                result.update({'x3': x3.real})
             else:
-                result.append(x3)            
+                result.append(x3.real)            
 
         return result
     
@@ -67,6 +67,6 @@ def EqSolv(a1, a2, a3, a4):
         result = None
         return result
 
-#top = {'a': -1.56, 'b': 10.9, 'c': -5.87, 'd': 9.7}
-#top = eqsolv(top,'' ,'' ,'')
-#print top
+'''top = {'a': -1.56, 'b': 10.9, 'c': -5.87, 'd': 9.7}
+top = EqSolv(top,'' ,'' ,'')
+print top'''
