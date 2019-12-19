@@ -47,7 +47,7 @@ class TopUtilities():
             Enu = TMath.Power((MisET2 + pznu**2), 0.5)
             p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
             neutrino = p4nu_rec
-
+        
         else:
             ptlep = leptonPt
             pxlep = leptonPx
@@ -107,25 +107,58 @@ class TopUtilities():
             p4nu_rec.SetPxPyPzE(minPx, minPy, pznu, Enu)
 
             neutrino = p4nu_rec
-
+            
+        self.neutrino = neutrino
         return neutrino
 
     def top4Momentum(self, lepton, jet, metPx, metPy):
+        topMt = self.topMtw(lepton, jet, metPx, metPy)
+        if topMt == None:
+            self.reco_topqv = None
+            self.neutrino = None
+            return None
+
         leptonPx = lepton.Px()
         leptonPy = lepton.Py()
         leptonPz = lepton.Pz()
         leptonPt = lepton.Pt()
         leptonE = lepton.Energy()
         reco_neutrino = self.NuMomentum(leptonPx, leptonPy, leptonPz, leptonPt, leptonE, metPx, metPy)
-        top = lepton + jet + self.neutrino
+        top = lepton + jet + reco_neutrino
+
         self.reco_topqv = top
         return self.reco_topqv
 
-'''reco = TopUtilities()
+    def topMtw(self, lepton, jet, metPx, metPy):
+        lb = lepton + jet
+        mlb2 = lb.M2()
+        ptlb = lb.Pt()
+        pxlb = lb.Px()
+        pylb = lb.Py()
+        
+        if mlb2 < 0.:
+            print "The given lepton and jet cannot come from a real particle!"
+            self.reco_topMt = None
+            return None
+        
+        etlb = TMath.Power((mlb2 + ptlb**2.), 0.5)
+        metPt = TMath.Power(metPx**2. + metPy**2.)
+
+        self.reco_topMt = TMath.Power((mlb2 + 2.*(etlb*metPt - pxlb*metPx - pylb*metPy)), 0.5)
+                                      
+        return self.reco_topMt
+
+reco = TopUtilities()
 lep = ROOT.TLorentzVector(1.04, 5.08, 6.07, 9.56)
 jet = ROOT.TLorentzVector(-5.03, 17.07, -8.06, 5.98)
 metPx = 9.45
 metPy = 10.67
 
 vector = reco.top4Momentum(lep, jet, metPx, metPy)
-print vector.Print()'''
+if not (vector is None):
+    print vector.Print()
+'''
+
+tmass = reco.topMtw(lep, jet, metPx, metPy)
+print tmass
+'''
