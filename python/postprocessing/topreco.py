@@ -2,18 +2,27 @@ import math as math
 import cmath
 import string
 import io
+import copy
 import EquationSolver
 import tools
 import ROOT
 import ROOT.TMath as TMath
 
 class TopUtilities():
-    def __init__(self):
+    def __init__(self, lepton = None, jet = None, MET = None):
         self.reco_topqv = ROOT.TLorentzVector()
         self.reco_topMt = 0.
         self.neutrino = ROOT.TLorentzVector()
+        self.lepton = copy.deepcopy(lepton)
+        self.IsParticle = True
+        self.IsReco = False
 
-    def NuMomentum(self,  leptonPx, leptonPy, leptonPz, leptonPt, leptonE, metPx, metPy):
+        if not lepton is None and not jet is None and not MET is None:
+            self.RecoTop4Momentum(lepton, jet, MET['metPx'], MET['metPy'])
+            self.RecoTopMtw(lepton, jet, MET['metPx'], MET['metPy'])
+            self.IsReco = True
+
+    def RecoNuMomentum(self,  leptonPx, leptonPy, leptonPz, leptonPt, leptonE, metPx, metPy):
         mW = 80.399
         
         MisET2 = (metPx**2. + metPy**2.)
@@ -109,27 +118,27 @@ class TopUtilities():
             neutrino = p4nu_rec
             
         self.neutrino = neutrino
-        return neutrino
+#        return neutrino
 
-    def top4Momentum(self, lepton, jet, metPx, metPy):
-        topMt = self.topMtw(lepton, jet, metPx, metPy)
-        if topMt == None:
+    def RecoTop4Momentum(self, lepton, jet, metPx, metPy):
+        topMt = self.RecoTopMtw(lepton, jet, metPx, metPy)
+        '''if topMt == None:
             self.reco_topqv = None
             self.neutrino = None
-            return None
+            return None'''
 
         leptonPx = lepton.Px()
         leptonPy = lepton.Py()
         leptonPz = lepton.Pz()
         leptonPt = lepton.Pt()
         leptonE = lepton.Energy()
-        reco_neutrino = self.NuMomentum(leptonPx, leptonPy, leptonPz, leptonPt, leptonE, metPx, metPy)
-        top = lepton + jet + reco_neutrino
+
+        self.RecoNuMomentum(leptonPx, leptonPy, leptonPz, leptonPt, leptonE, metPx, metPy)
+        top = lepton + jet + self.neutrino
 
         self.reco_topqv = top
-        return self.reco_topqv
-
-    def topMtw(self, lepton, jet, metPx, metPy):
+        
+    def RecoTopMtw(self, lepton, jet, metPx, metPy):
         lb = lepton + jet
         mlb2 = lb.M2()
         ptlb = lb.Pt()
@@ -137,28 +146,59 @@ class TopUtilities():
         pylb = lb.Py()
         
         if mlb2 < 0.:
-            print "The given lepton and jet cannot come from a real particle!"
             self.reco_topMt = None
+            self.IsParticle = False
             return None
         
         etlb = TMath.Power((mlb2 + ptlb**2.), 0.5)
         metPt = TMath.Power(metPx**2. + metPy**2.)
 
         self.reco_topMt = TMath.Power((mlb2 + 2.*(etlb*metPt - pxlb*metPx - pylb*metPy)), 0.5)
-                                      
-        return self.reco_topMt
 
-reco = TopUtilities()
+    def top4Momentum(self, lepton = None, jet = None, MET = None):
+        if self.IsReco:
+            return self.reco_topqv
+
+        if (not lepton is None and not jet is None and not MET is None and self.IsReco) or not self.IsReco:
+            self.RecoTop4Momentum(lepton, jet, MET['metPx'], MET['metPy'])
+            self.IsReco = True
+            return self.reco_topqv
+            
+    def topMtw(self):
+        if self.IsReco:
+            return self.reco_topMt
+
+        if (not lepton is None and not jet is None and not MET is None and self.IsReco) or not self.IsReco:
+            self.RecoTop4Mtw(lepton, jet, MET['metPx'], MET['metPy'])
+            self.IsReco = True
+            return self.reco_topMt
+
+    def neutrino(self):
+        if self.IsReco:
+            return self.neutrino
+        else:
+            return None
+
+    def IsAcceptable(self):
+        return IsParticle
+
+
 lep = ROOT.TLorentzVector(1.04, 5.08, 6.07, 9.56)
 jet = ROOT.TLorentzVector(-5.03, 17.07, -8.06, 5.98)
-metPx = 9.45
-metPy = 10.67
+MET={'metPx': 9.45,
+     'metPy': 10.67}
 
-vector = reco.top4Momentum(lep, jet, metPx, metPy)
+'''
+#First way to use the class
+reco = TopUtilities(lep, jet, MET)
+vector = reco.top4Momentum()
+if not (vector is None):
+    print vector.Print()
+
+#Second way to use the class
+reco = TopUtilities()
+vector = reco.top4Momentum(lep, jet, MET)
 if not (vector is None):
     print vector.Print()
 '''
 
-tmass = reco.topMtw(lep, jet, metPx, metPy)
-print tmass
-'''
