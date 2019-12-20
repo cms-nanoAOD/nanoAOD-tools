@@ -11,7 +11,7 @@ jecTagsMC = {'2016' : 'Summer16_07Aug2017_V11_MC',
              '2018' : 'Autumn18_V19_MC'}
 
 jecTagsFastSim = {'2016' : 'Spring16_25nsFastSimV1_MC',
-                  '2017' : 'Fall17_FastsimV1_MC',
+                  '2017' : 'Fall17_FastSimV1_MC',
                   '2018' : 'Autumn18_FastSimV1_MC'}
 
 archiveTagsDATA = {'2016' : 'Summer16_07Aug2017_V11_DATA', 
@@ -57,7 +57,7 @@ jmsValues = { '2016' : [1.00, 0.9906, 1.0094], #nominal, down, up
               '2018' : [0.982, 0.978, 0.986] # Use 2017 values for 2018 until 2018 are released
             }
 
-def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total", redojec=False, jetType = "AK4PFchs", noGroom=False, metBranchName="MET", isFastSim=False):
+def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total", redojec=False, jetType = "AK4PFchs", noGroom=False, metBranchName="MET", applySmearing=True, isFastSim=False):
     
     dataYear = str(dataYear)
 
@@ -88,15 +88,15 @@ def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total
 
     if 'AK4' in jetType:
       if isMC:
-          jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, metBranchName=met_)
+          jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, metBranchName=met_, applySmearing = applySmearing)
       else:
           jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, archive=archiveTag_, globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, metBranchName=met_, isData=True)
     # no MET variations calculated
     else:
       if isMC:
-          jmeCorrections = lambda : fatJetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jetType = jetType, jerTag=jerTag_, jmrVals = jmrValues_, jmsVals = jmsValues_)
+          jmeCorrections = lambda : fatJetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jetType = jetType, jerTag=jerTag_, jmrVals = jmrValues_, jmsVals = jmsValues_, applySmearing = applySmearing)
       else:
-          jmeCorrections = lambda : fatJetUncertaintiesProducer(era=dataYear, archive=archiveTag_, globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jetType = jetType, isData=True)
+          jmeCorrections = lambda : fatJetUncertaintiesProducer(era=dataYear, archive=archiveTag_, globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jetType = jetType, jerTag=jerTag_, jmrVals = jmrValues_, jmsVals = jmsValues_, isData=True)
 
     return jmeCorrections
 
