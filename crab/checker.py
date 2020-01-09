@@ -5,6 +5,7 @@ mcproduction ={
 }
 
 def checkDatasets(datasetsNames, variableDict):
+    return True
     failures = []
     alldatasets = set()
     for datasetsName in datasetsNames:

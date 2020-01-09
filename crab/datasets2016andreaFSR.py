@@ -81,9 +81,9 @@ mc2016 = {
 "STtbar_2016POW_MADSPIN_PY" : [
     '/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/nlu-RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1-137-613263e16580a19441b112a234e25be6/USER'
 ],
-#"STt_2016POW_MADSPIN_PY"    : [
-    #"/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM"
-#],
+"STt_2016POW_MADSPIN_PY"    : [
+    "/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16NanoAODv5-PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM"
+],
 
 
 "TT_2016POWPY"      : [

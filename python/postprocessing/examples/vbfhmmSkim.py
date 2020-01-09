@@ -126,15 +126,15 @@ class vbfhmmProducer(Module):
         dimuonMass = 0
         if dimuonSelection : dimuonMass = (mu1 + mu2).M()
         #if dimuon.M()<70 or dimuon.M()>110 :
-        #if dimuon.M()<70  :
+        #if dimuonMass<0.1  :
             #return False
                 
-        
-
 
 
         muonfilter = lambda j : (j.muonIdx1==-1 or muons[j.muonIdx1].iso>0.25 or not muons[j.muonIdx1].mediumId or muons[j.muonIdx1].correctedROC_pt<20) and (j.muonIdx2==-1 or muons[j.muonIdx2].iso>0.25 or not muons[j.muonIdx2].mediumId or muons[j.muonIdx2].correctedROC_pt<20)
         #electronfilter = lambda j : (j.electronIdx1==-1 or electrons[j.electronIdx1].pfRelIso03_all>0.25 or abs(electrons[j.electronIdx1].dz) > 0.2 or abs(electrons[j.electronIdx1].dxy) > 0.05) and(j.electronIdx2==-1 or electrons[j.electronIdx2].pfRelIso03_all>0.25 or abs(electrons[j.electronIdx2].dz) > 0.2 or abs(electrons[j.electronIdx2].dxy) > 0.05)
+        
+        
         
         jetFilter1      = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0  ) and abs(j.eta)<4.7 and (abs(j.eta)<2.5 or j.puId>6 or j.pt>50))
         jetFilter2      = lambda j : (j.jetId>0 and (j.pt>50 or j.puId>0  ) and abs(j.eta)<4.7 )
@@ -147,6 +147,10 @@ class vbfhmmProducer(Module):
         
         if len(jetsNolep) < 2:
             return False
+        
+        if self.year!="2017" : 
+            for j in jetsNolep : j.puId17 = j.puId
+        
         passAtLeastOne=False
         for vn in self.jesVariation:
             for j in jetsNolep:
