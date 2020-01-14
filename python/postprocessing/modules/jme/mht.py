@@ -54,6 +54,6 @@ class mhtProducer(Module):
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 mht = lambda : mhtProducer( lambda j : j.pt > 40, 
-                            lambda mu : mu.pt > 20 and mu.miniPFIso_all/mu.pt < 0.2,
-                            lambda el : el.pt > 20 and el.miniPFIso_all/el.pt < 0.2 ) 
+                            lambda mu : mu.pt > 20 and mu.miniPFRelIso_all < 0.2,
+                            lambda el : el.pt > 20 and el.miniPFRelIso_all < 0.2 ) 
  

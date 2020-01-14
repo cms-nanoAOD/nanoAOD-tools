@@ -91,12 +91,12 @@ pufile_data2016="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pil
 puWeight_2016 = lambda : puWeightProducer(pufile_mc2016,pufile_data2016,"pu_mc","pileup",verbose=False, doSysVar=True)
 puAutoWeight_2016 = lambda : puWeightProducer("auto", pufile_data2016,"pu_mc","pileup",verbose=False)
 
-pufile_data2017="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/puData2017_withVar.root" % os.environ['CMSSW_BASE']
+pufile_data2017="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/PileupHistogram-goldenJSON-13tev-2017-99bins_withVar.root" % os.environ['CMSSW_BASE']
 pufile_mc2017="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/mcPileup2017.root" % os.environ['CMSSW_BASE']
 puWeight_2017 = lambda : puWeightProducer(pufile_mc2017,pufile_data2017,"pu_mc","pileup",verbose=False, doSysVar=True)
 puAutoWeight_2017 = lambda : puWeightProducer("auto",pufile_data2017,"pu_mc","pileup",verbose=False)
 
-pufile_data2018="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/puData2018_withVar.root" % os.environ['CMSSW_BASE']
+pufile_data2018="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/PileupHistogram-goldenJSON-13tev-2018-100bins_withVar.root" % os.environ['CMSSW_BASE']
 pufile_mc2018="%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/pileup/mcPileup2018.root" % os.environ['CMSSW_BASE']
 puWeight_2018 = lambda : puWeightProducer(pufile_mc2018,pufile_data2018,"pu_mc","pileup",verbose=False, doSysVar=True)
 puAutoWeight_2018 = lambda : puWeightProducer("auto",pufile_data2018,"pu_mc","pileup",verbose=False)
