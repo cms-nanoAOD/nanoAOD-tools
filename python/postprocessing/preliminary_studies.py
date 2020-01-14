@@ -8,7 +8,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.preskimming import preSk
 
 inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/" 
 inpfiles = ["Wprime_4000_RH"
-#            ,"TT_Mtt-700to1000"
+            ,"TT_Mtt-700to1000"
             #"WJets",
             #,"QCD_Pt_600to800_1"
             #"SingleMuon_Run2016G_1"
@@ -31,13 +31,23 @@ def get_LooseMu(muons): #returns a collection of muons that pass the selection p
     return list(filter(lambda x : x.looseId and not x.tightId and x.pt > 35 and abs(x.eta) < 2.4, muons))
 
 def get_Ele(electrons): #returns a collection of electrons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.mvaFall17V2noIso_WP90 and abs(x.eta) < 1.4442 and abs(x.eta) > 1.566 and abs(x.eta) < 2.5, electrons))
+    return list(filter(lambda x : x.mvaFall17V2noIso_WP90 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))
 
 def get_LooseEle(electrons): #returns a collection of electrons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.mvaFall17V2noIso_WPL and not x.mvaFall17V2noIso_WP90 and abs(x.eta) < 1.4442 and abs(x.eta) > 1.566 and x.pt > 35 and abs(x.eta) < 2.5, electrons))
+    return list(filter(lambda x : x.mvaFall17V2noIso_WPL and not x.mvaFall17V2noIso_WP90 and x.pt > 35 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))
 
 def get_Jet(jets, pt): #returns a collection of jets that pass the selection performed by the filter function
     return list(filter(lambda x : x.jetId >= 2 and abs(x.eta) < 2.4 and x.pt > pt, jets))
+
+def get_HT(muons, electrons, jets):
+    eventSum = ROOT.TLorentzVector()
+    for mu in muons:
+        eventSum += mu.p4()
+    for ele in electrons:
+        eventSum += ele.p4()
+    for jet in jets:
+        eventSum += jet.p4()
+    return eventSum
  
 def presel(PV, muons, electrons, jet): #returns three booleans: goodEvent assure the presence of at least a good lepton vetoing the presence of additional loose leptons, goodMuEvt is for good muon event, goodEleEvt is for good muon event   
     isGoodPV = (PV.ndof>4 and abs(PV.z)<20 and math.hypot(PV.x, PV.y)<2) #basic requirements on the PV's goodness
@@ -64,8 +74,19 @@ def print_hist(infile, hist, option = "HIST"):
         c1.Print(plotpath + infile + "_" + hist.GetTitle() + ".root")
     else:
         c1 = ROOT.TCanvas(infile + "_" + hist[0].GetTitle() + '_comparison', "c1", 50,50,700,600)
-        for h in hist:
-            h.Draw(option+'SAME')
+        if isinstance(hist[0], ROOT.TGraph):
+            mg = ROOT.TMultiGraph()
+            for h in hist:
+                mg.Add(h)
+            mg.Draw(option)
+        elif isinstance(hist[0], ROOT.TEfficiency):
+            mg = ROOT.TMultiGraph()
+            for h in hist:
+                mg.Add(h.CreateGraph())
+            mg.Draw(option)
+        else:
+            for h in hist:
+                h.Draw(option+'SAME')
         c1.BuildLegend()
         c1.Print(plotpath + infile + "_" + hist[0].GetTitle() + '_comparison' + ".png")
         c1.Print(plotpath + infile + "_" + hist[0].GetTitle() + '_comparison' + ".root")
@@ -84,19 +105,28 @@ for inpfile in inpfiles:
     nbins = 15
     nmin = 0
     nmax = 400
-    edges = array('f',[0., 20., 40., 60., 80., 100., 130., 160., 190., 230., 270., 320., 360., 400., 700.,1000.])
+    edges = array('f',[0., 20., 40., 60., 80., 100., 130., 160., 190., 230., 270., 320., 360., 400., 700., 1000.])
+    edges_HT = array('f',[0., 50., 100., 150., 200., 270., 340., 410., 500., 600., 700., 900., 1200., 1500., 2200., 3000.])
     h_muonpt_HLT = ROOT.TH1F("Muon_pt", "Muon_pt", nbins, edges)
     h_HLT_Mu50 = ROOT.TH1F("HLT_Mu50", "HLT_Mu50", nbins, edges)
     h_HLT_TkMu50 = ROOT.TH1F("HLT_TkMu50", "HLT_TkMu50", nbins, edges)
     h_HLT = ROOT.TH1F("HLT_OR", "HLT_OR", nbins, edges)
-    ##histos muon
+    #h_HLT_Mu50Eff = ROOT.TEfficiency("h_HLT_Mu50Eff", "HLT_Mu50Eff;muon_pt [GeV];#epsilon", nbins, edges)
+
+    h_electronpt_HLT = ROOT.TH1F("Electron_pt", "Electron_pt", nbins, edges)
+    h_HLT_Ele115 = ROOT.TH1F("HLT_Ele115", "HLT_Ele115", nbins, edges)
+
+    h_HT = ROOT.TH1F("HT", "Event_HT", nbins, edges_HT)
+    h_HLT_HT = ROOT.TH1F("HLT_HT", "HLT_HT", nbins, edges_HT)
+
+    #histos muon
     h_drmin_ptrel_mu = ROOT.TH2F("h_drmin_ptrel_mu","DR_vs_pTrel_muon", 100, 0., 1.5, 100, 0., 300.)
     h_drmin_mu = ROOT.TH1F("h_drmin_mu","DR_muon", 100, 0., 1.5)
     h_MET_mu = ROOT.TH1F("h_MET_mu", "MET_distribution_muon", 100, 0, 500)
     h_leadingjet_mu = ROOT.TH1F("h_leadingjet_mu", "leadingjet_muon", 200, 0, 1000)
     h_subleadingjet_mu = ROOT.TH1F("h_subleadingjet_mu", "subleadingjet_muon", 200, 0, 1000)
     h_muonpt = ROOT.TH1F("h_muonpt", "muon_pt_distribution", 100, 0, 500)
-    ##histos electron
+    #histos electron
     h_drmin_ptrel_e = ROOT.TH2F("h_drmin_ptrel_e","DR_vs_pTrel_electron", 100, 0., 1.5, 100, 0., 300.)
     h_MET_e = ROOT.TH1F("h_MET_e", "MET_distribution_electron", 100, 0, 500)
     h_leadingjet_e = ROOT.TH1F("h_leadingjet_e", "leadingjet_electron", 200, 0, 1000)
@@ -129,6 +159,7 @@ for inpfile in inpfiles:
         if not goodEvt:
             badevt += 1
             continue
+        HT = get_HT(muons, electrons, jets)
         if isMu:
             for muon in muons:
                 if(muon.tightId==1 and muon.pt>50):
@@ -154,7 +185,7 @@ for inpfile in inpfiles:
         #h_muonpt.Draw()
         if isEle:
             for electron in electrons:
-                if(electron.mvaFall17V2noIso_WP90 and (electron.genPartFlav==15 or electron.genPartFlav==1)):
+                if(electron.mvaFall17V2noIso_WP90 and electron.pt > 50):
                     goodjets = get_Jet(jets, 35)
                     if len(goodjets)>0:
                         jet,drmin = closest(muon, goodjets)
@@ -164,6 +195,16 @@ for inpfile in inpfiles:
                         h_subleadingjet_e.Fill(jets[1].pt)
                         h_MET_e.Fill(met.pt)
                         h_electronpt.Fill(electron.pt)
+            h_electronpt_HLT.Fill(electrons[0].pt)
+            #print str(tree.HLT_Mu50)
+            if(HLT.Ele115_CaloIdVT_GsfTrkIdT):
+                h_HLT_Ele115.Fill(electrons[0].pt)
+
+        if isEle or isMu:
+            h_HT.Fill(HT.Pt())
+            if(HLT.PFHT800 or HLT.PFHT900):
+                h_HLT_HT.Fill(HT.Pt())
+
 
     print 'Total events: %d     ||     Bad MET flag events %d     ||     Bad events %d' %(tree.GetEntries(), badflag, badevt)
     print_hist(inpfile, h_drmin_ptrel_mu, "COLZ")
@@ -190,20 +231,32 @@ for inpfile in inpfiles:
     save_hist(inpfile, h_MET_e)
     save_hist(inpfile, h_electronpt)
 
-    h_HLT_Mu50.Sumw2()
-    h_HLT_Mu50.Divide(h_muonpt_HLT)
-    h_HLT_Mu50.SetLineColor(ROOT.kGreen)
-    save_hist(inpfile, h_HLT_Mu50)
-    print_hist(inpfile, h_HLT_Mu50)
-    h_HLT_TkMu50.Sumw2()
-    h_HLT_TkMu50.Divide(h_muonpt_HLT)
-    h_HLT_TkMu50.SetLineColor(ROOT.kBlack)
-    save_hist(inpfile, h_HLT_TkMu50)
-    print_hist(inpfile, h_HLT_TkMu50)
-    h_HLT.Sumw2()
-    h_HLT.Divide(h_muonpt_HLT)
-    #h_HLT.SetLineColor(ROOT.kYellow+2)
-    save_hist(inpfile, h_HLT)
-    print_hist(inpfile, h_HLT)
-    print_hist(inpfile, [h_HLT_Mu50, h_HLT_TkMu50, h_HLT], 'E')
+    h_HLT_Mu50Eff = ROOT.TEfficiency(h_HLT_Mu50, h_muonpt_HLT)
+    h_HLT_Mu50Eff.SetTitle("HLT_Mu50; muon_pt [GeV];#epsilon")
+    h_HLT_Mu50Eff.SetLineColor(ROOT.kGreen)
+    save_hist(inpfile, h_HLT_Mu50Eff)
+    print_hist(inpfile, h_HLT_Mu50Eff, 'AP')
+
+    h_HLT_TkMu50Eff = ROOT.TEfficiency(h_HLT_TkMu50, h_muonpt_HLT)
+    h_HLT_TkMu50Eff.SetTitle("HLT_TkMu50; muon_pt [GeV];#epsilon")
+    h_HLT_TkMu50Eff.SetLineColor(ROOT.kRed)
+    save_hist(inpfile, h_HLT_TkMu50Eff)
+    print_hist(inpfile, h_HLT_TkMu50Eff, 'AP')
+
+    h_HLTEff = ROOT.TEfficiency(h_HLT, h_muonpt_HLT)
+    h_HLTEff.SetTitle("HLT_Mu_OR; muon_pt [GeV];#epsilon")
+    h_HLTEff.SetLineColor(ROOT.kBlue)
+    save_hist(inpfile, h_HLTEff)
+    print_hist(inpfile, h_HLTEff)
+    print_hist(inpfile, [h_HLT_Mu50Eff, h_HLT_TkMu50Eff, h_HLTEff], 'AP')
+
+    h_HLT_Ele115Eff = ROOT.TEfficiency(h_HLT_Ele115, h_electronpt_HLT)
+    h_HLT_Ele115Eff.SetTitle("HLT_Ele115Eff; electron_pt [GeV];#epsilon")
+    save_hist(inpfile, h_HLT_Ele115Eff)
+    print_hist(inpfile, h_HLT_Ele115Eff, 'AP')
+
+    h_HLT_HTEff = ROOT.TEfficiency(h_HLT_HT, h_HT)
+    h_HLT_HTEff.SetTitle("HLT_HTEff; Event HT [GeV];#epsilon")
+    save_hist(inpfile, h_HLT_HTEff)
+    print_hist(inpfile, h_HLT_HTEff, 'AP')
 
