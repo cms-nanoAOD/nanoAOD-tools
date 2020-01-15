@@ -105,5 +105,3 @@ for inpfile in inpfiles:
         if lepton.pt < 50:
             unLepTriggered += 1
             continue
-          
-        HT = get_HT(jets)
