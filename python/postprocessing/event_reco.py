@@ -45,6 +45,7 @@ for inpfile in inpfiles:
     badevt = 0
     unHLTriggered = 0
     unLepTriggered = 0
+    unJetTriggered = 0
     nentries = tree.GetEntries()
     print 'n entries: %i' %(nentries)
 
@@ -83,6 +84,8 @@ for inpfile in inpfiles:
             badevt += 1
             continue
 
+
+
         #HLTriggering
         if isMu:
             if(HLT.Mu50 or HLT.TkMu50):
@@ -96,6 +99,9 @@ for inpfile in inpfiles:
             unHLTriggered += 1
             continue
 
+        #MCTruth reco
+        #Prendere il leptone se il suo genpar_idx = -1, nel caso non ci sia nessun leptone di questo tipo, verificare se gli il genlepton associato e' prompt o adronico (si vede dal pdgId della genPartMother). Stesso con jet (?)
+
         #LepTriggering
         if isMu:
             if not lepton.tightId:
@@ -105,3 +111,14 @@ for inpfile in inpfiles:
         if lepton.pt < 50:
             unLepTriggered += 1
             continue
+
+        #JetTriggering
+        goodjets = get_Jet(jets, 35)
+        if len(goodjets)<1:
+            unJetTriggered += 1
+            continue
+            
+        #tree.Scan("Electron_genPartIdx", "HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT")
+        #tree.Scan("GenPart_genPartIdxMother:GenPart_pdgId")
+
+
