@@ -34,6 +34,9 @@ print "root setted"
 def bjet_filter(jets): #returns a collection of only b-gen jets (to use only for MC samples)
     return list(filter(lambda x : x.partonFlavour == -5 or x.partonFlavour == 5, jets))
 
+def sameflav_filter(jets, flav): #returns a collection of only b-gen jets (to use only for MC samples)
+    return list(filter(lambda x : x.partonFlavour == flav, jets))
+
 for inpfile in inpfiles:
     filetoopen = inputpath + inpfile
     infile = ROOT.TFile.Open(filetoopen + ".root")
@@ -42,9 +45,13 @@ for inpfile in inpfiles:
     
     #histo booking
     nbins_edges = 15
-    nbins = 75
+    nbins = 120
     nmin = 0
-    nmax = 1500
+    nmax = 2400
+    wnbins = 150
+    wnmin = 0
+    wnmax = 6000
+    
     edges = array('f',[0., 20., 40., 60., 80., 100., 130., 160., 190., 230., 270., 320., 360., 400., 700., 1000.])
     h_mclepton_pt = {'electron': ROOT.TH1F("MC_Electron_pt", "MC_Electron_pt", nbins, nmin, nmax),
                      'muon': ROOT.TH1F("MC_Muon_pt", "MC_Muon_pt", nbins, nmin, nmax)
@@ -52,13 +59,22 @@ for inpfile in inpfiles:
     h_mclepton_eta = {'electron': ROOT.TH1F("MC_Electron_eta", "MC_Electron_eta", nbins, nmin, nmax),
                      'muon': ROOT.TH1F("MC_Muon_eta", "MC_Muon_eta", nbins, nmin, nmax)
                     }
-
+    h_mcbjet_pt = {'Wbjet_ev2': ROOT.TH1F("MC_ev2_Wbjet_pt", "MC_ev2_Wbjet_pt", nbins, nmin, nmax),
+                   'topbjet_ev2': ROOT.TH1F("MC_ev2_topbjet_pt", "MC_ev2_topbjet_pt", nbins, nmin, nmax),
+                   'Wbjet': ROOT.TH1F("MC_Wbjet_pt", "MC_Wbjet_pt", nbins, nmin, nmax),
+                   'topbjet': ROOT.TH1F("MC_topbjet_pt", "MC_topbjet_pt", nbins, nmin, nmax),
+                   }
+    h_mcWprime_mass = {'all': ROOT.TH1F("MC_Wprime_mass", "MC_Wprime_mass", wnbins, wnmin, wnmax),
+                       'ev2': ROOT.TH1F("MC_ev2_Wprime_mass", "MC_ev2_Wprime_mass", wnbins, wnmin, wnmax),
+                       }
     #preselection
     badflag = 0
     badevt = 0
     HLTriggered = 0
     LepTriggered = 0
     JetTriggered = 0
+    m2bjetev = 0
+    nmctruth_ev = 0
     nentries = tree.GetEntries()
     print 'n entries: %i' %(nentries)
 
@@ -83,7 +99,6 @@ for inpfile in inpfiles:
         lepton_p4 = None
         mclepton = None
         mclepton_p4 = None
-        nmctruth_ev = 0
 
         if last:
             print 'all object extracted'
@@ -142,9 +157,18 @@ for inpfile in inpfiles:
         bjetcheck = True
         bjets = bjet_filter(jets)
         if len(bjets)>2:
-            print 'Warning! More than 2 bjet from MCTruth in ev #%i' %i
+            #print 'Warning! More than 2 bjet from MCTruth in ev #%i' %i
             bjetcheck = False
-        #QUI
+            m2bjetev += 1
+        '''
+        else:
+            for bjet in bjets:
+                if bjet.partonFlavour == 5:
+                    h_mcbjet_pt['bjet'].Fill(bjet.pt)
+                else:
+                    h_mcbjet_pt['antibjet'].Fill(bjet.pt)
+        '''
+        
         if mclepton is not None:
             nmctruth_ev += 1
             mclepton_p4 = ROOT.TLorentzVector()
@@ -154,15 +178,45 @@ for inpfile in inpfiles:
             elif isEle:
                 h_mclepton_pt['electron'].Fill(mclepton.pt)
             
+            MCWprime_p4 = ROOT.TLorentzVector()
+
+            topgot = False
+            Wpgot = False
+
+            bottjets = sameflav_filter(bjets, 5)
+            abottjets = sameflav_filter(bjets, -5)
+
+            #if bjetcheck:
+             
             for bjet in bjets:
                 bjet_p4 = ROOT.TLorentzVector()
                 bjet_p4.SetPtEtaPhiM(bjet.pt, bjet.eta, bjet.phi, bjet.mass)
+
                 if abs(bjet.partonFlavour)!=5:
                     print 'bfilter not properly working'
                     continue
-                    blepflav = genpart[mclepton.genPartIdx].pdgId*bjet.partonFlavour
-                    if blepflav < 0:
-                        mctop_p4 = mclepton_p4 + bjet_p4
+            
+                blepflav = genpart[mclepton.genPartIdx].pdgId*bjet.partonFlavour
+
+                if blepflav < 0 and not topgot:
+                    mctop_p4 = mclepton_p4 + bjet_p4
+                    h_mcbjet_pt['topbjet'].Fill(bjet_p4.Pt())
+                    if bjetcheck:
+                        h_mcbjet_pt['topbjet_ev2'].Fill(bjet_p4.Pt())
+                    topgot = True
+                elif blepflav > 0 and not Wpgot:
+                    mcpromptbjet_p4 = bjet_p4
+                    h_mcbjet_pt['Wbjet'].Fill(bjet_p4.Pt())
+                    if bjetcheck:
+                        h_mcbjet_pt['Wbjet_ev2'].Fill(bjet_p4.Pt())
+                    Wpgot = True
+            
+            if topgot and Wpgot:
+                MCWprime_p4 = mctop_p4 + mcpromptbjet_p4
+                h_mcWprime_mass['all'].Fill(MCWprime_p4.M())
+                if bjetcheck:
+                    h_mcWprime_mass['ev2'].Fill(MCWprime_p4.M())
+            
 
         #LepTriggering
 
@@ -186,13 +240,22 @@ for inpfile in inpfiles:
         else:
             JetTriggered += 1
     
-    '''
+    
     #histo printing and saving
+    
     for value in h_mclepton_pt.values():
         print_hist(inpfile, value)
         save_hist(inpfile, value)
-    '''
-
+    
+    for value in h_mcbjet_pt.values():
+        print_hist(inpfile, value)
+        save_hist(inpfile, value)
+    
+    for value in h_mcWprime_mass.values():
+        print_hist(inpfile, value)
+        save_hist(inpfile, value)
+    
+    print 'Total events: %d     ||     Bad MET flag events %d     ||     Bad events %d      ||     Events with more than 2 mcbjets %d' %(tree.GetEntries(), badflag, badevt, m2bjetev)
         #tree.Scan("GenPart_genPartIdxMother:GenPart_pdgId")#, "GenPart_pdgId==-11 || GenPart_pdgId==11")
         #tree.Scan("Muon_genPartIdx", "(HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT) && Muon_genPartIdx == -1")
         #tree.Scan("GenPart_pdgId[GenPart_genPartIdxMother[Electron_genPartIdx]]:GenPart_pdgId[Electron_genPartIdx]:GenPart_pdgId[GenPart_genPartIdxMother[Muon_genPartIdx]]:GenPart_pdgId[Muon_genPartIdx]", "(Electron_genPartIdx != (-1) && Muon_genPartIdx != (-1) && (GenPart_pdgId[GenPart_genPartIdxMother[Electron_genPartIdx]] == GenPart_pdgId[Electron_genPartIdx] || GenPart_pdgId[GenPart_genPartIdxMother[Muon_genPartIdx]] == GenPart_pdgId[Muon_genPartIdx]))")
