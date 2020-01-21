@@ -64,14 +64,15 @@ class TopUtilities():
             metpx = metPx
             metpy = metPy
 
-            EquationCoeff1 = {'a': 1,
-                             'b': (-3 * pylep * mW / ptlep),
-                             'c': (((mW**2.) * (2. * pylep**2.) / (ptlep**2)) + mW**2. - (4. * pxlep**3. * metpx / ptlep**2) - (4. * pxlep**2. * pylep * metpy / ptlep**2)),
-                             'd': ((4. * pxlep**2. * mW * metpy / ptlep) - pylep * mW**3. / ptlep)}
+            EquationCoeff1 = [1,
+                              (-3 * pylep * mW / ptlep),
+                              (((mW**2.) * (2. * pylep**2.) / (ptlep**2)) + mW**2. - (4. * pxlep**3. * metpx / ptlep**2) - (4. * pxlep**2. * pylep * metpy / ptlep**2)),
+                              ((4. * pxlep**2. * mW * metpy / ptlep) - pylep * mW**3. / ptlep)
+                    ]
 
-            EquationCoeff2 = EquationCoeff1.copy()
-            EquationCoeff2['b'] = - EquationCoeff2['b']
-            EquationCoeff2['d'] = - EquationCoeff2['d']
+            EquationCoeff2 = copy.copy(EquationCoeff1)
+            EquationCoeff2[1] = - EquationCoeff2[1]
+            EquationCoeff2[3] = - EquationCoeff2[3]
             #solutions1 = EquationSolver.EqSolv(EquationCoeff1,'','','')
             #solutions2 = EquationSolver.EqSolv(EquationCoeff2,'','','')
 
@@ -85,18 +86,18 @@ class TopUtilities():
             ncoeff = ['x1', 'x2', 'x3']
 
             for j in range(2):
-                for i in ncoeff:
-                    if solutions[j][i] < 0.:
+                for value in solutions[j]:
+                    if value < 0.:
                         continue
+                    else:
+                        p_x = (value**2. - mW**2.) / (4.*pxlep)
+                        p_y = ((mW**2.)*pylep + 2.*pxlep*pylep*p_x - mW*ptlep*value) / (2*pxlep**2.)
+                        Delta2 = (p_x - metpx)**2. + (p_y - metpy)**2.
 
-                    p_x = (solutions[j][i]**2. - mW**2.) / (4.*pxlep)
-                    p_y = ((mW**2.)*pylep + 2.*pxlep*pylep*p_x - mW*ptlep*solutions[j][i]) / (2*pxlep**2.)
-                    Delta2 = (p_x - metpx)**2. + (p_y - metpy)**2.
-
-                    if Delta2 < deltaMin and Delta2 > 0 :
-                        deltaMin = Delta2
-                        minPx = p_x
-                        minPy = p_y
+                        if Delta2 < deltaMin and Delta2 > 0 :
+                            deltaMin = copy.copy(Delta2)
+                            minPx = copy.copy(p_x)
+                            minPy = copy.copy(p_y)
                     
             pyZeroValue = mW**2.*pxlep + 2.*pylep*zeroValue
             delta2ZeroValue = (zeroValue - metpx)**2. + (pyZeroValue - metpy)**2.
@@ -145,13 +146,15 @@ class TopUtilities():
         pxlb = lb.Px()
         pylb = lb.Py()
         
+        '''
         if mlb2 < 0.:
             self.reco_topMt = None
             self.IsParticle = False
             return None
-        
+        '''
+
         etlb = TMath.Power((mlb2 + ptlb**2.), 0.5)
-        metPt = TMath.Power(metPx**2. + metPy**2.)
+        metPt = TMath.Power((metPx**2. + metPy**2.), 0.5)
 
         self.reco_topMt = TMath.Power((mlb2 + 2.*(etlb*metPt - pxlb*metPx - pylb*metPy)), 0.5)
 
