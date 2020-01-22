@@ -73,7 +73,11 @@ class TopUtilities():
                               (-3 * pylep * mW / ptlep),
                               (((mW**2.) * (2. * pylep**2.) / (ptlep**2)) + mW**2. - (4. * pxlep**3. * metpx / ptlep**2) - (4. * pxlep**2. * pylep * metpy / ptlep**2)),
                               ((4. * pxlep**2. * mW * metpy / ptlep) - pylep * mW**3. / ptlep)
+<<<<<<< HEAD
                               ]
+=======
+                    ]
+>>>>>>> d548fd4d06c3b4785ef362b8c5946fccee8cc494
 
             EquationCoeff2 = copy.copy(EquationCoeff1)
             EquationCoeff2[1] = - EquationCoeff2[1]
@@ -99,10 +103,17 @@ class TopUtilities():
                         p_y = ((mW**2.)*pylep + 2.*pxlep*pylep*p_x - mW*ptlep*value) / (2*pxlep**2.)
                         Delta2 = (p_x - metpx)**2. + (p_y - metpy)**2.
 
+<<<<<<< HEAD
                     if Delta2 < deltaMin and Delta2 > 0 :
                         deltaMin = copy.copy(Delta2)
                         minPx = copy.copy(p_x)
                         minPy = copy.copy(p_y)
+=======
+                        if Delta2 < deltaMin and Delta2 > 0 :
+                            deltaMin = copy.copy(Delta2)
+                            minPx = copy.copy(p_x)
+                            minPy = copy.copy(p_y)
+>>>>>>> d548fd4d06c3b4785ef362b8c5946fccee8cc494
                     
             pyZeroValue = mW**2.*pxlep + 2.*pylep*zeroValue
             delta2ZeroValue = (zeroValue - metpx)**2. + (pyZeroValue - metpy)**2.
@@ -150,13 +161,15 @@ class TopUtilities():
         pxlb = lb.Px()
         pylb = lb.Py()
         
+        '''
         if mlb2 < 0.:
             self.reco_topMt = None
             self.IsParticle = False
             return None
-        
+        '''
+
         etlb = TMath.Power((mlb2 + ptlb**2.), 0.5)
-        metPt = TMath.Power(metPx**2. + metPy**2.)
+        metPt = TMath.Power((metPx**2. + metPy**2.), 0.5)
 
         return TMath.Power((mlb2 + 2.*(etlb*metPt - pxlb*metPx - pylb*metPy)), 0.5)
 
