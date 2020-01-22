@@ -297,7 +297,7 @@ for inpfile in inpfiles:
             if topgot and Wpgot:
                 MCWprime_p4 = mctop_p4 + mcpromptbjet_p4
                 MCWprime_p4t = mctop_p4t + mcpromptbjet_p4t
-                if True:#MCWprime_p4.M() > 6000:#Wpmass filter
+                if MCWprime_p4.M() > 6000:#Wpmass filter
                     h_mcbjet_pt['topbjet'].Fill(mctopbjet_p4.Pt())
                     h_mcbjet_pt['Wbjet'].Fill(mcpromptbjet_p4.Pt())
                     h_met_q['pt'].Fill(met.pt)
