@@ -29,7 +29,7 @@ modulesToBeCalled = {
 }
 
 if len(sys.argv) != 3:
-    raise Exception("Launch crab_script_all.py specifying two options: job numbers (eg. 0) and configuration (eg. mc2016). \n\nExample: python crab_script_all.py 0 data2018C\n")
+    raise Exception("Launch crab_script_all.py specifying two options: job numbers (eg. 0) and configuration (eg. mc2016). \n\nExample: python crab_script_all.py 0 mc2017\n")
 
 moduleSettings = sys.argv[2]
 
