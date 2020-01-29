@@ -17,8 +17,9 @@ namespace {
 
     EventShapes evShapes;
     TFEval tfEval;
-    TFEval::BranchAccessor branchAccessor(nullptr);
-    TFEval::ArrayFeatureGroup arrayFeatureGroup("blub",10,10,&branchAccessor);
+    TFEval::BranchAccessorTmpl<int> branchAccessorInt(nullptr);
+    TFEval::BranchAccessorTmpl<float> branchAccessorFloat(nullptr);
+    TFEval::ArrayFeatureGroup arrayFeatureGroup("blub",10,10,&branchAccessorInt);
     TFEval::ValueFeatureGroup valueFeatureGroup("blub",10);
     TFEval::Result result;
     TFEval::PyAccessor pyAccessor(nullptr,nullptr);

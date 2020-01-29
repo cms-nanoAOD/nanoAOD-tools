@@ -53,8 +53,9 @@ class exampleProducer(Module):
         print "--- Model: ",modelFile," ---"
         for groupName,featureCfg in featureDict.iteritems():
             if featureCfg.has_key("max"):
-                print "building group ... %s, shape=[%i,%i]"%(groupName,featureCfg["max"],len(featureCfg["branches"]))
-                lengthBranch = ROOT.TFEval.BranchAccessor(tree.arrayReader(featureCfg["length"]))
+                print "building group ... %s, shape=[%i,%i], length=%s"%(groupName,featureCfg["max"],len(featureCfg["branches"]),featureCfg["length"])
+                print tree.arrayReader(featureCfg["length"])
+                lengthBranch = ROOT.TFEval.createAccessor(tree.arrayReader(featureCfg["length"]))
                 featureGroup = ROOT.TFEval.ArrayFeatureGroup(
                     groupName,
                     len(featureCfg["branches"]),
@@ -63,7 +64,7 @@ class exampleProducer(Module):
                 )
                 for branchName in featureCfg["branches"]:
                     #print " + add feature: ",branchName
-                    featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
+                    featureGroup.addFeature(ROOT.TFEval.createAccessor(tree.arrayReader(branchName)))
                 tfEval.addFeatureGroup(featureGroup)
             else:
                 print "building group ... %s, shape=[%i]"%(groupName,len(featureCfg["branches"]))
@@ -73,7 +74,7 @@ class exampleProducer(Module):
                 )
                 for branchName in featureCfg["branches"]:
                     #print " + add feature: ",branchName
-                    featureGroup.addFeature(ROOT.TFEval.BranchAccessor(tree.arrayReader(branchName)))
+                    featureGroup.addFeature(ROOT.TFEval.createAccessor(tree.arrayReader(branchName)))
                 tfEval.addFeatureGroup(featureGroup)
                 
         return tfEval
@@ -81,8 +82,7 @@ class exampleProducer(Module):
     def setup(self,tree):
         #load dynamically from file
         featureDict = import_module('feature_dict').featureDict
-        self.tfEvalctau1 = self.setupTFEval(tree,"model_ctau1.pb",featureDict)
-        self.tfEvalParametric = self.setupTFEval(tree,"model_parametric.pb",featureDict)
+        self.tfEvalParametric = self.setupTFEval(tree,"weight2016_75.pb",featureDict)
         
         genFeatureGroup = ROOT.TFEval.ValueFeatureGroup("gen",1)
         self.nJets = 0
@@ -103,7 +103,7 @@ class exampleProducer(Module):
         jetorigin = Collection(event, "jetorigin")
         
         for ijet in range(len(jetorigin)):
-            if jetorigin[ijet].fromLLP>0.5 and jets[ijet].pt>20 and math.fabs(jets[ijet].eta)<2.4:
+            if jetorigin[ijet].isLLP_Q>0.5 and jets[ijet].pt>20 and math.fabs(jets[ijet].eta)<2.4:
                 self.nLLPTruth+=1
                 
                 #NOTE: one cannot access any other branches between setup & call to evaluate
@@ -113,14 +113,6 @@ class exampleProducer(Module):
                 self.nJets = len(jets)
                 #print ijet,":",
                 
-                resultCtau1 = self.tfEvalctau1.evaluate(1,numpy.array([ijet],numpy.int64))
-                predictedCtau1_class = numpy.argmax(resultCtau1.get("prediction",0))
-                if predictedCtau1_class==4:
-                    self.nLLPctau1 +=1
-                for ictau,ctau_value in enumerate(self.nLLPParam.keys()):
-                    self.logctau[ictau] = 1.*ctau_value
-                    
-                    
                 result = self.tfEvalParametric.evaluate(
                     len(self.nLLPParam.keys()),
                     numpy.array([ijet]*len(self.nLLPParam.keys()),numpy.int64)

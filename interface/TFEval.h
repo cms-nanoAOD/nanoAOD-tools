@@ -36,13 +36,28 @@ class TFEval
                 }
         };
         
+        
         class BranchAccessor:
             public Accessor
         {
-            protected:
-                TTreeReaderArray<float>* _branch;
             public:
-                BranchAccessor(TTreeReaderArray<float>* branch):
+                virtual int64_t size() const = 0;
+                
+                virtual float value(int64_t jetIndex, int64_t batchIndex) const = 0;
+                
+                virtual ~BranchAccessor()
+                {
+                }
+        };
+        
+        template<class TYPE>
+        class BranchAccessorTmpl:
+            public BranchAccessor
+        {
+            protected:
+                TTreeReaderArray<TYPE>* _branch;
+            public:
+                BranchAccessorTmpl(TTreeReaderArray<TYPE>* branch):
                     _branch(branch)
                 {
                 }
@@ -61,9 +76,19 @@ class TFEval
                     return _branch->At(jetIndex);
                 }
                 
-                virtual ~BranchAccessor()
+                virtual ~BranchAccessorTmpl()
                 {
                 }
+        };
+        
+        static BranchAccessorTmpl<int> createAccessor(TTreeReaderArray<int>* branch)
+        {
+            return BranchAccessorTmpl<int>(branch);
+        };
+        
+        static BranchAccessorTmpl<float> createAccessor(TTreeReaderArray<float>* branch)
+        {
+            return BranchAccessorTmpl<float>(branch);
         };
         
         class PyAccessor:
