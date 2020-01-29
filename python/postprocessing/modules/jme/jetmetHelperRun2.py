@@ -10,7 +10,7 @@ jecTagsMC = {'2016' : 'Summer16_07Aug2017_V11_MC',
              '2017' : 'Fall17_17Nov2017_V32_MC', 
              '2018' : 'Autumn18_V19_MC'}
 
-jecTagsFastSim = {'2016' : 'Spring16_25nsFastSimV1_MC',
+jecTagsFastSim = {'2016' : 'Summer16_FastSimV1_MC',
                   '2017' : 'Fall17_FastSimV1_MC',
                   '2018' : 'Autumn18_FastSimV1_MC'}
 
