@@ -142,8 +142,8 @@ class jetmetUncertaintiesProducer(Module):
             jesUncertainty_label = jesUncertainty
             if jesUncertainty == 'Total' and len(self.jesUncertainties) == 1:
                 jesUncertainty_label = ''
-            pars = ROOT.JetCorrectorParameters(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName),jesUncertainty_label)
             if jesUncertainty != "HEMIssue":
+                pars = ROOT.JetCorrectorParameters(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName),jesUncertainty_label)
                 self.jesUncertainty[jesUncertainty] = ROOT.JetCorrectionUncertainty(pars)    
 
         if not self.isData:
@@ -445,10 +445,10 @@ class jetmetUncertaintiesProducer(Module):
                             delta = 0.8
                           elif jet.eta <= -2.5 and jet.eta > -3:
                             delta = 0.65
-                      jet_pt_jesUp[jetUncertainty] = jet_pt_nom
-                      jet_pt_jesDown[jetUncertainty] = delta * jet_pt_nom
-                      jet_mass_jesUp[jetUncertainty] = jet_mass_nom
-                      jet_mass_jesDown[jetUncertainty] = delta * jet_mass_nom
+                      jet_pt_jesUp[jesUncertainty] = jet_pt_nom
+                      jet_pt_jesDown[jesUncertainty] = delta * jet_pt_nom
+                      jet_mass_jesUp[jesUncertainty] = jet_mass_nom
+                      jet_mass_jesDown[jesUncertainty] = delta * jet_mass_nom
 
                       jet_pt_jesUpT1[jesUncertainty]   = jet_pt_L1L2L3
                       jet_pt_jesDownT1[jesUncertainty] = delta * jet_pt_L1L2L3
