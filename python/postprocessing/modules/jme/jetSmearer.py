@@ -118,13 +118,7 @@ class jetSmearer(Module):
               #
               dPt = jet.Perp() - genJet.Perp()
               smearFactor = 1. + (jet_pt_sf_and_uncertainty[central_or_shift] - 1.)*dPt/jet.Perp()
-              
-              # check that smeared jet energy remains positive,
-              # as the direction of the jet would change ("flip") otherwise - and this is not what we want
-              if (smearFactor*jet.Perp()) < 1.e-2:
-                smearFactor = 1.e-2
               smear_vals[central_or_shift] = smearFactor
-              
         else:
           self.params_resolution.setJetPt(jet.Perp())
           self.params_resolution.setJetEta(jet.Eta())
@@ -144,13 +138,14 @@ class jetSmearer(Module):
               #         so we would need to randomly "unsmear" the jet, which is impossible
               #
               smearFactor = 1.
+            smear_vals[central_or_shift] = smearFactor
             
+          for central_or_shift in [ enum_nominal, enum_shift_up, enum_shift_down ]:
             # check that smeared jet energy remains positive,
             # as the direction of the jet would change ("flip") otherwise - and this is not what we want
-            if (smearFactor*jet.Perp()) < 1.e-2:
-                smearFactor = 1.e-2
-            smear_vals[central_or_shift] = smearFactor
-        
+            if smear_vals[central_or_shift]*jet.E() < 1.e-2:
+               smear_vals[central_or_shift] = 1.e-2 / jet.E()
+
         return ( smear_vals[enum_nominal], smear_vals[enum_shift_up], smear_vals[enum_shift_down] )
         
     
