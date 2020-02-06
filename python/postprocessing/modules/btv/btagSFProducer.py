@@ -317,7 +317,6 @@ class btagSFProducer(Module):
             isShape = ( wp == 'shape_corr' )
             central_and_systs = ( self.central_and_systs_shape_corr if isShape else self.central_and_systs )
             for central_or_syst in central_and_systs:
-                central_or_syst = central_or_syst.lower()
                 scale_factors = list(self.getSFs(preloaded_jets, central_or_syst, reader, 'auto', isShape))
                 self.out.fillBranch(self.branchNames_central_and_systs[wp][central_or_syst], scale_factors)
 
