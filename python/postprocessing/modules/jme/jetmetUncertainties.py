@@ -306,10 +306,9 @@ class jetmetUncertaintiesProducer(Module):
                 jet_rawmass = -1.0 * jet_mass #If factor not present factor will be saved as -1
 
             (jet_pt, jet_mass) = self.jetReCalibrator.correct(jet,rho)
+            (jet_pt_l1, jet_mass_l1) = self.jetReCalibratorL1.correct(jet,rho)
             jet.pt = jet_pt
             jet.mass = jet_mass
-            
-            (jet_pt_l1, jet_mass_l1) = self.jetReCalibratorL1.correct(jet,rho)
 
             # Get the JEC factors
             jec   = jet_pt/jet_rawpt
