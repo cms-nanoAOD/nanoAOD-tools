@@ -9,7 +9,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class PrefCorr(Module):
     def __init__(self, jetroot="L1prefiring_jetpt_2017BtoF.root", jetmapname="L1prefiring_jetpt_2017BtoF",
-                 photonroot="L1prefiring_photonpt_2017BtoF.root", photonmapname="L1prefiring_photonpt_2017BtoF"):
+                 photonroot="L1prefiring_photonpt_2017BtoF.root", photonmapname="L1prefiring_photonpt_2017BtoF", branchnames=["PrefireWeight","PrefireWeight_Up", "PrefireWeight_Down"]):
 
         cmssw_base = os.getenv('CMSSW_BASE')
 
@@ -20,7 +20,7 @@ class PrefCorr(Module):
         self.jet_map = self.get_root_obj(self.jet_file, jetmapname)
 
         self.UseEMpT = ("jetempt" in jetroot)
-
+        self.branchnames = branchnames
     def open_root(self, path):
         r_file = ROOT.TFile.Open(path)
         if not r_file.__nonzero__() or not r_file.IsOpen(): raise NameError('File ' + path + ' not open')
@@ -39,7 +39,6 @@ class PrefCorr(Module):
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.branchnames = ["PrefireWeight", "PrefireWeight_Up", "PrefireWeight_Down"]
         for bname in self.branchnames:
           self.out.branch(bname, "F")
 
