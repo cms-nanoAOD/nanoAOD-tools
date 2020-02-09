@@ -11,13 +11,12 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetS
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
 class jetmetUncertaintiesProducer(Module):
-    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], archive=None, globalTagProd=None, jetType = "AK4PFchs", metBranchName="MET", jerTag="", isData=False, redoJEC=False, applySmearing=True, applyHEMfix=False, splitJER=False):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], archive=None, globalTagProd=None, jetType = "AK4PFchs", metBranchName="MET", jerTag="", isData=False, applySmearing=True, applyHEMfix=False, splitJER=False):
 
         # globalTagProd only needs to be defined if METFixEE2017 is to be recorrected, and should be the GT that was used for the production of the nanoAOD files
         self.era = era
         self.isData = isData
         self.applySmearing = applySmearing if not isData else False # if set to true, Jet_pt_nom will have JER applied. not to be switched on for data.
-        self.redoJEC = redoJEC
         
         self.splitJER = splitJER
         if self.splitJER:
@@ -140,7 +139,7 @@ class jetmetUncertaintiesProducer(Module):
         # implementation didn't seem to work for factorized JEC, try again another way
         for jesUncertainty in self.jesUncertainties:
             jesUncertainty_label = jesUncertainty
-            if jesUncertainty == 'Total' and len(self.jesUncertainties) == 1:
+            if jesUncertainty == "Total" and (len(self.jesUncertainties) == 1 or (len(self.jesUncertainties) == 2 and "HEMIssue" in self.jesUncertainties)):
                 jesUncertainty_label = ''
             if jesUncertainty != "HEMIssue":
                 pars = ROOT.JetCorrectorParameters(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName),jesUncertainty_label)
@@ -299,7 +298,6 @@ class jetmetUncertaintiesProducer(Module):
             jet_pt_orig = jet_pt
             rawFactor = jet.rawFactor
 
-            #redo JECs if desired
             if hasattr(jet, "rawFactor"):
                 jet_rawpt = jet_pt * (1 - jet.rawFactor)
                 jet_rawmass = jet_mass * (1 - jet.rawFactor)
@@ -307,10 +305,9 @@ class jetmetUncertaintiesProducer(Module):
                 jet_rawpt = -1.0 * jet_pt #If factor not present factor will be saved as -1
                 jet_rawmass = -1.0 * jet_mass #If factor not present factor will be saved as -1
 
-            if self.redoJEC:
-                (jet_pt, jet_mass)    = self.jetReCalibrator.correct(jet,rho)
-                jet.pt = jet_pt
-                jet.mass = jet_mass
+            (jet_pt, jet_mass) = self.jetReCalibrator.correct(jet,rho)
+            jet.pt = jet_pt
+            jet.mass = jet_mass
             
             (jet_pt_l1, jet_mass_l1) = self.jetReCalibratorL1.correct(jet,rho)
 
@@ -391,20 +388,18 @@ class jetmetUncertaintiesProducer(Module):
                     delta_y_rawJet += jet_rawpt * math.sin(jet.phi)
 
 
+            jet_mass_nom = jet_pt_jerNomVal*jet_mass if self.applySmearing else jet_mass
+            if jet_mass_nom < 0.0:
+                jet_mass_nom *= -1.0
 
             # don't store the low pt jets in the Jet_pt_nom branch
             if iJet < nJet:
                 jets_pt_raw     .append(jet_rawpt)
                 jets_pt_nom     .append(jet_pt_nom)
                 jets_mass_raw   .append(jet_rawmass)
+                jets_mass_nom   .append(jet_mass_nom)
                 jets_corr_JEC   .append(jet_pt/jet_rawpt)
                 jets_corr_JER   .append(jet_pt_jerNomVal)  # can be used to undo JER
-
-                # no need to do this for low pt jets
-                jet_mass_nom           = jet_pt_jerNomVal*jet_mass if self.applySmearing else jet_mass
-                if jet_mass_nom < 0.0:
-                    jet_mass_nom *= -1.0
-                jets_mass_nom    .append(jet_mass_nom)
 
             if not self.isData:
               jet_pt_jerUp = { jerID: jet_pt_nom for jerID in self.splitJERIDs }
@@ -516,7 +511,6 @@ class jetmetUncertaintiesProducer(Module):
               met_px_jer += delta_x_rawJet - met_unclEE_x
               met_py_jer += delta_y_rawJet - met_unclEE_y
               
-              # FIXME is this correct?
               for jerID in self.splitJERIDs:
                   met_px_jerUp[jerID] += delta_x_rawJet - met_unclEE_x
                   met_py_jerUp[jerID] += delta_y_rawJet - met_unclEE_y
