@@ -1,17 +1,17 @@
 data2017 = {
 "SingleMuonRun2017"     : [
-    "/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2017_NANOV4_un2017F-31Mar2018-v1-fca2a3a20fe9002e1dc7c971a0424999/USER",
-    "/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2017_NANOV4_un2017E-31Mar2018-v1-fca2a3a20fe9002e1dc7c971a0424999/USER",
-    "/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2017_NANOV4_un2017D-31Mar2018-v1-fca2a3a20fe9002e1dc7c971a0424999/USER",
-    "/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2017_NANOV4_un2017C-31Mar2018-v1-fca2a3a20fe9002e1dc7c971a0424999/USER",
-    "/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2017_NANOV4_un2017B-31Mar2018-v1-fca2a3a20fe9002e1dc7c971a0424999/USER",
+    #"/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2017_NANOV4_un2017F-31Mar2018-v1-fca2a3a20fe9002e1dc7c971a0424999/USER",
+    #"/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2017_NANOV4_un2017E-31Mar2018-v1-fca2a3a20fe9002e1dc7c971a0424999/USER",
+    #"/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2017_NANOV4_un2017D-31Mar2018-v1-fca2a3a20fe9002e1dc7c971a0424999/USER",
+    #"/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2017_NANOV4_un2017C-31Mar2018-v1-fca2a3a20fe9002e1dc7c971a0424999/USER",
+    #"/SingleMuon/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdData2017_NANOV4_un2017B-31Mar2018-v1-fca2a3a20fe9002e1dc7c971a0424999/USER",
 ],
 }
 
 #/DYJetsToLL_M-105To160_TuneCP5_PSweights_13TeV-amcatnloFXFX-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4i_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER
 
 mc2017 = {'DY0J_2017AMCPY': ['/DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4b_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
- 'DY105VBF_2017AMCPY': ['/DYJetsToLL_M-105To160_VBFFilter_TuneCP5_PSweights_13TeV-amcatnloFXFX-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4b_ealistic_v14_ext1-v1-35a58109e00c38928fe6fe04f08bafb3/USER''/DYJetsToLL_M-105To160_VBFFilter_TuneCP5_13TeV-amcatnloFXFX-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4f_017_realistic_v14-v2-35a58109e00c38928fe6fe04f08bafb3/USER',
+ 'DY105VBF_2017AMCPY': ['/DYJetsToLL_M-105To160_VBFFilter_TuneCP5_PSweights_13TeV-amcatnloFXFX-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4b_ealistic_v14_ext1-v1-35a58109e00c38928fe6fe04f08bafb3/USER','/DYJetsToLL_M-105To160_VBFFilter_TuneCP5_13TeV-amcatnloFXFX-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4f_017_realistic_v14-v2-35a58109e00c38928fe6fe04f08bafb3/USER',
 ],
  'DY105VBF_2017MGPY': ['/DYJetsToLL_M-105To160_VBFFilter_TuneCP5_13TeV-madgraphMLM-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4b_017_realistic_v14-v2-35a58109e00c38928fe6fe04f08bafb3/USER'],
  'DY105_2017AMCPY': [  '/DYJetsToLL_M-105To160_TuneCP5_PSweights_13TeV-amcatnloFXFX-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4i_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER',
@@ -22,6 +22,7 @@ mc2017 = {'DY0J_2017AMCPY': ['/DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/
  'DYM50_2017AMCPY': ['/DYJetsToLL_M-50_VBFFilter_TuneCP5_PSweights_13TeV-amcatnloFXFX-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4a_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER',  ],
  'DYTau_2017AMCPY': [None],
  'EWKZ105_2017MGHERWIG': ['/EWK_LLJJ_MLL_105-160_SM_5f_LO_TuneCH3_13TeV-madgraph-herwig7/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4a_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
+ 'EWKZ105_2017MGPY': ['/EWK_LLJJ_MLL_105-160_SM_5f_LO_TuneCP5_PSweights_13TeV-madgraph-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV8c_017_realistic_v14-v1-ef4ff047883fc7dcd360f5fd3b961f3e/USER'],
  'EWKZ_2017MGHERWIG': [ '/EWK_LLJJ_MLL-50_MJJ-120_TuneCH3_PSweights_13TeV-madgraph-herwig7/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4f_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER',
 ],
  'EWKZ_2017MGPY': ['/EWK_LLJJ_MLL-50_MJJ-120_TuneCP5_13TeV-madgraph-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4a_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
@@ -83,19 +84,19 @@ mc2017 = {'DY0J_2017AMCPY': ['/DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/
 "/ZZTo4L_13TeV_powheg_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4a_017_realistic_v14-v2-35a58109e00c38928fe6fe04f08bafb3/USER",
 "/ZZTo4L_13TeV_powheg_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4a_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER"],
  'ZZ_2017AMCPY': ['/ZZ_TuneCP5_13TeV-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4a_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
- 'ggHmm_2017AMCPY': ['/GluGluHToMuMu_M125_13TeV_amcatnloFXFX_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4a_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
- 'ggHmm_2017AMCPY2': [None],
- 'ggHmm_2017POWPY': [None],
- 'ggHmm_2017POWPY2': [None,
-                      '/GluGluHToMuMu_M-125_TuneCP5_PSweights_13TeV_powheg_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4_ealistic_v14_ext1-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
- 'ttHmm_2017POWPY': ['/ttHToMuMu_M125_TuneCP5_13TeV-powheg-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4_017_realistic_v14-v3-35a58109e00c38928fe6fe04f08bafb3/USER',
- '/ttHToMuMu_M125_TuneCP5_PSweights_13TeV-powheg-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
- 'vbfHmm_2017AMCHERWIG': ['/VBFHToMuMu_M-125_TuneEEC5_13TeV-powheg-herwigpp/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4b_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
- 'vbfHmm_2017AMCPY': ['/VBFHToMuMu_M125_13TeV_amcatnlo_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4b_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
- 'vbfHmm_2017POWPY': ['/VBFHToMuMu_M-125_TuneCP5_PSweights_13TeV_powheg_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4e_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
- 'vbfHtautau_2017POWPY': ['/VBFHToTauTau_M125_13TeV_amcatnloFXFX_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
- 'zHmm_2017POWPY': ['/ZH_HToMuMu_ZToAll_M125_13TeV_powheg_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4a_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
- 'others_2017': [
- ],
+ #'ggHmm_2017AMCPY': ['/GluGluHToMuMu_M125_13TeV_amcatnloFXFX_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4a_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
+ #'ggHmm_2017AMCPY2': [None],
+ #'ggHmm_2017POWPY': [None],
+ #'ggHmm_2017POWPY2': [None,
+                      #'/GluGluHToMuMu_M-125_TuneCP5_PSweights_13TeV_powheg_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4_ealistic_v14_ext1-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
+ #'ttHmm_2017POWPY': ['/ttHToMuMu_M125_TuneCP5_13TeV-powheg-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4_017_realistic_v14-v3-35a58109e00c38928fe6fe04f08bafb3/USER',
+ #'/ttHToMuMu_M125_TuneCP5_PSweights_13TeV-powheg-pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
+ #'vbfHmm_2017AMCHERWIG': ['/VBFHToMuMu_M-125_TuneEEC5_13TeV-powheg-herwigpp/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4b_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
+ #'vbfHmm_2017AMCPY': ['/VBFHToMuMu_M125_13TeV_amcatnlo_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4b_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
+ #'vbfHmm_2017POWPY': ['/VBFHToMuMu_M-125_TuneCP5_PSweights_13TeV_powheg_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4e_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
+ #'vbfHtautau_2017POWPY': ['/VBFHToTauTau_M125_13TeV_amcatnloFXFX_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
+ #'zHmm_2017POWPY': ['/ZH_HToMuMu_ZToAll_M125_13TeV_powheg_pythia8/arizzi-RunIISummer16MiniAODv3_FSRmyNanoProdMc2017_NANOV4a_017_realistic_v14-v1-35a58109e00c38928fe6fe04f08bafb3/USER'],
+ #'others_2017': [
+ #],
  }
 
