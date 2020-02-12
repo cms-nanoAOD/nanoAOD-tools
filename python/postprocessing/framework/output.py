@@ -81,10 +81,7 @@ class FullOutput(OutputTree):
     ):
         outputFile.cd()
 
-        # enable/disable the output branches as requested in outputbranchSelection,
-        # then clone the input tree
-        if outputbranchSelection:
-            outputbranchSelection.selectBranches(inputTree)
+        
         self.outputbranchSelection = outputbranchSelection
         self.maxEntries = maxEntries
         self.firstEntry = firstEntry

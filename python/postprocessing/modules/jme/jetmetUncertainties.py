@@ -446,6 +446,9 @@ class jetmetUncertaintiesProducer(Module):
             met_py_nom += delta_y_rawJet - met_unclEE_y
             
             if not self.isData:
+              # apply v2 recipe correction factor also to JER central value and variations
+              met_px_jer += delta_x_rawJet - met_unclEE_x
+              met_py_jer += delta_y_rawJet - met_unclEE_y
               met_px_jerUp += delta_x_rawJet - met_unclEE_x
               met_py_jerUp += delta_y_rawJet - met_unclEE_y
               met_px_jerDown += delta_x_rawJet - met_unclEE_x
