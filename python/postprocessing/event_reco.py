@@ -13,13 +13,13 @@ print "Agostino's tools implemented"
 
 from topreco import *
 print "Andrea's tools implemented"
-'''
+
 inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/"
 
-inpfiles = ["Wprime_4000_RH"
+inpfiles = [#"Wprime_4000_RH"
             #"Wprimetotb_M2000W20_RH_MG_1",
             #"Wprimetotb_M4000W400_RH_MG_1"
-            #"TT_Mtt-700to1000"
+            "TT_Mtt-700to1000"
             #,"WJets"
             #,"QCD_Pt_600to800_1"
             #,"SingleMuon_Run2016G_1"
@@ -27,11 +27,11 @@ inpfiles = ["Wprime_4000_RH"
 '''
 
 inputpath = "/eos/home-a/apiccine/private/Wprime_BkgSample/merged/"
-inpfiles = ["Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8"
+inpfiles = [#"Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8"
             #"Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8"
-            #"Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
+            "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
 ]
-
+'''
 print "input pathed"
 
 
@@ -40,7 +40,7 @@ print "input pathed"
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch()        # don't pop up canvases
 ROOT.TH1.SetDefaultSumw2()
-#ROOT.TGaxis.SetMaxDigits(3)
+ROOT.TGaxis.SetMaxDigits(3)
 print "root setted"
 
 def genpart_filter(genparts, IdMother, flav1, flav2): #returns a collection of desired genparts (to use only for MC samples)
@@ -61,11 +61,49 @@ def Chi_TopMass(mT):
   chi = ( TMath.Power((mST-mT), 2.) ) / ( TMath.Power(sigma, 2.))
   return chi
 
+def GetTGAEfromTE(teff, stringlabel = None):
+    c1 = ROOT.TCanvas()
+    teff.Draw("AP")
+    c1.Pad().Update()
+    tgae = ROOT.TGraphAsymmErrors()
+    tgae = teff.GetPaintedGraph()
+    Low = teff.GetTotalHistogram().GetXaxis().GetBinLowEdge(1)
+    Nbin = teff.GetTotalHistogram().GetXaxis().GetNbins()
+    High = teff.GetTotalHistogram().GetXaxis().GetBinUpEdge(Nbin)
+    
+    tgae.GetXaxis().Set(Nbin, Low, High)
+    tgae.SetTitle(teff.GetTitle())
+    tgae.SetName(teff.GetName())
+        
+    if stringlabel is not None:
+        if len(stringlabel) != Nbin:
+            print "number of strings must be equal to number of bins!"
+            return None
+        else:
+            for i in range(Nbin):
+                tgae.GetXaxis().SetBinLabel(i+1, str(stringlabel[i]))
+
+    return tgae
+
+Debug = False
+
 #Step control booleans
 HLTrig = True
+LepHLTrig = False
+HadHLTrig = False
 AK8Reco = False
 MCReco = True
 DetReco = True
+BTagging = False
+
+#tresholds
+miniIso_cut = 0.1
+jet_ptcut = 35.
+leadingjet_ptcut = 250.
+mass_cut = 1200.
+
+jetptcut_str = "JetPtCuts" + str(leadingjet_ptcut)
+naeff = ["nEvents", "nEventsPrePres", "HLTrigger", "LepSel", jetptcut_str]
 
 for inpfile in inpfiles:
     filetoopen = inputpath + inpfile
@@ -87,8 +125,6 @@ for inpfile in inpfiles:
     if MCReco:
         h_mclepton_pt = {'electron': ROOT.TH1F("MC_Ele_pt", "MC_Ele_pt;electron pt [GeV];Countings", nbins, nmin, nmax),
                          'muon': ROOT.TH1F("MC_Mu_pt", "MC_Mu_pt;muon pt [GeV];Countings", nbins, nmin, nmax),
-                         #'electron_ev2': ROOT.TH1F("MC_ev2_Ele_pt", "MC_ev2_Ele_pt", nbins, nmin, nmax),
-                         #'muon_ev2': ROOT.TH1F("MC_ev2_Mu_pt", "MC_ev2_Mu_pt", nbins, nmin, nmax)
                     }
         h_mclepton_pt_unHLT = copy.deepcopy(h_mclepton_pt)
         for value in h_mclepton_pt_unHLT.values():
@@ -98,55 +134,33 @@ for inpfile in inpfiles:
             new_name = 'unHLT_' + old_name
             value.SetTitle(new_title)
             value.SetName(new_name)
-        h_mclepton_pt_hadHLT = copy.deepcopy(h_mclepton_pt)
-        for value in h_mclepton_pt_hadHLT.values():
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'hadHLT_' + old_title
-            new_name = 'hadHLT_' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-        h_mclepton_pt_lepHLT = copy.deepcopy(h_mclepton_pt)
-        for value in h_mclepton_pt_lepHLT.values():
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'lepHLT_' + old_title
-            new_name = 'lepHLT_' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-            
-        h_mcfatlepton_pt = {'electron': ROOT.TH1F("MC_fatEle_pt", "MC_fatEle_pt;fatelectron pt [GeV];Countings", nbins, nmin, nmax),
-                            'muon': ROOT.TH1F("MC_fatMu_pt", "MC_fatMu_pt;fatmu pt [GeV];Countings", nbins, nmin, nmax),
-                            #'electron_ev2': ROOT.TH1F("MC_ev2_Ele_pt", "MC_ev2_Ele_pt", nbins, nmin, nmax),
-                            #'muon_ev2': ROOT.TH1F("MC_ev2_Mu_pt", "MC_ev2_Mu_pt", nbins, nmin, nmax)
-        }    
-        '''
-        h_mclepton_eta = {'electron': ROOT.TH1F("MC_Ele_eta", "MC_Ele_eta;electron eta;Countings", nbins, nmin, nmax),
-        'muon': ROOT.TH1F("MC_Mu_eta", "MC_Mu_eta;muon eta;Countings", nbins, nmin, nmax),
-        #'electron_ev2': ROOT.TH1F("MC_ev2_Ele_eta", "MC_ev2_Ele_eta", nbins, nmin, nmax),
-        #'muon_ev2': ROOT.TH1F("MC_ev2_Mu_eta", "MC_ev2_Mu_eta", nbins, nmin, nmax)
-        }
-        h_mclepton_eta_unHLT = copy.deepcopy(h_mclepton_eta)
-        for value in h_mclepton_eta_unHLT.values():
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'unHLT_' + old_title
-            new_name = 'unHLT_' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-    
-        h_mcfatlepton_eta = {'electron': ROOT.TH1F("MC_fatEle_eta", "MC_fatEle_eta;fatelectron eta;Countings", nbins, nmin, nmax),
-            'muon': ROOT.TH1F("MC_fatMu_eta", "MC_fatMu_eta;fatmuon eta;Countings", nbins, nmin, nmax),
-                      #'electron_ev2': ROOT.TH1F("MC_ev2_Ele_eta", "MC_ev2_Ele_eta", nbins, nmin, nmax),
-                      #'muon_ev2': ROOT.TH1F("MC_ev2_Mu_eta", "MC_ev2_Mu_eta", nbins, nmin, nmax)
-                      }
-        '''
-        h_mcbjet_pt = {#'Wbjet_ev2': ROOT.TH1F("MC_ev2_Wbjet_pt", "MC_ev2_Wbjet_pt", nbins, nmin, nmax),
-            #'topbjet_ev2': ROOT.TH1F("MC_ev2_topbjet_pt", "MC_ev2_topbjet_pt", nbins, nmin, nmax),
-            #'top_ev2': ROOT.TH1F("MC_ev2_top_pt", "MC_ev2_top_pt", nbins, nmin, nmax),
+        if HadHLTrig:
+            h_mclepton_pt_hadHLT = copy.deepcopy(h_mclepton_pt)
+            for value in h_mclepton_pt_hadHLT.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'hadHLT_' + old_title
+                new_name = 'hadHLT_' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        if LepHLTrig:
+            h_mclepton_pt_lepHLT = copy.deepcopy(h_mclepton_pt)
+            for value in h_mclepton_pt_lepHLT.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'lepHLT_' + old_title
+                new_name = 'lepHLT_' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        
+        
+        h_mcbjet_pt = {
             'Wbjet': ROOT.TH1F("MC_Wbjet_pt", "MC_Wbjet_pt;prompt bjet pt [GeV];Countings", nbins, nmin, nmax),
             'topbjet': ROOT.TH1F("MC_topbjet_pt", "MC_topbjet_pt;top bjet pt [GeV];Countings", nbins, nmin, nmax),
             'top': ROOT.TH1F("MC_recotop_pt", "MC_recotop_pt;recotop pt [GeV];Countings", nbins, nmin, nmax)
+            }
+        h_mcrecotop_mass = {
+            'top': ROOT.TH1F("MC_recotop_mass", "MC_recotop_mass;recotop mass [GeV];Countings", nbins, nmin, nmax)
             }
         h_mcbjet_pt_unHLT = copy.deepcopy(h_mcbjet_pt)
         for value in h_mcbjet_pt_unHLT.values():
@@ -156,38 +170,30 @@ for inpfile in inpfiles:
             new_name = 'unHLT_' + old_name
             value.SetTitle(new_title)
             value.SetName(new_name)
-        h_mcbjet_pt_hadHLT = copy.deepcopy(h_mcbjet_pt)
-        for value in h_mcbjet_pt_hadHLT.values():
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'hadHLT_' + old_title
-            new_name = 'hadHLT_' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-        h_mcbjet_pt_lepHLT = copy.deepcopy(h_mcbjet_pt)
-        for value in h_mcbjet_pt_lepHLT.values():
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'lepHLT_' + old_title
-            new_name = 'lepHLT_' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
+        if HadHLTrig:
+            h_mcbjet_pt_hadHLT = copy.deepcopy(h_mcbjet_pt)
+            for value in h_mcbjet_pt_hadHLT.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'hadHLT_' + old_title
+                new_name = 'hadHLT_' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        if LepHLTrig:
+            h_mcbjet_pt_lepHLT = copy.deepcopy(h_mcbjet_pt)
+            for value in h_mcbjet_pt_lepHLT.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'lepHLT_' + old_title
+                new_name = 'lepHLT_' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
             
-
-        h_mcfatbjet_pt = {#'Wbjet_ev2': ROOT.TH1F("MC_ev2_Wfatbjet_pt", "MC_ev2_Wfatbjet_pt", nbins, nmin, nmax),
-            #'topbjet_ev2': ROOT.TH1F("MC_ev2_topfatbjet_pt", "MC_ev2_topfatbjet_pt", nbins, nmin, nmax),
-            'Wbjet': ROOT.TH1F("MC_Wfatbjet_pt", "MC_Wfatbjet_pt;prompt fatbjet pt [GeV];Countings", nbins, nmin, nmax),
-            'topbjet': ROOT.TH1F("MC_topfatbjet_pt", "MC_topfatbjet_pt;top fatbjet pt [GeV];Countings", nbins, nmin, nmax),
-            'top': ROOT.TH1F("MC_fattop_pt", "MC_fattop_pt;fatrecotop bjet pt [GeV];Countings", nbins, nmin, nmax)
-        }
         h_mcWprime_mass = {'gen': ROOT.TH1F("MC_GenPart_Wprime_mass", "MC_GenPart_Wprime_mas;GenPart W' mass [GeV];Countings", wnbins, wnmin, wnmax),
                            'all': ROOT.TH1F("MC_Lep_Wprime_mass", "MC_Lep_Wprime_mass;MCReco Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                           #'ev2': ROOT.TH1F("MC_Lep_ev2_Wprime_mass", "MC_ev2_Lep_Wprime_mass", wnbins, wnmin, wnmax),
-                        'ele_all': ROOT.TH1F("MC_Ele_Wprime_mass", "MC_Ele_Wprime_mass;MCReco Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                           #'ele_ev2': ROOT.TH1F("MC_Ele_ev2_Wprime_mass", "MC_Ele_ev2_Wprime_mass", wnbins, wnmin, wnmax),
+                           'ele_all': ROOT.TH1F("MC_Ele_Wprime_mass", "MC_Ele_Wprime_mass;MCReco Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
                            'mu_all': ROOT.TH1F("MC_Mu_Wprime_mass", "MC_Mu_Wprime_mass;MCReco Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                           #'mu_ev2': ROOT.TH1F("MC_ev2_Mu_Wprime_mass", "MC_ev2_Mu_Wprime_mass", wnbins, wnmin, wnmax)
-                    }
+        }
         h_mcWprime_mass_unHLT = copy.deepcopy(h_mcWprime_mass)
         for value in h_mcWprime_mass_unHLT.values():
             old_title = value.GetTitle()
@@ -196,38 +202,29 @@ for inpfile in inpfiles:
             new_name = 'unHLT_' + old_name
             value.SetTitle(new_title)
             value.SetName(new_name)
-        h_mcWprime_mass_hadHLT = copy.deepcopy(h_mcWprime_mass)
-        for value in h_mcWprime_mass_hadHLT.values():
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'hadHLT_' + old_title
-            new_name = 'hadHLT_' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-        h_mcWprime_mass_lepHLT = copy.deepcopy(h_mcWprime_mass)
-        for value in h_mcWprime_mass_lepHLT.values():
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'lepHLT_' + old_title
-            new_name = 'lepHLT_' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-
-
-        h_mcfatWprime_mass = {'all': ROOT.TH1F("MC_Lep_fatWprime_mass", "MC_Lep_fatWprime_mass;fatMCReco Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                              #'ev2': ROOT.TH1F("MC_Lep_ev2_fatWprime_mass", "MC_ev2_Lep_fatWprime_mass", wnbins, wnmin, wnmax),
-                              'ele_all': ROOT.TH1F("MC_Ele_fatWprime_mass", "MC_Ele_fatWprime_mass;fatMCReco Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                              #'ele_ev2': ROOT.TH1F("MC_Ele_ev2_fatWprime_mass", "MC_Ele_ev2_fatWprime_mass", wnbins, wnmin, wnmax),
-                              'mu_all': ROOT.TH1F("MC_Mu_fatWprime_mass", "MC_Mu_fatWprime_mass;fatMCReco Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                              #'mu_ev2': ROOT.TH1F("MC_ev2_Mu_fatWprime_mass", "MC_ev2_Mu_fatWprime_mass", wnbins, wnmin, wnmax)
-                          }
+        if HadHLTrig:
+            h_mcWprime_mass_hadHLT = copy.deepcopy(h_mcWprime_mass)
+            for value in h_mcWprime_mass_hadHLT.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'hadHLT_' + old_title
+                new_name = 'hadHLT_' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        if LepHLTrig:
+            h_mcWprime_mass_lepHLT = copy.deepcopy(h_mcWprime_mass)
+            for value in h_mcWprime_mass_lepHLT.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'lepHLT_' + old_title
+                new_name = 'lepHLT_' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        
         h_mcWprime_tmass = {'all': ROOT.TH1F("MC_Lep_Wprime_transverse_mass", "MC_Lep_Wprime_transverse_mass;MCReco Lep W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
-                            #'ev2': ROOT.TH1F("MC_ev2_Lep_Wprime_transverse_mass", "MC_ev2_Lep_Wprime_transverse_mass", wnbins, wnmin, wnmax),
                             'ele_all': ROOT.TH1F("MC_Ele_Wprime_transverse_mass", "MC_Ele_Wprime_transverse_mass;MCReco Ele W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
-                            #'ele_ev2': ROOT.TH1F("MC_ev2_Ele_Wprime_transverse_mass", "MC_ev2_Ele_Wprime_transverse_mass", wnbins, wnmin, wnmax),
                             'mu_all': ROOT.TH1F("MC_Mu_Wprime_transverse_mass", "MC_Mu_Wprime_transverse_mass;MCReco Mu W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
-                            #'mu_ev2': ROOT.TH1F("MC_ev2_Mu_Wprime_transverse_mass", "MC_ev2_Mu_Wprime_transverse_mass", wnbins, wnmin, wnmax)
-                        }
+        }
         h_mcWprime_tmass_unHLT = copy.deepcopy(h_mcWprime_tmass)
         for value in h_mcWprime_tmass_unHLT.values():
             old_title = value.GetTitle()
@@ -236,90 +233,279 @@ for inpfile in inpfiles:
             new_name = 'unHLT_' + old_name
             value.SetTitle(new_title)
             value.SetName(new_name)
-        h_mcWprime_tmass_hadHLT = copy.deepcopy(h_mcWprime_tmass)
-        for value in h_mcWprime_tmass_hadHLT.values():
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'hadHLT_' + old_title
-            new_name = 'hadHLT_' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-        h_mcWprime_tmass_lepHLT = copy.deepcopy(h_mcWprime_tmass)
-        for value in h_mcWprime_tmass_lepHLT.values():
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'lepHLT_' + old_title
-            new_name = 'lepHLT_' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-
-        h_mcfatWprime_tmass = {'all': ROOT.TH1F("MC_Lep_fatWprime_transverse_mass", "MC_Lep_fatWprime_transverse_mass;fatMCReco Lep W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
-                               #'ev2': ROOT.TH1F("MC_ev2_Lep_fatWprime_transverse_mass", "MC_ev2_Lep_fatWprime_transverse_mass", wnbins, wnmin, wnmax),
-                               'ele_all': ROOT.TH1F("MC_Ele_fatWprime_transverse_mass", "MC_Ele_fatWprime_transverse_mass;fatMCReco Ele W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
-                               #'ele_ev2': ROOT.TH1F("MC_ev2_Ele_fatWprime_transverse_mass", "MC_ev2_Ele_fatWprime_transverse_mass", wnbins, wnmin, wnmax),
-                               'mu_all': ROOT.TH1F("MC_Mu_fatWprime_transverse_mass", "MC_Mu_fatWprime_transverse_mass;fatMCReco Mu W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
-                               #'mu_ev2': ROOT.TH1F("MC_ev2_Mu_fatWprime_transverse_mass", "MC_ev2_Mu_fatWprime_transverse_mass", wnbins, wnmin, wnmax)
-                        }
+        if HadHLTrig:
+            h_mcWprime_tmass_hadHLT = copy.deepcopy(h_mcWprime_tmass)
+            for value in h_mcWprime_tmass_hadHLT.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'hadHLT_' + old_title
+                new_name = 'hadHLT_' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        if LepHLTrig:
+            h_mcWprime_tmass_lepHLT = copy.deepcopy(h_mcWprime_tmass)
+            for value in h_mcWprime_tmass_lepHLT.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'lepHLT_' + old_title
+                new_name = 'lepHLT_' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
 
         h_sameflav_bjet_deltaR = ROOT.TH1F("MC_Same_Flavour_bjet_DeltaR", "Same_Flavour_bjet_DeltaR", 50, 0, 4)
 
-    h_met_q = {'pt': ROOT.TH1F("MC_MET_pt", "MC_MET_pt;MET pt [GeV];Countings", nbins, nmin, nmax),
-               'Et': ROOT.TH1F("MC_MET_Et", "MC_MET_Et;MET Et [GeV];Countings", wnbins, wnmin, wnmax),
-               'phi': ROOT.TH1F("MC_MET_phi", "MC_MET_phi;MET phi;Countings", 50, 0, 4),
-               #'pt_ev2': ROOT.TH1F("MC_ev2_MET_pt", "MC_ev2_MET_pt", nbins, nmin, nmax),
-               #'Et_ev2': ROOT.TH1F("MC_ev2_MET_Et", "MC_ev2_MET_Et", wnbins, wnmin, wnmax),
-               #'phi_ev2': ROOT.TH1F("MC_ev2_MET_phi", "MC_ev2_MET_phi", 80, 0, 4)
-    }
-    h_met_q_unHLT = copy.deepcopy(h_met_q)
-    for value in h_met_q_unHLT.values():
-        old_title = value.GetTitle()
-        old_name = value.GetName()
-        new_title = 'unHLT_' + old_title
-        new_name = 'unHLT_' + old_name
-        value.SetTitle(new_title)
-        value.SetName(new_name)
-    h_met_q_hadHLT = copy.deepcopy(h_met_q)
-    for value in h_met_q_hadHLT.values():
-        old_title = value.GetTitle()
-        old_name = value.GetName()
-        new_title = 'hadHLT_' + old_title
-        new_name = 'hadHLT_' + old_name
-        value.SetTitle(new_title)
-        value.SetName(new_name)
-    h_met_q_lepHLT = copy.deepcopy(h_met_q)
-    for value in h_met_q_lepHLT.values():
-        old_title = value.GetTitle()
-        old_name = value.GetName()
-        new_title = 'lepHLT_' + old_title
-        new_name = 'lepHLT_' + old_name
-        value.SetTitle(new_title)
-        value.SetName(new_name)
+        h_mcmet_q = {'pt': ROOT.TH1F("MC_MET_pt", "MC_MET_pt;MET pt [GeV];Countings", nbins, nmin, nmax),
+                     'Et': ROOT.TH1F("MC_MET_Et", "MC_MET_Et;MET Et [GeV];Countings", wnbins, wnmin, wnmax),
+                     'phi': ROOT.TH1F("MC_MET_phi", "MC_MET_phi;MET phi;Countings", 50, 0, 4),
+        }
+        h_mcmet_q_unHLT = copy.deepcopy(h_mcmet_q)
+        for value in h_mcmet_q_unHLT.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = 'unHLT_' + old_title
+            new_name = 'unHLT_' + old_name
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        if HadHLTrig:
+            h_mcmet_q_hadHLT = copy.deepcopy(h_mcmet_q)
+            for value in h_mcmet_q_hadHLT.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'hadHLT_' + old_title
+                new_name = 'hadHLT_' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        if LepHLTrig:
+            h_mcmet_q_lepHLT = copy.deepcopy(h_mcmet_q)
+            for value in h_mcmet_q_lepHLT.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'lepHLT_' + old_title
+                new_name = 'lepHLT_' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
         
-    h_fatmet_q = {'pt': ROOT.TH1F("MC_fatMET_pt", "MC_fatMET_pt;fat MET pt [GeV];Countings", nbins, nmin, nmax),
-                  'Et': ROOT.TH1F("MC_fatMET_Et", "MC_fatMET_Et;fat MET Et [GeV];Countings", wnbins, wnmin, wnmax),
-                  'phi': ROOT.TH1F("MC_fatMET_phi", "MC_fatMET_phi;fat MET phi;Countings", 80, 0, 4),
-                  #'pt_ev2': ROOT.TH1F("MC_ev2_MET_pt", "MC_ev2_MET_pt", nbins, nmin, nmax),
-                  #'Et_ev2': ROOT.TH1F("MC_ev2_MET_Et", "MC_ev2_MET_Et", wnbins, wnmin, wnmax),
-                  #'phi_ev2': ROOT.TH1F("MC_ev2_MET_phi", "MC_ev2_MET_phi", 80, 0, 4)
-              }
+        if AK8Reco:
+            h_mcfatlepton_pt = {'electron': ROOT.TH1F("MC_fatEle_pt", "MC_fatEle_pt;fatelectron pt [GeV];Countings", nbins, nmin, nmax),
+                                'muon': ROOT.TH1F("MC_fatMu_pt", "MC_fatMu_pt;fatmu pt [GeV];Countings", nbins, nmin, nmax),
+            }
+        
+            h_mcfatbjet_pt = {'Wbjet': ROOT.TH1F("MC_Wfatbjet_pt", "MC_Wfatbjet_pt;prompt fatbjet pt [GeV];Countings", nbins, nmin, nmax),
+                              'topbjet': ROOT.TH1F("MC_topfatbjet_pt", "MC_topfatbjet_pt;top fatbjet pt [GeV];Countings", nbins, nmin, nmax),
+                              'top': ROOT.TH1F("MC_fattop_pt", "MC_fattop_pt;fatrecotop bjet pt [GeV];Countings", nbins, nmin, nmax)
+            }
+
+            h_mcfatWprime_mass = {'all': ROOT.TH1F("MC_Lep_fatWprime_mass", "MC_Lep_fatWprime_mass;fatMCReco Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                                  'ele_all': ROOT.TH1F("MC_Ele_fatWprime_mass", "MC_Ele_fatWprime_mass;fatMCReco Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                                  'mu_all': ROOT.TH1F("MC_Mu_fatWprime_mass", "MC_Mu_fatWprime_mass;fatMCReco Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+            }
+
+            h_mcfatWprime_tmass = {'all': ROOT.TH1F("MC_Lep_fatWprime_transverse_mass", "MC_Lep_fatWprime_transverse_mass;fatMCReco Lep W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
+                                   'ele_all': ROOT.TH1F("MC_Ele_fatWprime_transverse_mass", "MC_Ele_fatWprime_transverse_mass;fatMCReco Ele W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
+                                   'mu_all': ROOT.TH1F("MC_Mu_fatWprime_transverse_mass", "MC_Mu_fatWprime_transverse_mass;fatMCReco Mu W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
+            }
+
+            h_mcfatmet_q = {'pt': ROOT.TH1F("MC_fatMET_pt", "MC_fatMET_pt;fat MET pt [GeV];Countings", nbins, nmin, nmax),
+                          'Et': ROOT.TH1F("MC_fatMET_Et", "MC_fatMET_Et;fat MET Et [GeV];Countings", wnbins, wnmin, wnmax),
+                          'phi': ROOT.TH1F("MC_fatMET_phi", "MC_fatMET_phi;fat MET phi;Countings", 80, 0, 4),
+            }
+
+    #DetReco histos
+    if DetReco:
+        h_lepton_pt = {'electron': ROOT.TH1F("DetReco_Ele_pt", "DetReco_Ele_pt;electron pt [GeV];Countings", nbins, nmin, nmax),
+                       'muon': ROOT.TH1F("DetReco_Mu_pt", "DetReco_Mu_pt;muon pt [GeV];Countings", nbins, nmin, nmax),
+        }
+        if BTagging:
+            h_lepton_pt.update({
+                'electron_0btag': ROOT.TH1F("DetReco_0btag_Ele_pt", "DetReco_0btag_Ele_pt;0btagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_0btag': ROOT.TH1F("DetReco_0btag_Mu_pt", "DetReco_0btag_Mu_pt;0btagged muon pt [GeV];Countings", nbins, nmin, nmax),
+                'electron_1btag': ROOT.TH1F("DetReco_1btag_Ele_pt", "DetReco_1btag_Ele_pt;1btagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_1btag': ROOT.TH1F("DetReco_1btag_Mu_pt", "DetReco_1btag_Mu_pt;1btagged muon pt [GeV];Countings", nbins, nmin, nmax),
+                'electron_2btag': ROOT.TH1F("DetReco_2btag_Ele_pt", "DetReco_2btag_Ele_pt;2btagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_2btag': ROOT.TH1F("DetReco_2btag_Mu_pt", "DetReco_2btag_Mu_pt;2btagged muon pt [GeV];Countings", nbins, nmin, nmax),
+            })
+                
+        h_jet_pt_sublead = {
+            'Wbjet': ROOT.TH1F("DetReco_Wjet_pt", "DetReco_Wjet_pt;prompt jet pt [GeV];Countings", nbins, nmin, nmax),
+            'topbjet': ROOT.TH1F("DetReco_topbjet_pt", "DetReco_topjet_pt;top jet pt [GeV];Countings", nbins, nmin, nmax),
+            'top': ROOT.TH1F("DetReco_recotop_pt", "DetReco_recotop_pt;recotop pt [GeV];Countings", nbins, nmin, nmax)
+        }
+        h_recotop_mass_sublead = {
+            'top': ROOT.TH1F("DetReco_recotop_mass", "DetReco_recotop_mass;recotop mass [GeV];Countings", nbins, nmin, nmax)
+            }
+        if BTagging:
+            h_jet_pt_sublead.update({
+                'Wbjet_nobtag': ROOT.TH1F("DetReco_nobtag_Wjet_pt", "DetReco_nobtag_Wjet_pt;prompt nobtagged jet pt [GeV];Countings", nbins, nmin, nmax),
+                'Wbjet_btag': ROOT.TH1F("DetReco_btag_Wjet_pt", "DetReco_btag_Wjet_pt;prompt btagged jet pt [GeV];Countings", nbins, nmin, nmax),
+            
+                'topbjet_nobtag': ROOT.TH1F("DetReco_nobtag_topjet_pt", "DetReco_nobtag_topjet_pt;top nobtagged jet pt [GeV];Countings", nbins, nmin, nmax),
+                'topbjet_btag': ROOT.TH1F("DetReco_btag_topjet_pt", "DetReco_btag_topjet_pt;top btagged jet pt [GeV];Countings", nbins, nmin, nmax),
+            
+                'top_nobtag': ROOT.TH1F("DetReco_nobtag_recotop_pt", "DetReco_nobtag_recotop_pt;nobtagged recotop pt [GeV];Countings", nbins, nmin, nmax),
+                'top_btag': ROOT.TH1F("DetReco_btag_recotop_pt", "DetReco_btag_recotop_pt;btagged recotop pt [GeV];Countings", nbins, nmin, nmax)
+            })
+        h_jet_pt_closest = copy.deepcopy(h_jet_pt_sublead)
+        h_recotop_mass_closest = copy.deepcopy(h_recotop_mass_sublead)
+        h_recotop_mass_closest['top'].SetTitle('closest_' + h_recotop_mass_sublead['top'].GetTitle())
+        h_recotop_mass_closest['top'].SetName('closest_' + h_recotop_mass_sublead['top'].GetTitle())
+        for value in h_jet_pt_closest.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = 'closest_' + old_title
+            new_name = 'closest_' + old_name
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        h_jet_pt_chi = copy.deepcopy(h_jet_pt_sublead)
+        h_recotop_mass_chi = copy.deepcopy(h_recotop_mass_sublead)
+        h_recotop_mass_chi['top'].SetTitle('chi_' + h_recotop_mass_sublead['top'].GetTitle())
+        h_recotop_mass_chi['top'].SetName('chi_' + h_recotop_mass_sublead['top'].GetTitle())
+        for value in h_jet_pt_chi.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = 'chimass_' + old_title
+            new_name = 'chimass_' + old_name
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        h_recotop_mass_sublead['top'].SetTitle('sublead_' + h_recotop_mass_sublead['top'].GetTitle())
+        h_recotop_mass_sublead['top'].SetName('sublead_' + h_recotop_mass_sublead['top'].GetTitle())
+        for value in h_jet_pt_sublead.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = 'sublead_' + old_title
+            new_name = 'sublead_' + old_name
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+            
+        h_Wprime_mass_sublead = {'all': ROOT.TH1F("DetReco_Lep_Wprime_mass", "DetReco_Lep_Wprime_mass;DetReco Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all': ROOT.TH1F("DetReco_Ele_Wprime_mass", "DetReco_Ele_Wprime_mass;DetReco Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all': ROOT.TH1F("DetReco_Mu_Wprime_mass", "DetReco_Mu_Wprime_mass;DetReco Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax)
+        }
+        if BTagging:
+            h_Wprime_mass.update({
+                         'all_0btag': ROOT.TH1F("DetReco_0btag_Lep_Wprime_mass", "DetReco_0btag_Lep_Wprime_mass;DetReco 0btagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1btag_Lep_Wprime_mass", "DetReco_1btag_Lep_Wprime_mass;DetReco 1btagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2btag_Lep_Wprime_mass", "DetReco_2btag_Lep_Wprime_mass;DetReco 2btagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_0btag': ROOT.TH1F("DetReco_0btag_Ele_Wprime_mass", "DetReco_0btag_Ele_Wprime_mass;DetReco 0btagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_1btag': ROOT.TH1F("DetReco_1btag_Ele_Wprime_mass", "DetReco_1btag_Ele_Wprime_mass;DetReco 1btagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_2btag': ROOT.TH1F("DetReco_2btag_Ele_Wprime_mass", "DetReco_2btag_Ele_Wprime_mass;DetReco 2btagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_0btag': ROOT.TH1F("DetReco_0btag_Mu_Wprime_mass", "DetReco_0btag_Mu_Wprime_mass;DetReco 0btagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_1btag': ROOT.TH1F("DetReco_1btag_Mu_Wprime_mass", "DetReco_1btag_Mu_Wprime_mass;DetReco 1btagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_2btag': ROOT.TH1F("DetReco_2btag_Mu_Wprime_mass", "DetReco_2btag_Mu_Wprime_mass;DetReco 2btagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+            })
+        h_Wprime_mass_closest = copy.deepcopy(h_Wprime_mass_sublead)
+        for value in h_Wprime_mass_closest.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = 'closest_' + old_title
+            new_name = 'closest_' + old_name
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        h_Wprime_mass_chi = copy.deepcopy(h_Wprime_mass_sublead)
+        for value in h_Wprime_mass_chi.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = 'chimass_' + old_title
+            new_name = 'chimass_' + old_name
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        for value in h_Wprime_mass_sublead.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = 'sublead_' + old_title
+            new_name = 'sublead_' + old_name
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        '''
+        h_Wprime_tmass_sublead = {'all': ROOT.TH1F("DetReco_Lep_Wprime_transverse_mass", "DetReco_Lep_Wprime_transverse_mass;DetReco Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                          'ele_all': ROOT.TH1F("DetReco_Ele_Wprime_transverse_mass", "DetReco_Ele_Wprime_transverse_mass;DetReco Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                          'mu_all': ROOT.TH1F("DetReco_Mu_Wprime_transverse_mass", "DetReco_Mu_Wprime_transverse_mass;DetReco Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax)
+        }
+        if BTagging:
+            h_Wprime_tmass_sublead.update({
+                         'all_0btag': ROOT.TH1F("DetReco_0btag_Lep_Wprime_transverse_mass", "DetReco_0btag_Lep_Wprime_transverse_mass;DetReco 0btagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1btag_Lep_transverse_Wprime_mass", "DetReco_1btag_Lep_Wprime_transverse_mass;DetReco 1btagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2btag_Lep_Wprime_transverse_mass", "DetReco_2btag_Lep_Wprime_transverse_mass;DetReco 2btagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                          'ele_all_0btag': ROOT.TH1F("DetReco_0btag_Ele_Wprime_transverse_mass", "DetReco_0btag_Ele_Wprime_transverse_mass;DetReco 0btagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_1btag': ROOT.TH1F("DetReco_1btag_Ele_Wprime_transverse_mass", "DetReco_1btag_Ele_Wprime_transverse_mass;DetReco 1btagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_2btag': ROOT.TH1F("DetReco_2btag_Ele_Wprime_transverse_mass", "DetReco_2btag_Ele_Wprime_transverse_mass;DetReco 2btagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                          'mu_all_0btag': ROOT.TH1F("DetReco_0btag_Mu_Wprime_transverse_mass", "DetReco_0btag_Mu_Wprime_transverse_mass;DetReco 0btagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_1btag': ROOT.TH1F("DetReco_1btag_Mu_Wprime_transverse_mass", "DetReco_1btag_Mu_Wprime_transverse_mass;DetReco 1btagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_2btag': ROOT.TH1F("DetReco_2btag_Mu_Wprime_transverse_mass", "DetReco_2btag_Mu_Wprime_transverse_mass;DetReco 2btagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+            })
+        h_Wprime_tmass_closest = copy.deepcopy(h_Wprime_tmass_sublead)
+        for value in h_Wprime_tmass_closest.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = 'closest_' + old_title
+            new_name = 'closest_' + old_name
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        h_Wprime_tmass_chi = copy.deepcopy(h_Wprime_tmass_sublead)
+        for value in h_Wprime_tmass_chi.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = 'chimass_' + old_title
+            new_name = 'chimass_' + old_name
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        for value in h_Wprime_tmass_sublead.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = 'sublead_' + old_title
+            new_name = 'sublead_' + old_name
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        '''
+        h_met_q = {'pt': ROOT.TH1F("DetReco_MET_pt", "DetReco_MET_pt;MET pt [GeV];Countings", nbins, nmin, nmax),
+                   'Et': ROOT.TH1F("DetReco_MET_Et", "DetReco_MET_Et;MET Et [GeV];Countings", wnbins, wnmin, wnmax),
+                   'phi': ROOT.TH1F("DetReco_MET_phi", "DetReco_MET_phi;MET phi;Countings", 50, 0, 4),
+        }
+        if BTagging:
+            h_met_q.update({
+                'pt_0btag': ROOT.TH1F("DetReco_0btag_MET_pt", "DetReco_0btag_MET_pt;0btagged MET pt [GeV];Countings", nbins, nmin, nmax),
+                'Et_0btag': ROOT.TH1F("DetReco_0btag_MET_Et", "DetReco_0btag_MET_Et;0btagged MET Et [GeV];Countings", wnbins, wnmin, wnmax),
+                'phi_0btag': ROOT.TH1F("DetReco_0btag_MET_phi", "DetReco_0btag_MET_phi;0btagged MET phi;Countings", 50, 0, 4),
+                'pt_1btag': ROOT.TH1F("DetReco_1btag_MET_pt", "DetReco_1btag_MET_pt;1btagged MET pt [GeV];Countings", nbins, nmin, nmax),
+                'Et_1btag': ROOT.TH1F("DetReco_1btag_MET_Et", "DetReco_1btag_MET_Et;1btagged MET Et [GeV];Countings", wnbins, wnmin, wnmax),
+                'phi_1btag': ROOT.TH1F("DetReco_1btag_MET_phi", "DetReco_1btag_MET_phi;1btagged MET phi;Countings", 50, 0, 4),
+                'pt_2btag': ROOT.TH1F("DetReco_2btag_MET_pt", "DetReco_2btag_MET_pt;2btagged MET pt [GeV];Countings", nbins, nmin, nmax),
+                'Et_2btag': ROOT.TH1F("DetReco_2btag_MET_Et", "DetReco_2btag_MET_Et;2btagged MET Et [GeV];Countings", wnbins, wnmin, wnmax),
+                'phi_2btag': ROOT.TH1F("DetReco_2btag_MET_phi", "DetReco_2btag_MET_phi;2btagged MET phi;Countings", 50, 0, 4),
+            })
+
+        #histo cut_and_count
+        h_countings = ROOT.TH1F("DetReco_countings", "DetReco_countings", 5, 0, 5)
+        h_eff_benchmark = ROOT.TH1F("DetReco_bmeff", "DetReco_bmeff", 5, 0, 5)
+
+        for i in range(5):
+            k = i + 1
+            h_eff_benchmark.GetXaxis().SetBinLabel(k, str(naeff[i]))
+            h_countings.GetXaxis().SetBinLabel(k, str(naeff[i]))
 
     #preselection
     badflag = 0
     badevt = 0
+    PreSelEvt = 0
     HLTriggered = 0
     LepTriggered = 0
     JetTriggered = 0
+    MCEvents = 0
     m2bjetev = 0
     nmctruth_ev = 0
     nentries = tree.GetEntries()
-    print 'n entries: %i' %(nentries)
+    
+    if Debug:
+        nentries = 5000
 
-    for i in xrange(0,tree.GetEntries()):
+    print 'n entries: %i' %(nentries)
+   
+    for i in xrange(0, nentries):
         last = False
 
         if i == (nentries-1):
             last = True
-        
+            
+        isEvent = True
         event = Event(tree,i)
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
@@ -342,10 +528,12 @@ for inpfile in inpfiles:
 
         #Selection booleans
         #isEleHLT, isMuHLT, isHadHLT, noHLT = trig_map(HLT)
+        isPreSel = False
         isHadHLT = False
         isLepHLT = False
         isHLT = False
         isLepSel = False
+        isJetSel = False
 
         if last:
             print 'all object extracted'
@@ -385,11 +573,16 @@ for inpfile in inpfiles:
         if not goodEvt:
             badevt += 1
             continue
+        
+        isPreSel = True
+        PreSelEvt += 1
+
+        goodleptons = None
 
         #HLTriggering + mclepton finding
         if isMu:        
+            goodleptons = get_Mu(muons)
             if HLTrig and (HLT.Mu50 or HLT.TkMu50 or HLT.PFHT800 or HLT.PFHT900):
-                lepton = muons[0]
                 isHLT = True
                 if (HLT.Mu50 or HLT.TkMu50):
                     isLepHLT = True
@@ -397,7 +590,7 @@ for inpfile in inpfiles:
                     isHadHLT = True
             if MCReco:
                 mctfound = False
-                for muon in muons:
+                for muon in goodleptons:
                     if (muon.genPartFlav == 1 or muon.genPartFlav == 15) and not mctfound:
                         mclepton = muon
                         mctfound = True
@@ -406,8 +599,8 @@ for inpfile in inpfiles:
                             continue
     
         if isEle:
+            goodleptons = get_Ele(electrons)
             if HLTrig and (HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.PFHT800 or HLT.PFHT900):
-                lepton = electrons[0]
                 isHLT = True
                 if (HLT.Ele115_CaloIdVT_GsfTrkIdT):
                     isLepHLT = True
@@ -415,7 +608,7 @@ for inpfile in inpfiles:
                     isHadHLT = True
             if MCReco:
                 mctfound = False
-                for electron in electrons:
+                for electron in goodleptons:
                     if (electron.genPartFlav == 1 or electron.genPartFlav == 15) and not mctfound:
                         mclepton = electron
                         mctfound = True
@@ -424,6 +617,9 @@ for inpfile in inpfiles:
                             continue
     
         #print 'HLTriggered'
+
+        if mctfound:
+            MCEvents += 1
 
         recotop = TopUtilities()
         #MCtruth event reconstruction
@@ -509,39 +705,39 @@ for inpfile in inpfiles:
             if topgot_ak4 and Wpgot_ak4:
                 MCWprime_p4 = mctop_p4 + mcpromptbjet_p4
                 MCWprime_p4t = mctop_p4t + mcpromptbjet_p4t
-                if True:
-                #if mctop_p4.M() > 400:#Wpmass filter
+                if MCWprime_p4.M() > mass_cut :#True:
                     h_mcWprime_mass_unHLT['gen'].Fill(GenWprime_p4.M())
                     h_mcbjet_pt_unHLT['topbjet'].Fill(mctopbjet_p4.Pt())
                     h_mcbjet_pt_unHLT['Wbjet'].Fill(mcpromptbjet_p4.Pt())
                     h_mcbjet_pt_unHLT['top'].Fill(mctop_p4.Pt())
-                    h_met_q_unHLT['pt'].Fill(met.pt)
-                    h_met_q_unHLT['Et'].Fill(met.sumEt)
-                    h_met_q_unHLT['phi'].Fill(met.phi)
+                    h_mcmet_q_unHLT['pt'].Fill(met.pt)
+                    h_mcmet_q_unHLT['Et'].Fill(met.sumEt)
+                    h_mcmet_q_unHLT['phi'].Fill(met.phi)
                     if isHLT:
                         h_mcWprime_mass['gen'].Fill(GenWprime_p4.M())
                         h_mcbjet_pt['topbjet'].Fill(mctopbjet_p4.Pt())
                         h_mcbjet_pt['Wbjet'].Fill(mcpromptbjet_p4.Pt())
                         h_mcbjet_pt['top'].Fill(mctop_p4.Pt())
-                        h_met_q['pt'].Fill(met.pt)
-                        h_met_q['Et'].Fill(met.sumEt)
-                        h_met_q['phi'].Fill(met.phi)
-                    if isLepHLT:
+                        h_mcrecotop_mass['top'].Fill(mctop_p4.M())
+                        h_mcmet_q['pt'].Fill(met.pt)
+                        h_mcmet_q['Et'].Fill(met.sumEt)
+                        h_mcmet_q['phi'].Fill(met.phi)
+                    if isLepHLT and LepHLTrig:
                         h_mcWprime_mass_lepHLT['gen'].Fill(GenWprime_p4.M())
                         h_mcbjet_pt_lepHLT['topbjet'].Fill(mctopbjet_p4.Pt())
                         h_mcbjet_pt_lepHLT['Wbjet'].Fill(mcpromptbjet_p4.Pt())
                         h_mcbjet_pt_lepHLT['top'].Fill(mctop_p4.Pt())
-                        h_met_q_lepHLT['pt'].Fill(met.pt)
-                        h_met_q_lepHLT['Et'].Fill(met.sumEt)
-                        h_met_q_lepHLT['phi'].Fill(met.phi)
-                    if isHadHLT:
+                        h_mcmet_q_lepHLT['pt'].Fill(met.pt)
+                        h_mcmet_q_lepHLT['Et'].Fill(met.sumEt)
+                        h_mcmet_q_lepHLT['phi'].Fill(met.phi)
+                    if isHadHLT and HadHLTrig:
                         h_mcWprime_mass_hadHLT['gen'].Fill(GenWprime_p4.M())
                         h_mcbjet_pt_hadHLT['topbjet'].Fill(mctopbjet_p4.Pt())
                         h_mcbjet_pt_hadHLT['Wbjet'].Fill(mcpromptbjet_p4.Pt())
                         h_mcbjet_pt_hadHLT['top'].Fill(mctop_p4.Pt())
-                        h_met_q_hadHLT['pt'].Fill(met.pt)
-                        h_met_q_hadHLT['Et'].Fill(met.sumEt)
-                        h_met_q_hadHLT['phi'].Fill(met.phi)
+                        h_mcmet_q_hadHLT['pt'].Fill(met.pt)
+                        h_mcmet_q_hadHLT['Et'].Fill(met.sumEt)
+                        h_mcmet_q_hadHLT['phi'].Fill(met.phi)
                     for dR in samedR:
                         h_sameflav_bjet_deltaR.Fill(dR)
                     
@@ -567,7 +763,7 @@ for inpfile in inpfiles:
                             h_mcWprime_mass['mu_all'].Fill(MCWprime_p4.M())
                             h_mcWprime_tmass['mu_all'].Fill(MCWprime_p4t.M())
                             h_mclepton_pt['muon'].Fill(mclepton.pt)
-                    if isLepHLT:
+                    if isLepHLT and LepHLTrig:
                         h_mcWprime_mass_lepHLT['all'].Fill(MCWprime_p4.M())
                         h_mcWprime_tmass_lepHLT['all'].Fill(MCWprime_p4t.M())
                         if isEle:
@@ -578,7 +774,7 @@ for inpfile in inpfiles:
                             h_mcWprime_mass_lepHLT['mu_all'].Fill(MCWprime_p4.M())
                             h_mcWprime_tmass_lepHLT['mu_all'].Fill(MCWprime_p4t.M())
                             h_mclepton_pt_lepHLT['muon'].Fill(mclepton.pt)
-                    if isHadHLT:
+                    if isHadHLT and HadHLTrig:
                         h_mcWprime_mass_hadHLT['all'].Fill(MCWprime_p4.M())
                         h_mcWprime_tmass_hadHLT['all'].Fill(MCWprime_p4t.M())
                         if isEle:
@@ -640,14 +836,12 @@ for inpfile in inpfiles:
                     MCfatWprime_p4 = mcfattop_p4 + mcpromptfatbjet_p4
                     MCfatWprime_p4t = mcfattop_p4t + mcpromptfatbjet_p4t
                     if True:
-                    #if mcpromptfatbjet_p4.Pt() > 600:
-                    #if MCfatWprime_p4.M() < 800:#Wpmass filter
                         h_mcfatbjet_pt['topbjet'].Fill(mctopfatbjet_p4.Pt())
                         h_mcfatbjet_pt['Wbjet'].Fill(mcpromptfatbjet_p4.Pt())
                         h_mcfatbjet_pt['top'].Fill(mcfattop_p4.Pt())
-                        h_fatmet_q['pt'].Fill(met.pt)
-                        h_fatmet_q['Et'].Fill(met.sumEt)
-                        h_fatmet_q['phi'].Fill(met.phi)
+                        h_mcfatmet_q['pt'].Fill(met.pt)
+                        h_mcfatmet_q['Et'].Fill(met.sumEt)
+                        h_mcfatmet_q['phi'].Fill(met.phi)
                         
                         h_mcfatWprime_mass['all'].Fill(MCfatWprime_p4.M())
                         h_mcfatWprime_tmass['all'].Fill(MCfatWprime_p4t.M())
@@ -668,69 +862,125 @@ for inpfile in inpfiles:
         else:
             continue
 
-        if isMu:
-            goodmuons = get_Mu(muons)
-            if len(goodmuons) < 1 :
-                isLepSel = True
-                LepTriggerd += 1
-            else:
+        if len(goodleptons) > 0:
+            isLepSel = True
+            selleptons = list(filter(lambda x : x.miniPFRelIso_all < miniIso_cut, goodleptons))
+            if len(selleptons) < 1:
                 continue
-
-        if isEle:
-            goodelectrons = get_Ele(electrons)
-            if len(goodelectrons) < 1:
-                isLepSel = True
-                LepTriggered += 1
-            else:
-                continue
+            LepTriggered += 1
+            sellepton = selleptons[0]
+        else:
+            continue
 
         #JetTriggering
-        goodjets = get_Jet(jets, 35)
-        if len(goodjets) < 1:
+        goodjets = get_Jet(jets, jet_ptcut)
+        if len(goodjets) < 2:
             continue
+        if len(goodjets) == 1:
+            print "only 1 goodjet!"
        
         #Reconstruction with detected particles
-        highptjets = get_Jet(goodjets, 250)
+        highptjets = get_Jet(goodjets, leadingjet_ptcut)
         if len(highptjets) < 1:
             continue
         else:
             JetTriggered += 1
 
-        promptjet = goodjets[0]
+        isJetSel = True
+        promptjet = highptjets[0]
         DeltaR_nujet = 100.
         DeltaR_Idx = 0
         tm_chi = 1000.
         tm_Idx = 0
         mtop_p4 = None
-        for goodjet, i in goodjets, range(len(goodjets)):
-            if i > 0:
-                dPhi = deltaPhi(goodjet.phi, met.phi)
+        for i in range(len(goodjets)):
+            if goodjets[i].pt == promptjet.pt:
+                continue
+            else:
+                dPhi = deltaPhi(goodjets[i].phi, met.phi)
                 if dPhi < DeltaR_nujet:
                     DeltaR_nujet = dPhi
                     DeltaR_Idx = i
 
-                goodjet_p4 = ROOT.TLorentzVector()
-                goodjet_p4.SetPtEtaPhiM(goodjet.pt, goodjet.eta, goodjet.phi, goodjet.mass)
-                mtop_p4 = recotop.top4Momentum(mclepton_p4, goodjet_p4, MET['metPx'], MET['metPy'])
+                mtop_p4 = recotop.top4Momentum(sellepton.p4(), goodjets[i].p4(), MET['metPx'], MET['metPy'])
                 chi = Chi_TopMass(mtop_p4.M())
                 if chi < tm_chi:
                     tm_chi = chi
                     tm_Idx = i
-            else:
-                continue
+            
+        #jet closest to MET p4
+        closest_jet_p4 = goodjets[DeltaR_Idx].p4()
+        closest_recotop_p4 = recotop.top4Momentum(sellepton.p4(), closest_jet_p4, MET['metPx'], MET['metPy'])
+            
+        #jet reconstructing top with the least chi2 p4
+        chi_jet_p4 = goodjets[tm_Idx].p4()
+        chi_recotop_p4 = recotop.top4Momentum(sellepton.p4(), chi_jet_p4, MET['metPx'], MET['metPy'])
+        
+        #subleading jet reconstruction
+        sublead_jet_p4 = None
+        if len(highptjets) > 1:
+            sublead_jet_p4 = highptjets[1].p4()
+        else:
+            sublead_jet_p4 = goodjets[1].p4()
+        sublead_recotop_p4 = recotop.top4Momentum(sellepton.p4(), sublead_jet_p4, MET['metPx'], MET['metPy'])
 
-            #jet closest to MET p4
-            closest_jet_p4 = ROOT.TLorentzVector()
-            closest_jet_p4.SetPtEtaPhiM(goodjet[DeltaR_Idx].pt, goodjets[DeltaR_Idx].eta, goodjets[DeltaR_Idx].phi, goodjets[DeltaR_Idx].mass)
-    
-            #jet reconstructing top with the least chi2 p4
-            chimass_jet_p4 = ROOT.TLorentzVector()
-            chimass_jet_p4.SetPtEtaPhiM(goodjet[tm_Idx].pt, goodjets[tm_Idx].eta, goodjets[tm_Idx].phi, goodjets[tm_Idx].mass)
+        #Wprime reco
+        closest_Wprime_p4 = closest_recotop_p4 + promptjet.p4()
+        chi_Wprime_p4 = chi_recotop_p4 + promptjet.p4()
+        sublead_Wprime_p4 = sublead_recotop_p4 + promptjet.p4()
 
-            closest_recotop_p4 = recotop.top4Momentum(mclepton_p4, closest_jet_p4, MET['metPx'], MET['metPy'])
-            chimass_recotop_p4 = recotop.top4Momentum(mclepton_p4, chimass_jet_p4, MET['metPx'], MET['metPy'])
-
-
+        if sublead_Wprime_p4.M() > mass_cut:
+            h_jet_pt_sublead['topbjet'].Fill(sublead_jet_p4.Pt())
+            h_jet_pt_sublead['Wbjet'].Fill(promptjet.pt)
+            h_jet_pt_sublead['top'].Fill(sublead_recotop_p4.Pt())
+            h_recotop_mass_sublead['top'].Fill(sublead_recotop_p4.M())
+        if closest_Wprime_p4.M() > mass_cut:
+            h_jet_pt_closest['topbjet'].Fill(closest_jet_p4.Pt())
+            h_jet_pt_closest['Wbjet'].Fill(promptjet.pt)
+            h_jet_pt_closest['top'].Fill(closest_recotop_p4.Pt())
+            h_recotop_mass_closest['top'].Fill(closest_recotop_p4.M())
+        if chi_Wprime_p4.M() > mass_cut:
+            h_jet_pt_chi['topbjet'].Fill(chi_jet_p4.Pt())
+            h_jet_pt_chi['Wbjet'].Fill(promptjet.pt)
+            h_jet_pt_chi['top'].Fill(chi_recotop_p4.Pt())
+            h_recotop_mass_chi['top'].Fill(chi_recotop_p4.M())
+        
+        if sublead_Wprime_p4.M() > mass_cut or closest_Wprime_p4.M() > mass_cut or chi_Wprime_p4.M() > mass_cut:
+            h_met_q['pt'].Fill(met.pt)
+            h_met_q['Et'].Fill(met.sumEt)
+            h_met_q['phi'].Fill(met.phi)
+        
+        if sublead_Wprime_p4.M() > mass_cut:
+            h_Wprime_mass_sublead['all'].Fill(sublead_Wprime_p4.M())
+        if closest_Wprime_p4.M() > mass_cut:
+            h_Wprime_mass_closest['all'].Fill(closest_Wprime_p4.M())
+        if chi_Wprime_p4.M() > mass_cut:
+            h_Wprime_mass_chi['all'].Fill(chi_Wprime_p4.M())
+        if isEle:
+            if sublead_Wprime_p4.M() > mass_cut:
+                h_Wprime_mass_sublead['ele_all'].Fill(sublead_Wprime_p4.M())
+            if closest_Wprime_p4.M() > mass_cut:
+                h_Wprime_mass_closest['ele_all'].Fill(closest_Wprime_p4.M())
+            if chi_Wprime_p4.M() > mass_cut:
+                h_Wprime_mass_chi['ele_all'].Fill(chi_Wprime_p4.M())
+            h_lepton_pt['electron'].Fill(sellepton.pt)
+        elif isMu:
+            if sublead_Wprime_p4.M() > mass_cut:
+                h_Wprime_mass_sublead['mu_all'].Fill(sublead_Wprime_p4.M())
+            if closest_Wprime_p4.M() > mass_cut:
+                h_Wprime_mass_closest['mu_all'].Fill(closest_Wprime_p4.M())
+            if chi_Wprime_p4.M() > mass_cut:
+                h_Wprime_mass_chi['mu_all'].Fill(chi_Wprime_p4.M())
+            h_lepton_pt['muon'].Fill(sellepton.pt)
+        
+        #cut_and_count efficiences
+        '''
+        h_efficiencies.Fill(isEvent, 1)
+        h_efficiencies.Fill(isPreSel, 2)
+        h_efficiencies.Fill(isHLT, 3)
+        h_efficiencies.Fill(isLepSel, 4)
+        h_efficiencies.Fill(isJetSel, 5)
+        '''
     #efficiencies histos
     if HLTrig and MCReco:
         heff_mclepton_pt = {'electron': ROOT.TEfficiency(h_mclepton_pt['electron'], h_mclepton_pt_unHLT['electron']),
@@ -742,39 +992,27 @@ for inpfile in inpfiles:
         heff_mclepton_pt['muon'].SetName("HLTEff_MC_Mu_pt")
         for value in heff_mclepton_pt.values():
             value.SetLineColor(ROOT.kBlue)
+        if LepHLTrig:
+            heff_lep_mclepton_pt = copy.deepcopy(heff_mclepton_pt)
+            for key, value in heff_lep_mclepton_pt.items():
+                value.SetPassedHistogram(h_mclepton_pt_lepHLT[key], "")
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'lep' + old_title
+                new_name = 'lep' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        if HadHLTrig:
+            heff_had_mclepton_pt = copy.deepcopy(heff_mclepton_pt)
+            for key, value in heff_had_mclepton_pt.items():
+                value.SetPassedHistogram(h_mclepton_pt_hadHLT[key], "")
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'had' + old_title
+                new_name = 'had' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
             
-        heff_lep_mclepton_pt = copy.deepcopy(heff_mclepton_pt)
-        for key, value in heff_lep_mclepton_pt.items():
-            value.SetPassedHistogram(h_mclepton_pt_lepHLT[key], "")
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'lep' + old_title
-            new_name = 'lep' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-        heff_had_mclepton_pt = copy.deepcopy(heff_mclepton_pt)
-        for key, value in heff_had_mclepton_pt.items():
-            value.SetPassedHistogram(h_mclepton_pt_hadHLT[key], "")
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'had' + old_title
-            new_name = 'had' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-            
-
-
-        '''    
-        heff_mclepton_eta = {'electron': ROOT.TEfficiency(h_mclepton_eta['electron'], h_mclepton_eta_unHLT['electron']),
-                             'muon': ROOT.TEfficiency(h_mclepton_eta['muon'], h_mclepton_eta_unHLT['muon'])
-                         }
-        heff_mclepton_eta['electron'].SetTitle("MC_HLTEff_Ele_eta;electron #eta;#varepsilon")
-        heff_mclepton_eta['electron'].SetName("MC_HLTEff_Ele_eta")
-        heff_mclepton_eta['muon'].SetTitle("MC_HLTEff_Mu_eta;muon #eta;#varepsilon")
-        heff_mclepton_eta['muon'].SetName("MC_HLTEff_Mu_eta")
-        for value in heff_mclepton_eta.values():
-            value.SetLineColor(ROOT.kBlue)
-        '''
         heff_mcbjet_pt = {'Wbjet': ROOT.TEfficiency(h_mcbjet_pt['Wbjet'], h_mcbjet_pt_unHLT['Wbjet']),
                           'topbjet': ROOT.TEfficiency(h_mcbjet_pt['topbjet'], h_mcbjet_pt_unHLT['topbjet']),
                           'top': ROOT.TEfficiency(h_mcbjet_pt['top'], h_mcbjet_pt_unHLT['top']),
@@ -787,27 +1025,27 @@ for inpfile in inpfiles:
         heff_mcbjet_pt['top'].SetName("HLTEff_MC_top_pt")
         for value in heff_mcbjet_pt.values():
             value.SetLineColor(ROOT.kBlue)
+        if LepHLTrig:
+            heff_lep_mcbjet_pt = copy.deepcopy(heff_mcbjet_pt)
+            for key, value in heff_lep_mcbjet_pt.items():
+                value.SetPassedHistogram(h_mcbjet_pt_lepHLT[key], "")
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'lep' + old_title
+                new_name = 'lep' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        if HadHLTrig:
+                heff_had_mcbjet_pt = copy.deepcopy(heff_mcbjet_pt)
+                for key, value in heff_had_mcbjet_pt.items():
+                    value.SetPassedHistogram(h_mcbjet_pt_hadHLT[key], "")
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = 'had' + old_title
+                    new_name = 'had' + old_name
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
         
-        heff_lep_mcbjet_pt = copy.deepcopy(heff_mcbjet_pt)
-        for key, value in heff_lep_mcbjet_pt.items():
-            value.SetPassedHistogram(h_mcbjet_pt_lepHLT[key], "")
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'lep' + old_title
-            new_name = 'lep' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-        heff_had_mcbjet_pt = copy.deepcopy(heff_mcbjet_pt)
-        for key, value in heff_had_mcbjet_pt.items():
-            value.SetPassedHistogram(h_mcbjet_pt_hadHLT[key], "")
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'had' + old_title
-            new_name = 'had' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-        
-
         heff_mcWprime_mass = {'gen': ROOT.TEfficiency(h_mcWprime_mass['gen'], h_mcWprime_mass_unHLT['gen']),
                               'all': ROOT.TEfficiency(h_mcWprime_mass['all'], h_mcWprime_mass_unHLT['all']),
                               'ele_all': ROOT.TEfficiency(h_mcWprime_mass['ele_all'], h_mcWprime_mass_unHLT['ele_all']),
@@ -823,25 +1061,26 @@ for inpfile in inpfiles:
         heff_mcWprime_mass['mu_all'].SetName("HLTEff_MC_Mu_Wprime_mass")
         for value in heff_mcWprime_mass.values():
             value.SetLineColor(ROOT.kBlue)
-        
-        heff_lep_mcWprime_mass = copy.deepcopy(heff_mcWprime_mass)
-        for key, value in heff_lep_mcWprime_mass.items():
-            value.SetPassedHistogram(h_mcWprime_mass_lepHLT[key], "")
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'lep' + old_title
-            new_name = 'lep' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-        heff_had_mcWprime_mass = copy.deepcopy(heff_mcWprime_mass)
-        for key, value in heff_had_mcWprime_mass.items():
-            value.SetPassedHistogram(h_mcWprime_mass_hadHLT[key], "")
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'had' + old_title
-            new_name = 'had' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
+        if LepHLTrig:
+            heff_lep_mcWprime_mass = copy.deepcopy(heff_mcWprime_mass)
+            for key, value in heff_lep_mcWprime_mass.items():
+                value.SetPassedHistogram(h_mcWprime_mass_lepHLT[key], "")
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'lep' + old_title
+                new_name = 'lep' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        if HadHLTrig:
+            heff_had_mcWprime_mass = copy.deepcopy(heff_mcWprime_mass)
+            for key, value in heff_had_mcWprime_mass.items():
+                value.SetPassedHistogram(h_mcWprime_mass_hadHLT[key], "")
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'had' + old_title
+                new_name = 'had' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
         
         heff_mcWprime_tmass = {'all': ROOT.TEfficiency(h_mcWprime_tmass['all'], h_mcWprime_tmass_unHLT['all']),
                                'ele_all': ROOT.TEfficiency(h_mcWprime_tmass['ele_all'], h_mcWprime_tmass_unHLT['ele_all']),
@@ -855,139 +1094,250 @@ for inpfile in inpfiles:
         heff_mcWprime_tmass['mu_all'].SetName("HLTEff_MC_Mu_Wprime_transverse_mass")
         for value in heff_mcWprime_tmass.values():
             value.SetLineColor(ROOT.kBlue)
+        if LepHLTrig:
+            heff_lep_mcWprime_tmass = copy.deepcopy(heff_mcWprime_tmass)
+            for key, value in heff_lep_mcWprime_tmass.items():
+                value.SetPassedHistogram(h_mcWprime_tmass_lepHLT[key], "")
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'lep' + old_title
+                new_name = 'lep' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        if HadHLTrig:
+            heff_had_mcWprime_tmass = copy.deepcopy(heff_mcWprime_tmass)
+            for key, value in heff_had_mcWprime_tmass.items():
+                value.SetPassedHistogram(h_mcWprime_tmass_hadHLT[key], "")
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = 'had' + old_title
+                new_name = 'had' + old_name
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+    if DetReco:
+        h_countings.SetBinContent(1, nentries)
+        h_countings.SetBinContent(2, PreSelEvt)
+        h_countings.SetBinContent(3, HLTriggered)
+        h_countings.SetBinContent(4, LepTriggered)
+        h_countings.SetBinContent(5, JetTriggered)
+
+        for i in range(5):
+            k = i + 1
+            h_eff_benchmark.SetBinContent(k, nentries)
+
+        h_efficiencies = ROOT.TEfficiency(h_countings, h_eff_benchmark)
+        h_efficiencies.SetName("DetReco_efficiencies;;Countings")
+        h_efficiencies.SetTitle("DetReco_efficiencies;;#varepsilon")
+        h_efficiencies.SetLineColor(ROOT.kBlue)
+        h_efficiencies_gae = GetTGAEfromTE(h_efficiencies, naeff)
         
-        heff_lep_mcWprime_tmass = copy.deepcopy(heff_mcWprime_tmass)
-        for key, value in heff_lep_mcWprime_tmass.items():
-            value.SetPassedHistogram(h_mcWprime_tmass_lepHLT[key], "")
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'lep' + old_title
-            new_name = 'lep' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
-        heff_had_mcWprime_tmass = copy.deepcopy(heff_mcWprime_tmass)
-        for key, value in heff_had_mcWprime_tmass.items():
-            value.SetPassedHistogram(h_mcWprime_tmass_hadHLT[key], "")
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = 'had' + old_title
-            new_name = 'had' + old_name
-            value.SetTitle(new_title)
-            value.SetName(new_name)
+    if DetReco and MCReco and HLTrig:
+        hmceff_Wprime_mass_sublead = {'all': ROOT.TEfficiency(),
+                                      'ele_all': ROOT.TEfficiency(),
+                                      'mu_all': ROOT.TEfficiency(),
+        }
+        
+        hmceff_Wprime_mass_sublead['all'].SetPassedHistogram(h_Wprime_mass_sublead['all'], "f")
+        hmceff_Wprime_mass_sublead['all'].SetTotalHistogram(h_mcWprime_mass['all'], "f")
+        hmceff_Wprime_mass_sublead['ele_all'].SetPassedHistogram(h_Wprime_mass_sublead['ele_all'], "f")
+        hmceff_Wprime_mass_sublead['ele_all'].SetTotalHistogram(h_mcWprime_mass['ele_all'], "f")
+        hmceff_Wprime_mass_sublead['mu_all'].SetPassedHistogram(h_Wprime_mass_sublead['mu_all'], "f")
+        hmceff_Wprime_mass_sublead['mu_all'].SetTotalHistogram(h_mcWprime_mass['mu_all'], "f")
+        hmceff_Wprime_mass_sublead['all'].SetTitle("MCEff_sublead_Lep_Wprime_mass;Lep DetReco W' mass [GeV];#varepsilon")
+        hmceff_Wprime_mass_sublead['all'].SetName("MCEff_sublead_Lep_Wprime_mass")
+        hmceff_Wprime_mass_sublead['ele_all'].SetTitle("MCEff_sublead_Ele_Wprime_mass;Ele DetReco W' mass [GeV];#varepsilon")
+        hmceff_Wprime_mass_sublead['ele_all'].SetName("MCEff_sublead_Ele_Wprime_mass")
+        hmceff_Wprime_mass_sublead['mu_all'].SetTitle("MCEff_sublead_Mu_Wprime_mass;Mu DetReco  W' mass [GeV];#varepsilon")
+        hmceff_Wprime_mass_sublead['mu_all'].SetName("MCEff_sublead_Mu_Wprime_mass")
+
+        for value in hmceff_Wprime_mass_sublead.values():
+            value.SetLineColor(ROOT.kBlue)
+        hmceff_Wprime_mass_sublead_gae = {}
+        for key, value in hmceff_Wprime_mass_sublead.items():
+            value.SetConfidenceLevel(0.01)
+            tgae = GetTGAEfromTE(value)
+            new_item = {key: tgae}
+            hmceff_Wprime_mass_sublead_gae.update(new_item)
+                
+        hmceff_Wprime_mass_closest = {'all': ROOT.TEfficiency(),#h_Wprime_mass_closest['all'], h_mcWprime_mass['all']),
+                                      'ele_all': ROOT.TEfficiency(),#h_Wprime_mass_closest['all'], h_mcWprime_mass['ele_all']),
+                                      'mu_all': ROOT.TEfficiency(),#h_Wprime_mass_closest['mu_all'], h_mcWprime_mass['mu_all']),
+        }
+        
+        hmceff_Wprime_mass_closest['all'].SetPassedHistogram(h_Wprime_mass_closest['all'], "f")
+        hmceff_Wprime_mass_closest['all'].SetTotalHistogram(h_mcWprime_mass['all'], "f")
+        hmceff_Wprime_mass_closest['ele_all'].SetPassedHistogram(h_Wprime_mass_closest['ele_all'], "f")
+        hmceff_Wprime_mass_closest['ele_all'].SetTotalHistogram(h_mcWprime_mass['ele_all'], "f")
+        hmceff_Wprime_mass_closest['mu_all'].SetPassedHistogram(h_Wprime_mass_closest['mu_all'], "f")
+        hmceff_Wprime_mass_closest['mu_all'].SetTotalHistogram(h_mcWprime_mass['mu_all'], "f")
+        hmceff_Wprime_mass_closest['all'].SetTitle("MCEff_closest_Lep_Wprime_mass;Lep DetReco W' mass [GeV];#varepsilon")
+        hmceff_Wprime_mass_closest['all'].SetName("MCEff_closest_Lep_Wprime_mass")
+        hmceff_Wprime_mass_closest['ele_all'].SetTitle("MCEff_closest_Ele_Wprime_mass;Ele DetReco W' mass [GeV];#varepsilon")
+        hmceff_Wprime_mass_closest['ele_all'].SetName("MCEff_closest_Ele_Wprime_mass")
+        hmceff_Wprime_mass_closest['mu_all'].SetTitle("MCEff_closest_Mu_Wprime_mass;Mu DetReco  W' mass [GeV];#varepsilon")
+        hmceff_Wprime_mass_closest['mu_all'].SetName("MCEff_closest_Mu_Wprime_mass")
+
+        for value in hmceff_Wprime_mass_closest.values():
+            value.SetLineColor(ROOT.kBlue)
+        hmceff_Wprime_mass_closest_gae = {}
+        for key, value in hmceff_Wprime_mass_closest.items():
+            value.SetConfidenceLevel(0.01)
+            tgae = GetTGAEfromTE(value)
+            new_item = {key: tgae}
+            hmceff_Wprime_mass_closest_gae.update(new_item)
+
+        hmceff_Wprime_mass_chi = {'all': ROOT.TEfficiency(),#h_Wprime_mass_chi['all'], h_mcWprime_mass['all']),
+                                      'ele_all': ROOT.TEfficiency(),#h_Wprime_mass_chi['all'], h_mcWprime_mass['ele_all']),
+                                      'mu_all': ROOT.TEfficiency(),#h_Wprime_mass_chi['mu_all'], h_mcWprime_mass['mu_all']),
+        }
+        hmceff_Wprime_mass_chi['all'].SetPassedHistogram(h_Wprime_mass_chi['all'], "f")
+        hmceff_Wprime_mass_chi['all'].SetTotalHistogram(h_mcWprime_mass['all'], "f")
+        hmceff_Wprime_mass_chi['ele_all'].SetPassedHistogram(h_Wprime_mass_chi['ele_all'], "f")
+        hmceff_Wprime_mass_chi['ele_all'].SetTotalHistogram(h_mcWprime_mass['ele_all'], "f")
+        hmceff_Wprime_mass_chi['mu_all'].SetPassedHistogram(h_Wprime_mass_chi['mu_all'], "f")
+        hmceff_Wprime_mass_chi['mu_all'].SetTotalHistogram(h_mcWprime_mass['mu_all'], "f")
+        hmceff_Wprime_mass_chi['all'].SetTitle("MCEff_chi_Lep_Wprime_mass;Lep DetReco W' mass [GeV];#varepsilon")
+        hmceff_Wprime_mass_chi['all'].SetName("MCEff_chi_Lep_Wprime_mass")
+        hmceff_Wprime_mass_chi['ele_all'].SetTitle("MCEff_chi_Ele_Wprime_mass;Ele DetReco W' mass [GeV];#varepsilon")
+        hmceff_Wprime_mass_chi['ele_all'].SetName("MCEff_chi_Ele_Wprime_mass")
+        hmceff_Wprime_mass_chi['mu_all'].SetTitle("MCEff_chi_Mu_Wprime_mass;Mu DetReco  W' mass [GeV];#varepsilon")
+        hmceff_Wprime_mass_chi['mu_all'].SetName("MCEff_chi_Mu_Wprime_mass")
+
+        for value in hmceff_Wprime_mass_chi.values():
+            value.SetLineColor(ROOT.kBlue)
+        hmceff_Wprime_mass_chi_gae = {}
+        for key, value in hmceff_Wprime_mass_chi.items():
+            value.SetConfidenceLevel(0.01)
+            tgae = GetTGAEfromTE(value)
+            new_item = {key: tgae}
+            hmceff_Wprime_mass_chi_gae.update(new_item)
 
     #effhistos printing and saving
     if HLTrig and MCReco:
         for value in heff_mclepton_pt.values():
             print_hist(inpfile, value, 'AP')
             save_hist(inpfile, value, 'AP')
-        
-        for value in heff_lep_mclepton_pt.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
-        for value in heff_had_mclepton_pt.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
-        
         for value in heff_mcbjet_pt.values():
             print_hist(inpfile, value, 'AP')
             save_hist(inpfile, value, 'AP')
-        
-        for value in heff_lep_mcbjet_pt.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
-        for value in heff_had_mcbjet_pt.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
-        
         for value in heff_mcWprime_mass.values():
             print_hist(inpfile, value, 'AP')
             save_hist(inpfile, value, 'AP')
-        
-        for value in heff_lep_mcWprime_mass.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
-        for value in heff_had_mcWprime_mass.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
-        
         for value in heff_mcWprime_tmass.values():
             print_hist(inpfile, value, 'AP')
             save_hist(inpfile, value, 'AP')
-        
-        for value in heff_lep_mcWprime_tmass.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
-        for value in heff_had_mcWprime_tmass.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
-        
 
+        if LepHLTrig:
+            for value in heff_lep_mclepton_pt.values():
+                print_hist(inpfile, value, 'AP')
+                save_hist(inpfile, value, 'AP')
+            for value in heff_lep_mcbjet_pt.values():
+                print_hist(inpfile, value, 'AP')
+                save_hist(inpfile, value, 'AP')
+            for value in heff_lep_mcWprime_mass.values():
+                print_hist(inpfile, value, 'AP')
+                save_hist(inpfile, value, 'AP')
+            for value in heff_lep_mcWprime_tmass.values():
+                print_hist(inpfile, value, 'AP')
+                save_hist(inpfile, value, 'AP')
+        
+        if HadHLTrig:
+            for value in heff_had_mclepton_pt.values():
+                print_hist(inpfile, value, 'AP')
+                save_hist(inpfile, value, 'AP')
+            for value in heff_had_mcbjet_pt.values():
+                print_hist(inpfile, value, 'AP')
+                save_hist(inpfile, value, 'AP')
+            for value in heff_had_mcWprime_mass.values():
+                print_hist(inpfile, value, 'AP')
+                save_hist(inpfile, value, 'AP')
+            for value in heff_had_mcWprime_tmass.values():
+                print_hist(inpfile, value, 'AP')
+                save_hist(inpfile, value, 'AP')
+        
+        if DetReco:
+            for value in hmceff_Wprime_mass_sublead_gae.values():
+               print_hist(inpfile, value)
+               save_hist(inpfile, value)
+            for value in hmceff_Wprime_mass_closest_gae.values():
+               print_hist(inpfile, value)
+               save_hist(inpfile, value)
+            for value in hmceff_Wprime_mass_chi_gae.values():
+               print_hist(inpfile, value)
+               save_hist(inpfile, value)
+            
     #histo printing and saving
-    
-    if HLTrig and MCReco:
-        for value in h_mclepton_pt.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
+    if MCReco:
         for value in h_mclepton_pt_unHLT.values():
             print_hist(inpfile, value)
             save_hist(inpfile, value)
-
-        for value in h_mclepton_pt_lepHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
-        for value in h_mclepton_pt_hadHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
-        for value in h_mcbjet_pt.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
         for value in h_mcbjet_pt_unHLT.values():
             print_hist(inpfile, value)
             save_hist(inpfile, value)
-
-        for value in h_mcbjet_pt_lepHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
-        for value in h_mcbjet_pt_hadHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-    
-        for value in h_mcWprime_mass.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
         for value in h_mcWprime_mass_unHLT.values():
             print_hist(inpfile, value)
             save_hist(inpfile, value)
-
-        for value in h_mcWprime_mass_lepHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
-        for value in h_mcWprime_mass_hadHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
-        for value in h_mcWprime_tmass.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
         for value in h_mcWprime_tmass_unHLT.values():
             print_hist(inpfile, value)
             save_hist(inpfile, value)
-
-        for value in h_mcWprime_tmass_lepHLT.values():
+        for value in h_mcmet_q_unHLT.values():
             print_hist(inpfile, value)
             save_hist(inpfile, value)
 
-        for value in h_mcWprime_tmass_hadHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+        if HLTrig:
+            for value in h_mclepton_pt.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcbjet_pt.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcWprime_mass.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcWprime_tmass.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcmet_q.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+
+            print_hist(inpfile, h_mcrecotop_mass['top'], "HIST0")
+            save_hist(inpfile, h_mcrecotop_mass['top'], "HIST0")
+        
+        if LepHLTrig:
+            for value in h_mclepton_pt_lepHLT.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcbjet_pt_lepHLT.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcWprime_mass_lepHLT.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcWprime_tmass_lepHLT.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcmet_q_lepHLT.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+
+        if HadHLTrig:
+            for value in h_mclepton_pt_hadHLT.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcbjet_pt_hadHLT.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcWprime_mass_hadHLT.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcWprime_tmass_hadHLT.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
+            for value in h_mcmet_q_hadHLT.values():
+                print_hist(inpfile, value)
+                save_hist(inpfile, value)
 
         if AK8Reco:
             for value in h_mcfatlepton_pt.values():
@@ -1002,35 +1352,64 @@ for inpfile in inpfiles:
             for value in h_mcfatWprime_tmass.values():
                 print_hist(inpfile, value)
                 save_hist(inpfile, value)
-
-    for value in h_met_q_unHLT.values():
-        print_hist(inpfile, value)
-        save_hist(inpfile, value)
-
-    if HLTrig:
-        for value in h_met_q.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-                
-        for value in h_met_q_lepHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
-        for value in h_met_q_hadHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-
-        if AK8Reco:
             for value in h_fatmet_q.values():
                 print_hist(inpfile, value)
                 save_hist(inpfile, value)
+                
+        print_hist(inpfile, h_sameflav_bjet_deltaR)
+        save_hist(inpfile, h_sameflav_bjet_deltaR)
     
-    print_hist(inpfile, h_sameflav_bjet_deltaR)
-    save_hist(inpfile, h_sameflav_bjet_deltaR)
+    if DetReco:
+        for value in h_lepton_pt.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+        for value in h_jet_pt_sublead.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+        for value in h_jet_pt_closest.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+        for value in h_jet_pt_chi.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+        for value in h_Wprime_mass_sublead.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+        for value in h_Wprime_mass_closest.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+        for value in h_Wprime_mass_chi.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+        '''
+        for value in h_Wprime_tmass_sublead.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+        for value in h_Wprime_tmass_closest.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+        for value in h_Wprime_tmass_chi.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+        '''
+        for value in h_met_q.values():
+            print_hist(inpfile, value)
+            save_hist(inpfile, value)
+
+        print_hist(inpfile, h_countings, "HIST0")
+        save_hist(inpfile, h_countings, "HIST0")
+        print_hist(inpfile, h_efficiencies_gae, "AP")
+        save_hist(inpfile, h_efficiencies_gae, "AP")
+
+        print_hist(inpfile, h_recotop_mass_sublead['top'], "HIST0")
+        save_hist(inpfile, h_recotop_mass_sublead['top'], "HIST0")
+        print_hist(inpfile, h_recotop_mass_closest['top'], "HIST0")
+        save_hist(inpfile, h_recotop_mass_closest['top'], "HIST0")
+        print_hist(inpfile, h_recotop_mass_chi['top'], "HIST0")
+        save_hist(inpfile, h_recotop_mass_chi['top'], "HIST0")
+
+
     
-    print 'Total events: %d     ||     Bad MET flag events %d     ||     Bad events %d      ||     Events with more than 2 mcbjets %d' %(tree.GetEntries(), badflag, badevt, m2bjetev)
-        #tree.Scan("GenPart_genPartIdxMother:GenPart_pdgId")#, "GenPart_pdgId==-11 || GenPart_pdgId==11")
-        #tree.Scan("Muon_genPartIdx", "(HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT) && Muon_genPartIdx == -1")
-        #tree.Scan("GenPart_pdgId[GenPart_genPartIdxMother[Electron_genPartIdx]]:GenPart_pdgId[Electron_genPartIdx]:GenPart_pdgId[GenPart_genPartIdxMother[Muon_genPartIdx]]:GenPart_pdgId[Muon_genPartIdx]", "(Electron_genPartIdx != (-1) && Muon_genPartIdx != (-1) && (GenPart_pdgId[GenPart_genPartIdxMother[Electron_genPartIdx]] == GenPart_pdgId[Electron_genPartIdx] || GenPart_pdgId[GenPart_genPartIdxMother[Muon_genPartIdx]] == GenPart_pdgId[Muon_genPartIdx]))")
+    print 'Total events: %d   ||   Bad MET flag events %d   ||   Bad events %d   ||   MC Events %d    ||   HLTriggered %d   ||   LepTriggered %d   ||   JetTriggered %d   ||' %(tree.GetEntries(), badflag, badevt, MCEvents, HLTriggered, LepTriggered, JetTriggered)
 
 
