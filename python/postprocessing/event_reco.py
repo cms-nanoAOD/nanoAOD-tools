@@ -14,6 +14,7 @@ print "Agostino's tools implemented"
 from topreco import *
 print "Andrea's tools implemented"
 
+'''
 inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/"
 
 inpfiles = [#"Wprime_4000_RH"
@@ -31,7 +32,7 @@ inpfiles = [#"Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8"
             #"Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8"
             "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
 ]
-'''
+
 print "input pathed"
 
 
@@ -92,7 +93,7 @@ HLTrig = True
 LepHLTrig = False
 HadHLTrig = False
 AK8Reco = False
-MCReco = True
+MCReco = False
 DetReco = True
 BTagging = False
 
@@ -116,6 +117,9 @@ for inpfile in inpfiles:
     nbins = 40
     nmin = 0
     nmax = 2400
+    nbinst = 15
+    nmint = 0
+    nmaxt = 3000
     wnbins = 50
     wnmin = 0
     wnmax = 10000
@@ -331,23 +335,23 @@ for inpfile in inpfiles:
             'top': ROOT.TH1F("DetReco_recotop_pt", "DetReco_recotop_pt;recotop pt [GeV];Countings", nbins, nmin, nmax)
         }
         h_recotop_mass_sublead = {
-            'top': ROOT.TH1F("DetReco_recotop_mass", "DetReco_recotop_mass;recotop mass [GeV];Countings", nbins, nmin, nmax)
+            'top': ROOT.TH1F("DetReco_recotop_mass", "DetReco_recotop_mass;recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
             }
         if BTagging:
             h_jet_pt_sublead.update({
-                'Wbjet_nobtag': ROOT.TH1F("DetReco_nobtag_Wjet_pt", "DetReco_nobtag_Wjet_pt;prompt nobtagged jet pt [GeV];Countings", nbins, nmin, nmax),
-                'Wbjet_btag': ROOT.TH1F("DetReco_btag_Wjet_pt", "DetReco_btag_Wjet_pt;prompt btagged jet pt [GeV];Countings", nbins, nmin, nmax),
+                'Wbjet_nobtag': ROOT.TH1F("DetReco_nobtag_Wjet_pt", "DetReco_nobtag_Wjet_pt;prompt nobtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'Wbjet_btag': ROOT.TH1F("DetReco_btag_Wjet_pt", "DetReco_btag_Wjet_pt;prompt btagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
             
-                'topbjet_nobtag': ROOT.TH1F("DetReco_nobtag_topjet_pt", "DetReco_nobtag_topjet_pt;top nobtagged jet pt [GeV];Countings", nbins, nmin, nmax),
-                'topbjet_btag': ROOT.TH1F("DetReco_btag_topjet_pt", "DetReco_btag_topjet_pt;top btagged jet pt [GeV];Countings", nbins, nmin, nmax),
+                'topbjet_nobtag': ROOT.TH1F("DetReco_nobtag_topjet_pt", "DetReco_nobtag_topjet_pt;top nobtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'topbjet_btag': ROOT.TH1F("DetReco_btag_topjet_pt", "DetReco_btag_topjet_pt;top btagged jet pt [GeV];Countings", nbins, nmin, nmaxt),
             
-                'top_nobtag': ROOT.TH1F("DetReco_nobtag_recotop_pt", "DetReco_nobtag_recotop_pt;nobtagged recotop pt [GeV];Countings", nbins, nmin, nmax),
-                'top_btag': ROOT.TH1F("DetReco_btag_recotop_pt", "DetReco_btag_recotop_pt;btagged recotop pt [GeV];Countings", nbins, nmin, nmax)
+                'top_nobtag': ROOT.TH1F("DetReco_nobtag_recotop_pt", "DetReco_nobtag_recotop_pt;nobtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_btag_recotop_pt", "DetReco_btag_recotop_pt;btagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
             })
         h_jet_pt_closest = copy.deepcopy(h_jet_pt_sublead)
         h_recotop_mass_closest = copy.deepcopy(h_recotop_mass_sublead)
         h_recotop_mass_closest['top'].SetTitle('closest_' + h_recotop_mass_sublead['top'].GetTitle())
-        h_recotop_mass_closest['top'].SetName('closest_' + h_recotop_mass_sublead['top'].GetTitle())
+        h_recotop_mass_closest['top'].SetName('closest_' + h_recotop_mass_sublead['top'].GetName())
         for value in h_jet_pt_closest.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
@@ -358,7 +362,7 @@ for inpfile in inpfiles:
         h_jet_pt_chi = copy.deepcopy(h_jet_pt_sublead)
         h_recotop_mass_chi = copy.deepcopy(h_recotop_mass_sublead)
         h_recotop_mass_chi['top'].SetTitle('chi_' + h_recotop_mass_sublead['top'].GetTitle())
-        h_recotop_mass_chi['top'].SetName('chi_' + h_recotop_mass_sublead['top'].GetTitle())
+        h_recotop_mass_chi['top'].SetName('chi_' + h_recotop_mass_sublead['top'].GetName())
         for value in h_jet_pt_chi.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
@@ -367,7 +371,7 @@ for inpfile in inpfiles:
             value.SetTitle(new_title)
             value.SetName(new_name)
         h_recotop_mass_sublead['top'].SetTitle('sublead_' + h_recotop_mass_sublead['top'].GetTitle())
-        h_recotop_mass_sublead['top'].SetName('sublead_' + h_recotop_mass_sublead['top'].GetTitle())
+        h_recotop_mass_sublead['top'].SetName('sublead_' + h_recotop_mass_sublead['top'].GetName())
         for value in h_jet_pt_sublead.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
@@ -618,7 +622,7 @@ for inpfile in inpfiles:
     
         #print 'HLTriggered'
 
-        if mctfound:
+        if MCReco and mctfound:
             MCEvents += 1
 
         recotop = TopUtilities()
@@ -887,33 +891,52 @@ for inpfile in inpfiles:
             JetTriggered += 1
 
         isJetSel = True
-        promptjet = highptjets[0]
+        closest_promptjet = None
+        chi_promptjet = None
+        sublead_promptjet = highptjets[0]
         DeltaR_nujet = 100.
         DeltaR_Idx = 0
         tm_chi = 1000.
         tm_Idx = 0
         mtop_p4 = None
         for i in range(len(goodjets)):
+            '''
             if goodjets[i].pt == promptjet.pt:
                 continue
+            
             else:
-                dPhi = deltaPhi(goodjets[i].phi, met.phi)
-                if dPhi < DeltaR_nujet:
-                    DeltaR_nujet = dPhi
-                    DeltaR_Idx = i
+            '''
+            dPhi = deltaPhi(goodjets[i].phi, met.phi)
+            if dPhi < DeltaR_nujet:
+                DeltaR_nujet = dPhi
+                DeltaR_Idx = i
 
-                mtop_p4 = recotop.top4Momentum(sellepton.p4(), goodjets[i].p4(), MET['metPx'], MET['metPy'])
-                chi = Chi_TopMass(mtop_p4.M())
-                if chi < tm_chi:
-                    tm_chi = chi
-                    tm_Idx = i
+            mtop_p4 = recotop.top4Momentum(sellepton.p4(), goodjets[i].p4(), MET['metPx'], MET['metPy'])
+            chi = Chi_TopMass(mtop_p4.M())
+            if chi < tm_chi:
+                tm_chi = chi
+                tm_Idx = i
             
         #jet closest to MET p4
         closest_jet_p4 = goodjets[DeltaR_Idx].p4()
+        if DeltaR_Idx == 0:
+            if len(highptjets) > 1:
+                closest_promptjet = highptjets[1]
+            else:
+                closest_promptjet = goodjets[1]
+        else:
+            closest_promptjet = highptjets[0]
         closest_recotop_p4 = recotop.top4Momentum(sellepton.p4(), closest_jet_p4, MET['metPx'], MET['metPy'])
             
         #jet reconstructing top with the least chi2 p4
         chi_jet_p4 = goodjets[tm_Idx].p4()
+        if tm_Idx == 0:
+            if len(highptjets) > 1:
+                chi_promptjet = highptjets[1]
+            else:
+                chi_promptjet = goodjets[1]
+        else:
+            chi_promptjet = highptjets[0]
         chi_recotop_p4 = recotop.top4Momentum(sellepton.p4(), chi_jet_p4, MET['metPx'], MET['metPy'])
         
         #subleading jet reconstruction
@@ -925,23 +948,23 @@ for inpfile in inpfiles:
         sublead_recotop_p4 = recotop.top4Momentum(sellepton.p4(), sublead_jet_p4, MET['metPx'], MET['metPy'])
 
         #Wprime reco
-        closest_Wprime_p4 = closest_recotop_p4 + promptjet.p4()
-        chi_Wprime_p4 = chi_recotop_p4 + promptjet.p4()
-        sublead_Wprime_p4 = sublead_recotop_p4 + promptjet.p4()
+        closest_Wprime_p4 = closest_recotop_p4 + closest_promptjet.p4()
+        chi_Wprime_p4 = chi_recotop_p4 + chi_promptjet.p4()
+        sublead_Wprime_p4 = sublead_recotop_p4 + sublead_promptjet.p4()
 
         if sublead_Wprime_p4.M() > mass_cut:
             h_jet_pt_sublead['topbjet'].Fill(sublead_jet_p4.Pt())
-            h_jet_pt_sublead['Wbjet'].Fill(promptjet.pt)
+            h_jet_pt_sublead['Wbjet'].Fill(sublead_promptjet.pt)
             h_jet_pt_sublead['top'].Fill(sublead_recotop_p4.Pt())
             h_recotop_mass_sublead['top'].Fill(sublead_recotop_p4.M())
         if closest_Wprime_p4.M() > mass_cut:
             h_jet_pt_closest['topbjet'].Fill(closest_jet_p4.Pt())
-            h_jet_pt_closest['Wbjet'].Fill(promptjet.pt)
+            h_jet_pt_closest['Wbjet'].Fill(closest_promptjet.pt)
             h_jet_pt_closest['top'].Fill(closest_recotop_p4.Pt())
             h_recotop_mass_closest['top'].Fill(closest_recotop_p4.M())
         if chi_Wprime_p4.M() > mass_cut:
             h_jet_pt_chi['topbjet'].Fill(chi_jet_p4.Pt())
-            h_jet_pt_chi['Wbjet'].Fill(promptjet.pt)
+            h_jet_pt_chi['Wbjet'].Fill(chi_promptjet.pt)
             h_jet_pt_chi['top'].Fill(chi_recotop_p4.Pt())
             h_recotop_mass_chi['top'].Fill(chi_recotop_p4.M())
         
@@ -1127,7 +1150,7 @@ for inpfile in inpfiles:
             h_eff_benchmark.SetBinContent(k, nentries)
 
         h_efficiencies = ROOT.TEfficiency(h_countings, h_eff_benchmark)
-        h_efficiencies.SetName("DetReco_efficiencies;;Countings")
+        h_efficiencies.SetName("DetReco_efficiencies")
         h_efficiencies.SetTitle("DetReco_efficiencies;;#varepsilon")
         h_efficiencies.SetLineColor(ROOT.kBlue)
         h_efficiencies_gae = GetTGAEfromTE(h_efficiencies, naeff)
