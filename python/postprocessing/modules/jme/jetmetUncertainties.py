@@ -237,9 +237,20 @@ class jetmetUncertaintiesProducer(Module):
         
         # match reconstructed jets to generator level ones
         # (needed to evaluate JER scale factors and uncertainties)
+        def resolution_matching(jet, genjet):
+          '''Helper function to match to gen based on pt difference'''
+          params = ROOT.PyJetParametersWrapper()
+          params.setJetEta(jet.eta)
+          params.setJetPt(jet.pt)
+          params.setRho(rho)
+
+          resolution = self.jetSmearer.jer.getResolution(params)
+
+          return abs(jet.pt - genjet.pt) < 3*resolution*jet.pt
+
         if not self.isData:
-          pairs = matchObjectCollection(jets, genJets)
-          lowPtPairs = matchObjectCollection(lowPtJets, genJets)
+          pairs = matchObjectCollection(jets, genJets, dRmax=0.2, presel=resolution_matching)
+          lowPtPairs = matchObjectCollection(lowPtJets, genJets, dRmax=0.2, presel=resolution_matching)
           pairs.update(lowPtPairs)
 
         for iJet, jet in enumerate(itertools.chain(jets, lowPtJets)):
@@ -433,6 +444,9 @@ class jetmetUncertaintiesProducer(Module):
             met_py_nom += delta_y_rawJet - met_unclEE_y
             
             if not self.isData:
+              # apply v2 recipe correction factor also to JER central value and variations
+              met_px_jer += delta_x_rawJet - met_unclEE_x
+              met_py_jer += delta_y_rawJet - met_unclEE_y
               met_px_jerUp += delta_x_rawJet - met_unclEE_x
               met_py_jerUp += delta_y_rawJet - met_unclEE_y
               met_px_jerDown += delta_x_rawJet - met_unclEE_x
