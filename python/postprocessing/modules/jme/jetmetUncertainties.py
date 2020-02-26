@@ -434,7 +434,7 @@ class jetmetUncertaintiesProducer(Module):
                   # cf. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/2000.html
                   if jesUncertainty == "HEMIssue":
                       delta = 1.
-                      if jet.phi > -1.57 and jet.phi < -0.87:
+                      if iJet < nJet and jet_pt_nom > 15 and jet.jetId & 2 and jet.phi > -1.57 and jet.phi < -0.87:
                           if jet.eta > -2.5 and jet.eta < -1.3:
                             delta = 0.8
                           elif jet.eta <= -2.5 and jet.eta > -3:
