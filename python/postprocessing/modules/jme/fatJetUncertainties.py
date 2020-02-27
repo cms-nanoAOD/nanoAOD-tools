@@ -10,10 +10,9 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetS
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
 class fatJetUncertaintiesProducer(Module):
-    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], archive=None, jetType = "AK8PFPuppi", redoJEC=False, noGroom=False, jerTag="", jmrVals = [], jmsVals = [], isData=False, applySmearing=True):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], archive=None, jetType = "AK8PFPuppi", noGroom=False, jerTag="", jmrVals = [], jmsVals = [], isData=False, applySmearing=True):
 
         self.era = era
-        self.redoJEC = redoJEC
         self.noGroom = noGroom
         self.isData = isData
         self.applySmearing = applySmearing if not isData else False # don't smear for data
@@ -101,8 +100,7 @@ class fatJetUncertaintiesProducer(Module):
                 sources = map(lambda x: x[1:-1], sources)
                 self.jesUncertainties = sources
             
-        if self.redoJEC :
-            self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
+        self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
         
 
         # load libraries for accessing JES scale factors and uncertainties from txt files
@@ -256,17 +254,15 @@ class fatJetUncertaintiesProducer(Module):
             jet_pt=jet.pt
             jet_mass=jet.mass
             
-            #redo JECs if desired
             if hasattr(jet, "rawFactor"):
                 jet_rawpt = jet_pt * (1 - jet.rawFactor)
                 jet_rawmass = jet_mass * (1 - jet.rawFactor)
             else:
                 jet_rawpt = -1.0 * jet_pt #If factor not present factor will be saved as -1
                 jet_rawmass = -1.0 * jet_mass #If factor not present factor will be saved as -1
-            if self.redoJEC :
-                (jet_pt, jet_mass) = self.jetReCalibrator.correct(jet,rho)
-                jet.pt = jet_pt
-                jet.mass = jet_mass
+            (jet_pt, jet_mass) = self.jetReCalibrator.correct(jet,rho)
+            jet.pt = jet_pt
+            jet.mass = jet_mass
             jets_pt_raw.append(jet_rawpt)
             jets_mass_raw.append(jet_rawmass)
             jets_corr_JEC.append(jet_pt/jet_rawpt)
@@ -490,10 +486,10 @@ fatJetUncertainties2016 = lambda : fatJetUncertaintiesProducer("2016", "Summer16
 fatJetUncertainties2016All = lambda : fatJetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", [ "All" ])
 
 fatJetUncertainties2017 = lambda : fatJetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "Total" ])
-fatJetUncertainties2017All = lambda : fatJetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "All" ], redoJEC=True)
+fatJetUncertainties2017All = lambda : fatJetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "All" ])
 
 fatJetUncertainties2018 = lambda : fatJetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ])
-fatJetUncertainties2018All = lambda : fatJetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "All" ], redoJEC=True)
+fatJetUncertainties2018All = lambda : fatJetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "All" ])
 
 fatJetUncertainties2016AK4Puppi = lambda : fatJetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", [ "Total" ], jetType="AK4PFPuppi")
 fatJetUncertainties2016AK4PuppiAll = lambda : fatJetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC",  [ "All" ], jetType="AK4PFPuppi")
@@ -507,12 +503,12 @@ fatJetUncertainties2018AK4PuppiAll = lambda : fatJetUncertaintiesProducer("2018"
 
 fatJetUncertainties2016AK8Puppi = lambda : fatJetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", [ "Total" ], jetType="AK8PFPuppi")
 fatJetUncertainties2016AK8PuppiAll = lambda : fatJetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC",  [ "All" ], jetType="AK8PFPuppi")
-fatJetUncertainties2016AK8PuppiNoGroom = lambda : fatJetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", [ "Total" ], jetType="AK8PFPuppi",redoJEC=False,noGroom=True)
-fatJetUncertainties2016AK8PuppiAllNoGroom = lambda : fatJetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", ["All"], jetType="AK8PFPuppi",redoJEC=False,noGroom=True)
+fatJetUncertainties2016AK8PuppiNoGroom = lambda : fatJetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", [ "Total" ], jetType="AK8PFPuppi", noGroom=True)
+fatJetUncertainties2016AK8PuppiAllNoGroom = lambda : fatJetUncertaintiesProducer("2016", "Summer16_07Aug2017_V11_MC", ["All"], jetType="AK8PFPuppi", noGroom=True)
 
 fatJetUncertainties2017AK8Puppi = lambda : fatJetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", [ "Total" ], jetType="AK8PFPuppi")
 fatJetUncertainties2017AK8PuppiAll = lambda : fatJetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", ["All"], jetType="AK8PFPuppi")
 
 fatJetUncertainties2018AK8Puppi = lambda : fatJetUncertaintiesProducer("2018", "Autumn18_V8_MC", [ "Total" ], jetType="AK8PFPuppi")
-fatJetUncertainties2018AK8PuppiAll = lambda : fatJetUncertaintiesProducer("2018", "Autumn18_V8_MC", ["All"], jetType="AK8PFPuppi",redoJEC = True)
+fatJetUncertainties2018AK8PuppiAll = lambda : fatJetUncertaintiesProducer("2018", "Autumn18_V8_MC", ["All"], jetType="AK8PFPuppi")
 
