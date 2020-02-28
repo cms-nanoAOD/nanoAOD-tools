@@ -6,7 +6,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.tools import *
 
-class MySelectorModule(Module):
+class preselection(Module):
     def __init__(self):
         pass
     def beginJob(self):
