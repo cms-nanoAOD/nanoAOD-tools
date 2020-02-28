@@ -69,8 +69,8 @@ def presel(PV, muons, electrons, jets): #returns three booleans: goodEvent assur
     goodEleEvt = isGoodPV and isElectron
     return goodEvent, goodMuEvt, goodEleEvt
 
-def print_hist(infile, hist, option = "HIST", log = False):
-    plotpath = "./plots/"
+def print_hist(infile, subfold, hist, option = "HIST", log = False):
+    plotpath = "./plots/" + str(subfold) + "/"
     if not(isinstance(hist, list)):
         c1 = ROOT.TCanvas(infile + "_" + hist.GetName(), "c1", 50,50,700,600)
         if log:
@@ -129,8 +129,8 @@ def print_hist(infile, hist, option = "HIST", log = False):
         c1.Print(plotpath + 'comparison' + ".png")#plotpath + infile + "_" + hist[0].GetName() + '_comparison' + ".png")
         c1.Print(plotpath + 'comparison' + ".root")#plotpath + infile + "_" + hist[0].GetName() + '_comparison' + ".root")
 
-def save_hist(infile, hist, option = "HIST"):
-     fout = ROOT.TFile.Open("./plots/"+ infile +".root", "UPDATE")
+def save_hist(infile, subfold, hist, option = "HIST"):
+     fout = ROOT.TFile.Open("./plots/" + str(subfold) + "/" + infile +".root", "UPDATE")
      fout.cd()
      hist.Write()
      fout.Close()
