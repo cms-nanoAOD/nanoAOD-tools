@@ -14,7 +14,7 @@ print "Agostino's tools implemented"
 from topreco import *
 print "Andrea's tools implemented"
 
-'''
+
 inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/"
 
 inpfiles = [#"Wprime_4000_RH"
@@ -25,16 +25,30 @@ inpfiles = [#"Wprime_4000_RH"
             #,"QCD_Pt_600to800_1"
             #,"SingleMuon_Run2016G_1"
 ]
-'''
 
+'''
 inputpath = "/eos/home-a/apiccine/private/Wprime_BkgSample/merged/"
-inpfiles = [#"Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8"
-            #"Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8"
-            "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
+inpfiles = [#"Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8",
+            "Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
+            "Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8"
+]
+'''
+subfolds = [#"Wp_m4000w400_pt350_mt500",
+           #"Wp_m4000w400_pt350_mt400",
+           #"Wp_m4000w400_pt350",
+           #"Wp_m3000w300_pt350_mt500",
+           #"Wp_m3000w300_pt350_mt400",
+           #"Wp_m3000w300_pt350",
+           #"Wp_m2000w20_pt350_mt500",
+           #"Wp_m2000w20_pt350_mt400",
+           #"Wp_m2000w20_pt350",
+           #"TT_mtt700to1000_pt350_mt500",
+           "TT_mtt700to1000_pt350_mt400",
+           #"TT_mtt700to1000_pt350",
+           #"TT_mtt700to1000_pt250",
 ]
 
 print "input pathed"
-
 
 #ROOT.gROOT.SetStyle('Plain')
 #ROOT.gStyle.SetPalette(1)   
@@ -52,6 +66,15 @@ def flav_filter(genparts, flav): #returns a collection of desired genparts (to u
 
 def bjet_filter(jets): #returns a collection of only b-gen jets (to use only for MC samples)
     return list(filter(lambda x : x.partonFlavour == -5 or x.partonFlavour == 5, jets))
+
+def IsMCbjet(jet): #returns a collection of only b-gen jets (to use only for MC samples)
+    if jet.partonFlavour == -5 or x.partonFlavour == 5:
+        return True
+    else:
+        return False
+
+def nobjet_filter(jets): #returns a collection of only b-gen jets (to use only for MC samples)
+    return list(filter(lambda x : not x.partonFlavour == -5 and not x.partonFlavour == 5, jets))
 
 def sameflav_filter(jets, flav): #returns a collection of only b-gen jets (to use only for MC samples)
     return list(filter(lambda x : x.partonFlavour == flav, jets))
@@ -86,27 +109,35 @@ def GetTGAEfromTE(teff, stringlabel = None):
 
     return tgae
 
+def insert_char_into_string(position, char, string):
+    new_string = string[:position] + str(char) + string[position:]
+    return new_string
+
 Debug = False
+print Debug
 
 #Step control booleans
 HLTrig = True
 LepHLTrig = False
 HadHLTrig = False
 AK8Reco = False
-MCReco = False
+MCReco = True
 DetReco = True
 BTagging = False
 
 #tresholds
 miniIso_cut = 0.1
 jet_ptcut = 35.
-leadingjet_ptcut = 250.
-mass_cut = 1200.
+leadingjet_ptcut = 350.
+mass_cut = 400.
+mass_cut_inf = -100.
 
 jetptcut_str = "JetPtCuts" + str(leadingjet_ptcut)
-naeff = ["nEvents", "nEventsPrePres", "HLTrigger", "LepSel", jetptcut_str]
+naeff = ["nEvents", "nEventsPrePres", "HLTrigger", "LepSel", jetptcut_str, "sublead", "chimass", "closest", "best"]
 
-for inpfile in inpfiles:
+for i in range(len(inpfiles)):
+    inpfile = inpfiles[i]
+    subfold = subfolds[i]
     filetoopen = inputpath + inpfile
     infile = ROOT.TFile.Open(filetoopen + ".root")
     tree = InputTree(infile.Events)
@@ -118,8 +149,11 @@ for inpfile in inpfiles:
     nmin = 0
     nmax = 2400
     nbinst = 15
+    nbinst = nbins
     nmint = 0
+    nmint = nmin
     nmaxt = 3000
+    nmaxt = nmax
     wnbins = 50
     wnmin = 0
     wnmax = 10000
@@ -166,6 +200,16 @@ for inpfile in inpfiles:
         h_mcrecotop_mass = {
             'top': ROOT.TH1F("MC_recotop_mass", "MC_recotop_mass;recotop mass [GeV];Countings", nbins, nmin, nmax)
             }
+        h_mcrecotop_vs_mcWprime_mass = ROOT.TH1F("MC_recotop_Wprime_massesratio", "MC_recotop_Wprime_massesratio;recotop mass/W' mass;Countings", 22, 0, 1.1)
+        h_mc_criteria_quant = {'deltaR': ROOT.TH1F("MC_closest_deltaR", "MC_closest_deltaR;#DeltaR;Countings", 60, 0, 3),
+                               'chimass': ROOT.TH1F("MC_chimass", "MC_chimass;#Chi^{2};Countings", 100, 0, 25),
+                               'sublead': ROOT.TH1F("MC_subleading_pt", "MC_subleading_pt;subleading jet pt [GeV];Countings", nbins, nmin, nmax)
+            }
+        h_mc_2dcriteria = {'dR_vs_chi': ROOT.TH2F("MC_deltaR_vs_chi", "MC_deltaR_vs_chi;#Chi^{2};#DeltaR", 100, 0, 25, 60, 0, 3),
+                           'dR_vs_sublead': ROOT.TH2F("MC_deltaR_vs_sublead_pt", "MC_deltaR_vs_sublead_pt;subleading jet pt [GeV];#DeltaR", nbins, nmin, nmax, 60, 0, 3),
+                           'chi_vs_sublead': ROOT.TH2F("MC_chi_vs_sublead_pt", "MC_chi_vs_sublead_pt;subleading jet pt [GeV];#Chi^{2}", nbins, nmin, nmax, 100, 0, 25),
+        }
+
         h_mcbjet_pt_unHLT = copy.deepcopy(h_mcbjet_pt)
         for value in h_mcbjet_pt_unHLT.values():
             old_title = value.GetTitle()
@@ -256,7 +300,7 @@ for inpfile in inpfiles:
                 value.SetTitle(new_title)
                 value.SetName(new_name)
 
-        h_sameflav_bjet_deltaR = ROOT.TH1F("MC_Same_Flavour_bjet_DeltaR", "Same_Flavour_bjet_DeltaR", 50, 0, 4)
+        h_sameflav_bjet_deltaR = ROOT.TH1F("MC_Same_Flavour_bjet_DeltaR", "Same_Flavour_bjet_DeltaR", 100, 0, 5)
 
         h_mcmet_q = {'pt': ROOT.TH1F("MC_MET_pt", "MC_MET_pt;MET pt [GeV];Countings", nbins, nmin, nmax),
                      'Et': ROOT.TH1F("MC_MET_Et", "MC_MET_Et;MET Et [GeV];Countings", wnbins, wnmin, wnmax),
@@ -348,37 +392,142 @@ for inpfile in inpfiles:
                 'top_nobtag': ROOT.TH1F("DetReco_nobtag_recotop_pt", "DetReco_nobtag_recotop_pt;nobtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
                 'top_btag': ROOT.TH1F("DetReco_btag_recotop_pt", "DetReco_btag_recotop_pt;btagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
             })
+            h_recotop_mass_sublead.update({
+                'top_nobtag': ROOT.TH1F("DetReco_nobtag_recotop_mass", "DetReco_nobtag_recotop_mass;nobtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_btag_recotop_mass", "DetReco_btag_recotop_mass;btagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
+            })
+
         h_jet_pt_closest = copy.deepcopy(h_jet_pt_sublead)
         h_recotop_mass_closest = copy.deepcopy(h_recotop_mass_sublead)
-        h_recotop_mass_closest['top'].SetTitle('closest_' + h_recotop_mass_sublead['top'].GetTitle())
-        h_recotop_mass_closest['top'].SetName('closest_' + h_recotop_mass_sublead['top'].GetName())
+        h_recotop_mass_closest['top'].SetTitle(insert_char_into_string(len('DetReco_'), 'closest_', h_recotop_mass_sublead['top'].GetTitle()))
+        h_recotop_mass_closest['top'].SetName(insert_char_into_string(len('DetReco_'), 'closest_', h_recotop_mass_sublead['top'].GetName()))
         for value in h_jet_pt_closest.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
-            new_title = 'closest_' + old_title
-            new_name = 'closest_' + old_name
+            new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
+        
         h_jet_pt_chi = copy.deepcopy(h_jet_pt_sublead)
         h_recotop_mass_chi = copy.deepcopy(h_recotop_mass_sublead)
-        h_recotop_mass_chi['top'].SetTitle('chi_' + h_recotop_mass_sublead['top'].GetTitle())
-        h_recotop_mass_chi['top'].SetName('chi_' + h_recotop_mass_sublead['top'].GetName())
+        h_recotop_mass_chi['top'].SetTitle(insert_char_into_string(len('DetReco_'), 'chimass_', h_recotop_mass_sublead['top'].GetTitle()))
+        h_recotop_mass_chi['top'].SetName(insert_char_into_string(len('DetReco_'), 'chimass_', h_recotop_mass_sublead['top'].GetName()))
         for value in h_jet_pt_chi.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
-            new_title = 'chimass_' + old_title
-            new_name = 'chimass_' + old_name
+            new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
-        h_recotop_mass_sublead['top'].SetTitle('sublead_' + h_recotop_mass_sublead['top'].GetTitle())
-        h_recotop_mass_sublead['top'].SetName('sublead_' + h_recotop_mass_sublead['top'].GetName())
+
+        h_jet_pt_best = copy.deepcopy(h_jet_pt_sublead)
+        h_recotop_mass_best = copy.deepcopy(h_recotop_mass_sublead)
+        h_recotop_mass_best['top'].SetTitle(insert_char_into_string(len('DetReco_'), 'best_', h_recotop_mass_sublead['top'].GetTitle()))
+        h_recotop_mass_best['top'].SetName(insert_char_into_string(len('DetReco_'), 'best_', h_recotop_mass_sublead['top'].GetName()))
+        for value in h_jet_pt_best.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        
+        h_recotop_mass_sublead['top'].SetTitle(insert_char_into_string(len('DetReco_'), 'sublead_', h_recotop_mass_sublead['top'].GetTitle()))
+        h_recotop_mass_sublead['top'].SetName(insert_char_into_string(len('DetReco_'), 'sublead_', h_recotop_mass_sublead['top'].GetName()))
         for value in h_jet_pt_sublead.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
-            new_title = 'sublead_' + old_title
-            new_name = 'sublead_' + old_name
+            new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
+        
+        h_recotop_vs_Wprime_mass_sublead = {'nobtag': ROOT.TH1F("DetReco_recotop_Wprime_massesratio", "DetReco_recotop_Wprime_massesratio;recotop mass/W' mass;Countings", 22, 0, 1.1)
+        }
+        if BTagging:
+            h_recotop_vs_Wprime_mass_sublead.update({
+                'tnobtag_w0btag': ROOT.TH1F("DetReco_tnobtag_w0btag_recotop_Wprime_massesratio", "DetReco_tnobtag_w0btag_recotop_Wprime_massesratio;(nobtagged top, 0btag W') recotop mass/W' mass;Countings", 22, 0, 1.1),
+            })
+        h_recotop_vs_Wprime_mass_closest = copy.deepcopy(h_recotop_vs_Wprime_mass_sublead)
+        for value in h_recotop_vs_Wprime_mass_closest.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        
+        h_recotop_vs_Wprime_mass_best = copy.deepcopy(h_recotop_vs_Wprime_mass_sublead)
+        for value in h_recotop_vs_Wprime_mass_best.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        
+        h_recotop_vs_Wprime_mass_chi = copy.deepcopy(h_recotop_vs_Wprime_mass_sublead)
+        for value in h_recotop_vs_Wprime_mass_chi.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        
+        for value in h_recotop_vs_Wprime_mass_sublead.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        
+        h_criteria_quant = {'deltaR': ROOT.TH1F("DetReco_closest_deltaR", "DetReco_closest_deltaR;#DeltaR;Countings", 60, 0, 3),
+                            'chimass': ROOT.TH1F("DetReco_chimass_chisquare", "DetReco_chimass_chisquare;#Chi^{2};Countings", 100, 0, 25),
+                            'sublead': ROOT.TH1F("DetReco_sublead_subleading_pt", "DetReco_sublead_subleading_pt;subleading jet pt [GeV];Countings", nbins, nmin, nmax)
+            }
+        if MCReco:
+            h_notmatch_criteria_quant = copy.deepcopy(h_criteria_quant)
+            h_match_criteria_quant = copy.deepcopy(h_criteria_quant)
+            for value in h_notmatch_criteria_quant.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'notMCmatch_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'notMCmatch_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_match_criteria_quant.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'MCmatch_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'MCmatch_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+        h_2dcriteria = {'dR_vs_chi': ROOT.TH2F("DetReco_deltaR_vs_chi", "DetReco_deltaR_vs_chi;#Chi^{2};#DeltaR", 100, 0, 25, 60, 0, 3),
+                        'dR_vs_sublead': ROOT.TH2F("DetReco_deltaR_vs_sublead_pt", "DetReco_deltaR_vs_sublead_pt;subleading jet pt [GeV];#DeltaR", nbins, nmin, nmax, 60, 0, 3),
+                        'chi_vs_sublead': ROOT.TH2F("DetReco_chi_vs_sublead_pt", "DetReco_chi_vs_sublead_pt;subleading jet pt [GeV];#Chi^{2}", nbins, nmin, nmax, 100, 0, 25),
+        }
+        
+        if MCReco:
+            h_notmatch_2dcriteria = copy.deepcopy(h_2dcriteria)
+            h_match_2dcriteria = copy.deepcopy(h_2dcriteria)
+            for value in h_notmatch_2dcriteria.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'notMCmatch_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'notMCmatch_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_match_2dcriteria.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'MCmatch_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'MCmatch_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
             
         h_Wprime_mass_sublead = {'all': ROOT.TH1F("DetReco_Lep_Wprime_mass", "DetReco_Lep_Wprime_mass;DetReco Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
                          'ele_all': ROOT.TH1F("DetReco_Ele_Wprime_mass", "DetReco_Ele_Wprime_mass;DetReco Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
@@ -400,23 +549,33 @@ for inpfile in inpfiles:
         for value in h_Wprime_mass_closest.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
-            new_title = 'closest_' + old_title
-            new_name = 'closest_' + old_name
+            #new_title = 'closest_' + old_title
+            #new_name = 'closest_' + old_name
+            new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        h_Wprime_mass_best = copy.deepcopy(h_Wprime_mass_sublead)
+        for value in h_Wprime_mass_best.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
         h_Wprime_mass_chi = copy.deepcopy(h_Wprime_mass_sublead)
         for value in h_Wprime_mass_chi.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
-            new_title = 'chimass_' + old_title
-            new_name = 'chimass_' + old_name
+            new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
         for value in h_Wprime_mass_sublead.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
-            new_title = 'sublead_' + old_title
-            new_name = 'sublead_' + old_name
+            new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
         '''
@@ -478,13 +637,13 @@ for inpfile in inpfiles:
             })
 
         #histo cut_and_count
-        h_countings = ROOT.TH1F("DetReco_countings", "DetReco_countings", 5, 0, 5)
-        h_eff_benchmark = ROOT.TH1F("DetReco_bmeff", "DetReco_bmeff", 5, 0, 5)
+        h_countings = ROOT.TH1F("DetReco_countings", "DetReco_countings", 9, 0, 9)
+        h_eff_benchmark = ROOT.TH1F("DetReco_bmeff", "DetReco_bmeff", 9, 0, 9)
 
-        for i in range(5):
-            k = i + 1
-            h_eff_benchmark.GetXaxis().SetBinLabel(k, str(naeff[i]))
-            h_countings.GetXaxis().SetBinLabel(k, str(naeff[i]))
+        for k in range(9):
+            t = k + 1
+            h_eff_benchmark.GetXaxis().SetBinLabel(t, str(naeff[k]))
+            h_countings.GetXaxis().SetBinLabel(t, str(naeff[k]))
 
     #preselection
     badflag = 0
@@ -496,6 +655,10 @@ for inpfile in inpfiles:
     MCEvents = 0
     m2bjetev = 0
     nmctruth_ev = 0
+    sublead_ev = 0
+    closest_ev = 0
+    chimass_ev = 0
+    best_ev = 0
     nentries = tree.GetEntries()
     
     if Debug:
@@ -619,7 +782,7 @@ for inpfile in inpfiles:
                         if mclepton.genPartIdx == -1:
                             print 'MCTruth reconstruction not properly working - lepton step'
                             continue
-    
+        
         #print 'HLTriggered'
 
         if MCReco and mctfound:
@@ -632,9 +795,11 @@ for inpfile in inpfiles:
             mctop_p4t = None
             mcpromptbjet_p4 = None
             mctopbjet_p4 = None
+            mctopbjet_p4_pre = None
             mcpromptbjet_p4t = None
             bjetcheck = True
             bjets = bjet_filter(jets)
+            nobjets = nobjet_filter(jets)
 
             mcfattop_p4 = None
             mcfattop_p4t = None
@@ -643,7 +808,6 @@ for inpfile in inpfiles:
             mcpromptfatbjet_p4t = None
 
             if len(bjets)>2:
-                #print 'Warning! More than 2 bjet from MCTruth in ev #%i' %i
                 bjetcheck = False
                 m2bjetev += 1
         
@@ -665,14 +829,14 @@ for inpfile in inpfiles:
             samedR = []
             
             if len(bottjets)>1:
-                for i in reversed(range(len(bottjets))):
-                    for j in range(i):
-                        samedR.append(deltaR(bottjets[i].eta, bottjets[i].phi, bottjets[j].eta, bottjets[j].phi))
+                for k in reversed(range(len(bottjets))):
+                    for j in range(k):
+                        samedR.append(deltaR(bottjets[k].eta, bottjets[k].phi, bottjets[j].eta, bottjets[j].phi))
                         
             if len(abottjets)>1:
-                for i in reversed(range(len(abottjets))):
-                    for j in range(i):
-                        samedR.append(deltaR(abottjets[i].eta, abottjets[i].phi, abottjets[j].eta, abottjets[j].phi))
+                for k in reversed(range(len(abottjets))):
+                    for j in range(k):
+                        samedR.append(deltaR(abottjets[k].eta, abottjets[k].phi, abottjets[j].eta, abottjets[j].phi))
                         
             #AK4 RECO
             for bjet in bjets:
@@ -687,10 +851,13 @@ for inpfile in inpfiles:
                     
                 if bjet.hadronFlavour == 5:
                     if blepflav < 0 and not topgot_ak4:
+                        mctopbjet_p4_pre = copy.deepcopy(bjet_p4)
+                        if deltaR(bjet_p4.Eta(), bjet_p4.Phi(), mclepton_p4.Eta(), mclepton_p4.Phi()) < 0.4:
+                            bjet_p4 -= mclepton_p4
+                        mctopbjet_p4 = bjet_p4
                         mctop_p4 = recotop.top4Momentum(mclepton_p4, bjet_p4, MET['metPx'], MET['metPy'])
                         mclepton_p4t = copy.deepcopy(mclepton_p4)
                         mclepton_p4t.SetPz(0.)
-                        mctopbjet_p4 = bjet_p4
                         bjet_p4t = copy.deepcopy(bjet_p4)
                         bjet_p4t.SetPz(0.)
                         met_p4t = ROOT.TLorentzVector()
@@ -709,7 +876,7 @@ for inpfile in inpfiles:
             if topgot_ak4 and Wpgot_ak4:
                 MCWprime_p4 = mctop_p4 + mcpromptbjet_p4
                 MCWprime_p4t = mctop_p4t + mcpromptbjet_p4t
-                if MCWprime_p4.M() > mass_cut :#True:
+                if mass_cut_inf < mctop_p4.M() < mass_cut :
                     h_mcWprime_mass_unHLT['gen'].Fill(GenWprime_p4.M())
                     h_mcbjet_pt_unHLT['topbjet'].Fill(mctopbjet_p4.Pt())
                     h_mcbjet_pt_unHLT['Wbjet'].Fill(mcpromptbjet_p4.Pt())
@@ -718,6 +885,13 @@ for inpfile in inpfiles:
                     h_mcmet_q_unHLT['Et'].Fill(met.sumEt)
                     h_mcmet_q_unHLT['phi'].Fill(met.phi)
                     if isHLT:
+                        mcdR = deltaR(mctopbjet_p4.Eta(), mctopbjet_p4.Phi(), mclepton_p4.Eta(), mclepton_p4.Phi())
+                        h_mc_criteria_quant['deltaR'].Fill(mcdR)
+                        h_mc_criteria_quant['chimass'].Fill(Chi_TopMass(mctop_p4.M()))
+                        h_mc_criteria_quant['sublead'].Fill(mctopbjet_p4.Pt())
+                        h_mc_2dcriteria['dR_vs_chi'].Fill(Chi_TopMass(mctop_p4.M()), mcdR)
+                        h_mc_2dcriteria['dR_vs_sublead'].Fill(mcpromptbjet_p4.Pt(), mcdR)
+                        h_mc_2dcriteria['chi_vs_sublead'].Fill(mcpromptbjet_p4.Pt(), Chi_TopMass(mctop_p4.M()))
                         h_mcWprime_mass['gen'].Fill(GenWprime_p4.M())
                         h_mcbjet_pt['topbjet'].Fill(mctopbjet_p4.Pt())
                         h_mcbjet_pt['Wbjet'].Fill(mcpromptbjet_p4.Pt())
@@ -757,6 +931,7 @@ for inpfile in inpfiles:
                         h_mclepton_pt_unHLT['muon'].Fill(mclepton.pt)
 
                     if isHLT:
+                        h_mcrecotop_vs_mcWprime_mass.Fill(mctop_p4.M()/MCWprime_p4.M())
                         h_mcWprime_mass['all'].Fill(MCWprime_p4.M())
                         h_mcWprime_tmass['all'].Fill(MCWprime_p4t.M())
                         if isEle:
@@ -892,34 +1067,41 @@ for inpfile in inpfiles:
 
         isJetSel = True
         closest_promptjet = None
+        closest_jet_p4 = None
+        closest_jet_p4_pre = None
         chi_promptjet = None
+        chi_jet_p4 = None
+        chi_jet_p4_pre = None
         sublead_promptjet = highptjets[0]
+        sublead_jet_p4 = None
+        sublead_jet_p4_pre = None
+        best_promptjet = None
+        best_jet_p4 = None
         DeltaR_nujet = 100.
         DeltaR_Idx = 0
         tm_chi = 1000.
         tm_Idx = 0
         mtop_p4 = None
-        for i in range(len(goodjets)):
+        for k in range(len(goodjets)):
             '''
-            if goodjets[i].pt == promptjet.pt:
-                continue
-            
-            else:
-            '''
-            dPhi = deltaPhi(goodjets[i].phi, met.phi)
-            if dPhi < DeltaR_nujet:
+            if abs(dPhi) < DeltaR_nujet:
                 DeltaR_nujet = dPhi
-                DeltaR_Idx = i
-
-            mtop_p4 = recotop.top4Momentum(sellepton.p4(), goodjets[i].p4(), MET['metPx'], MET['metPy'])
+                DeltaR_Idx = k
+            '''
+            mtop_p4 = recotop.top4Momentum(sellepton.p4(), goodjets[k].p4(), MET['metPx'], MET['metPy'])
             chi = Chi_TopMass(mtop_p4.M())
             if chi < tm_chi:
                 tm_chi = chi
-                tm_Idx = i
+                tm_Idx = k
             
         #jet closest to MET p4
-        closest_jet_p4 = goodjets[DeltaR_Idx].p4()
-        if DeltaR_Idx == 0:
+        closest_jet, detrecodR = closest(sellepton, goodjets)
+        closest_jet_p4_pre = closest_jet.p4()
+        if deltaR(closest_jet.eta, closest_jet.phi, sellepton.eta, sellepton.phi) < 0.4:
+            closest_jet_p4 = closest_jet_p4_pre - sellepton.p4()
+        else:
+            closest_jet_p4 = closest_jet_p4_pre
+        if closest_jet == goodjets[0]:
             if len(highptjets) > 1:
                 closest_promptjet = highptjets[1]
             else:
@@ -929,7 +1111,11 @@ for inpfile in inpfiles:
         closest_recotop_p4 = recotop.top4Momentum(sellepton.p4(), closest_jet_p4, MET['metPx'], MET['metPy'])
             
         #jet reconstructing top with the least chi2 p4
-        chi_jet_p4 = goodjets[tm_Idx].p4()
+        chi_jet_p4_pre = goodjets[tm_Idx].p4()
+        if deltaR(chi_jet_p4_pre.Eta(), chi_jet_p4_pre.Phi(), sellepton.eta, sellepton.phi) < 0.4:
+            chi_jet_p4 = chi_jet_p4_pre - sellepton.p4()
+        else:
+            chi_jet_p4 = chi_jet_p4_pre
         if tm_Idx == 0:
             if len(highptjets) > 1:
                 chi_promptjet = highptjets[1]
@@ -940,61 +1126,151 @@ for inpfile in inpfiles:
         chi_recotop_p4 = recotop.top4Momentum(sellepton.p4(), chi_jet_p4, MET['metPx'], MET['metPy'])
         
         #subleading jet reconstruction
-        sublead_jet_p4 = None
         if len(highptjets) > 1:
-            sublead_jet_p4 = highptjets[1].p4()
+            sublead_jet_p4_pre = highptjets[1].p4()
         else:
-            sublead_jet_p4 = goodjets[1].p4()
+            sublead_jet_p4_pre = goodjets[1].p4()
+        if deltaR(sublead_jet_p4_pre.Eta(), sublead_jet_p4_pre.Phi(), sellepton.eta, sellepton.phi) < 0.4:
+            sublead_jet_p4 = sublead_jet_p4_pre - sellepton.p4()
+        else:
+            sublead_jet_p4 = sublead_jet_p4_pre
         sublead_recotop_p4 = recotop.top4Momentum(sellepton.p4(), sublead_jet_p4, MET['metPx'], MET['metPy'])
+
+        #best jet reconstruction
+        BestFound = False
+        if sublead_jet_p4_pre == closest_jet_p4_pre:
+            best_jet_p4 = sublead_jet_p4
+            best_promptjet = sublead_promptjet
+            BestFound = True
+        elif sublead_jet_p4_pre == chi_jet_p4_pre:
+            best_jet_p4 = sublead_jet_p4
+            best_promptjet = sublead_promptjet
+            BestFound = True
+        elif chi_jet_p4_pre == closest_jet_p4_pre:
+            best_jet_p4 = chi_jet_p4
+            best_promptjet = chi_promptjet
+            BestFound = True
+
+        if not BestFound:
+            if mass_cut_inf < sublead_recotop_p4.M() < mass_cut:
+                best_jet_p4 = sublead_jet_p4
+                best_promptjet = sublead_promptjet
+                BestFound = True
+            elif mass_cut_inf < chi_recotop_p4.M() < mass_cut:
+                best_jet_p4 = chi_jet_p4
+                best_promptjet = chi_promptjet
+                BestFound = True
+            elif mass_cut_inf < closest_recotop_p4.M() < mass_cut:
+                best_jet_p4 = closest_jet_p4
+                best_promptjet = closest_promptjet
+                BestFound = True
+
+        if BestFound:
+            best_recotop_p4 = recotop.top4Momentum(sellepton.p4(), best_jet_p4, MET['metPx'], MET['metPy'])
 
         #Wprime reco
         closest_Wprime_p4 = closest_recotop_p4 + closest_promptjet.p4()
         chi_Wprime_p4 = chi_recotop_p4 + chi_promptjet.p4()
         sublead_Wprime_p4 = sublead_recotop_p4 + sublead_promptjet.p4()
+        best_Wprime_p4 = None
+        if BestFound:
+            best_Wprime_p4 = best_recotop_p4 + best_promptjet.p4()
 
-        if sublead_Wprime_p4.M() > mass_cut:
+        h_criteria_quant['sublead'].Fill(sublead_jet_p4.Pt())
+        h_criteria_quant['deltaR'].Fill(detrecodR)
+        h_criteria_quant['chimass'].Fill(tm_chi)
+        h_2dcriteria['dR_vs_sublead'].Fill(sublead_jet_p4.Pt(), detrecodR)
+        h_2dcriteria['dR_vs_chi'].Fill(tm_chi, detrecodR)
+        h_2dcriteria['chi_vs_sublead'].Fill(sublead_jet_p4.Pt(), tm_chi)
+
+        if MCReco:
+            if not sublead_jet_p4_pre == mctopbjet_p4_pre:
+                h_notmatch_criteria_quant['sublead'].Fill(sublead_jet_p4.Pt())
+                if not closest_jet_p4_pre == mctopbjet_p4_pre:
+                    h_notmatch_2dcriteria['dR_vs_sublead'].Fill(sublead_jet_p4.Pt(), detrecodR)
+            else:
+                h_match_criteria_quant['sublead'].Fill(sublead_jet_p4.Pt())
+                if closest_jet_p4_pre == mctopbjet_p4_pre:
+                    h_match_2dcriteria['dR_vs_sublead'].Fill(sublead_jet_p4.Pt(), detrecodR)
+
+            if not closest_jet_p4_pre == mctopbjet_p4_pre:
+                h_notmatch_criteria_quant['deltaR'].Fill(detrecodR)
+                if not chi_jet_p4_pre == mctopbjet_p4_pre:
+                    h_notmatch_2dcriteria['dR_vs_chi'].Fill(tm_chi, detrecodR)
+            else:
+                h_match_criteria_quant['deltaR'].Fill(detrecodR)
+                if chi_jet_p4_pre == mctopbjet_p4_pre:
+                    h_match_2dcriteria['dR_vs_chi'].Fill(tm_chi, detrecodR)
+                    
+            if not chi_jet_p4_pre == mctopbjet_p4_pre:
+                h_notmatch_criteria_quant['chimass'].Fill(tm_chi)
+                if not sublead_jet_p4_pre == mctopbjet_p4_pre:
+                    h_notmatch_2dcriteria['chi_vs_sublead'].Fill(sublead_jet_p4.Pt(), tm_chi)
+            else:
+                h_match_criteria_quant['chimass'].Fill(tm_chi)
+                if sublead_jet_p4_pre == mctopbjet_p4_pre:
+                    h_match_2dcriteria['chi_vs_sublead'].Fill(sublead_jet_p4.Pt(), tm_chi)
+
+        if mass_cut_inf < sublead_recotop_p4.M() < mass_cut:#sublead_Wprime_p4.M() > mass_cut:
+            sublead_ev += 1
+            h_recotop_vs_Wprime_mass_sublead['nobtag'].Fill(sublead_recotop_p4.M()/sublead_Wprime_p4.M())
             h_jet_pt_sublead['topbjet'].Fill(sublead_jet_p4.Pt())
             h_jet_pt_sublead['Wbjet'].Fill(sublead_promptjet.pt)
             h_jet_pt_sublead['top'].Fill(sublead_recotop_p4.Pt())
             h_recotop_mass_sublead['top'].Fill(sublead_recotop_p4.M())
-        if closest_Wprime_p4.M() > mass_cut:
+            h_Wprime_mass_sublead['all'].Fill(sublead_Wprime_p4.M())
+            if isEle:
+                h_Wprime_mass_sublead['ele_all'].Fill(sublead_Wprime_p4.M())
+            if isMu:
+                h_Wprime_mass_sublead['mu_all'].Fill(sublead_Wprime_p4.M())
+
+        if mass_cut_inf < closest_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
+            closest_ev += 1
+            h_recotop_vs_Wprime_mass_closest['nobtag'].Fill(closest_recotop_p4.M()/closest_Wprime_p4.M())
             h_jet_pt_closest['topbjet'].Fill(closest_jet_p4.Pt())
             h_jet_pt_closest['Wbjet'].Fill(closest_promptjet.pt)
             h_jet_pt_closest['top'].Fill(closest_recotop_p4.Pt())
             h_recotop_mass_closest['top'].Fill(closest_recotop_p4.M())
-        if chi_Wprime_p4.M() > mass_cut:
+            h_Wprime_mass_closest['all'].Fill(closest_Wprime_p4.M())
+            if isEle:
+                h_Wprime_mass_closest['ele_all'].Fill(closest_Wprime_p4.M())
+            if isMu:
+                h_Wprime_mass_closest['mu_all'].Fill(closest_Wprime_p4.M())
+
+        if mass_cut_inf < chi_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
+            chimass_ev += 1
+            h_recotop_vs_Wprime_mass_chi['nobtag'].Fill(chi_recotop_p4.M()/chi_Wprime_p4.M())
             h_jet_pt_chi['topbjet'].Fill(chi_jet_p4.Pt())
             h_jet_pt_chi['Wbjet'].Fill(chi_promptjet.pt)
             h_jet_pt_chi['top'].Fill(chi_recotop_p4.Pt())
             h_recotop_mass_chi['top'].Fill(chi_recotop_p4.M())
-        
-        if sublead_Wprime_p4.M() > mass_cut or closest_Wprime_p4.M() > mass_cut or chi_Wprime_p4.M() > mass_cut:
+            h_Wprime_mass_chi['all'].Fill(chi_Wprime_p4.M())
+            if isEle:
+                h_Wprime_mass_chi['ele_all'].Fill(chi_Wprime_p4.M())
+            if isMu:
+                h_Wprime_mass_chi['mu_all'].Fill(chi_Wprime_p4.M())
+
+        if BestFound and mass_cut_inf < best_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
+            best_ev += 1
+            h_recotop_vs_Wprime_mass_best['nobtag'].Fill(best_recotop_p4.M()/best_Wprime_p4.M())
+            h_jet_pt_best['topbjet'].Fill(best_jet_p4.Pt())
+            h_jet_pt_best['Wbjet'].Fill(best_promptjet.pt)
+            h_jet_pt_best['top'].Fill(best_recotop_p4.Pt())
+            h_recotop_mass_best['top'].Fill(best_recotop_p4.M())
+            h_Wprime_mass_best['all'].Fill(best_Wprime_p4.M())
+            if isEle:
+                h_Wprime_mass_best['ele_all'].Fill(best_Wprime_p4.M())
+            if isMu:
+                h_Wprime_mass_best['mu_all'].Fill(best_Wprime_p4.M())
+
+        if mass_cut_inf < sublead_recotop_p4.M() < mass_cut or mass_cut_inf < closest_recotop_p4.M() < mass_cut or mass_cut_inf < chi_recotop_p4.M() < mass_cut:
             h_met_q['pt'].Fill(met.pt)
             h_met_q['Et'].Fill(met.sumEt)
             h_met_q['phi'].Fill(met.phi)
-        
-        if sublead_Wprime_p4.M() > mass_cut:
-            h_Wprime_mass_sublead['all'].Fill(sublead_Wprime_p4.M())
-        if closest_Wprime_p4.M() > mass_cut:
-            h_Wprime_mass_closest['all'].Fill(closest_Wprime_p4.M())
-        if chi_Wprime_p4.M() > mass_cut:
-            h_Wprime_mass_chi['all'].Fill(chi_Wprime_p4.M())
-        if isEle:
-            if sublead_Wprime_p4.M() > mass_cut:
-                h_Wprime_mass_sublead['ele_all'].Fill(sublead_Wprime_p4.M())
-            if closest_Wprime_p4.M() > mass_cut:
-                h_Wprime_mass_closest['ele_all'].Fill(closest_Wprime_p4.M())
-            if chi_Wprime_p4.M() > mass_cut:
-                h_Wprime_mass_chi['ele_all'].Fill(chi_Wprime_p4.M())
-            h_lepton_pt['electron'].Fill(sellepton.pt)
-        elif isMu:
-            if sublead_Wprime_p4.M() > mass_cut:
-                h_Wprime_mass_sublead['mu_all'].Fill(sublead_Wprime_p4.M())
-            if closest_Wprime_p4.M() > mass_cut:
-                h_Wprime_mass_closest['mu_all'].Fill(closest_Wprime_p4.M())
-            if chi_Wprime_p4.M() > mass_cut:
-                h_Wprime_mass_chi['mu_all'].Fill(chi_Wprime_p4.M())
-            h_lepton_pt['muon'].Fill(sellepton.pt)
+            if isEle:
+                h_lepton_pt['electron'].Fill(sellepton.pt)
+            elif isMu:
+                h_lepton_pt['muon'].Fill(sellepton.pt)
         
         #cut_and_count efficiences
         '''
@@ -1004,6 +1280,8 @@ for inpfile in inpfiles:
         h_efficiencies.Fill(isLepSel, 4)
         h_efficiencies.Fill(isJetSel, 5)
         '''
+        if (i%100) == 0:
+            print i
     #efficiencies histos
     if HLTrig and MCReco:
         heff_mclepton_pt = {'electron': ROOT.TEfficiency(h_mclepton_pt['electron'], h_mclepton_pt_unHLT['electron']),
@@ -1144,9 +1422,13 @@ for inpfile in inpfiles:
         h_countings.SetBinContent(3, HLTriggered)
         h_countings.SetBinContent(4, LepTriggered)
         h_countings.SetBinContent(5, JetTriggered)
+        h_countings.SetBinContent(6, sublead_ev)
+        h_countings.SetBinContent(7, chimass_ev)
+        h_countings.SetBinContent(8, closest_ev)
+        h_countings.SetBinContent(9, best_ev)
 
-        for i in range(5):
-            k = i + 1
+        for k in range(9):
+            k = k + 1
             h_eff_benchmark.SetBinContent(k, nentries)
 
         h_efficiencies = ROOT.TEfficiency(h_countings, h_eff_benchmark)
@@ -1154,7 +1436,8 @@ for inpfile in inpfiles:
         h_efficiencies.SetTitle("DetReco_efficiencies;;#varepsilon")
         h_efficiencies.SetLineColor(ROOT.kBlue)
         h_efficiencies_gae = GetTGAEfromTE(h_efficiencies, naeff)
-        
+
+    '''    
     if DetReco and MCReco and HLTrig:
         hmceff_Wprime_mass_sublead = {'all': ROOT.TEfficiency(),
                                       'ele_all': ROOT.TEfficiency(),
@@ -1235,50 +1518,51 @@ for inpfile in inpfiles:
             tgae = GetTGAEfromTE(value)
             new_item = {key: tgae}
             hmceff_Wprime_mass_chi_gae.update(new_item)
+    '''
 
     #effhistos printing and saving
     if HLTrig and MCReco:
         for value in heff_mclepton_pt.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
+            print_hist(inpfile, subfold, value, 'AP')
+            save_hist(inpfile, subfold, value, 'AP')
         for value in heff_mcbjet_pt.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
+            print_hist(inpfile, subfold, value, 'AP')
+            save_hist(inpfile, subfold, value, 'AP')
         for value in heff_mcWprime_mass.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
+            print_hist(inpfile, subfold, value, 'AP')
+            save_hist(inpfile, subfold, value, 'AP')
         for value in heff_mcWprime_tmass.values():
-            print_hist(inpfile, value, 'AP')
-            save_hist(inpfile, value, 'AP')
+            print_hist(inpfile, subfold, value, 'AP')
+            save_hist(inpfile, subfold, value, 'AP')
 
         if LepHLTrig:
             for value in heff_lep_mclepton_pt.values():
-                print_hist(inpfile, value, 'AP')
-                save_hist(inpfile, value, 'AP')
+                print_hist(inpfile, subfold, value, 'AP')
+                save_hist(inpfile, subfold, value, 'AP')
             for value in heff_lep_mcbjet_pt.values():
-                print_hist(inpfile, value, 'AP')
-                save_hist(inpfile, value, 'AP')
+                print_hist(inpfile, subfold, value, 'AP')
+                save_hist(inpfile, subfold, value, 'AP')
             for value in heff_lep_mcWprime_mass.values():
-                print_hist(inpfile, value, 'AP')
-                save_hist(inpfile, value, 'AP')
+                print_hist(inpfile, subfold, value, 'AP')
+                save_hist(inpfile, subfold, value, 'AP')
             for value in heff_lep_mcWprime_tmass.values():
-                print_hist(inpfile, value, 'AP')
-                save_hist(inpfile, value, 'AP')
+                print_hist(inpfile, subfold, value, 'AP')
+                save_hist(inpfile, subfold, value, 'AP')
         
         if HadHLTrig:
             for value in heff_had_mclepton_pt.values():
-                print_hist(inpfile, value, 'AP')
-                save_hist(inpfile, value, 'AP')
+                print_hist(inpfile, subfold, value, 'AP')
+                save_hist(inpfile, subfold, value, 'AP')
             for value in heff_had_mcbjet_pt.values():
-                print_hist(inpfile, value, 'AP')
-                save_hist(inpfile, value, 'AP')
+                print_hist(inpfile, subfold, value, 'AP')
+                save_hist(inpfile, subfold, value, 'AP')
             for value in heff_had_mcWprime_mass.values():
-                print_hist(inpfile, value, 'AP')
-                save_hist(inpfile, value, 'AP')
+                print_hist(inpfile, subfold, value, 'AP')
+                save_hist(inpfile, subfold, value, 'AP')
             for value in heff_had_mcWprime_tmass.values():
-                print_hist(inpfile, value, 'AP')
-                save_hist(inpfile, value, 'AP')
-        
+                print_hist(inpfile, subfold, value, 'AP')
+                save_hist(inpfile, subfold, value, 'AP')
+        '''
         if DetReco:
             for value in hmceff_Wprime_mass_sublead_gae.values():
                print_hist(inpfile, value)
@@ -1289,121 +1573,166 @@ for inpfile in inpfiles:
             for value in hmceff_Wprime_mass_chi_gae.values():
                print_hist(inpfile, value)
                save_hist(inpfile, value)
-            
+         '''   
     #histo printing and saving
     if MCReco:
         for value in h_mclepton_pt_unHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_mcbjet_pt_unHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_mcWprime_mass_unHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_mcWprime_tmass_unHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_mcmet_q_unHLT.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
 
         if HLTrig:
+            for value in h_mc_criteria_quant.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_mc_2dcriteria.values():
+                print_hist(inpfile, subfold, value, "COLZ")
+                save_hist(inpfile, subfold, value, "COLZ")
             for value in h_mclepton_pt.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcbjet_pt.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcWprime_mass.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcWprime_tmass.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcmet_q.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
 
-            print_hist(inpfile, h_mcrecotop_mass['top'], "HIST0")
-            save_hist(inpfile, h_mcrecotop_mass['top'], "HIST0")
+            print_hist(inpfile, subfold, h_mcrecotop_mass['top'], "HIST0")
+            save_hist(inpfile, subfold, h_mcrecotop_mass['top'], "HIST0")
         
         if LepHLTrig:
             for value in h_mclepton_pt_lepHLT.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcbjet_pt_lepHLT.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcWprime_mass_lepHLT.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcWprime_tmass_lepHLT.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcmet_q_lepHLT.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
 
         if HadHLTrig:
             for value in h_mclepton_pt_hadHLT.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcbjet_pt_hadHLT.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcWprime_mass_hadHLT.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcWprime_tmass_hadHLT.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcmet_q_hadHLT.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
 
         if AK8Reco:
             for value in h_mcfatlepton_pt.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcfatbjet_pt.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcfatWprime_mass.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcfatWprime_tmass.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_fatmet_q.values():
-                print_hist(inpfile, value)
-                save_hist(inpfile, value)
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
                 
-        print_hist(inpfile, h_sameflav_bjet_deltaR)
-        save_hist(inpfile, h_sameflav_bjet_deltaR)
-    
+        print_hist(inpfile, subfold, h_sameflav_bjet_deltaR)
+        save_hist(inpfile, subfold, h_sameflav_bjet_deltaR)
+        print_hist(inpfile, subfold, h_mcrecotop_vs_mcWprime_mass)
+        save_hist(inpfile, subfold, h_mcrecotop_vs_mcWprime_mass)
     if DetReco:
+        for value in h_recotop_vs_Wprime_mass_sublead.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_recotop_vs_Wprime_mass_closest.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_recotop_vs_Wprime_mass_chi.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_recotop_vs_Wprime_mass_best.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_criteria_quant.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_2dcriteria.values():
+            print_hist(inpfile, subfold, value, "COLZ")
+            save_hist(inpfile, subfold, value, "COLZ")
         for value in h_lepton_pt.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_jet_pt_sublead.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_jet_pt_closest.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_jet_pt_chi.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_jet_pt_best.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_Wprime_mass_sublead.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_Wprime_mass_closest.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_Wprime_mass_best.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_Wprime_mass_chi.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        if MCReco:
+            for value in h_notmatch_criteria_quant.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_match_criteria_quant.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_notmatch_2dcriteria.values():
+                print_hist(inpfile, subfold, value, "COLZ")
+                save_hist(inpfile, subfold, value, "COLZ")
+            for value in h_match_2dcriteria.values():
+                print_hist(inpfile, subfold, value, "COLZ")
+                save_hist(inpfile, subfold, value, "COLZ")
+
         '''
         for value in h_Wprime_tmass_sublead.values():
             print_hist(inpfile, value)
@@ -1416,22 +1745,22 @@ for inpfile in inpfiles:
             save_hist(inpfile, value)
         '''
         for value in h_met_q.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
 
-        print_hist(inpfile, h_countings, "HIST0")
-        save_hist(inpfile, h_countings, "HIST0")
-        print_hist(inpfile, h_efficiencies_gae, "AP")
-        save_hist(inpfile, h_efficiencies_gae, "AP")
+        print_hist(inpfile, subfold, h_countings, "HIST0")
+        save_hist(inpfile, subfold, h_countings, "HIST0")
+        print_hist(inpfile, subfold, h_efficiencies_gae, "AP")
+        save_hist(inpfile, subfold, h_efficiencies_gae, "AP")
 
-        print_hist(inpfile, h_recotop_mass_sublead['top'], "HIST0")
-        save_hist(inpfile, h_recotop_mass_sublead['top'], "HIST0")
-        print_hist(inpfile, h_recotop_mass_closest['top'], "HIST0")
-        save_hist(inpfile, h_recotop_mass_closest['top'], "HIST0")
-        print_hist(inpfile, h_recotop_mass_chi['top'], "HIST0")
-        save_hist(inpfile, h_recotop_mass_chi['top'], "HIST0")
-
-
+        print_hist(inpfile, subfold, h_recotop_mass_sublead['top'], "HIST0")
+        save_hist(inpfile, subfold, h_recotop_mass_sublead['top'], "HIST0")
+        print_hist(inpfile, subfold, h_recotop_mass_closest['top'], "HIST0")
+        save_hist(inpfile, subfold, h_recotop_mass_closest['top'], "HIST0")
+        print_hist(inpfile, subfold, h_recotop_mass_chi['top'], "HIST0")
+        save_hist(inpfile, subfold, h_recotop_mass_chi['top'], "HIST0")
+        print_hist(inpfile, subfold, h_recotop_mass_best['top'], "HIST0")
+        save_hist(inpfile, subfold, h_recotop_mass_best['top'], "HIST0")
     
     print 'Total events: %d   ||   Bad MET flag events %d   ||   Bad events %d   ||   MC Events %d    ||   HLTriggered %d   ||   LepTriggered %d   ||   JetTriggered %d   ||' %(tree.GetEntries(), badflag, badevt, MCEvents, HLTriggered, LepTriggered, JetTriggered)
 
