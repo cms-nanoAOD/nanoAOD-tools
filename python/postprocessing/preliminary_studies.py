@@ -6,14 +6,14 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import *
 
 inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/" 
-inpfiles = [#'Wprime_4000_RH'
+inpfiles = ['Wprime_4000_RH'
             #,"TT_Mtt-700to1000"
             #,'TT_Mtt-1000toInf_2016_1'
             #,"WJets"
             #,'QCD_Pt_600to800_1'
-            "SingleMuon_Run2016G_1"
+            #"SingleMuon_Run2016G_1"
             #,'Wprimetotb_M2000W20_RH_MG_8'
-            #,'Wprimetotb_M4000W400_RH_MG_1'
+            ,'Wprimetotb_M4000W400_RH_MG_1'
     ,'TT_Incl_2016_1'
         ]
 
@@ -28,16 +28,16 @@ def pass_MET(flag): #returns the True if the event pass the MET Filter requirime
     return flag.goodVertices and flag.globalSuperTightHalo2016Filter and flag.HBHENoiseFilter and flag.HBHENoiseIsoFilter and flag.EcalDeadCellTriggerPrimitiveFilter and flag.BadPFMuonFilter
 
 def get_Mu(muons): #returns a collection of muons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.tightId and abs(x.eta) < 2.4, muons))
+    return list(filter(lambda x : x.tightId and abs(x.eta) < 2.4 and x.miniPFRelIso_all < 0.1, muons))#
 
 def get_LooseMu(muons): #returns a collection of muons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.looseId and not x.tightId and x.pt > 35 and abs(x.eta) < 2.4, muons))
+    return list(filter(lambda x : x.looseId and not x.tightId and x.pt > 35 and x.miniPFRelIso_all < 0.4 and abs(x.eta) < 2.4, muons)) #
 
 def get_Ele(electrons): #returns a collection of electrons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.mvaFall17V2noIso_WP90 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))
+    return list(filter(lambda x : x.mvaFall17V2noIso_WP90 and x.miniPFRelIso_all < 0.1 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))#
 
 def get_LooseEle(electrons): #returns a collection of electrons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.mvaFall17V2noIso_WPL and not x.mvaFall17V2noIso_WP90 and x.pt > 35 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))
+    return list(filter(lambda x : x.mvaFall17V2noIso_WPL and not x.mvaFall17V2noIso_WP90 and x.miniPFRelIso_all < 0.4 and x.pt > 35 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))
 
 def get_Jet(jets, pt): #returns a collection of jets that pass the selection performed by the filter function
     return list(filter(lambda x : x.jetId >= 2 and abs(x.eta) < 2.4 and x.pt > pt, jets))
@@ -128,6 +128,40 @@ def save_hist(infile, hist, option = "HIST"):
      hist.Write()
      fout.Close()
 
+def miniisoscan(isMu,threshold, lepton):
+    for lepton in leptons:
+        if(isMC and (lepton.genPartFlav == 1 or lepton.genPartFlav == 15)):
+            totalMClep += 1.
+            if (lepton.miniPFRelIso_all < threshold):
+                if (lepton.pt > 50):
+                    lepmatch_iso0p1_pt_50 += 1.
+                if (lepton.pt > 75):
+                    lepmatch_iso0p1_pt_75 += 1.
+                if (lepton.pt > 100):
+                    lepmatch_iso0p1_pt_100 += 1.
+                if (lepton.pt > 125):
+                    lepmatch_iso0p1_pt_125 += 1.
+        if not(isMC and (lepton.genPartFlav == 1 or lepton.genPartFlav == 15)):
+            totalnoMClep += 1.
+            if (lepton.miniPFRelIso_all < threshold):
+                if (lepton.pt > 50):
+                    lepnomatch_iso0p1_pt_50 += 1.
+                if (lepton.pt > 75):
+                    lepnomatch_iso0p1_pt_75 += 1.
+                if (lepton.pt > 100):
+                    lepnomatch_iso0p1_pt_100 += 1.
+                if (lepton.pt > 125):
+                    lepnomatch_iso0p1_pt_125 += 1.
+    return totalMClep,lepmatch_iso0p1_pt_50,lepmatch_iso0p1_pt_75,lepmatch_iso0p1_pt_100,lepmatch_iso0p1_pt_125,totalnoMClep,lepnomatch_iso0p1_pt_50,lepnomatch_iso0p1_pt_75,lepnomatch_iso0p1_pt_100,lepnomatch_iso0p1_pt_125
+
+# b-tag working points: mistagging efficiency tight = 0.1%, medium 1% and loose = 10% 
+deepFlv_T = 0.7264 
+deepFlv_M = 0.2770 
+deepFlv_L = 0.0494 
+deepCSV_T = 0.7527 
+deepCSV_M = 0.4184 
+deepCSV_L = 0.1241 
+
 for inpfile in inpfiles:
     infile = ROOT.TFile.Open(inputpath + inpfile + ".root")
     tree = InputTree(infile.Events)
@@ -189,6 +223,21 @@ for inpfile in inpfiles:
     h_miniiso_electron_nomatched = ROOT.TH1F("h_electron_miniiso_nomatched", "Electron_miniiso_wrong; miniiso; Events/bin", 100, 0., 1.)
     h_miniiso_pt_electron_matched = ROOT.TH2F("h_electron_miniiso_pt_matched", "Electron_miniiso_pt_right; miniiso; Electron pt [GeV]", 100, 0., .4, 200, 0, 1000)
     h_miniiso_pt_electron_nomatched = ROOT.TH2F("h_electron_miniiso_pt_nomatched", "Electron_miniiso_pt_wrong; miniiso; Electron pt [GeV]", 100, 0., .4, 200, 0, 1000)
+    #histos jets
+    h_btag_den = ROOT.TH1F("btag_den", "b tagging efficiency", nbins, edges)
+    h_mistag_den = ROOT.TH1F("mistag_den", "mis-tagging efficiency", nbins, edges)
+    h_btag_DeepCSV_T_num = ROOT.TH1F("btag_DeepCSV_T_num", "b tagging efficiency", nbins, edges)
+    h_btag_DeepFlv_T_num = ROOT.TH1F("btag_DeepFlv_T_num", "b tagging efficiency", nbins, edges)
+    h_mistag_DeepCSV_T_num = ROOT.TH1F("mistag_DeepCSV_T_num", "b tagging efficiency", nbins, edges)
+    h_mistag_DeepFlv_T_num = ROOT.TH1F("mistag_DeepFlv_T_num", "b tagging efficiency", nbins, edges)
+    h_btag_DeepCSV_M_num = ROOT.TH1F("btag_DeepCSV_M_num", "b tagging efficiency", nbins, edges)
+    h_btag_DeepFlv_M_num = ROOT.TH1F("btag_DeepFlv_M_num", "b tagging efficiency", nbins, edges)
+    h_mistag_DeepCSV_M_num = ROOT.TH1F("mistag_DeepCSV_M_num", "b tagging efficiency", nbins, edges)
+    h_mistag_DeepFlv_M_num = ROOT.TH1F("mistag_DeepFlv_M_num", "b tagging efficiency", nbins, edges)
+    h_btag_DeepCSV_L_num = ROOT.TH1F("btag_DeepCSV_L_num", "b tagging efficiency", nbins, edges)
+    h_btag_DeepFlv_L_num = ROOT.TH1F("btag_DeepFlv_L_num", "b tagging efficiency", nbins, edges)
+    h_mistag_DeepCSV_L_num = ROOT.TH1F("mistag_DeepCSV_L_num", "b tagging efficiency", nbins, edges)
+    h_mistag_DeepFlv_L_num = ROOT.TH1F("mistag_DeepFlv_L_num", "b tagging efficiency", nbins, edges)
 
     badflag = 0 
     badevt = 0
@@ -238,8 +287,19 @@ for inpfile in inpfiles:
     good_ele_ptrel_drmin = 0.
 
     # bool flags
-    miniisoscan = False
+    dominiisoscan = False
     trigger = True
+
+    if not (dominiisoscan):
+        totalMCmu = 1.
+        totalMCele = 1.
+        totalnoMCmu = 1.
+        totalnoMCele = 1.
+        total_mu_ptrel_drmin = 1.
+        good_mu_ptrel_drmin = 1.
+        total_ele_ptrel_drmin = 1.
+        good_ele_ptrel_drmin = 1.
+
 
     for i in xrange(0,tree.GetEntries()):
     #for i in xrange(0,20):
@@ -282,55 +342,19 @@ for inpfile in inpfiles:
             badevt += 1
             continue
         HT = get_HT(jets)
+
         if isMu:
+            if(dominiisoscan):
+                totalMCmu,mumatch_iso0p1_pt_50,mumatch_iso0p1_pt_75,mumatch_iso0p1_pt_100,mumatch_iso0p1_pt_125,totalnoMCmu,munomatch_iso0p1_pt_50,munomatch_iso0p1_pt_75,munomatch_iso0p1_pt_100,munomatch_iso0p1_pt_125 = miniisoscan(isMu,0.1,muons)
+                totalMCmu,mumatch_iso0p2_pt_50,mumatch_iso0p2_pt_75,mumatch_iso0p2_pt_100,mumatch_iso0p2_pt_125,totalnoMCmu,munomatch_iso0p2_pt_50,munomatch_iso0p2_pt_75,munomatch_iso0p2_pt_100,munomatch_iso0p2_pt_125 = miniisoscan(isMu,0.2,muons)
             for muon in muons:
-                if(isMC and (muon.genPartFlav == 1 or muon.genPartFlav == 15)):
-                    totalMCmu += 1.
+                if(muon.genPartFlav == 1 or muon.genPartFlav == 15):
                     h_miniiso_muon_matched.Fill(muon.miniPFRelIso_all)
                     h_miniiso_pt_muon_matched.Fill(muon.miniPFRelIso_all, muon.pt)
-                    if (muon.miniPFRelIso_all < 0.1 and miniisoscan):
-                        if (muon.pt > 50):
-                            mumatch_iso0p1_pt_50 += 1.
-                        if (muon.pt > 75):
-                            mumatch_iso0p1_pt_75 += 1.
-                        if (muon.pt > 100):
-                            mumatch_iso0p1_pt_100 += 1.
-                        if (muon.pt > 125):
-                            mumatch_iso0p1_pt_125 += 1.
-                    if (muon.miniPFRelIso_all < 0.2 and miniisoscan):
-                        if (muon.pt > 50):
-                            mumatch_iso0p2_pt_50 += 1.
-                        if (muon.pt > 75):
-                            mumatch_iso0p2_pt_75 += 1.
-                        if (muon.pt > 100):
-                            mumatch_iso0p2_pt_100 += 1.
-                        if (muon.pt > 125):
-                            mumatch_iso0p2_pt_125 += 1.
+                    h_muonpt.Fill(muon.pt)
                 if not(isMC and (muon.genPartFlav == 1 or muon.genPartFlav == 15)):
-                    totalnoMCmu += 1.
                     h_miniiso_muon_nomatched.Fill(muon.miniPFRelIso_all)
                     h_miniiso_pt_muon_nomatched.Fill(muon.miniPFRelIso_all, muon.pt)
-                    if (muon.miniPFRelIso_all < 0.1 and miniisoscan):
-                        if (muon.pt > 50):
-                            munomatch_iso0p1_pt_50 += 1.
-                        if (muon.pt > 75):
-                            munomatch_iso0p1_pt_75 += 1.
-                        if (muon.pt > 100):
-                            munomatch_iso0p1_pt_100 += 1.
-                        if (muon.pt > 125):
-                            munomatch_iso0p1_pt_125 += 1.
-                    if (muon.miniPFRelIso_all < 0.2 and miniisoscan):
-                        if (muon.pt > 50):
-                            munomatch_iso0p2_pt_50 += 1.
-                        if (muon.pt > 75):
-                            munomatch_iso0p2_pt_75 += 1.
-                        if (muon.pt > 100):
-                            munomatch_iso0p2_pt_100 += 1.
-                        if (muon.pt > 125):
-                            munomatch_iso0p2_pt_125 += 1.
-                if (isMC and (muon.genPartFlav == 1 or muon.genPartFlav == 15)):
-                    h_muonpt.Fill(muon.pt)
-
                 if(muon.tightId==1 and muon.pt>50):
                     goodjets = get_Jet(jets, 15)
                     if len(goodjets)>0:
@@ -371,51 +395,17 @@ for inpfile in inpfiles:
 
         #h_muonpt.Draw()
         if isEle:
+            if(dominiisoscan):
+                totalMCele,elematch_iso0p1_pt_50,elematch_iso0p1_pt_75,elematch_iso0p1_pt_100,elematch_iso0p1_pt_125,totalnoMCele,elenomatch_iso0p1_pt_50,elenomatch_iso0p1_pt_75,elenomatch_iso0p1_pt_100,elenomatch_iso0p1_pt_125 = miniisoscan(isEle,0.1,electrons)
+                totalMCele,elematch_iso0p2_pt_50,elematch_iso0p2_pt_75,elematch_iso0p2_pt_100,elematch_iso0p2_pt_125,totalnoMCele,elenomatch_iso0p2_pt_50,elenomatch_iso0p2_pt_75,elenomatch_iso0p2_pt_100,elenomatch_iso0p2_pt_125 = miniisoscan(isEle,0.2,electrons)
             for electron in electrons:
-                if(isMC and (electron.genPartFlav == 1 or electron.genPartFlav == 15)):
-                    totalMCele += 1.
+                if(electron.genPartFlav == 1 or electron.genPartFlav == 15):
                     h_miniiso_electron_matched.Fill(electron.miniPFRelIso_all)
                     h_miniiso_pt_electron_matched.Fill(electron.miniPFRelIso_all, electron.pt)
-                    if (electron.miniPFRelIso_all < 0.1 and miniisoscan):
-                        if (electron.pt > 50):
-                            elematch_iso0p1_pt_50 += 1.
-                        if (electron.pt > 75):
-                            elematch_iso0p1_pt_75 += 1.
-                        if (electron.pt > 100):
-                            elematch_iso0p1_pt_100 += 1.
-                        if (electron.pt > 125):
-                            elematch_iso0p1_pt_125 += 1.
-                    if (electron.miniPFRelIso_all < 0.2 and miniisoscan):
-                        if (electron.pt > 50):
-                            elematch_iso0p2_pt_50 += 1.
-                        if (electron.pt > 75):
-                            elematch_iso0p2_pt_75 += 1.
-                        if (electron.pt > 100):
-                            elematch_iso0p2_pt_100 += 1.
-                        if (electron.pt > 125):
-                            elematch_iso0p2_pt_125 += 1.
+                    h_electronpt.Fill(electron.pt)
                 if not(isMC and (electron.genPartFlav == 1 or electron.genPartFlav == 15)):
-                    totalnoMCele += 1.
                     h_miniiso_electron_nomatched.Fill(electron.miniPFRelIso_all)
                     h_miniiso_pt_electron_nomatched.Fill(electron.miniPFRelIso_all, electron.pt)
-                    if (electron.miniPFRelIso_all < 0.1 and miniisoscan):
-                        if (electron.pt > 50):
-                            elenomatch_iso0p1_pt_50 += 1.
-                        if (electron.pt > 75):
-                            elenomatch_iso0p1_pt_75 += 1.
-                        if (electron.pt > 100):
-                            elenomatch_iso0p1_pt_100 += 1.
-                        if (electron.pt > 125):
-                            elenomatch_iso0p1_pt_125 += 1.
-                    if (electron.miniPFRelIso_all < 0.2 and miniisoscan):
-                        if (electron.pt > 50):
-                            elenomatch_iso0p2_pt_50 += 1.
-                        if (electron.pt > 75):
-                            elenomatch_iso0p2_pt_75 += 1.
-                        if (electron.pt > 100):
-                            elenomatch_iso0p2_pt_100 += 1.
-                        if (electron.pt > 125):
-                            elenomatch_iso0p2_pt_125 += 1.
                 if(electron.mvaFall17V2noIso_WP90 and electron.pt > 50):
                     goodjets = get_Jet(jets, 15)
                     if len(goodjets)>0:
@@ -441,7 +431,40 @@ for inpfile in inpfiles:
                 h_HLT_HT.Fill(HT)
             if(HLT.PFHT800 or HLT.PFHT900 or HLT.Ele115_CaloIdVT_GsfTrkIdT):
                 h_HLT_HT_electron.Fill(HT)
+
+        if isMu or isEle:
+            for jet in jets:
+                if(abs(jet.partonFlavour) == 5 and jet.hadronFlavour == 5):
+                    h_btag_den.Fill(jet.pt)
+                if(not abs(jet.partonFlavour) == 5 and not jet.hadronFlavour == 5):
+                    h_mistag_den.Fill(jet.pt)
+                if(jet.btagDeepB > deepCSV_L and abs(jet.partonFlavour) == 5 and jet.hadronFlavour == 5):
+                    h_btag_DeepCSV_L_num.Fill(jet.pt)
+                if(jet.btagDeepB > deepCSV_L and not abs(jet.partonFlavour) == 5 and not jet.hadronFlavour == 5):
+                    h_mistag_DeepCSV_L_num.Fill(jet.pt)
+                if(jet.btagDeepFlavB > deepFlv_L and abs(jet.partonFlavour) == 5 and jet.hadronFlavour == 5):
+                    h_btag_DeepFlv_L_num.Fill(jet.pt)
+                if(jet.btagDeepFlavB > deepFlv_L and not abs(jet.partonFlavour) == 5 and not jet.hadronFlavour == 5):
+                    h_mistag_DeepFlv_L_num.Fill(jet.pt)
+                if(jet.btagDeepB > deepCSV_M and abs(jet.partonFlavour) == 5 and jet.hadronFlavour == 5):
+                    h_btag_DeepCSV_M_num.Fill(jet.pt)
+                if(jet.btagDeepB > deepCSV_M and not abs(jet.partonFlavour) == 5 and not jet.hadronFlavour == 5):
+                    h_mistag_DeepCSV_M_num.Fill(jet.pt)
+                if(jet.btagDeepFlavB > deepFlv_M and abs(jet.partonFlavour) == 5 and jet.hadronFlavour == 5):
+                    h_btag_DeepFlv_M_num.Fill(jet.pt)
+                if(jet.btagDeepFlavB > deepFlv_M and not abs(jet.partonFlavour) == 5 and not jet.hadronFlavour == 5):
+                    h_mistag_DeepFlv_M_num.Fill(jet.pt)
+                if(jet.btagDeepB > deepCSV_T and abs(jet.partonFlavour) == 5 and jet.hadronFlavour == 5):
+                    h_btag_DeepCSV_T_num.Fill(jet.pt)
+                if(jet.btagDeepB > deepCSV_T and not abs(jet.partonFlavour) == 5 and not jet.hadronFlavour == 5):
+                    h_mistag_DeepCSV_T_num.Fill(jet.pt)
+                if(jet.btagDeepFlavB > deepFlv_T and abs(jet.partonFlavour) == 5 and jet.hadronFlavour == 5):
+                    h_btag_DeepFlv_T_num.Fill(jet.pt)
+                if(jet.btagDeepFlavB > deepFlv_T and not abs(jet.partonFlavour) == 5 and not jet.hadronFlavour == 5):
+                    h_mistag_DeepFlv_T_num.Fill(jet.pt)
+                
     print 'Total events: %d     ||     Bad MET flag events %d     ||     Bad events %d' %(tree.GetEntries(), badflag, badevt)
+    print totalMCmu
     if (miniisoscan):
         print  ' %.2f percent and %.2f percent and %.2f percent and  %.2f ' %(mumatch_iso0p1_pt_50/totalMCmu*100, mumatch_iso0p1_pt_75/totalMCmu*100, mumatch_iso0p1_pt_100/totalMCmu*100, mumatch_iso0p1_pt_125/totalMCmu*100),
         print ' and %.2f percent and %.2f percent and %.2f percent and %.2f \\\\' %(mumatch_iso0p2_pt_50/totalMCmu*100, mumatch_iso0p2_pt_75/totalMCmu*100, mumatch_iso0p2_pt_100/totalMCmu*100, mumatch_iso0p2_pt_125/totalMCmu*100)
@@ -571,4 +594,70 @@ for inpfile in inpfiles:
     save_hist(inpfile, h_HLT_Muon_pt_dilepEff)
     print_hist(inpfile, h_HLT_Muon_pt_dilepEff, 'AP')
 
+    h_btag_DeepCSV_L_Eff = ROOT.TEfficiency(h_btag_DeepCSV_L_num, h_btag_den)
+    h_btag_DeepCSV_L_Eff.SetTitle("btag_DeepCSV_L_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_btag_DeepCSV_L_Eff.SetLineColor(ROOT.kBlue)
+    save_hist(inpfile, h_btag_DeepCSV_L_Eff)
+    print_hist(inpfile, h_btag_DeepCSV_L_Eff, 'AP')
+    h_btag_DeepCSV_M_Eff = ROOT.TEfficiency(h_btag_DeepCSV_M_num, h_btag_den)
+    h_btag_DeepCSV_M_Eff.SetTitle("btag_DeepCSV_M_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_btag_DeepCSV_M_Eff.SetLineColor(ROOT.kGreen)
+    save_hist(inpfile, h_btag_DeepCSV_M_Eff)
+    print_hist(inpfile, h_btag_DeepCSV_M_Eff, 'AP')
+    h_btag_DeepCSV_T_Eff = ROOT.TEfficiency(h_btag_DeepCSV_T_num, h_btag_den)
+    h_btag_DeepCSV_T_Eff.SetTitle("btag_DeepCSV_T_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_btag_DeepCSV_T_Eff.SetLineColor(ROOT.kRed)
+    save_hist(inpfile, h_btag_DeepCSV_T_Eff)
+    print_hist(inpfile, h_btag_DeepCSV_T_Eff, 'AP')
+    print_hist(inpfile, [h_btag_DeepCSV_T_Eff, h_btag_DeepCSV_M_Eff, h_btag_DeepCSV_L_Eff], 'AP')
 
+    h_mistag_DeepCSV_L_Eff = ROOT.TEfficiency(h_mistag_DeepCSV_L_num, h_mistag_den)
+    h_mistag_DeepCSV_L_Eff.SetTitle("mistag_DeepCSV_L_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_mistag_DeepCSV_L_Eff.SetLineColor(ROOT.kBlue)
+    save_hist(inpfile, h_mistag_DeepCSV_L_Eff)
+    print_hist(inpfile, h_mistag_DeepCSV_L_Eff, 'AP')
+    h_mistag_DeepCSV_M_Eff = ROOT.TEfficiency(h_mistag_DeepCSV_M_num, h_mistag_den)
+    h_mistag_DeepCSV_M_Eff.SetTitle("mistag_DeepCSV_M_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_mistag_DeepCSV_M_Eff.SetLineColor(ROOT.kGreen)
+    save_hist(inpfile, h_mistag_DeepCSV_M_Eff)
+    print_hist(inpfile, h_mistag_DeepCSV_M_Eff, 'AP')
+    h_mistag_DeepCSV_T_Eff = ROOT.TEfficiency(h_mistag_DeepCSV_T_num, h_mistag_den)
+    h_mistag_DeepCSV_T_Eff.SetTitle("mistag_DeepCSV_T_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_mistag_DeepCSV_T_Eff.SetLineColor(ROOT.kRed)
+    save_hist(inpfile, h_mistag_DeepCSV_T_Eff)
+    print_hist(inpfile, h_mistag_DeepCSV_T_Eff, 'AP')
+    print_hist(inpfile, [h_mistag_DeepCSV_T_Eff, h_mistag_DeepCSV_M_Eff, h_mistag_DeepCSV_L_Eff], 'AP')
+
+    h_btag_DeepFlv_L_Eff = ROOT.TEfficiency(h_btag_DeepFlv_L_num, h_btag_den)
+    h_btag_DeepFlv_L_Eff.SetTitle("btag_DeepFlv_L_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_btag_DeepFlv_L_Eff.SetLineColor(ROOT.kBlue)
+    save_hist(inpfile, h_btag_DeepFlv_L_Eff)
+    print_hist(inpfile, h_btag_DeepFlv_L_Eff, 'AP')
+    h_btag_DeepFlv_M_Eff = ROOT.TEfficiency(h_btag_DeepFlv_M_num, h_btag_den)
+    h_btag_DeepFlv_M_Eff.SetTitle("btag_DeepFlv_M_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_btag_DeepFlv_M_Eff.SetLineColor(ROOT.kGreen)
+    save_hist(inpfile, h_btag_DeepFlv_M_Eff)
+    print_hist(inpfile, h_btag_DeepFlv_M_Eff, 'AP')
+    h_btag_DeepFlv_T_Eff = ROOT.TEfficiency(h_btag_DeepFlv_T_num, h_btag_den)
+    h_btag_DeepFlv_T_Eff.SetTitle("btag_DeepFlv_T_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_btag_DeepFlv_T_Eff.SetLineColor(ROOT.kRed)
+    save_hist(inpfile, h_btag_DeepFlv_T_Eff)
+    print_hist(inpfile, h_btag_DeepFlv_T_Eff, 'AP')
+    print_hist(inpfile, [h_btag_DeepFlv_T_Eff, h_btag_DeepFlv_M_Eff, h_btag_DeepFlv_L_Eff], 'AP')
+
+    h_mistag_DeepFlv_L_Eff = ROOT.TEfficiency(h_mistag_DeepFlv_L_num, h_mistag_den)
+    h_mistag_DeepFlv_L_Eff.SetTitle("mistag_DeepFlv_L_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_mistag_DeepFlv_L_Eff.SetLineColor(ROOT.kBlue)
+    save_hist(inpfile, h_mistag_DeepFlv_L_Eff)
+    print_hist(inpfile, h_mistag_DeepFlv_L_Eff, 'AP')
+    h_mistag_DeepFlv_M_Eff = ROOT.TEfficiency(h_mistag_DeepFlv_M_num, h_mistag_den)
+    h_mistag_DeepFlv_M_Eff.SetTitle("mistag_DeepFlv_M_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_mistag_DeepFlv_M_Eff.SetLineColor(ROOT.kGreen)
+    save_hist(inpfile, h_mistag_DeepFlv_M_Eff)
+    print_hist(inpfile, h_mistag_DeepFlv_M_Eff, 'AP')
+    h_mistag_DeepFlv_T_Eff = ROOT.TEfficiency(h_mistag_DeepFlv_T_num, h_mistag_den)
+    h_mistag_DeepFlv_T_Eff.SetTitle("mistag_DeepFlv_T_Efficiency; b-jet pt [GeV]; #epsilon")
+    h_mistag_DeepFlv_T_Eff.SetLineColor(ROOT.kRed)
+    save_hist(inpfile, h_mistag_DeepFlv_T_Eff)
+    print_hist(inpfile, h_mistag_DeepFlv_T_Eff, 'AP')
+    print_hist(inpfile, [h_mistag_DeepFlv_T_Eff, h_mistag_DeepFlv_M_Eff, h_mistag_DeepFlv_L_Eff], 'AP')
