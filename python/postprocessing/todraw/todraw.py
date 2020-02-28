@@ -19,13 +19,13 @@ inpfiles = ["TT_Mtt-700to1000",
             #"WJets"                                                              
             #,"QCD_Pt_600to800_1"                                                                            
             #,"SingleMuon_Run2016G_1"                                                                         
-            "Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8",
-            "Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
-            "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
+            #"Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8",
+            #"Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
+            #"Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
 ]
 
-ptcuts = ["250",
-          #"350"
+ptcuts = [#"250",
+          "350"
 ]
 
 ptlabels = {'250': 'pt > 250 GeV',
@@ -38,6 +38,10 @@ masscuts = {'Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8': "5200",
             'TT_Mtt-700to1000': "1200"
 }
 
+topmasscuts = {'400': 'm_{top} < 400 GeV',
+               '500': 'm_{top} < 500 GeV',
+}
+
 masslabels = {'Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') > 5.2 TeV",
               'Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') > 3.9 TeV",
               'Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') > 2.06 TeV",
@@ -46,26 +50,43 @@ masslabels = {'Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') >
 
 plotstodraw = []
 
-plotnt = [#"sublead_DetReco_Wjet_pt",
+plotnt = ["MC_recotop_Wprime_massesratio",
+          "DetReco_sublead_recotop_Wprime_massesratio",
+          "DetReco_closest_recotop_Wprime_massesratio",
+          "DetReco_chimass_recotop_Wprime_massesratio",
+          #"DetReco_best_recotop_Wprime_massesratio"
+          #"DetReco_chi_vs_sublead_pt"
+          #"MC_chimass",
+          #"DetReco_chimass_chisquare",
+          #"MC_closest_deltaR",
+          #"DetReco_closest_deltaR",
+          #"DetReco_best_Lep_Wprime_mass",
+          #"DetReco_best_Ele_Wprime_mass",
+          #"MC_subleading_pt",
+          #"DetReco_sublead_subleading_pt",
+          #"sublead_DetReco_Wjet_pt",
           #"closest_DetReco_Wjet_pt",
-          "chimass_DetReco_Wjet_pt",
+          #"chimass_DetReco_Wjet_pt",
           #"sublead_sublead_DetReco_recotop_mass",
           #"closest_DetReco_recotop_mass",
           #"chi_DetReco_recotop_mass",
           #"DetReco_efficiencies",
           #"MCEff_sublead_Lep_Wprime_mass": 'TGraphAsymmErrors',
           #"MC_Lep_Wprime_mass",
-          #"sublead_DetReco_Lep_Wprime_mass",
-          #"closest_DetReco_Lep_Wprime_mass",
-          #"chimass_DetReco_Lep_Wprime_mass",
+          #"DetReco_sublead_Lep_Wprime_mass",
+          #"DetReco_closest_Lep_Wprime_mass",
+          #"DetReco_chimass_Lep_Wprime_mass",
+          #"DetReco_best_Lep_Wprime_mass",   
           #"MC_Ele_Wprime_mass",
-          #"sublead_DetReco_Ele_Wprime_mass",
-          #"closest_DetReco_Ele_Wprime_mass",
-          #"chimass_DetReco_Ele_Wprime_mass",
+          #"DetReco_sublead_Ele_Wprime_mass",
+          #"DetReco_closest_Ele_Wprime_mass",
+          #"DetReco_chimass_Ele_Wprime_mass",
+          #"DetReco_best_Ele_Wprime_mass", 
           #"MC_Mu_Wprime_mass",
-          #"sublead_DetReco_Mu_Wprime_mass",
-          #"closest_DetReco_Mu_Wprime_mass",
-          #"chimass_DetReco_Mu_Wprime_mass",
+          #"DetReco_sublead_Mu_Wprime_mass",
+          #"DetReco_closest_Mu_Wprime_mass",
+          #"DetReco_chimass_Mu_Wprime_mass",
+          #"DetReco_best_Mu_Wprime_mass", 
           #"sublead_DetReco_Wjet_pt": 'TH1F',
           #"closest_DetReco_Wjet_pt": 'TH1F',
           #"chimass_DetReco_Wjet_pt": 'TH1F',
@@ -74,7 +95,8 @@ plotnt = [#"sublead_DetReco_Wjet_pt",
 recocatlabels = ["MC",
                  "sublead",
                  "closest",
-                 "chi"
+                 "chi",
+                 "best"
 ]
 
 samplelabels = {"Wprimetotb_M4000W400_RH": "W'RH m=4TeV w=0.4TeV",
@@ -87,10 +109,14 @@ LogSc=False
 
 isPtCut = True
 isMassCut = False
-SampleLabels = True
-CatLabels = False
+isTopMassCut = False
+SampleLabels = False
+CatLabels = True
 PtLabels = False
 MassLabels = False
+TopMassLabels = False
+Together = True
+toScale = False
 
 for inpfile in inpfiles:
     nfile = None
@@ -101,12 +127,20 @@ for inpfile in inpfiles:
         for key in ptcuts:
             fptcut = nfile + '_lpt' + key
             ftoopen = fptcut + '.root'
-            infiles.append(ftoopen)
+            if Together:
+                infiles.append(ftoopen)
+            print ftoopen
             if isMassCut:
                 for key, value in masscuts.items():
                     if key == inpfile:
                         ftoopen = fptcut + '_mw' + value + '.root'
                         infiles.append(ftoopen)
+            if isTopMassCut:
+                for key, value in topmasscuts.items():
+                    #if ('mt' + str(key)) in inpfile:
+                    ftoopen = fptcut + '_mt' + key + '.root'
+                    print ftoopen
+                    infiles.append(ftoopen)
 
     for infile in infiles:
         plots = []
@@ -135,13 +169,23 @@ for inpfile in inpfiles:
                         new_name = new_name + label
             if PtLabels:
                 for label, string in ptlabels.items():
-                    if ('lpt'+string) in infile:
+                    if ('lpt'+label) in infile:
                         if new_title != "":
                             new_title = new_title + " "
                         if new_name != "":
                             new_name = new_name + "_"
                         new_title = new_title + string
                         new_name = new_name + "pt" + label
+            if TopMassLabels:
+                for label, string in topmasscuts.items():
+                    if ('mt'+label) in infile:
+                        if new_title != "":
+                            new_title = new_title + " "
+                        if new_name != "":
+                            new_name = new_name + "_"
+                        new_title = new_title + string
+                        new_name = new_name + "mt" + label
+            
             if MassLabels:
                 for label, string in masscuts.items():
                     if ('mw' + string) in infile:
@@ -153,12 +197,16 @@ for inpfile in inpfiles:
                         new_name = new_name + "mw" + string
             plot.SetTitle(new_title)
             plot.SetName(new_name)
+            if toScale:
+                entries = 1./plot.GetEntries()
+                plot.Scale(entries)
+                plot.GetYaxis().SetTitle("#varepsilon")
             plotstodraw.append(copy.deepcopy(plot))
 
 print plotstodraw
 
 if isinstance(plotstodraw[0], ROOT.TH1F):
-    print_hist("", plotstodraw, "nostack hist", LogSc)
+    print_hist("", "boh", plotstodraw, "nostack hist", LogSc)
 else:
-    print_hist("", plotstodraw, "AP", LogSc)
+    print_hist("", "boh", plotstodraw, "AP", LogSc)
 
