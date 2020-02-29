@@ -16,7 +16,7 @@ print "Andrea's tools implemented"
 
 
 inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/"
-
+'''
 inpfiles = [#"Wprime_4000_RH"
             #"Wprimetotb_M2000W20_RH_MG_1",
             #"Wprimetotb_M4000W400_RH_MG_1"
@@ -28,22 +28,22 @@ inpfiles = [#"Wprime_4000_RH"
 
 '''
 inputpath = "/eos/home-a/apiccine/private/Wprime_BkgSample/merged/"
-inpfiles = [#"Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8",
+inpfiles = ["Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8",
             "Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
             "Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8"
 ]
-'''
-subfolds = [#"Wp_m4000w400_pt350_mt500",
+
+subfolds = ["Wp_m4000w400_pt350_mt500",
            #"Wp_m4000w400_pt350_mt400",
            #"Wp_m4000w400_pt350",
-           #"Wp_m3000w300_pt350_mt500",
+           "Wp_m3000w300_pt350_mt500",
            #"Wp_m3000w300_pt350_mt400",
            #"Wp_m3000w300_pt350",
-           #"Wp_m2000w20_pt350_mt500",
+           "Wp_m2000w20_pt350_mt500",
            #"Wp_m2000w20_pt350_mt400",
            #"Wp_m2000w20_pt350",
            #"TT_mtt700to1000_pt350_mt500",
-           "TT_mtt700to1000_pt350_mt400",
+           #"TT_mtt700to1000_pt350_mt400",
            #"TT_mtt700to1000_pt350",
            #"TT_mtt700to1000_pt250",
 ]
@@ -129,7 +129,7 @@ BTagging = False
 miniIso_cut = 0.1
 jet_ptcut = 35.
 leadingjet_ptcut = 350.
-mass_cut = 400.
+mass_cut = 500.
 mass_cut_inf = -100.
 
 jetptcut_str = "JetPtCuts" + str(leadingjet_ptcut)
@@ -792,6 +792,8 @@ for i in range(len(inpfiles)):
         #MCtruth event reconstruction
         if MCReco and mclepton is not None:
             mctop_p4 = None
+            IsmcNeg = False
+            #QUI
             mctop_p4t = None
             mcpromptbjet_p4 = None
             mctopbjet_p4 = None
@@ -855,7 +857,9 @@ for i in range(len(inpfiles)):
                         if deltaR(bjet_p4.Eta(), bjet_p4.Phi(), mclepton_p4.Eta(), mclepton_p4.Phi()) < 0.4:
                             bjet_p4 -= mclepton_p4
                         mctopbjet_p4 = bjet_p4
-                        mctop_p4 = recotop.top4Momentum(mclepton_p4, bjet_p4, MET['metPx'], MET['metPy'])
+                        mctop_p4, ismcNeg = recotop.top4Momentum(mclepton_p4, bjet_p4, MET['metPx'], MET['metPy'])
+                        if mctop_p4 is None:
+                            continue
                         mclepton_p4t = copy.deepcopy(mclepton_p4)
                         mclepton_p4t.SetPz(0.)
                         bjet_p4t = copy.deepcopy(bjet_p4)
@@ -992,7 +996,9 @@ for i in range(len(inpfiles)):
                     blepflav = genpart[mclepton.genPartIdx].pdgId*genfatbjet.partonFlavour                    
                     if genfatbjet.hadronFlavour == 5:
                         if blepflav < 0 and not topgot_ak8:
-                            mcfattop_p4 = recotop.top4Momentum(mclepton_p4, fatbjet_p4, MET['metPx'], MET['metPy'])
+                            mcfattop_p4, isfatNeg = recotop.top4Momentum(mclepton_p4, fatbjet_p4, MET['metPx'], MET['metPy'])
+                            if mcfattop_p4 is None:
+                                continue
                             mclepton_p4t = copy.deepcopy(mclepton_p4)
                             mclepton_p4t.SetPz(0.)
                             mctopfatbjet_p4 = fatbjet_p4
@@ -1082,13 +1088,22 @@ for i in range(len(inpfiles)):
         tm_chi = 1000.
         tm_Idx = 0
         mtop_p4 = None
+
+        closestTrig = False
+        chiTrig = False
+        subleadTrig = False
+        bestTrig = False
+
         for k in range(len(goodjets)):
             '''
             if abs(dPhi) < DeltaR_nujet:
                 DeltaR_nujet = dPhi
                 DeltaR_Idx = k
             '''
-            mtop_p4 = recotop.top4Momentum(sellepton.p4(), goodjets[k].p4(), MET['metPx'], MET['metPy'])
+
+            mtop_p4, isdetrecoNeg = recotop.top4Momentum(sellepton.p4(), goodjets[k].p4(), MET['metPx'], MET['metPy'])
+            if mtop_p4 is None:
+                continue
             chi = Chi_TopMass(mtop_p4.M())
             if chi < tm_chi:
                 tm_chi = chi
@@ -1108,7 +1123,7 @@ for i in range(len(inpfiles)):
                 closest_promptjet = goodjets[1]
         else:
             closest_promptjet = highptjets[0]
-        closest_recotop_p4 = recotop.top4Momentum(sellepton.p4(), closest_jet_p4, MET['metPx'], MET['metPy'])
+        closest_recotop_p4, IsNeg_closest = recotop.top4Momentum(sellepton.p4(), closest_jet_p4, MET['metPx'], MET['metPy'])
             
         #jet reconstructing top with the least chi2 p4
         chi_jet_p4_pre = goodjets[tm_Idx].p4()
@@ -1123,7 +1138,7 @@ for i in range(len(inpfiles)):
                 chi_promptjet = goodjets[1]
         else:
             chi_promptjet = highptjets[0]
-        chi_recotop_p4 = recotop.top4Momentum(sellepton.p4(), chi_jet_p4, MET['metPx'], MET['metPy'])
+        chi_recotop_p4, IsNeg_chi = recotop.top4Momentum(sellepton.p4(), chi_jet_p4, MET['metPx'], MET['metPy'])
         
         #subleading jet reconstruction
         if len(highptjets) > 1:
@@ -1134,10 +1149,24 @@ for i in range(len(inpfiles)):
             sublead_jet_p4 = sublead_jet_p4_pre - sellepton.p4()
         else:
             sublead_jet_p4 = sublead_jet_p4_pre
-        sublead_recotop_p4 = recotop.top4Momentum(sellepton.p4(), sublead_jet_p4, MET['metPx'], MET['metPy'])
+        sublead_recotop_p4, IsNeg_sublead = recotop.top4Momentum(sellepton.p4(), sublead_jet_p4, MET['metPx'], MET['metPy'])
+
+        if not (sublead_recotop_p4 is None):
+            if mass_cut_inf < sublead_recotop_p4.M() < mass_cut:#sublead_Wprime_p4.M() > mass_cut:
+                subleadTrig = True
+     
+        if not (closest_recotop_p4 is None):
+            if mass_cut_inf < closest_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
+                closestTrig = True
+
+        if not (chi_recotop_p4 is None):
+            if mass_cut_inf < chi_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
+                chiTrig = True
 
         #best jet reconstruction
         BestFound = False
+        best_recotop_p4 = None
+        IsNeg_best = None
         if sublead_jet_p4_pre == closest_jet_p4_pre:
             best_jet_p4 = sublead_jet_p4
             best_promptjet = sublead_promptjet
@@ -1152,39 +1181,53 @@ for i in range(len(inpfiles)):
             BestFound = True
 
         if not BestFound:
-            if mass_cut_inf < sublead_recotop_p4.M() < mass_cut:
+            if subleadTrig:
                 best_jet_p4 = sublead_jet_p4
                 best_promptjet = sublead_promptjet
                 BestFound = True
-            elif mass_cut_inf < chi_recotop_p4.M() < mass_cut:
+            elif chiTrig:
                 best_jet_p4 = chi_jet_p4
                 best_promptjet = chi_promptjet
                 BestFound = True
-            elif mass_cut_inf < closest_recotop_p4.M() < mass_cut:
+            elif closestTrig:
                 best_jet_p4 = closest_jet_p4
                 best_promptjet = closest_promptjet
                 BestFound = True
 
         if BestFound:
-            best_recotop_p4 = recotop.top4Momentum(sellepton.p4(), best_jet_p4, MET['metPx'], MET['metPy'])
+            best_recotop_p4, IsNeg_best = recotop.top4Momentum(sellepton.p4(), best_jet_p4, MET['metPx'], MET['metPy'])
+
+        if not (best_recotop_p4 is None):
+            if mass_cut_inf < best_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
+                bestTrig = True
 
         #Wprime reco
-        closest_Wprime_p4 = closest_recotop_p4 + closest_promptjet.p4()
-        chi_Wprime_p4 = chi_recotop_p4 + chi_promptjet.p4()
-        sublead_Wprime_p4 = sublead_recotop_p4 + sublead_promptjet.p4()
+        if closestTrig:
+            closest_Wprime_p4 = closest_recotop_p4 + closest_promptjet.p4()
+        if chiTrig:
+            chi_Wprime_p4 = chi_recotop_p4 + chi_promptjet.p4()
+        if subleadTrig:
+            sublead_Wprime_p4 = sublead_recotop_p4 + sublead_promptjet.p4()
         best_Wprime_p4 = None
-        if BestFound:
+        if bestTrig:
             best_Wprime_p4 = best_recotop_p4 + best_promptjet.p4()
 
-        h_criteria_quant['sublead'].Fill(sublead_jet_p4.Pt())
-        h_criteria_quant['deltaR'].Fill(detrecodR)
-        h_criteria_quant['chimass'].Fill(tm_chi)
-        h_2dcriteria['dR_vs_sublead'].Fill(sublead_jet_p4.Pt(), detrecodR)
-        h_2dcriteria['dR_vs_chi'].Fill(tm_chi, detrecodR)
-        h_2dcriteria['chi_vs_sublead'].Fill(sublead_jet_p4.Pt(), tm_chi)
+        if not (sublead_recotop_p4 is None):
+            h_criteria_quant['sublead'].Fill(sublead_jet_p4.Pt())
+            if not (closest_recotop_p4 is None):
+                h_2dcriteria['dR_vs_sublead'].Fill(sublead_jet_p4.Pt(), detrecodR)
+            if not (chi_recotop_p4 is None):
+                h_2dcriteria['chi_vs_sublead'].Fill(sublead_jet_p4.Pt(), tm_chi)
+        if not (closest_recotop_p4 is None):
+            h_criteria_quant['deltaR'].Fill(detrecodR)
+        if not (chi_recotop_p4 is None):
+            h_criteria_quant['chimass'].Fill(tm_chi)
+            if not (closest_recotop_p4 is None):
+                h_2dcriteria['dR_vs_chi'].Fill(tm_chi, detrecodR)
+
 
         if MCReco:
-            if not sublead_jet_p4_pre == mctopbjet_p4_pre:
+            if not sublead_jet_p4_pre == mctopbjet_p4_pre:# and not (sublead_recotop_p4 is None):
                 h_notmatch_criteria_quant['sublead'].Fill(sublead_jet_p4.Pt())
                 if not closest_jet_p4_pre == mctopbjet_p4_pre:
                     h_notmatch_2dcriteria['dR_vs_sublead'].Fill(sublead_jet_p4.Pt(), detrecodR)
@@ -1210,8 +1253,8 @@ for i in range(len(inpfiles)):
                 h_match_criteria_quant['chimass'].Fill(tm_chi)
                 if sublead_jet_p4_pre == mctopbjet_p4_pre:
                     h_match_2dcriteria['chi_vs_sublead'].Fill(sublead_jet_p4.Pt(), tm_chi)
-
-        if mass_cut_inf < sublead_recotop_p4.M() < mass_cut:#sublead_Wprime_p4.M() > mass_cut:
+                
+        if subleadTrig:
             sublead_ev += 1
             h_recotop_vs_Wprime_mass_sublead['nobtag'].Fill(sublead_recotop_p4.M()/sublead_Wprime_p4.M())
             h_jet_pt_sublead['topbjet'].Fill(sublead_jet_p4.Pt())
@@ -1224,7 +1267,7 @@ for i in range(len(inpfiles)):
             if isMu:
                 h_Wprime_mass_sublead['mu_all'].Fill(sublead_Wprime_p4.M())
 
-        if mass_cut_inf < closest_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
+        if closestTrig:
             closest_ev += 1
             h_recotop_vs_Wprime_mass_closest['nobtag'].Fill(closest_recotop_p4.M()/closest_Wprime_p4.M())
             h_jet_pt_closest['topbjet'].Fill(closest_jet_p4.Pt())
@@ -1237,7 +1280,7 @@ for i in range(len(inpfiles)):
             if isMu:
                 h_Wprime_mass_closest['mu_all'].Fill(closest_Wprime_p4.M())
 
-        if mass_cut_inf < chi_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
+        if chiTrig:
             chimass_ev += 1
             h_recotop_vs_Wprime_mass_chi['nobtag'].Fill(chi_recotop_p4.M()/chi_Wprime_p4.M())
             h_jet_pt_chi['topbjet'].Fill(chi_jet_p4.Pt())
@@ -1250,7 +1293,7 @@ for i in range(len(inpfiles)):
             if isMu:
                 h_Wprime_mass_chi['mu_all'].Fill(chi_Wprime_p4.M())
 
-        if BestFound and mass_cut_inf < best_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
+        if bestTrig:
             best_ev += 1
             h_recotop_vs_Wprime_mass_best['nobtag'].Fill(best_recotop_p4.M()/best_Wprime_p4.M())
             h_jet_pt_best['topbjet'].Fill(best_jet_p4.Pt())
@@ -1263,7 +1306,7 @@ for i in range(len(inpfiles)):
             if isMu:
                 h_Wprime_mass_best['mu_all'].Fill(best_Wprime_p4.M())
 
-        if mass_cut_inf < sublead_recotop_p4.M() < mass_cut or mass_cut_inf < closest_recotop_p4.M() < mass_cut or mass_cut_inf < chi_recotop_p4.M() < mass_cut:
+        if subleadTrig or closestTrig or chiTrig:
             h_met_q['pt'].Fill(met.pt)
             h_met_q['Et'].Fill(met.sumEt)
             h_met_q['phi'].Fill(met.phi)
