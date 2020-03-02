@@ -1,5 +1,5 @@
 import ROOT
-import math
+from math import *
 from array import array
 from PhysicsTools.NanoAODTools.postprocessing.tools import *
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object, Event
@@ -84,28 +84,47 @@ def pass_MET(flag): #returns the True if the event pass the MET Filter requirime
     return flag.goodVertices and flag.globalSuperTightHalo2016Filter and flag.HBHENoiseFilter and flag.HBHENoiseIsoFilter and flag.EcalDeadCellTriggerPrimitiveFilter and flag.BadPFMuonFilter
 
 def get_Mu(muons): #returns a collection of muons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.tightId and abs(x.eta) < 2.4, muons))
+    return list(filter(lambda x : x.tightId and abs(x.eta) < 2.4 and x.miniPFRelIso_all < 0.1, muons))
 
 def get_LooseMu(muons): #returns a collection of muons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.looseId and not x.tightId and x.pt > 35 and abs(x.eta) < 2.4, muons))
+    return list(filter(lambda x : x.looseId and not x.tightId and x.pt > 35 and x.miniPFRelIso_all < 0.4 and abs(x.eta) < 2.4, muons))
 
 def get_Ele(electrons): #returns a collection of electrons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.mvaFall17V2noIso_WP90 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))
+    return list(filter(lambda x : x.mvaFall17V2noIso_WP90 and x.miniPFRelIso_all < 0.1 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))
 
 def get_LooseEle(electrons): #returns a collection of electrons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.mvaFall17V2noIso_WPL and not x.mvaFall17V2noIso_WP90 and x.pt > 35 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))
+    return list(filter(lambda x : x.mvaFall17V2noIso_WPL and not x.mvaFall17V2noIso_WP90 and x.miniPFRelIso_all < 0.4 and x.pt > 35 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta)< 2.5)), electrons))
 
 def get_Jet(jets, pt): #returns a collection of jets that pass the selection performed by the filter function
     return list(filter(lambda x : x.jetId >= 2 and abs(x.eta) < 2.4 and x.pt > pt, jets))
 
 def get_HT(jets):
-    HT = ROOT.TLorentzVector()
+    HT = 0.
     for jet in jets:
-        HT += jet.p4()
+        HT += jet.pt
     return HT
+
+def trig_map(HLT):
+    passMu = False
+    passEle = False
+    passHT = False
+    noTrigger = False
+    if(HLT.Mu50 or HLT.TkMu50):
+        passMu = True
+    elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
+        passEle = True  
+    elif(HLT.PFHT800 or HLT.PFHT900):
+        passHT = True
+    else:
+        noTrigger = True
+    return passMu, passEle, passHT, noTrigger
+
+def get_ptrel(lepton, jet):
+    ptrel = ((jet.p4()-lepton.p4()).Vect().Cross(lepton.p4().Vect())).Mag()/(jet.p4().Vect().Mag())
+    return ptrel
  
 def presel(PV, muons, electrons, jets): #returns three booleans: goodEvent assure the presence of at least a good lepton vetoing the presence of additional loose leptons, goodMuEvt is for good muon event, goodEleEvt is for good muon event   
-    isGoodPV = (PV.ndof>4 and abs(PV.z)<20 and math.hypot(PV.x, PV.y)<2) #basic requirements on the PV's goodness
+    isGoodPV = (PV.ndof>4 and abs(PV.z)<20 and hypot(PV.x, PV.y)<2) #basic requirements on the PV's goodness
     VetoMu = get_LooseMu(muons)
     goodMu = get_Mu(muons)
     VetoEle = get_LooseEle(electrons)
@@ -119,7 +138,7 @@ def presel(PV, muons, electrons, jets): #returns three booleans: goodEvent assur
     goodMuEvt = isGoodPV and isMuon
     goodEleEvt = isGoodPV and isElectron
     return goodEvent, goodMuEvt, goodEleEvt
-
+ 
 def print_hist(infile, plotpath, hist, option = "HIST", log = False):
     if not(isinstance(hist, list)):
         c1 = ROOT.TCanvas(infile + "_" + hist.GetName(), "c1", 50,50,700,600)
@@ -132,34 +151,29 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False):
         c1 = ROOT.TCanvas(infile + "_" + hist[0].GetName() + '_comparison', "c1", 50,50,700,600)
         if isinstance(hist[0], ROOT.TGraph) or isinstance(hist[0], ROOT.TGraphAsymmErrors):
             i = 0
-            mg = ROOT.TMultiGraph()
+            mg = ROOT.TMultiGraph('mg', hist[0].GetTitle()+';'+hist[0].GetXaxis().GetTitle()+';'+hist[0].GetYaxis().GetTitle())
             for h in hist:
                 h.SetLineColor(colors[i])
                 mg.Add(h)
                 i += 1
             cap = hist[0].GetXaxis().GetTitle()
             mg.Draw(option)
-            mg.GetXaxis().SetTitle(hist[0].GetXaxis().GetTitle())
-            mg.GetYaxis().SetTitle(hist[0].GetYaxis().GetTitle())
-
             Low = hist[0].GetXaxis().GetBinLowEdge(1)
             Nbin = hist[0].GetXaxis().GetNbins()
             High = hist[0].GetXaxis().GetBinUpEdge(Nbin)
             mg.GetXaxis().Set(Nbin, Low, High)
-            
             for i in range(hist[0].GetXaxis().GetNbins()):
                 u = i + 1
                 mg.GetXaxis().SetBinLabel(u, hist[0].GetXaxis().GetBinLabel(u))
         elif isinstance(hist[0], ROOT.TEfficiency):
             i = 0
-            mg = ROOT.TMultiGraph()
+            mg = ROOT.TMultiGraph('mg', hist[0].GetTitle()+';'+hist[0].GetPaintedGraph().GetXaxis().GetTitle()+';'+hist[0].GetPaintedGraph().GetYaxis().GetTitle())
             for h in hist:
                 h.SetLineColor(colors[i])
                 mg.Add(h.CreateGraph())
                 i += 1
+            mg.SetMaximum(1.1)
             mg.Draw(option)
-            mg.GetXaxis().SetTitle(hist[0].GetXaxis().GetTitle())
-            mg.GetYaxis().SetTitle(hist[0].GetYaxis().GetTitle())
         elif isinstance(hist[0], ROOT.TH1F):
             mg = ROOT.THStack()
             i = 0
@@ -186,3 +200,29 @@ def save_hist(infile, plotpath, hist, option = "HIST"):
      fout.cd()
      hist.Write()
      fout.Close()
+
+def miniisoscan(isMu,threshold, lepton):
+    for lepton in leptons:
+        if(isMC and (lepton.genPartFlav == 1 or lepton.genPartFlav == 15)):
+            totalMClep += 1.
+            if (lepton.miniPFRelIso_all < threshold):
+                if (lepton.pt > 50):
+                    lepmatch_iso0p1_pt_50 += 1.
+                if (lepton.pt > 75):
+                    lepmatch_iso0p1_pt_75 += 1.
+                if (lepton.pt > 100):
+                    lepmatch_iso0p1_pt_100 += 1.
+                if (lepton.pt > 125):
+                    lepmatch_iso0p1_pt_125 += 1.
+        if not(isMC and (lepton.genPartFlav == 1 or lepton.genPartFlav == 15)):
+            totalnoMClep += 1.
+            if (lepton.miniPFRelIso_all < threshold):
+                if (lepton.pt > 50):
+                    lepnomatch_iso0p1_pt_50 += 1.
+                if (lepton.pt > 75):
+                    lepnomatch_iso0p1_pt_75 += 1.
+                if (lepton.pt > 100):
+                    lepnomatch_iso0p1_pt_100 += 1.
+                if (lepton.pt > 125):
+                    lepnomatch_iso0p1_pt_125 += 1.
+    return totalMClep,lepmatch_iso0p1_pt_50,lepmatch_iso0p1_pt_75,lepmatch_iso0p1_pt_100,lepmatch_iso0p1_pt_125,totalnoMClep,lepnomatch_iso0p1_pt_50,lepnomatch_iso0p1_pt_75,lepnomatch_iso0p1_pt_100,lepnomatch_iso0p1_pt_125

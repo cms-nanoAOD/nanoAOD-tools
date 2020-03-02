@@ -14,7 +14,7 @@ inpfiles = ['Wprime_4000_RH'
             #"SingleMuon_Run2016G_1"
             #,'Wprimetotb_M2000W20_RH_MG_8'
             ,'Wprimetotb_M4000W400_RH_MG_1'
-    ,'TT_Incl_2016_1'
+            ,'TT_Incl_2016_1'
         ]
 
 #ROOT.gROOT.SetStyle('Plain')
@@ -24,135 +24,7 @@ ROOT.gROOT.SetBatch()        # don't pop up canvases
 ROOT.TH1.SetDefaultSumw2()
 #ROOT.TGaxis.SetMaxDigits(3)
 
-def pass_MET(flag): #returns the True if the event pass the MET Filter requiriments otherwise False
-    return flag.goodVertices and flag.globalSuperTightHalo2016Filter and flag.HBHENoiseFilter and flag.HBHENoiseIsoFilter and flag.EcalDeadCellTriggerPrimitiveFilter and flag.BadPFMuonFilter
-
-def get_Mu(muons): #returns a collection of muons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.tightId and abs(x.eta) < 2.4 and x.miniPFRelIso_all < 0.1, muons))#
-
-def get_LooseMu(muons): #returns a collection of muons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.looseId and not x.tightId and x.pt > 35 and x.miniPFRelIso_all < 0.4 and abs(x.eta) < 2.4, muons)) #
-
-def get_Ele(electrons): #returns a collection of electrons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.mvaFall17V2noIso_WP90 and x.miniPFRelIso_all < 0.1 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))#
-
-def get_LooseEle(electrons): #returns a collection of electrons that pass the selection performed by the filter function
-    return list(filter(lambda x : x.mvaFall17V2noIso_WPL and not x.mvaFall17V2noIso_WP90 and x.miniPFRelIso_all < 0.4 and x.pt > 35 and ((abs(x.eta) < 1.4442) or (abs(x.eta) > 1.566 and abs(x.eta) < 2.5)), electrons))
-
-def get_Jet(jets, pt): #returns a collection of jets that pass the selection performed by the filter function
-    return list(filter(lambda x : x.jetId >= 2 and abs(x.eta) < 2.4 and x.pt > pt, jets))
-
-def get_HT(jets):
-    HT = 0.
-    for jet in jets:
-        HT += jet.pt
-    return HT
-
-def trig_map(HLT):
-    passMu = False
-    passEle = False
-    passHT = False
-    noTrigger = False
-    if(HLT.Mu50 or HLT.TkMu50):
-        passMu = True
-    elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
-        passEle = True  
-    elif(HLT.PFHT800 or HLT.PFHT900):
-        passHT = True
-    else:
-        noTrigger = True
-    return passMu, passEle, passHT, noTrigger
-
-def get_ptrel(lepton, jet):
-    #print 'lepton Mag ' + str(lepton.p4().Mag()) + ' jet Mag ' + str(jet.p4().Mag()) + ' jet - lepton Mag ' + str((jet.p4() - lepton.p4()).Mag()) 
-    #ptrel = ((jet.p4()-lepton.p4()).Vect().Cross(lepton.p4().Vect())).Mag()/jet.p4().Vect().Mag()
-    ptrel = ((jet.p4()-lepton.p4()).Vect().Cross(lepton.p4().Vect())).Mag()/(jet.p4().Vect().Mag())
-    return ptrel
- 
-def presel(PV, muons, electrons, jet): #returns three booleans: goodEvent assure the presence of at least a good lepton vetoing the presence of additional loose leptons, goodMuEvt is for good muon event, goodEleEvt is for good muon event   
-    isGoodPV = (PV.ndof>4 and abs(PV.z)<20 and math.hypot(PV.x, PV.y)<2) #basic requirements on the PV's goodness
-    VetoMu = get_LooseMu(muons)
-    goodMu = get_Mu(muons)
-    VetoEle = get_LooseEle(electrons)
-    goodEle = get_Ele(electrons)
-    goodJet = get_Jet(jets, 25)
-
-    isGoodEvent = ((((len(goodMu) >= 1) and (len(goodEle) == 0)) or ((len(goodMu) == 0) and (len(goodEle) >= 1))) and len(VetoMu) == 0 and len(VetoEle) == 0 and len(goodJet) >= 2)
-    isMuon = (len(goodMu) >= 1) and (len(goodEle) == 0) and len(VetoMu) == 0 and len(VetoEle) == 0 and len(goodJet) >= 2
-    isElectron = (len(goodMu) == 0) and (len(goodEle) >= 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and len(goodJet) >= 2
-    goodEvent = isGoodPV and isGoodEvent
-    goodMuEvt = isGoodPV and isMuon
-    goodEleEvt = isGoodPV and isElectron
-    return goodEvent, goodMuEvt, goodEleEvt
-
-def print_hist(infile, hist, option = "HIST", log = 0):
-    plotpath = "./plots/"
-    if not(isinstance(hist, list)):
-        c1 = ROOT.TCanvas(infile + "_" + hist.GetTitle(), "c1", 50,50,700,600)
-        hist.Draw(option)
-        #c1.BuildLegend()
-        if log:
-            if option=='COLZ':
-                c1.SetLogz()
-            else:
-                c1.SetLogy()
-            c1.Update()
-        c1.Print(plotpath + infile + "_" + hist.GetTitle() + ".png")
-        c1.Print(plotpath + infile + "_" + hist.GetTitle() + ".root")
-    else:
-        c1 = ROOT.TCanvas(infile + "_" + hist[0].GetTitle() + '_comparison', "c1", 50,50,700,600)
-        if isinstance(hist[0], ROOT.TGraph):
-            mg = ROOT.TMultiGraph()
-            for h in hist:
-                mg.Add(h)
-            mg.Draw(option)
-        elif isinstance(hist[0], ROOT.TEfficiency):
-            mg = ROOT.TMultiGraph('mg', hist[0].GetTitle()+';'+hist[0].GetPaintedGraph().GetXaxis().GetTitle()+';'+hist[0].GetPaintedGraph().GetYaxis().GetTitle())
-            for h in hist:
-                mg.Add(h.CreateGraph())
-            mg.SetMaximum(1.1)
-            mg.Draw(option)
-        else:
-            for h in hist:
-                h.Draw(option+'SAME')
-        if log:
-            c1.SetLogy()
-            c1.Update()
-        c1.BuildLegend()
-        c1.Print(plotpath + infile + "_" + hist[0].GetTitle() + '_comparison' + ".png")
-        c1.Print(plotpath + infile + "_" + hist[0].GetTitle() + '_comparison' + ".root")
-
-def save_hist(infile, hist, option = "HIST"):
-     fout = ROOT.TFile.Open("./plots/"+ infile +".root", "UPDATE")
-     fout.cd()
-     hist.Write()
-     fout.Close()
-
-def miniisoscan(isMu,threshold, lepton):
-    for lepton in leptons:
-        if(isMC and (lepton.genPartFlav == 1 or lepton.genPartFlav == 15)):
-            totalMClep += 1.
-            if (lepton.miniPFRelIso_all < threshold):
-                if (lepton.pt > 50):
-                    lepmatch_iso0p1_pt_50 += 1.
-                if (lepton.pt > 75):
-                    lepmatch_iso0p1_pt_75 += 1.
-                if (lepton.pt > 100):
-                    lepmatch_iso0p1_pt_100 += 1.
-                if (lepton.pt > 125):
-                    lepmatch_iso0p1_pt_125 += 1.
-        if not(isMC and (lepton.genPartFlav == 1 or lepton.genPartFlav == 15)):
-            totalnoMClep += 1.
-            if (lepton.miniPFRelIso_all < threshold):
-                if (lepton.pt > 50):
-                    lepnomatch_iso0p1_pt_50 += 1.
-                if (lepton.pt > 75):
-                    lepnomatch_iso0p1_pt_75 += 1.
-                if (lepton.pt > 100):
-                    lepnomatch_iso0p1_pt_100 += 1.
-                if (lepton.pt > 125):
-                    lepnomatch_iso0p1_pt_125 += 1.
-    return totalMClep,lepmatch_iso0p1_pt_50,lepmatch_iso0p1_pt_75,lepmatch_iso0p1_pt_100,lepmatch_iso0p1_pt_125,totalnoMClep,lepnomatch_iso0p1_pt_50,lepnomatch_iso0p1_pt_75,lepnomatch_iso0p1_pt_100,lepnomatch_iso0p1_pt_125
+plotpath = './plots/'
 
 # b-tag working points: mistagging efficiency tight = 0.1%, medium 1% and loose = 10% 
 deepFlv_T = 0.7264 
@@ -475,189 +347,189 @@ for inpfile in inpfiles:
         print ' %.2f percent and %.2f percent and %.2f percent and %.2f '  %(elenomatch_iso0p1_pt_50/totalnoMCele*100, elenomatch_iso0p1_pt_75/totalnoMCele*100, elenomatch_iso0p1_pt_100/totalnoMCele*100, elenomatch_iso0p1_pt_125/totalnoMCele*100),
         print ' and %.2f percent and %.2f percent and %.2f percent and %.2f \\\\'  %(elenomatch_iso0p2_pt_50/totalnoMCele*100, elenomatch_iso0p2_pt_75/totalnoMCele*100, elenomatch_iso0p2_pt_100/totalnoMCele*100, elenomatch_iso0p2_pt_125/totalnoMCele*100)
         print '2D cut muon %.2f electron %.2f \\\\'  %(good_mu_ptrel_drmin/total_mu_ptrel_drmin*100, good_ele_ptrel_drmin/total_ele_ptrel_drmin*100)
-    print_hist(inpfile, h_drmin_ptrel_mu, "COLZ",1)
-    print_hist(inpfile, h_drmin_mu)
-    print_hist(inpfile, h_leadingjet_mu)
-    print_hist(inpfile, h_subleadingjet_mu)
-    print_hist(inpfile, h_MET_mu)
-    print_hist(inpfile, h_muonpt)
-    print_hist(inpfile, h_drmin_ptrel_e, "COLZ",1)
-    print_hist(inpfile, h_leadingjet_e)
-    print_hist(inpfile, h_subleadingjet_e)
-    print_hist(inpfile, h_MET_e)
-    print_hist(inpfile, h_electronpt)
-    print_hist(inpfile, h_electroneta)
-    print_hist(inpfile, h_HT)
-    print_hist(inpfile, h_ele_HT_binned)
-    print_hist(inpfile, h_mu_HT_binned)
+    print_hist(inpfile, plotpath, h_drmin_ptrel_mu, "COLZ",1)
+    print_hist(inpfile, plotpath, h_drmin_mu)
+    print_hist(inpfile, plotpath, h_leadingjet_mu)
+    print_hist(inpfile, plotpath, h_subleadingjet_mu)
+    print_hist(inpfile, plotpath, h_MET_mu)
+    print_hist(inpfile, plotpath, h_muonpt)
+    print_hist(inpfile, plotpath, h_drmin_ptrel_e, "COLZ",1)
+    print_hist(inpfile, plotpath, h_leadingjet_e)
+    print_hist(inpfile, plotpath, h_subleadingjet_e)
+    print_hist(inpfile, plotpath, h_MET_e)
+    print_hist(inpfile, plotpath, h_electronpt)
+    print_hist(inpfile, plotpath, h_electroneta)
+    print_hist(inpfile, plotpath, h_HT)
+    print_hist(inpfile, plotpath, h_ele_HT_binned)
+    print_hist(inpfile, plotpath, h_mu_HT_binned)
 
-    save_hist(inpfile, h_drmin_ptrel_mu, "COLZ")
-    save_hist(inpfile, h_drmin_mu)
-    save_hist(inpfile, h_leadingjet_mu)
-    save_hist(inpfile, h_subleadingjet_mu)
-    save_hist(inpfile, h_MET_mu)
-    save_hist(inpfile, h_muonpt)
-    save_hist(inpfile, h_drmin_ptrel_e, "COLZ")
-    save_hist(inpfile, h_leadingjet_e)
-    save_hist(inpfile, h_subleadingjet_e)
-    save_hist(inpfile, h_MET_e)
-    save_hist(inpfile, h_electronpt)
-    save_hist(inpfile, h_electroneta)
-    save_hist(inpfile, h_HT)
-    save_hist(inpfile, h_miniiso_electron_nomatched)
-    save_hist(inpfile, h_miniiso_electron_matched)
+    save_hist(inpfile, plotpath, h_drmin_ptrel_mu, "COLZ")
+    save_hist(inpfile, plotpath, h_drmin_mu)
+    save_hist(inpfile, plotpath, h_leadingjet_mu)
+    save_hist(inpfile, plotpath, h_subleadingjet_mu)
+    save_hist(inpfile, plotpath, h_MET_mu)
+    save_hist(inpfile, plotpath, h_muonpt)
+    save_hist(inpfile, plotpath, h_drmin_ptrel_e, "COLZ")
+    save_hist(inpfile, plotpath, h_leadingjet_e)
+    save_hist(inpfile, plotpath, h_subleadingjet_e)
+    save_hist(inpfile, plotpath, h_MET_e)
+    save_hist(inpfile, plotpath, h_electronpt)
+    save_hist(inpfile, plotpath, h_electroneta)
+    save_hist(inpfile, plotpath, h_HT)
+    save_hist(inpfile, plotpath, h_miniiso_electron_nomatched)
+    save_hist(inpfile, plotpath, h_miniiso_electron_matched)
 
-    save_hist(inpfile, h_miniiso_pt_electron_nomatched, "COLZ")
-    save_hist(inpfile, h_miniiso_pt_electron_matched, "COLZ")
-    print_hist(inpfile, h_miniiso_pt_electron_nomatched, "COLZ", 1)
-    print_hist(inpfile, h_miniiso_pt_electron_matched, "COLZ", 1)
+    save_hist(inpfile, plotpath, h_miniiso_pt_electron_nomatched, "COLZ")
+    save_hist(inpfile, plotpath, h_miniiso_pt_electron_matched, "COLZ")
+    print_hist(inpfile, plotpath, h_miniiso_pt_electron_nomatched, "COLZ", 1)
+    print_hist(inpfile, plotpath, h_miniiso_pt_electron_matched, "COLZ", 1)
 
-    save_hist(inpfile, h_miniiso_pt_muon_nomatched, "COLZ")
-    save_hist(inpfile, h_miniiso_pt_muon_matched, "COLZ")
-    print_hist(inpfile, h_miniiso_pt_muon_nomatched, "COLZ", 1)
-    print_hist(inpfile, h_miniiso_pt_muon_matched, "COLZ", 1)
+    save_hist(inpfile, plotpath, h_miniiso_pt_muon_nomatched, "COLZ")
+    save_hist(inpfile, plotpath, h_miniiso_pt_muon_matched, "COLZ")
+    print_hist(inpfile, plotpath, h_miniiso_pt_muon_nomatched, "COLZ", 1)
+    print_hist(inpfile, plotpath, h_miniiso_pt_muon_matched, "COLZ", 1)
 
     h_miniiso_electron_nomatched.SetLineColor(ROOT.kRed)
-    print_hist(inpfile, [h_miniiso_electron_matched, h_miniiso_electron_nomatched])
+    print_hist(inpfile, plotpath, [h_miniiso_electron_matched, h_miniiso_electron_nomatched])
 
     h_HLT_Mu50Eff = ROOT.TEfficiency(h_HLT_Mu50, h_muonpt_HLT)
     h_HLT_Mu50Eff.SetTitle("HLT_Mu50; muon_pt [GeV];#epsilon")
     h_HLT_Mu50Eff.SetLineColor(ROOT.kGreen)
-    save_hist(inpfile, h_HLT_Mu50Eff)
-    print_hist(inpfile, h_HLT_Mu50Eff, 'AP')
+    save_hist(inpfile, plotpath, h_HLT_Mu50Eff)
+    print_hist(inpfile, plotpath, h_HLT_Mu50Eff, 'AP')
     h_HLT_TkMu50Eff = ROOT.TEfficiency(h_HLT_TkMu50, h_muonpt_HLT)
     h_HLT_TkMu50Eff.SetTitle("HLT_TkMu50; muon_pt [GeV];#epsilon")
     h_HLT_TkMu50Eff.SetLineColor(ROOT.kRed)
-    save_hist(inpfile, h_HLT_TkMu50Eff)
-    print_hist(inpfile, h_HLT_TkMu50Eff, 'AP')
+    save_hist(inpfile, plotpath, h_HLT_TkMu50Eff)
+    print_hist(inpfile, plotpath, h_HLT_TkMu50Eff, 'AP')
     h_HLTEff = ROOT.TEfficiency(h_HLT, h_muonpt_HLT)
     h_HLTEff.SetTitle("HLT_Mu_OR; muon_pt [GeV];#epsilon")
     h_HLTEff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_HLTEff)
-    print_hist(inpfile, h_HLTEff)
-    print_hist(inpfile, [h_HLT_Mu50Eff, h_HLT_TkMu50Eff, h_HLTEff], 'AP')
+    save_hist(inpfile, plotpath, h_HLTEff)
+    print_hist(inpfile, plotpath, h_HLTEff)
+    print_hist(inpfile, plotpath, [h_HLT_Mu50Eff, h_HLT_TkMu50Eff, h_HLTEff], 'AP')
 
     h_miniiso_mediumEff = ROOT.TEfficiency(h_muonpt_miniiso_medium, h_muonpt)
     h_miniiso_mediumEff.SetTitle("MiniIsoMedium; muon_pt [GeV];#epsilon")
     h_miniiso_mediumEff.SetLineColor(ROOT.kRed)
-    save_hist(inpfile, h_miniiso_mediumEff)
-    print_hist(inpfile, h_miniiso_mediumEff)
+    save_hist(inpfile, plotpath, h_miniiso_mediumEff)
+    print_hist(inpfile, plotpath, h_miniiso_mediumEff)
     h_miniiso_tightEff = ROOT.TEfficiency(h_muonpt_miniiso_tight, h_muonpt)
     h_miniiso_tightEff.SetTitle("MiniIsoTight; muon_pt [GeV];#epsilon")
     h_miniiso_tightEff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_miniiso_tightEff)
-    print_hist(inpfile, h_miniiso_tightEff)
-    print_hist(inpfile, [h_miniiso_mediumEff, h_miniiso_tightEff], 'AP')
+    save_hist(inpfile, plotpath, h_miniiso_tightEff)
+    print_hist(inpfile, plotpath, h_miniiso_tightEff)
+    print_hist(inpfile, plotpath, [h_miniiso_mediumEff, h_miniiso_tightEff], 'AP')
 
     h_HLT_Ele115Eff = ROOT.TEfficiency(h_HLT_Ele115, h_electronpt_HLT)
     h_HLT_Ele115Eff.SetTitle("HLT_Ele115_CaloIdVT_GsfTrkIdT; electron_pt [GeV];#epsilon")
-    save_hist(inpfile, h_HLT_Ele115Eff)
-    print_hist(inpfile, h_HLT_Ele115Eff, 'AP')
+    save_hist(inpfile, plotpath, h_HLT_Ele115Eff)
+    print_hist(inpfile, plotpath, h_HLT_Ele115Eff, 'AP')
 
     h_HLT_HTEff = ROOT.TEfficiency(h_HLT_HT, h_HT)
     h_HLT_HTEff.SetTitle("HLT_PFHT_800_OR_900; Event HT [GeV];#epsilon")
     h_HLT_HTEff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_HLT_HTEff)
-    print_hist(inpfile, h_HLT_HTEff, 'AP')
+    save_hist(inpfile, plotpath, h_HLT_HTEff)
+    print_hist(inpfile, plotpath, h_HLT_HTEff, 'AP')
     h_HLT_HT_muonEff = ROOT.TEfficiency(h_HLT_HT_muon, h_HT_mu)
     h_HLT_HT_muonEff.SetTitle("HLT_PFHT_800_OR_900_Muon_50; Event HT [GeV];#epsilon")
     h_HLT_HT_muonEff.SetLineColor(ROOT.kGreen)
-    save_hist(inpfile, h_HLT_HT_muonEff)
-    print_hist(inpfile, h_HLT_HT_muonEff, 'AP')
+    save_hist(inpfile, plotpath, h_HLT_HT_muonEff)
+    print_hist(inpfile, plotpath, h_HLT_HT_muonEff, 'AP')
     h_HLT_HT_electronEff = ROOT.TEfficiency(h_HLT_HT_electron, h_HT_ele)
     h_HLT_HT_electronEff.SetTitle("HLT_PFHT_800_OR_900_Electron_115; Event HT [GeV];#epsilon")
     h_HLT_HT_electronEff.SetLineColor(ROOT.kRed)
-    save_hist(inpfile, h_HLT_HT_electronEff)
-    print_hist(inpfile, h_HLT_HT_electronEff, 'AP')
-    print_hist(inpfile, [h_HLT_HT_electronEff, h_HLT_HT_muonEff, h_HLT_HTEff], 'AP')
+    save_hist(inpfile, plotpath, h_HLT_HT_electronEff)
+    print_hist(inpfile, plotpath, h_HLT_HT_electronEff, 'AP')
+    print_hist(inpfile, plotpath, [h_HLT_HT_electronEff, h_HLT_HT_muonEff, h_HLT_HTEff], 'AP')
 
     #Lepton trigger efficiency in HT bins
     h_HLT_Muon_HTEff = ROOT.TEfficiency(h_mu_HT_binned, h_HT_mu)
     h_HLT_Muon_HTEff.SetTitle("HLT_Muon_50_HT_binned; Event HT [GeV];#epsilon")
     h_HLT_Muon_HTEff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_HLT_Muon_HTEff)
-    print_hist(inpfile, h_HLT_Muon_HTEff, 'AP')
+    save_hist(inpfile, plotpath, h_HLT_Muon_HTEff)
+    print_hist(inpfile, plotpath, h_HLT_Muon_HTEff, 'AP')
     h_HLT_Electron_HTEff = ROOT.TEfficiency(h_ele_HT_binned, h_HT_ele)
     h_HLT_Electron_HTEff.SetTitle("HLT_Electron_115_HT_binned; Event HT [GeV];#epsilon")
     h_HLT_Electron_HTEff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_HLT_Electron_HTEff)
-    print_hist(inpfile, h_HLT_Electron_HTEff, 'AP')
+    save_hist(inpfile, plotpath, h_HLT_Electron_HTEff)
+    print_hist(inpfile, plotpath, h_HLT_Electron_HTEff, 'AP')
     #trigger in dileptonic ttbar
     h_HLT_Electron_pt_dilepEff = ROOT.TEfficiency(h_electron_trigger_num, h_electron_trigger_den)
     h_HLT_Electron_pt_dilepEff.SetTitle("HLT_Electron_115_pt_binned_dilep; Electron pt [GeV]; #epsilon")
     h_HLT_Electron_pt_dilepEff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_HLT_Electron_pt_dilepEff)
-    print_hist(inpfile, h_HLT_Electron_pt_dilepEff, 'AP')
+    save_hist(inpfile, plotpath, h_HLT_Electron_pt_dilepEff)
+    print_hist(inpfile, plotpath, h_HLT_Electron_pt_dilepEff, 'AP')
     h_HLT_Muon_pt_dilepEff = ROOT.TEfficiency(h_muon_trigger_num, h_muon_trigger_den)
     h_HLT_Muon_pt_dilepEff.SetTitle("HLT_Muon_115_pt_binned_dilep; Muon pt [GeV]; #epsilon")
     h_HLT_Muon_pt_dilepEff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_HLT_Muon_pt_dilepEff)
-    print_hist(inpfile, h_HLT_Muon_pt_dilepEff, 'AP')
+    save_hist(inpfile, plotpath, h_HLT_Muon_pt_dilepEff)
+    print_hist(inpfile, plotpath, h_HLT_Muon_pt_dilepEff, 'AP')
 
     h_btag_DeepCSV_L_Eff = ROOT.TEfficiency(h_btag_DeepCSV_L_num, h_btag_den)
     h_btag_DeepCSV_L_Eff.SetTitle("btag_DeepCSV_L_Efficiency; b-jet pt [GeV]; #epsilon")
     h_btag_DeepCSV_L_Eff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_btag_DeepCSV_L_Eff)
-    print_hist(inpfile, h_btag_DeepCSV_L_Eff, 'AP')
+    save_hist(inpfile, plotpath, h_btag_DeepCSV_L_Eff)
+    print_hist(inpfile, plotpath, h_btag_DeepCSV_L_Eff, 'AP')
     h_btag_DeepCSV_M_Eff = ROOT.TEfficiency(h_btag_DeepCSV_M_num, h_btag_den)
     h_btag_DeepCSV_M_Eff.SetTitle("btag_DeepCSV_M_Efficiency; b-jet pt [GeV]; #epsilon")
     h_btag_DeepCSV_M_Eff.SetLineColor(ROOT.kGreen)
-    save_hist(inpfile, h_btag_DeepCSV_M_Eff)
-    print_hist(inpfile, h_btag_DeepCSV_M_Eff, 'AP')
+    save_hist(inpfile, plotpath, h_btag_DeepCSV_M_Eff)
+    print_hist(inpfile, plotpath, h_btag_DeepCSV_M_Eff, 'AP')
     h_btag_DeepCSV_T_Eff = ROOT.TEfficiency(h_btag_DeepCSV_T_num, h_btag_den)
     h_btag_DeepCSV_T_Eff.SetTitle("btag_DeepCSV_T_Efficiency; b-jet pt [GeV]; #epsilon")
     h_btag_DeepCSV_T_Eff.SetLineColor(ROOT.kRed)
-    save_hist(inpfile, h_btag_DeepCSV_T_Eff)
-    print_hist(inpfile, h_btag_DeepCSV_T_Eff, 'AP')
-    print_hist(inpfile, [h_btag_DeepCSV_T_Eff, h_btag_DeepCSV_M_Eff, h_btag_DeepCSV_L_Eff], 'AP')
+    save_hist(inpfile, plotpath, h_btag_DeepCSV_T_Eff)
+    print_hist(inpfile, plotpath, h_btag_DeepCSV_T_Eff, 'AP')
+    print_hist(inpfile, plotpath, [h_btag_DeepCSV_T_Eff, h_btag_DeepCSV_M_Eff, h_btag_DeepCSV_L_Eff], 'AP')
 
     h_mistag_DeepCSV_L_Eff = ROOT.TEfficiency(h_mistag_DeepCSV_L_num, h_mistag_den)
     h_mistag_DeepCSV_L_Eff.SetTitle("mistag_DeepCSV_L_Efficiency; b-jet pt [GeV]; #epsilon")
     h_mistag_DeepCSV_L_Eff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_mistag_DeepCSV_L_Eff)
-    print_hist(inpfile, h_mistag_DeepCSV_L_Eff, 'AP')
+    save_hist(inpfile, plotpath, h_mistag_DeepCSV_L_Eff)
+    print_hist(inpfile, plotpath, h_mistag_DeepCSV_L_Eff, 'AP')
     h_mistag_DeepCSV_M_Eff = ROOT.TEfficiency(h_mistag_DeepCSV_M_num, h_mistag_den)
     h_mistag_DeepCSV_M_Eff.SetTitle("mistag_DeepCSV_M_Efficiency; b-jet pt [GeV]; #epsilon")
     h_mistag_DeepCSV_M_Eff.SetLineColor(ROOT.kGreen)
-    save_hist(inpfile, h_mistag_DeepCSV_M_Eff)
-    print_hist(inpfile, h_mistag_DeepCSV_M_Eff, 'AP')
+    save_hist(inpfile, plotpath, h_mistag_DeepCSV_M_Eff)
+    print_hist(inpfile, plotpath, h_mistag_DeepCSV_M_Eff, 'AP')
     h_mistag_DeepCSV_T_Eff = ROOT.TEfficiency(h_mistag_DeepCSV_T_num, h_mistag_den)
     h_mistag_DeepCSV_T_Eff.SetTitle("mistag_DeepCSV_T_Efficiency; b-jet pt [GeV]; #epsilon")
     h_mistag_DeepCSV_T_Eff.SetLineColor(ROOT.kRed)
-    save_hist(inpfile, h_mistag_DeepCSV_T_Eff)
-    print_hist(inpfile, h_mistag_DeepCSV_T_Eff, 'AP')
-    print_hist(inpfile, [h_mistag_DeepCSV_T_Eff, h_mistag_DeepCSV_M_Eff, h_mistag_DeepCSV_L_Eff], 'AP')
+    save_hist(inpfile, plotpath, h_mistag_DeepCSV_T_Eff)
+    print_hist(inpfile, plotpath, h_mistag_DeepCSV_T_Eff, 'AP')
+    print_hist(inpfile, plotpath, [h_mistag_DeepCSV_T_Eff, h_mistag_DeepCSV_M_Eff, h_mistag_DeepCSV_L_Eff], 'AP')
 
     h_btag_DeepFlv_L_Eff = ROOT.TEfficiency(h_btag_DeepFlv_L_num, h_btag_den)
     h_btag_DeepFlv_L_Eff.SetTitle("btag_DeepFlv_L_Efficiency; b-jet pt [GeV]; #epsilon")
     h_btag_DeepFlv_L_Eff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_btag_DeepFlv_L_Eff)
-    print_hist(inpfile, h_btag_DeepFlv_L_Eff, 'AP')
+    save_hist(inpfile, plotpath, h_btag_DeepFlv_L_Eff)
+    print_hist(inpfile, plotpath, h_btag_DeepFlv_L_Eff, 'AP')
     h_btag_DeepFlv_M_Eff = ROOT.TEfficiency(h_btag_DeepFlv_M_num, h_btag_den)
     h_btag_DeepFlv_M_Eff.SetTitle("btag_DeepFlv_M_Efficiency; b-jet pt [GeV]; #epsilon")
     h_btag_DeepFlv_M_Eff.SetLineColor(ROOT.kGreen)
-    save_hist(inpfile, h_btag_DeepFlv_M_Eff)
-    print_hist(inpfile, h_btag_DeepFlv_M_Eff, 'AP')
+    save_hist(inpfile, plotpath, h_btag_DeepFlv_M_Eff)
+    print_hist(inpfile, plotpath, h_btag_DeepFlv_M_Eff, 'AP')
     h_btag_DeepFlv_T_Eff = ROOT.TEfficiency(h_btag_DeepFlv_T_num, h_btag_den)
     h_btag_DeepFlv_T_Eff.SetTitle("btag_DeepFlv_T_Efficiency; b-jet pt [GeV]; #epsilon")
     h_btag_DeepFlv_T_Eff.SetLineColor(ROOT.kRed)
-    save_hist(inpfile, h_btag_DeepFlv_T_Eff)
-    print_hist(inpfile, h_btag_DeepFlv_T_Eff, 'AP')
-    print_hist(inpfile, [h_btag_DeepFlv_T_Eff, h_btag_DeepFlv_M_Eff, h_btag_DeepFlv_L_Eff], 'AP')
+    save_hist(inpfile, plotpath, h_btag_DeepFlv_T_Eff)
+    print_hist(inpfile, plotpath, h_btag_DeepFlv_T_Eff, 'AP')
+    print_hist(inpfile, plotpath, [h_btag_DeepFlv_T_Eff, h_btag_DeepFlv_M_Eff, h_btag_DeepFlv_L_Eff], 'AP')
 
     h_mistag_DeepFlv_L_Eff = ROOT.TEfficiency(h_mistag_DeepFlv_L_num, h_mistag_den)
     h_mistag_DeepFlv_L_Eff.SetTitle("mistag_DeepFlv_L_Efficiency; b-jet pt [GeV]; #epsilon")
     h_mistag_DeepFlv_L_Eff.SetLineColor(ROOT.kBlue)
-    save_hist(inpfile, h_mistag_DeepFlv_L_Eff)
-    print_hist(inpfile, h_mistag_DeepFlv_L_Eff, 'AP')
+    save_hist(inpfile, plotpath, h_mistag_DeepFlv_L_Eff)
+    print_hist(inpfile, plotpath, h_mistag_DeepFlv_L_Eff, 'AP')
     h_mistag_DeepFlv_M_Eff = ROOT.TEfficiency(h_mistag_DeepFlv_M_num, h_mistag_den)
     h_mistag_DeepFlv_M_Eff.SetTitle("mistag_DeepFlv_M_Efficiency; b-jet pt [GeV]; #epsilon")
     h_mistag_DeepFlv_M_Eff.SetLineColor(ROOT.kGreen)
-    save_hist(inpfile, h_mistag_DeepFlv_M_Eff)
-    print_hist(inpfile, h_mistag_DeepFlv_M_Eff, 'AP')
+    save_hist(inpfile, plotpath, h_mistag_DeepFlv_M_Eff)
+    print_hist(inpfile, plotpath, h_mistag_DeepFlv_M_Eff, 'AP')
     h_mistag_DeepFlv_T_Eff = ROOT.TEfficiency(h_mistag_DeepFlv_T_num, h_mistag_den)
     h_mistag_DeepFlv_T_Eff.SetTitle("mistag_DeepFlv_T_Efficiency; b-jet pt [GeV]; #epsilon")
     h_mistag_DeepFlv_T_Eff.SetLineColor(ROOT.kRed)
-    save_hist(inpfile, h_mistag_DeepFlv_T_Eff)
-    print_hist(inpfile, h_mistag_DeepFlv_T_Eff, 'AP')
-    print_hist(inpfile, [h_mistag_DeepFlv_T_Eff, h_mistag_DeepFlv_M_Eff, h_mistag_DeepFlv_L_Eff], 'AP')
+    save_hist(inpfile, plotpath, h_mistag_DeepFlv_T_Eff)
+    print_hist(inpfile, plotpath, h_mistag_DeepFlv_T_Eff, 'AP')
+    print_hist(inpfile, plotpath, [h_mistag_DeepFlv_T_Eff, h_mistag_DeepFlv_M_Eff, h_mistag_DeepFlv_L_Eff], 'AP')

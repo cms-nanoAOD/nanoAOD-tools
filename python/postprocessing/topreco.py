@@ -61,16 +61,11 @@ class TopUtilities():
             p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
             neutrino = p4nu_rec
         else:
-            ptlep = leptonPt
-            pxlep = leptonPx
-            pylep = leptonPy
-            metpx = metPx
-            metpy = metPy
 
             EquationCoeff1 = [1,
-                              (-3 * pylep * mW / ptlep),
-                              (((mW**2.) * (2. * pylep**2.) / (ptlep**2)) + mW**2. - (4. * pxlep**3. * metpx / ptlep**2) - (4. * pxlep**2. * pylep * metpy / ptlep**2)),
-                              ((4. * pxlep**2. * mW * metpy / ptlep) - pylep * mW**3. / ptlep)
+                              (-3 * leptonPy * mW / leptonPt),
+                              (((mW**2.) * (2. * leptonPy**2.) / (leptonPt**2)) + mW**2. - (4. * leptonPx**3. * metPx / leptonPt**2) - (4. * leptonPx**2. * leptonPy * metPy / leptonPt**2)),
+                              ((4. * leptonPx**2. * mW * metPy / leptonPt) - leptonPy * mW**3. / leptonPt)
                               ]
 
             EquationCoeff2 = copy.copy(EquationCoeff1)
@@ -82,7 +77,7 @@ class TopUtilities():
             solutions = [EquationSolver.EqSolv(EquationCoeff1,'','',''), EquationSolver.EqSolv(EquationCoeff2,'','','')]
 
             deltaMin = 14000.**2.
-            zeroValue = - mW**2./(4.*pxlep)
+            zeroValue = - mW**2./(4.*leptonPx)
             minPx = 0.
             minPy = 0.
 
@@ -92,16 +87,16 @@ class TopUtilities():
                 for value in solutions[j]:
                     if value < 0.:
                         continue
-                    p_x = (value**2. - mW**2.) / (4.*pxlep)
-                    p_y = ((mW**2.)*pylep + 2.*pxlep*pylep*p_x - mW*ptlep*value) / (2*pxlep**2.)
-                    Delta2 = (p_x - metpx)**2. + (p_y - metpy)**2.
+                    p_x = (value**2. - mW**2.) / (4.*leptonPx)
+                    p_y = ((mW**2.)*leptonPy + 2.*leptonPx*leptonPy*p_x - mW*leptonPt*value) / (2*leptonPx**2.)
+                    Delta2 = (p_x - metPx)**2. + (p_y - metPy)**2.
                     if Delta2 < deltaMin and Delta2 > 0:
                         deltaMin = copy.copy(Delta2)
                         minPx = copy.copy(p_x)
                         minPy = copy.copy(p_y)
 
-            pyZeroValue = mW**2.*pxlep + 2.*pylep*zeroValue
-            delta2ZeroValue = (zeroValue - metpx)**2. + (pyZeroValue - metpy)**2.
+            pyZeroValue = mW**2.*leptonPx + 2.*leptonPy*zeroValue
+            delta2ZeroValue = (zeroValue - metPx)**2. + (pyZeroValue - metPy)**2.
 
             if deltaMin == 14000.**2. :
                 return neutrino
@@ -111,7 +106,7 @@ class TopUtilities():
                 minPx = copy.copy(zeroValue)
                 minPy = copy.copy(pyZeroValue)
 
-            mu_Minimum = mW**2./2. + minPx*pxlep*minPy*pylep
+            mu_Minimum = mW**2./2. + minPx*leptonPx*minPy*leptonPy
             a_Minimum = (mu_Minimum*leptonPz) / (leptonE**2. - leptonPz**2.)
             pznu = a_Minimum
             Enu = TMath.Power((minPx**2. + minPy**2. + pznu**2.), 0.5)
@@ -128,13 +123,7 @@ class TopUtilities():
             self.neutrino = None
             return None'''
 
-        leptonPx = lepton.Px()
-        leptonPy = lepton.Py()
-        leptonPz = lepton.Pz()
-        leptonPt = lepton.Pt()
-        leptonE = lepton.Energy()
-
-        neutrino = self.NuMomentum(leptonPx, leptonPy, leptonPz, leptonPt, leptonE, metPx, metPy)
+        neutrino = self.NuMomentum(lepton.Px(), lepton.Py(), lepton.Pz(), lepton.Pt(), lepton.Energy(), metPx, metPy)
         top = lepton + jet + neutrino
 
         return top
@@ -144,8 +133,8 @@ class TopUtilities():
         mlb2 = lb.M2()
         ptlb = lb.Pt()
         pxlb = lb.Px()
-        pylb = lb.Py()
-        
+        pylb = lb.Py() 
+       
         '''
         if mlb2 < 0.:
             self.reco_topMt = None
