@@ -1,3 +1,4 @@
+#!/bin/bash
 #this is not mean to be run locally
 #
 echo Check if TTY

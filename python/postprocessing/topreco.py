@@ -26,9 +26,9 @@ class TopUtilities():
         '''
         MisET2 = (metPx**2. + metPy**2.)
         mu = (mW**2.)/2. + metPx*leptonPx + metPy*leptonPy
-        a = (mu*leptonPz) / (TMath.Power(leptonE, 2.) - TMath.Power(leptonPz, 2.))
-        a2 = TMath.Power(a, 2.)
-        b = (TMath.Power(leptonE, 2.)*(MisET2) - TMath.Power(mu, 2.))/(TMath.Power(leptonE, 2.) - TMath.Power(leptonPz, 2.))
+        a = mu*leptonPz/leptonPt**2
+        a2 = a**2.
+        b = (leptonE**2.*MisET2 - mu**2.)/leptonPt**2
         '''
         print MisET2
         print mu
@@ -47,21 +47,19 @@ class TopUtilities():
         p40_rec = ROOT.TLorentzVector(0.0, 0.0, 0.0, 0.0)
 
         if (a2-b) > 0:
-            root = TMath.Power((a2-b), 0.5)
+            root = (a2-b)**0.5
             pz1 = a + root
             pz2 = a - root
             nNuSol = 2
             pznu = 0.0
-
             if abs(pz1) > abs(pz2):
                 pznu = pz2
             else:
                 pznu = pz1
 
-            Enu = TMath.Power((MisET2 + pznu**2), 0.5)
+            Enu = (MisET2 + pznu**2)**0.5
             p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
             neutrino = p4nu_rec
-        
         else:
             ptlep = leptonPt
             pxlep = leptonPx
@@ -82,7 +80,7 @@ class TopUtilities():
             #solutions2 = EquationSolver.EqSolv(EquationCoeff2,'','','')
 
             solutions = [EquationSolver.EqSolv(EquationCoeff1,'','',''), EquationSolver.EqSolv(EquationCoeff2,'','','')]
-            
+
             deltaMin = 14000.**2.
             zeroValue = - mW**2./(4.*pxlep)
             minPx = 0.
@@ -94,21 +92,14 @@ class TopUtilities():
                 for value in solutions[j]:
                     if value < 0.:
                         continue
-                    else:
-                        p_x = (value**2. - mW**2.) / (4.*pxlep)
-                        p_y = ((mW**2.)*pylep + 2.*pxlep*pylep*p_x - mW*ptlep*value) / (2*pxlep**2.)
-                        Delta2 = (p_x - metpx)**2. + (p_y - metpy)**2.
-
-                    if Delta2 < deltaMin and Delta2 > 0 :
+                    p_x = (value**2. - mW**2.) / (4.*pxlep)
+                    p_y = ((mW**2.)*pylep + 2.*pxlep*pylep*p_x - mW*ptlep*value) / (2*pxlep**2.)
+                    Delta2 = (p_x - metpx)**2. + (p_y - metpy)**2.
+                    if Delta2 < deltaMin and Delta2 > 0:
                         deltaMin = copy.copy(Delta2)
                         minPx = copy.copy(p_x)
                         minPy = copy.copy(p_y)
 
-                        if Delta2 < deltaMin and Delta2 > 0 :
-                            deltaMin = copy.copy(Delta2)
-                            minPx = copy.copy(p_x)
-                            minPy = copy.copy(p_y)
-                    
             pyZeroValue = mW**2.*pxlep + 2.*pylep*zeroValue
             delta2ZeroValue = (zeroValue - metpx)**2. + (pyZeroValue - metpy)**2.
 
