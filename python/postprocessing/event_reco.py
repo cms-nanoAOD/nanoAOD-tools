@@ -1806,7 +1806,13 @@ for i in range(len(inpfiles)):
             for value in h_mc_criteria_quant.values():
                 print_hist(inpfile, subfold, value)
                 save_hist(inpfile, subfold, value)
+            for value in h_mc_criteria_quant_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mc_2dcriteria.values():
+                print_hist(inpfile, subfold, value, "COLZ")
+                save_hist(inpfile, subfold, value, "COLZ")
+            for value in h_mc_2dcriteria_IsNeg.values():
                 print_hist(inpfile, subfold, value, "COLZ")
                 save_hist(inpfile, subfold, value, "COLZ")
             for value in h_mclepton_pt.values():
@@ -1818,15 +1824,24 @@ for i in range(len(inpfiles)):
             for value in h_mcWprime_mass.values():
                 print_hist(inpfile, subfold, value)
                 save_hist(inpfile, subfold, value)
+            for value in h_mcWprime_mass_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
             for value in h_mcWprime_tmass.values():
                 print_hist(inpfile, subfold, value)
                 save_hist(inpfile, subfold, value)
             for value in h_mcmet_q.values():
                 print_hist(inpfile, subfold, value)
                 save_hist(inpfile, subfold, value)
+            for value in h_mcmet_q_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
 
             print_hist(inpfile, subfold, h_mcrecotop_mass['top'], "HIST0")
             save_hist(inpfile, subfold, h_mcrecotop_mass['top'], "HIST0")
+            for value in h_mcrecotop_mass_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
         
         if LepHLTrig:
             for value in h_mclepton_pt_lepHLT.values():
@@ -1883,6 +1898,9 @@ for i in range(len(inpfiles)):
         save_hist(inpfile, subfold, h_sameflav_bjet_deltaR)
         print_hist(inpfile, subfold, h_mcrecotop_vs_mcWprime_mass)
         save_hist(inpfile, subfold, h_mcrecotop_vs_mcWprime_mass)
+        for value in h_mcmcrecotop_vs_mcWprime_mass_IsNeg.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
     if DetReco:
         for value in h_recotop_vs_Wprime_mass_sublead.values():
             print_hist(inpfile, subfold, value)
@@ -1896,6 +1914,19 @@ for i in range(len(inpfiles)):
         for value in h_recotop_vs_Wprime_mass_best.values():
             print_hist(inpfile, subfold, value)
             save_hist(inpfile, subfold, value)
+        for value in h_recotop_vs_Wprime_mass_sublead_IsNeg.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_recotop_vs_Wprime_mass_closest_IsNeg.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_recotop_vs_Wprime_mass_chi_IsNeg.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_recotop_vs_Wprime_mass_best_IsNeg.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+
         for value in h_criteria_quant.values():
             print_hist(inpfile, subfold, value)
             save_hist(inpfile, subfold, value)
