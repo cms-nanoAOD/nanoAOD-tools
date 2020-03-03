@@ -23,7 +23,7 @@ def cfg_writer(label, dataset, outdir):
     #config.Data.runRange = ''
     #config.Data.lumiMask  = ''
     #f.write("config.Data.splitting = 'EventAwareLumiBased'")
-    f.write("config.Data.unitsPerJob = 10\n")
+    f.write("config.Data.unitsPerJob = 5\n")
     #f.write("config.Data.totalUnits = 10\n")
     f.write("config.Data.outLFNDirBase = '/store/user/%s/%s' % (getUsernameFromSiteDB(), '" +outdir+"')\n")
     f.write("config.Data.publication = False\n")
@@ -49,13 +49,10 @@ def crab_script_writer(files, outpath, isMC, year, modules):
     f.write("metCorrector = createJMECorrector(isMC="+isMC+", dataYear="+year+", jesUncert='All', redojec=True)\n")
     f.write("fatJetCorrector = createJMECorrector(isMC="+isMC+", dataYear="+year+", jesUncert='All', redojec=True, jetType = 'AK8PFchs')\n")
 
-    f.write("passMETFilter = 'Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter'\n")
     #f.write("infile = "+str(files)+"\n")
-    f.write("outpath = '"+ outpath+"'\n")
-    path = os.path.dirname(os.path.abspath(__file__))
-    f.write("branc_sel = '"+path+"/../python/postprocessing/examples/keep_and_drop.txt'\n")
+    #f.write("outpath = '"+ outpath+"'\n")
     #Deafult PostProcessor(outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression='LZMA:9',friend=False,postfix=None, jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,firstEntry=0, prefetch=False,longTermCache=False)\n")
-    f.write("p=PostProcessor(outpath, inputFiles(), passMETFilter, modules=["+modules+"], provenance=True, fwkJobReport=True, jsonInput=runsAndLumis(), outputbranchsel=branc_sel)\n")
+    f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, fwkJobReport=True)\n")#, jsonInput=runsAndLumis(), outputbranchsel="+os.path.abspath('../python/postprocessing/examples/keep_and_drop.txt')+"
     f.write("p.run()\n")
     f.write("print 'DONE'\n")
     f.close()
@@ -76,7 +73,7 @@ if ('SingleMuon' in sample.label) or ('SingleElectron' in sample.label):
     isMC = 'False'
 else:
     isMC = 'True'
-modules = "MySelectorModule(), PrefireCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
+modules = "MySelectorModule(), PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
 
 print "Producing crab script"
 crab_script_writer(sample.files,'/eos/user/a/adeiorio/Wprime/nosynch/', isMC, year, modules)
