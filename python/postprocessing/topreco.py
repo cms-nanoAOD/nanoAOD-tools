@@ -24,30 +24,6 @@ class TopUtilities():
 
         MisET2 = (metPx**2. + metPy**2.)
         mu = (mW**2.)/2. + metPx*leptonPx + metPy*leptonPy
-<<<<<<< HEAD
-<<<<<<< HEAD
-        a = (mu*leptonPz) / (TMath.Power(leptonE, 2.) - TMath.Power(leptonPz, 2.))
-        a2 = TMath.Power(a, 2.)
-        b = (TMath.Power(leptonE, 2.)*(MisET2) - TMath.Power(mu, 2.))/(TMath.Power(leptonE, 2.) - TMath.Power(leptonPz, 2.))
-
-        IsNegative = False
-
-        p4nu_rec = []
-        #ROOT.TLorentzVector()
-=======
-        a = mu*leptonPz/leptonPt**2
-        a2 = a**2.
-        b = (leptonE**2.*MisET2 - mu**2.)/leptonPt**2
-        '''
-        print MisET2
-        print mu
-        print a
-        print a2
-        print b
-        '''
-        p4nu_rec = ROOT.TLorentzVector()
->>>>>>> 1aacb5dce9fcde5110e42bbaf7c3fa3b6b4b6905
-=======
         
         a = mu*leptonPz/leptonPt**2
         a2 = a**2.
@@ -56,7 +32,6 @@ class TopUtilities():
         IsNegative = False
 
         p4nu_rec = []
->>>>>>> 364d0a5aeadb3335f05b1efe07bb6887a9afa696
         p4W_rec = ROOT.TLorentzVector()
         p4b_rec = ROOT.TLorentzVector()
         p4Top_rec = ROOT.TLorentzVector()
@@ -68,10 +43,6 @@ class TopUtilities():
         p40_rec = ROOT.TLorentzVector(0.0, 0.0, 0.0, 0.0)
 
         if (a2-b) > 0:
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 364d0a5aeadb3335f05b1efe07bb6887a9afa696
             root = TMath.Power((a2-b), 0.5)
             pz = []
             pz.append(a + root)
@@ -81,22 +52,6 @@ class TopUtilities():
             nNuSol = 2
             pznu = 0.0
 
-<<<<<<< HEAD
-            '''
-=======
-            root = (a2-b)**0.5
-            pz1 = a + root
-            pz2 = a - root
-            nNuSol = 2
-            pznu = 0.0
->>>>>>> 1aacb5dce9fcde5110e42bbaf7c3fa3b6b4b6905
-            if abs(pz1) > abs(pz2):
-                pznu = pz2
-            else:
-                pznu = pz1
-            '''
-=======
->>>>>>> 364d0a5aeadb3335f05b1efe07bb6887a9afa696
             for i in range(nNuSol):
                 Enu = TMath.Power((MisET2 + pz[i]**2), 0.5)
                 #Enu = TMath.Power((MisET2 + pznu**2), 0.5)
@@ -108,28 +63,11 @@ class TopUtilities():
             neutrino = copy.deepcopy(p4nu_rec)
             return neutrino, IsNegative
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        else:
-            IsNegative = True
-            ptlep = leptonPt
-            pxlep = leptonPx
-            pylep = leptonPy
-            metpx = metPx
-            metpy = metPy
-=======
-            Enu = (MisET2 + pznu**2)**0.5
-            p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
-            neutrino = p4nu_rec
-        else:
->>>>>>> 1aacb5dce9fcde5110e42bbaf7c3fa3b6b4b6905
-=======
         else:
             IsNegative = True
             Enu = (MisET2 + pznu**2)**0.5
             p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
             neutrino = p4nu_rec
->>>>>>> 364d0a5aeadb3335f05b1efe07bb6887a9afa696
 
             EquationCoeff1 = [1,
                               (-3 * leptonPy * mW / leptonPt),
@@ -195,18 +133,7 @@ class TopUtilities():
             self.neutrino = None
             return None'''
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        leptonPx = lepton.Px()
-        leptonPy = lepton.Py()
-        leptonPz = lepton.Pz()
-        leptonPt = lepton.Pt()
-        leptonE = lepton.Energy()
-
-        neutrino, IsNeg = self.NuMomentum(leptonPx, leptonPy, leptonPz, leptonPt, leptonE, metPx, metPy)
-=======
         neutrino, IsNeg  = self.NuMomentum(lepton.Px(), lepton.Py(), lepton.Pz(), lepton.Pt(), lepton.Energy(), metPx, metPy)
->>>>>>> 364d0a5aeadb3335f05b1efe07bb6887a9afa696
         besttop = None
         #recochi = []
         chi2 = 100000000.
@@ -226,17 +153,7 @@ class TopUtilities():
         
         #top = lepton + jet + neutrino
         return besttop, IsNeg
-<<<<<<< HEAD
-=======
-        neutrino = self.NuMomentum(lepton.Px(), lepton.Py(), lepton.Pz(), lepton.Pt(), lepton.Energy(), metPx, metPy)
-        top = lepton + jet + neutrino
 
-        return top
->>>>>>> 1aacb5dce9fcde5110e42bbaf7c3fa3b6b4b6905
-        
-=======
-
->>>>>>> 364d0a5aeadb3335f05b1efe07bb6887a9afa696
     def topMtw(self, lepton, jet, metPx, metPy):
         lb = lepton + jet
         mlb2 = lb.M2()
