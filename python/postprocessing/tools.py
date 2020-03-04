@@ -145,8 +145,8 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False):
         if log:
             c1.SetLogy()
         hist.Draw(option)            
-        c1.Print(plotpath + infile + "_" + hist.GetName() + ".png")
-        c1.Print(plotpath + infile + "_" + hist.GetName() + ".root")
+        c1.Print(plotpath + "/" + infile + "_" + hist.GetName() + ".png")
+        c1.Print(plotpath + "/" + infile + "_" + hist.GetName() + ".root")
     else:
         c1 = ROOT.TCanvas(infile + "_" + hist[0].GetName() + '_comparison', "c1", 50,50,700,600)
         if isinstance(hist[0], ROOT.TGraph) or isinstance(hist[0], ROOT.TGraphAsymmErrors):

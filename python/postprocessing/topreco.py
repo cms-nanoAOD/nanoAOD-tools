@@ -65,10 +65,11 @@ class TopUtilities():
 
         else:
             IsNegative = True
+            '''
             Enu = (MisET2 + pznu**2)**0.5
             p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
             neutrino = p4nu_rec
-
+            '''
             EquationCoeff1 = [1,
                               (-3 * leptonPy * mW / leptonPt),
                               (((mW**2.) * (2. * leptonPy**2.) / (leptonPt**2)) + mW**2. - (4. * leptonPx**3. * metPx / leptonPt**2) - (4. * leptonPx**2. * leptonPy * metPy / leptonPt**2)),
