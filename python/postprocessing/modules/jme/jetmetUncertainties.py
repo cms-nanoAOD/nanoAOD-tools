@@ -479,11 +479,14 @@ class jetmetUncertaintiesProducer(Module):
                     if not self.isData:
                       met_px_jer     = met_px_jer     - (jet_pt_L1L2L3*jet_pt_jerNomVal   - jet_pt_L1)*jet_cosPhi 
                       met_py_jer     = met_py_jer     - (jet_pt_L1L2L3*jet_pt_jerNomVal   - jet_pt_L1)*jet_sinPhi 
-                      jerID = self.getJERsplitID(jet_pt_nom, jet.eta)
-                      met_px_jerUp[jerID]   = met_px_jerUp[jerID]   - (jet_pt_L1L2L3*jet_pt_jerUpVal    - jet_pt_L1)*jet_cosPhi 
-                      met_py_jerUp[jerID]   = met_py_jerUp[jerID]   - (jet_pt_L1L2L3*jet_pt_jerUpVal    - jet_pt_L1)*jet_sinPhi 
-                      met_px_jerDown[jerID] = met_px_jerDown[jerID] - (jet_pt_L1L2L3*jet_pt_jerDownVal  - jet_pt_L1)*jet_cosPhi 
-                      met_py_jerDown[jerID] = met_py_jerDown[jerID] - (jet_pt_L1L2L3*jet_pt_jerDownVal  - jet_pt_L1)*jet_sinPhi 
+                      for jerID in self.splitJERIDs:
+                          jerUpVal, jerDownVal = jet_pt_jerNomVal, jet_pt_jerNomVal
+                          if jerID == self.getJERsplitID(jet_pt_nom, jet.eta):
+                              jerUpVal, jerDownVal = jet_pt_jerUpVal, jet_pt_jerDownVal
+                          met_px_jerUp[jerID]   = met_px_jerUp[jerID]   - (jet_pt_L1L2L3*jerUpVal    - jet_pt_L1)*jet_cosPhi
+                          met_py_jerUp[jerID]   = met_py_jerUp[jerID]   - (jet_pt_L1L2L3*jerUpVal    - jet_pt_L1)*jet_sinPhi
+                          met_px_jerDown[jerID] = met_px_jerDown[jerID] - (jet_pt_L1L2L3*jerDownVal  - jet_pt_L1)*jet_cosPhi
+                          met_py_jerDown[jerID] = met_py_jerDown[jerID] - (jet_pt_L1L2L3*jerDownVal  - jet_pt_L1)*jet_sinPhi
                       for jesUncertainty in self.jesUncertainties:
                           met_px_jesUp[jesUncertainty]   = met_px_jesUp[jesUncertainty]   - (jet_pt_jesUpT1[jesUncertainty]   - jet_pt_L1)*jet_cosPhi
                           met_py_jesUp[jesUncertainty]   = met_py_jesUp[jesUncertainty]   - (jet_pt_jesUpT1[jesUncertainty]   - jet_pt_L1)*jet_sinPhi
