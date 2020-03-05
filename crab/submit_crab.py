@@ -65,15 +65,22 @@ cfg_writer(sample.label, sample.dataset, "OutDir")
 #Writing the script file 
 if '2016' in sample.label:
     year = '2016'
+    lep_mod = 'lepSF_2016()'
 if '2017' in sample.label:
     year = '2017'
+    lep_mod = 'lepSF_2017()'
 if '2018' in sample.label:
     year = '2018'
+    lep_mod = 'lepSF_2018()'
 if ('SingleMuon' in sample.label) or ('SingleElectron' in sample.label):
     isMC = 'False'
 else:
     isMC = 'True'
-modules = "MySelectorModule(), PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
+
+if isMC:
+    modules = "MCweight_writer(), MET_HLT_Filter()," + lep_mod + ", PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
+else:
+    modules = "MET_HLT_Filter(), PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
 
 print "Producing crab script"
 crab_script_writer(sample.files,'/eos/user/a/adeiorio/Wprime/nosynch/', isMC, year, modules)

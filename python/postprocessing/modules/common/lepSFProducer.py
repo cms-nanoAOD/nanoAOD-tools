@@ -8,14 +8,33 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class lepSFProducer(Module):
     def __init__(self, muonSelectionTag, electronSelectionTag):
-        if muonSelectionTag=="LooseWP_2016":
-            mu_f=["Mu_Trg.root","Mu_ID.root","Mu_Iso.root"]
-            mu_h = ["IsoMu24_OR_IsoTkMu24_PtEtaBins/pt_abseta_ratio",
-                    "MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio",
-                    "LooseISO_LooseID_pt_eta/pt_abseta_ratio"]
-        if electronSelectionTag=="GPMVA90_2016":
+        if muonSelectionTag=="TightWP_2016":
+            mu_f=["RunBCDEF_SF_ID_2016.root", "RunGH_SF_ID_2017.root", "Mu_MiniIso.root"]
+            mu_h = ["NUM_TightID_DEN_genTracks_eta_pt",
+                    "LooseISO_TightID_pt_eta/pt_abseta_ratio"] # Check the histogram name
+
+        if electronSelectionTag=="NoIsoMVA90_2016":
             el_f = ["EGM2D_eleGSF.root","EGM2D_eleMVA90.root"]
             el_h = ["EGamma_SF2D", "EGamma_SF2D"]
+
+        if muonSelectionTag=="TightWP_2017":
+            mu_f=["RunBCDEF_SF_ID_2017.root","RunBCDEF_SF_MiniIso_2017.root"]
+            mu_h = ["NUM_TightID_DEN_genTracks_pt_abseta",
+                    "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio"] # Check the histogram name
+
+        if electronSelectionTag=="NoIsoMVA90_2017":
+            el_f = ["EGM2D_eleGSF.root","EGM2D_eleMVA90.root"]
+            el_h = ["EGamma_SF2D", "EGamma_SF2D"]
+
+        if muonSelectionTag=="TightWP_2018":
+            mu_f=["RunABCD_SF_ID_2018.root","RunABCD_SF_MiniIso_2018.root"]
+            mu_h = ["NUM_TightID_DEN_TrackerMuons_pt_abseta",
+                    "LooseISO_TightID_pt_eta/pt_abseta_ratio"] # Check the histogram name
+
+        if electronSelectionTag=="NoIsoMVA90_2018":
+            el_f = ["EGM2D_eleGSF.root","EGM2D_eleMVA90.root"]
+            el_h = ["EGamma_SF2D", "EGamma_SF2D"]
+
         mu_f = ["%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/leptonSF/" % os.environ['CMSSW_BASE'] + f for f in mu_f]
         el_f = ["%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/leptonSF/" % os.environ['CMSSW_BASE'] + f for f in el_f]
 
@@ -52,5 +71,7 @@ class lepSFProducer(Module):
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
-lepSF = lambda : lepSFProducer( "LooseWP_2016", "GPMVA90_2016")
+lepSF_2016 = lambda : lepSFProducer( "TightWP_2016", "NoIsoMVA90_2016")
+lepSF_2017 = lambda : lepSFProducer( "TightWP_2017", "NoIsoMVA90_2017")
+lepSF_2018 = lambda : lepSFProducer( "TightWP_2018", "NoIsoMVA90_2018")
 
