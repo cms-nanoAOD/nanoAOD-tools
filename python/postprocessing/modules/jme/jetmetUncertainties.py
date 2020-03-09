@@ -425,8 +425,8 @@ class jetmetUncertaintiesProducer(Module):
                   for jerID in self.splitJERIDs:
                       jets_pt_jerUp[jerID].append(jet_pt_jerUp[jerID])
                       jets_pt_jerDown[jerID].append(jet_pt_jerDown[jerID])
-                      jets_mass_jerUp[jerID].append(jet_pt_jerUp[jerID])
-                      jets_mass_jerDown[jerID].append(jet_pt_jerDown[jerID])
+                      jets_mass_jerUp[jerID].append(jet_mass_jerUp[jerID])
+                      jets_mass_jerDown[jerID].append(jet_mass_jerDown[jerID])
               
               for jesUncertainty in self.jesUncertainties:
                   # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties )
