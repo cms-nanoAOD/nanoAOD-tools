@@ -16,9 +16,9 @@ ROOT.TGaxis.SetMaxDigits(3)
 inputpath = "./"
 
 inpfiles = ["TT_Mtt-700to1000",
-            #"WJets"                                                              
-            #,"QCD_Pt_600to800_1"                                                                            
-            #,"SingleMuon_Run2016G_1"                                                                         
+            #"WJets",  
+            #"QCD_Pt_600to800_1",
+            #"SingleMuon_Run2016G_1",
             #"Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8",
             #"Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
             #"Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
@@ -27,6 +27,11 @@ inpfiles = ["TT_Mtt-700to1000",
 ptcuts = [#"250",
           "350"
 ]
+
+noneg = {'noneg': 'without #Delta < 0 sol.'
+}
+isneg = {'IsNeg': 'only #Delta < 0 sol.'
+}
 
 ptlabels = {'250': 'pt > 250 GeV',
             '350': 'pt > 350 GeV'
@@ -38,7 +43,7 @@ masscuts = {'Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8': "5200",
             'TT_Mtt-700to1000': "1200"
 }
 
-topmasscuts = {'400': 'm_{top} < 400 GeV',
+topmasscuts = {#'400': 'm_{top} < 400 GeV',
                '500': 'm_{top} < 500 GeV',
 }
 
@@ -50,18 +55,16 @@ masslabels = {'Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') >
 
 plotstodraw = []
 
-plotnt = ["MC_recotop_Wprime_massesratio",
-          "DetReco_sublead_recotop_Wprime_massesratio",
-          "DetReco_closest_recotop_Wprime_massesratio",
-          "DetReco_chimass_recotop_Wprime_massesratio",
+plotnt = [#"MC_recotop_Wprime_massesratio",
+          #"DetReco_sublead_recotop_Wprime_massesratio",
+          #"DetReco_closest_recotop_Wprime_massesratio",
+          #"DetReco_chimass_recotop_Wprime_massesratio",
           #"DetReco_best_recotop_Wprime_massesratio"
           #"DetReco_chi_vs_sublead_pt"
           #"MC_chimass",
           #"DetReco_chimass_chisquare",
           #"MC_closest_deltaR",
           #"DetReco_closest_deltaR",
-          #"DetReco_best_Lep_Wprime_mass",
-          #"DetReco_best_Ele_Wprime_mass",
           #"MC_subleading_pt",
           #"DetReco_sublead_subleading_pt",
           #"sublead_DetReco_Wjet_pt",
@@ -73,10 +76,12 @@ plotnt = ["MC_recotop_Wprime_massesratio",
           #"DetReco_efficiencies",
           #"MCEff_sublead_Lep_Wprime_mass": 'TGraphAsymmErrors',
           #"MC_Lep_Wprime_mass",
+          #"MC_IsNeg_Lep_Wprime_mass",
           #"DetReco_sublead_Lep_Wprime_mass",
           #"DetReco_closest_Lep_Wprime_mass",
           #"DetReco_chimass_Lep_Wprime_mass",
-          #"DetReco_best_Lep_Wprime_mass",   
+          "DetReco_best_Lep_Wprime_mass",   
+          "DetReco_best_IsNeg_Lep_Wprime_mass",   
           #"MC_Ele_Wprime_mass",
           #"DetReco_sublead_Ele_Wprime_mass",
           #"DetReco_closest_Ele_Wprime_mass",
@@ -110,12 +115,15 @@ LogSc=False
 isPtCut = True
 isMassCut = False
 isTopMassCut = False
+NoNeg = True
 SampleLabels = False
+NoNegLabels = True
+IsNegLabels = True
 CatLabels = True
 PtLabels = False
 MassLabels = False
 TopMassLabels = False
-Together = True
+Together = True #flag to take or not the sample with only pt cut
 toScale = False
 
 for inpfile in inpfiles:
@@ -130,6 +138,10 @@ for inpfile in inpfiles:
             if Together:
                 infiles.append(ftoopen)
             print ftoopen
+            if NoNeg:
+                for key in noneg.keys():
+                    ftoopen = fptcut + '_' + key + '.root'
+                    infiles.append(ftoopen)
             if isMassCut:
                 for key, value in masscuts.items():
                     if key == inpfile:
@@ -148,7 +160,10 @@ for inpfile in inpfiles:
         inputf = ROOT.TFile.Open(infile)
         
         for key in plotnt:
-            plot = copy.deepcopy(ROOT.gROOT.FindObject(str(key)).Clone())
+            try:
+                plot = copy.deepcopy(ROOT.gROOT.FindObject(str(key)).Clone())
+            except:
+                continue
             new_title = ""
             new_name = ""
         
@@ -195,6 +210,27 @@ for inpfile in inpfiles:
                             new_name = new_name + "_"
                         new_title = new_title + masslabels[label]
                         new_name = new_name + "mw" + string
+
+            if NoNegLabels and not ('IsNeg' in str(plot.GetName())):
+                for label, string in noneg.items():
+                    if label in infile:
+                        if new_title != "":
+                            new_title = new_title + " "
+                        if new_name != "":
+                            new_name = new_name + "_"
+                        new_title = new_title + string
+                        new_name = new_name + label
+
+            if IsNegLabels:
+                for label, string in isneg.items():
+                    if label in str(plot.GetName()):
+                        if new_title != "":
+                            new_title = new_title + " "
+                        if new_name != "":
+                            new_name = new_name + "_"
+                        new_title = new_title + string
+                        new_name = new_name + label
+
             plot.SetTitle(new_title)
             plot.SetName(new_name)
             if toScale:
