@@ -8,13 +8,13 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools imp
 inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/" 
 inpfiles = ['Wprime_4000_RH'
             #,"TT_Mtt-700to1000"
-            #,'TT_Mtt-1000toInf_2016_1'
+            ,'TT_Mtt-1000toInf_2016_1'
             #,"WJets"
             #,'QCD_Pt_600to800_1'
             #"SingleMuon_Run2016G_1"
             #,'Wprimetotb_M2000W20_RH_MG_8'
             ,'Wprimetotb_M4000W400_RH_MG_1'
-            ,'TT_Incl_2016_1'
+            #,'TT_Incl_2016_1'
         ]
 
 #ROOT.gROOT.SetStyle('Plain')
@@ -184,6 +184,11 @@ for inpfile in inpfiles:
         met = Object(event, "MET")
         HLT = Object(event, "HLT")
         Flag = Object(event, 'Flag')
+        LHEPdfWeight = Collection(event, 'LHEPdfWeight')
+
+        print "no. of pdf weights " + str(len(LHEPdfWeight))
+        for pdfw in LHEPdfWeight:
+            print str(pdfw.__getattr__(""))
 
         if trigger:
             isGoodPV = (PV.ndof>4 and abs(PV.z)<20 and math.hypot(PV.x, PV.y)<2) #basic requirements on the PV's goodness

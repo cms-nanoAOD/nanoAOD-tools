@@ -16,9 +16,6 @@ tag_2016 = 'RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asympto
 tag_2017 = 'RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7'
 tag_2018 = 'RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20'
 
-"/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2018+"-v1/NANOAODSIM"
-"/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2017+"-v1/NANOAODSIM"
-
 TT_Mtt700to1000_2016 = sample(ROOT.kRed, 1, 1001, "#mathrm{t#bar{t}}", "TT_Mtt700to1000_2016")
 TT_Mtt700to1000_2016.sigma = 80.5 #pb
 TT_Mtt700to1000_2016.dataset = "/TT_Mtt-700to1000_TuneCUETP8M2T4_13TeV-powheg-pythia8/"+tag_2016+"-v2/NANOAODSIM"
@@ -67,7 +64,7 @@ WJets_2016.components = [WJetsHT200to400_2016, WJetsHT400to600_2016, WJetsHT600t
 
 TT_Mtt700to1000_2017 = sample(ROOT.kRed, 1, 1001, "#mathrm{t#bar{t}}", "TT_Mtt700to1000_2017")
 TT_Mtt700to1000_2017.sigma = 80.5 #pb
-TT_Mtt700to1000_2017.dataset = "/TT_Mtt-700to1000_TuneCP5_13TeV-powheg-pythia8/"+tag_2017+"-v1/NANOAODSIM"
+TT_Mtt700to1000_2017.dataset = "/TT_Mtt-700to1000_TuneCP5_13TeV-powheg-pythia8/"+tag_2017+"-v2/NANOAODSIM"
 TT_Mtt700to1000_2017.files = jr.json_reader(""+path+"/TT_Mtt700to1000_2017.json")
 
 TT_Mtt1000toInf_2017 = sample(ROOT.kRed, 1, 1001, "#mathrm{t#bar{t}}", "TT_Mtt1000toInf_2017")

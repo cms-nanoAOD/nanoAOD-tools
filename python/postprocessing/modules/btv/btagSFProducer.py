@@ -36,6 +36,7 @@ class btagSFProducer(Module):
 
         self.era = era
         self.algo = algo.lower()
+        print "Calculating btagging scale factors for algorithm " + self.algo
         self.selectedWPs = selectedWPs
         self.verbose = verbose
         self.jesSystsForShape = jesSystsForShape
@@ -323,7 +324,7 @@ class btagSFProducer(Module):
         return True
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
-btagSF2016 = lambda : btagSFProducer("2016", "deepjet")
+btagSF2016 = lambda : btagSFProducer("Legacy2016", "deepjet")
 btagSF2017 = lambda : btagSFProducer("2017", "deepjet")
 btagSF2018 = lambda : btagSFProducer("2018", "deepjet")
 
