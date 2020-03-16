@@ -50,7 +50,10 @@ class Object:
     """Class that allows seeing a set branches plus possibly an index as an Object"""
     def __init__(self,event,prefix,index=None):
         self._event = event
-        self._prefix = prefix+"_"
+        if not (prefix == 'LHEPdfWeight'):
+            self._prefix = prefix+"_"
+        else:
+            self._prefix = prefix
         self._index = index
     def __getattr__(self,name):
         if name in self.__dict__: return self.__dict__[name]
