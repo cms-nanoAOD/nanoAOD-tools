@@ -1,5 +1,12 @@
 from PhysicsTools.NanoAODTools.postprocessing.samples.samples import *
 import os
+import optparse
+
+#usage = 'python submit_crab.py -d dataset_name'
+#parser = optparse.OptionParser(usage)
+#parser.add_option('-d', '--dat', dest='dat', type=sample, default = '', help='Please enter a dataset name')
+#(opt, args) = parser.parse_args()
+
 
 def cfg_writer(label, dataset, outdir):
     f = open("crab_cfg.py", "w")
@@ -56,7 +63,7 @@ def crab_script_writer(sample, outpath, isMC, year, modules):
     #f.write("infile = "+str(sample.files)+"\n")
     #f.write("outpath = '"+ outpath+"'\n")
     #Deafult PostProcessor(outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression='LZMA:9',friend=False,postfix=None, jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,firstEntry=0, prefetch=False,longTermCache=False)\n")
-    f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, fwkJobReport=True, histFileName='"+sample.label+"_hist.root', haddFileName='"+sample.label+".root', histDirName='plots')\n")#, jsonInput=runsAndLumis(), outputbranchsel="+os.path.abspath('../python/postprocessing/examples/keep_and_drop.txt')+"
+    f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, fwkJobReport=True, histFileName='"+sample.label+"_hist.root', histDirName='plots')\n")#, outputbranchsel="+os.path.abspath('../python/postprocessing/examples/keep_and_drop.txt')+" , jsonInput=runsAndLumis(), haddFileName='"+sample.label+".root'
     f.write("p.run()\n")
     f.write("print 'DONE'\n")
     f.close()
@@ -76,41 +83,44 @@ def PSet_writer(sample):
     f.write("process.out = cms.EndPath(process.output)\n")
     f.close()
     
-sample = TT_Mtt1000toInf_2017
+dataset = WJets_2017
+#sample = TT_Mtt1000toInf_2017
 #Writing the configuration file
-print "Producing crab configuration file"
-cfg_writer(sample.label, sample.dataset, "OutDir")
+for sample in dataset.components:
+    print 'Launching sample ' + sample.label
+    print "Producing crab configuration file"
+    cfg_writer(sample.label, sample.dataset, "OutDir")
 
-#Writing the script file 
-if '2016' in sample.label:
-    year = '2016'
-    lep_mod = 'lepSF_2016()'
-    btag_mod = 'btagSF2016()'
-    met_hlt_mod = 'MET_HLT_Filter_2016()'
-if '2017' in sample.label:
-    year = '2017'
-    lep_mod = 'lepSF_2017()'
-    btag_mod = 'btagSF2017()'
-    met_hlt_mod = 'MET_HLT_Filter_2017()'
-if '2018' in sample.label:
-    year = '2018'
-    lep_mod = 'lepSF_2018()'
-    btag_mod = 'btagSF2018()'
-    met_hlt_mod = 'MET_HLT_Filter_2018()'
+    #Writing the script file 
+    if '2016' in sample.label:
+        year = '2016'
+        lep_mod = 'lepSF_2016()'
+        btag_mod = 'btagSF2016()'
+        met_hlt_mod = 'MET_HLT_Filter_2016()'
+    if '2017' in sample.label:
+        year = '2017'
+        lep_mod = 'lepSF_2017()'
+        btag_mod = 'btagSF2017()'
+        met_hlt_mod = 'MET_HLT_Filter_2017()'
+    if '2018' in sample.label:
+        year = '2018'
+        lep_mod = 'lepSF_2018()'
+        btag_mod = 'btagSF2018()'
+        met_hlt_mod = 'MET_HLT_Filter_2018()'
 
-if ('SingleMuon' in sample.label) or ('SingleElectron' in sample.label):
-    isMC = 'False'
-else:
-    isMC = 'True'
+    if ('SingleMuon' in sample.label) or ('SingleElectron' in sample.label):
+        isMC = 'False'
+    else:
+        isMC = 'True'
+        
+    if isMC:
+        modules = "MCweight_writer(),  " + met_hlt_mod + ", " + lep_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
+    else:
+        modules = "MET_HLT_Filter(), PrefCorr()" # Put here all the modules you want to be runned by crab
 
-if isMC:
-    modules = "MCweight_writer(),  " + met_hlt_mod + ", " + lep_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
-else:
-    modules = "MET_HLT_Filter(), PrefCorr()" # Put here all the modules you want to be runned by crab
+    print "Producing crab script"
+    crab_script_writer(sample,'/eos/user/a/adeiorio/Wprime/nosynch/', isMC, year, modules)
 
-print "Producing crab script"
-crab_script_writer(sample,'/eos/user/a/adeiorio/Wprime/nosynch/', isMC, year, modules)
-
-#Launching crab
-print "Submitting crab jobs..."
-os.system("crab submit -c crab_cfg.py")
+    #Launching crab
+    print "Submitting crab jobs..."
+    os.system("crab submit -c crab_cfg.py")
