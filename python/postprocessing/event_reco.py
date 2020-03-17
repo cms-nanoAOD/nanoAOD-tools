@@ -422,14 +422,30 @@ for i in range(len(inpfiles)):
                        'muon': ROOT.TH1F("DetReco_Mu_pt", "DetReco_Mu_pt;muon pt [GeV];Countings", nbins, nmin, nmax),
         }
         if BTagging:
-            h_lepton_pt.update({
-                'electron_0btag': ROOT.TH1F("DetReco_0btag_Ele_pt", "DetReco_0btag_Ele_pt;0btagged electron pt [GeV];Countings", nbins, nmin, nmax),
-                'muon_0btag': ROOT.TH1F("DetReco_0btag_Mu_pt", "DetReco_0btag_Mu_pt;0btagged muon pt [GeV];Countings", nbins, nmin, nmax),
-                'electron_1btag': ROOT.TH1F("DetReco_1btag_Ele_pt", "DetReco_1btag_Ele_pt;1btagged electron pt [GeV];Countings", nbins, nmin, nmax),
-                'muon_1btag': ROOT.TH1F("DetReco_1btag_Mu_pt", "DetReco_1btag_Mu_pt;1btagged muon pt [GeV];Countings", nbins, nmin, nmax),
-                'electron_2btag': ROOT.TH1F("DetReco_2btag_Ele_pt", "DetReco_2btag_Ele_pt;2btagged electron pt [GeV];Countings", nbins, nmin, nmax),
-                'muon_2btag': ROOT.TH1F("DetReco_2btag_Mu_pt", "DetReco_2btag_Mu_pt;2btagged muon pt [GeV];Countings", nbins, nmin, nmax),
-            })
+            h_lepton_pt_L = {
+                'electron_0btag': ROOT.TH1F("DetReco_0Lbtag_Ele_pt", "DetReco_0Lbtag_Ele_pt;0Lbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_0btag': ROOT.TH1F("DetReco_0Lbtag_Mu_pt", "DetReco_0Lbtag_Mu_pt;0Lbtagged muon pt [GeV];Countings", nbins, nmin, nmax),
+                'electron_1btag': ROOT.TH1F("DetReco_1Lbtag_Ele_pt", "DetReco_1Lbtag_Ele_pt;1Lbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_1btag': ROOT.TH1F("DetReco_1Lbtag_Mu_pt", "DetReco_1Lbtag_Mu_pt;1Lbtagged muon pt [GeV];Countings", nbins, nmin, nmax),
+                'electron_2btag': ROOT.TH1F("DetReco_2Lbtag_Ele_pt", "DetReco_2Lbtag_Ele_pt;2Lbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_2btag': ROOT.TH1F("DetReco_2Lbtag_Mu_pt", "DetReco_2Lbtag_Mu_pt;2Lbtagged muon pt [GeV];Countings", nbins, nmin, nmax),
+            }
+            h_lepton_pt_M = {
+                'electron_0btag': ROOT.TH1F("DetReco_0Mbtag_Ele_pt", "DetReco_0Mbtag_Ele_pt;0Mbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_0btag': ROOT.TH1F("DetReco_0Mbtag_Mu_pt", "DetReco_0Mbtag_Mu_pt;0Mbtagged muon pt [GeV];Countings", nbins, nmin, nmax),
+                'electron_1btag': ROOT.TH1F("DetReco_1Mbtag_Ele_pt", "DetReco_1Mbtag_Ele_pt;1Mbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_1btag': ROOT.TH1F("DetReco_1Mbtag_Mu_pt", "DetReco_1Mbtag_Mu_pt;1Mbtagged muon pt [GeV];Countings", nbins, nmin, nmax),
+                'electron_2btag': ROOT.TH1F("DetReco_2Mbtag_Ele_pt", "DetReco_2Mbtag_Ele_pt;2Mbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_2btag': ROOT.TH1F("DetReco_2Mbtag_Mu_pt", "DetReco_2Mbtag_Mu_pt;2Mbtagged muon pt [GeV];Countings", nbins, nmin, nmax),
+            }
+            h_lepton_pt_T = {
+                'electron_0btag': ROOT.TH1F("DetReco_0Tbtag_Ele_pt", "DetReco_0Tbtag_Ele_pt;0Tbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_0btag': ROOT.TH1F("DetReco_0Tbtag_Mu_pt", "DetReco_0Tbtag_Mu_pt;0Tbtagged muon pt [GeV];Countings", nbins, nmin, nmax),
+                'electron_1btag': ROOT.TH1F("DetReco_1Tbtag_Ele_pt", "DetReco_1Tbtag_Ele_pt;1Tbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_1btag': ROOT.TH1F("DetReco_1Tbtag_Mu_pt", "DetReco_1Tbtag_Mu_pt;1Tbtagged muon pt [GeV];Countings", nbins, nmin, nmax),
+                'electron_2btag': ROOT.TH1F("DetReco_2Tbtag_Ele_pt", "DetReco_2Tbtag_Ele_pt;2Tbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
+                'muon_2btag': ROOT.TH1F("DetReco_2Tbtag_Mu_pt", "DetReco_2Tbtag_Mu_pt;2Tbtagged muon pt [GeV];Countings", nbins, nmin, nmax),
+            }
                 
         h_jet_pt_sublead = {
             'Wbjet': ROOT.TH1F("DetReco_Wjet_pt", "DetReco_Wjet_pt;prompt jet pt [GeV];Countings", nbins, nmin, nmax),
@@ -439,21 +455,6 @@ for i in range(len(inpfiles)):
         h_recotop_mass_sublead = {
             'top': ROOT.TH1F("DetReco_recotop_mass", "DetReco_recotop_mass;recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
             }
-        if BTagging:
-            h_jet_pt_sublead.update({
-                'Wbjet_nobtag': ROOT.TH1F("DetReco_nobtag_Wjet_pt", "DetReco_nobtag_Wjet_pt;prompt nobtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'Wbjet_btag': ROOT.TH1F("DetReco_btag_Wjet_pt", "DetReco_btag_Wjet_pt;prompt btagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
-            
-                'topbjet_nobtag': ROOT.TH1F("DetReco_nobtag_topjet_pt", "DetReco_nobtag_topjet_pt;top nobtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'topbjet_btag': ROOT.TH1F("DetReco_btag_topjet_pt", "DetReco_btag_topjet_pt;top btagged jet pt [GeV];Countings", nbins, nmin, nmaxt),
-            
-                'top_nobtag': ROOT.TH1F("DetReco_nobtag_recotop_pt", "DetReco_nobtag_recotop_pt;nobtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'top_btag': ROOT.TH1F("DetReco_btag_recotop_pt", "DetReco_btag_recotop_pt;btagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
-            })
-            h_recotop_mass_sublead.update({
-                'top_nobtag': ROOT.TH1F("DetReco_nobtag_recotop_mass", "DetReco_nobtag_recotop_mass;nobtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
-                'top_btag': ROOT.TH1F("DetReco_btag_recotop_mass", "DetReco_btag_recotop_mass;btagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
-            })
 
         h_jet_pt_closest = copy.deepcopy(h_jet_pt_sublead)
         h_recotop_mass_closest = copy.deepcopy(h_recotop_mass_sublead)
@@ -466,7 +467,7 @@ for i in range(len(inpfiles)):
             new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
-        
+
         h_jet_pt_chi = copy.deepcopy(h_jet_pt_sublead)
         h_recotop_mass_chi = copy.deepcopy(h_recotop_mass_sublead)
         h_recotop_mass_chi['top'].SetTitle(insert_char_into_string(len('DetReco_'), 'chimass_', h_recotop_mass_sublead['top'].GetTitle()))
@@ -483,7 +484,6 @@ for i in range(len(inpfiles)):
         h_recotop_mass_best = copy.deepcopy(h_recotop_mass_sublead)
         h_recotop_mass_best['top'].SetTitle(insert_char_into_string(len('DetReco_'), 'best_', h_recotop_mass_sublead['top'].GetTitle()))
         h_recotop_mass_best['top'].SetName(insert_char_into_string(len('DetReco_'), 'best_', h_recotop_mass_sublead['top'].GetName()))
-
         for value in h_jet_pt_best.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
@@ -491,10 +491,14 @@ for i in range(len(inpfiles)):
             new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
-        
-        h_recotop_mass_sublead['top'].SetTitle(insert_char_into_string(len('DetReco_'), 'sublead_', h_recotop_mass_sublead['top'].GetTitle()))
-        h_recotop_mass_sublead['top'].SetName(insert_char_into_string(len('DetReco_'), 'sublead_', h_recotop_mass_sublead['top'].GetName()))
 
+        for value in h_recotop_mass_sublead.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+            value.SetTitle(new_title)
+            value.SetName(new_name)
         for value in h_jet_pt_sublead.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
@@ -502,6 +506,240 @@ for i in range(len(inpfiles)):
             new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
+
+        if BTagging:
+            h_jet_pt_sublead_L = {
+                'Wbjet_nobtag': ROOT.TH1F("DetReco_noLbtag_Wjet_pt", "DetReco_noLbtag_Wjet_pt;prompt noLbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'Wbjet_btag': ROOT.TH1F("DetReco_Lbtag_Wjet_pt", "DetReco_Lbtag_Wjet_pt;prompt Lbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+            
+                'topbjet_nobtag': ROOT.TH1F("DetReco_noLbtag_topjet_pt", "DetReco_noLbtag_topjet_pt;top noLbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'topbjet_btag': ROOT.TH1F("DetReco_Lbtag_topjet_pt", "DetReco_Lbtag_topjet_pt;top Lbtagged jet pt [GeV];Countings", nbins, nmin, nmaxt),
+            
+                'top_nobtag': ROOT.TH1F("DetReco_noLbtag_recotop_pt", "DetReco_noLbtag_recotop_pt;noLbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Lbtag_recotop_pt", "DetReco_Lbtag_recotop_pt;Lbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
+            }
+            h_recotop_mass_sublead_L = {
+                'top_nobtag': ROOT.TH1F("DetReco_noLbtag_recotop_mass", "DetReco_noLbtag_recotop_mass;noLbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Lbtag_recotop_mass", "DetReco_Lbtag_recotop_mass;Lbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
+            }
+            h_jet_pt_sublead_M = {
+                'Wbjet_nobtag': ROOT.TH1F("DetReco_noMbtag_Wjet_pt", "DetReco_noMbtag_Wjet_pt;prompt noMbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'Wbjet_btag': ROOT.TH1F("DetReco_Mbtag_Wjet_pt", "DetReco_Mbtag_Wjet_pt;prompt Mbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+            
+                'topbjet_nobtag': ROOT.TH1F("DetReco_noMbtag_topjet_pt", "DetReco_noMbtag_topjet_pt;top noMbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'topbjet_btag': ROOT.TH1F("DetReco_Mbtag_topjet_pt", "DetReco_Mbtag_topjet_pt;top Mbtagged jet pt [GeV];Countings", nbins, nmin, nmaxt),
+            
+                'top_nobtag': ROOT.TH1F("DetReco_noMbtag_recotop_pt", "DetReco_noMbtag_recotop_pt;noMbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Mbtag_recotop_pt", "DetReco_Mbtag_recotop_pt;Mbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
+            }
+            h_recotop_mass_sublead_M = {
+                'top_nobtag': ROOT.TH1F("DetReco_noMbtag_recotop_mass", "DetReco_noMbtag_recotop_mass;noMbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Mbtag_recotop_mass", "DetReco_Mbtag_recotop_mass;Mbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
+            }
+            h_jet_pt_sublead_T = {
+                'Wbjet_nobtag': ROOT.TH1F("DetReco_noTbtag_Wjet_pt", "DetReco_noTbtag_Wjet_pt;prompt noTbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'Wbjet_btag': ROOT.TH1F("DetReco_Tbtag_Wjet_pt", "DetReco_Tbtag_Wjet_pt;prompt Tbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+            
+                'topbjet_nobtag': ROOT.TH1F("DetReco_noTbtag_topjet_pt", "DetReco_noTbtag_topjet_pt;top noTbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'topbjet_btag': ROOT.TH1F("DetReco_Tbtag_topjet_pt", "DetReco_Tbtag_topjet_pt;top Tbtagged jet pt [GeV];Countings", nbins, nmin, nmaxt),
+            
+                'top_nobtag': ROOT.TH1F("DetReco_noTbtag_recotop_pt", "DetReco_noTbtag_recotop_pt;noTbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Tbtag_recotop_pt", "DetReco_Tbtag_recotop_pt;Tbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
+            }
+            h_recotop_mass_sublead_T = {
+                'top_nobtag': ROOT.TH1F("DetReco_noTbtag_recotop_mass", "DetReco_noTbtag_recotop_mass;noTbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Tbtag_recotop_mass", "DetReco_Tbtag_recotop_mass;Tbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
+            }
+
+            h_jet_pt_closest_L = copy.deepcopy(h_jet_pt_sublead_L)
+            h_recotop_mass_closest_L = copy.deepcopy(h_recotop_mass_sublead_L)
+            for value in h_recotop_mass_closest_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_closest_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_jet_pt_closest_M = copy.deepcopy(h_jet_pt_sublead_M)
+            h_recotop_mass_closest_M = copy.deepcopy(h_recotop_mass_sublead_M)
+            for value in h_recotop_mass_closest_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_closest_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_jet_pt_closest_T = copy.deepcopy(h_jet_pt_sublead_T)
+            h_recotop_mass_closest_T = copy.deepcopy(h_recotop_mass_sublead_T)
+            for value in h_recotop_mass_closest_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_closest_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+        
+            h_jet_pt_chi_L = copy.deepcopy(h_jet_pt_sublead_L)
+            h_recotop_mass_chi_L = copy.deepcopy(h_recotop_mass_sublead_L)
+            for value in h_recotop_mass_chi_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_chi_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_jet_pt_chi_M = copy.deepcopy(h_jet_pt_sublead_M)
+            h_recotop_mass_chi_M = copy.deepcopy(h_recotop_mass_sublead_M)
+            for value in h_recotop_mass_chi_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_chi_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_jet_pt_chi_T = copy.deepcopy(h_jet_pt_sublead_T)
+            h_recotop_mass_chi_T = copy.deepcopy(h_recotop_mass_sublead_T)
+            for value in h_recotop_mass_chi_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_chi_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+            h_jet_pt_best_L = copy.deepcopy(h_jet_pt_sublead_L)
+            h_recotop_mass_best_L = copy.deepcopy(h_recotop_mass_sublead_L)
+            for value in h_recotop_mass_best_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_best_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_jet_pt_best_M = copy.deepcopy(h_jet_pt_sublead_M)
+            h_recotop_mass_best_M = copy.deepcopy(h_recotop_mass_sublead_M)
+            for value in h_recotop_mass_best_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_best_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_jet_pt_best_T = copy.deepcopy(h_jet_pt_sublead_T)
+            h_recotop_mass_best_T = copy.deepcopy(h_recotop_mass_sublead_T)
+            for value in h_recotop_mass_best_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_best_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+            for value in h_recotop_mass_sublead_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_sublead_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_recotop_mass_sublead_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_sublead_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_recotop_mass_sublead_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_jet_pt_sublead_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
 
         if DeltaFilter:
             h_recotop_mass_sublead_IsNeg = copy.deepcopy(h_recotop_mass_sublead)
@@ -536,13 +774,108 @@ for i in range(len(inpfiles)):
                 new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
                 value.SetTitle(new_title)
                 value.SetName(new_name)
+            if BTagging:
+                h_recotop_mass_sublead_IsNeg_L = copy.deepcopy(h_recotop_mass_sublead_L)
+                for value in h_recotop_mass_sublead_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_closest_IsNeg_L = copy.deepcopy(h_recotop_mass_closest_L)
+                for value in h_recotop_mass_closest_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_chi_IsNeg_L = copy.deepcopy(h_recotop_mass_chi_L)
+                for value in h_recotop_mass_chi_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_best_IsNeg_L = copy.deepcopy(h_recotop_mass_best_L)
+                for value in h_recotop_mass_best_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_sublead_IsNeg_M = copy.deepcopy(h_recotop_mass_sublead_M)
+                for value in h_recotop_mass_sublead_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_closest_IsNeg_M = copy.deepcopy(h_recotop_mass_closest_M)
+                for value in h_recotop_mass_closest_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_chi_IsNeg_M = copy.deepcopy(h_recotop_mass_chi_M)
+                for value in h_recotop_mass_chi_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_best_IsNeg_M = copy.deepcopy(h_recotop_mass_best_M)
+                for value in h_recotop_mass_best_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_sublead_IsNeg_T = copy.deepcopy(h_recotop_mass_sublead_T)
+                for value in h_recotop_mass_sublead_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_closest_IsNeg_T = copy.deepcopy(h_recotop_mass_closest_T)
+                for value in h_recotop_mass_closest_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_chi_IsNeg_T = copy.deepcopy(h_recotop_mass_chi_T)
+                for value in h_recotop_mass_chi_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_recotop_mass_best_IsNeg_T = copy.deepcopy(h_recotop_mass_best_T)
+                for value in h_recotop_mass_best_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+
         
         h_recotop_vs_Wprime_mass_sublead = {'nobtag': ROOT.TH1F("DetReco_recotop_Wprime_massesratio", "DetReco_recotop_Wprime_massesratio;recotop mass/W' mass;Countings", 22, 0, 1.1)
         }
-        if BTagging:
-            h_recotop_vs_Wprime_mass_sublead.update({
-                'tnobtag_w0btag': ROOT.TH1F("DetReco_tnobtag_w0btag_recotop_Wprime_massesratio", "DetReco_tnobtag_w0btag_recotop_Wprime_massesratio;(nobtagged top, 0btag W') recotop mass/W' mass;Countings", 22, 0, 1.1),
-            })
+
         h_recotop_vs_Wprime_mass_closest = copy.deepcopy(h_recotop_vs_Wprime_mass_sublead)
         for value in h_recotop_vs_Wprime_mass_closest.values():
             old_title = value.GetTitle()
@@ -664,24 +997,10 @@ for i in range(len(inpfiles)):
                          'ele_all': ROOT.TH1F("DetReco_Ele_Wprime_mass", "DetReco_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
                          'mu_all': ROOT.TH1F("DetReco_Mu_Wprime_mass", "DetReco_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax)
         }
-        if BTagging:
-            h_Wprime_mass_sublead.update({
-                         'all_0btag': ROOT.TH1F("DetReco_0btag_Lep_Wprime_mass", "DetReco_0btag_Lep_Wprime_mass;0btagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_1btag': ROOT.TH1F("DetReco_1btag_Lep_Wprime_mass", "DetReco_1btag_Lep_Wprime_mass;1btagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_2btag': ROOT.TH1F("DetReco_2btag_Lep_Wprime_mass", "DetReco_2btag_Lep_Wprime_mass;2btagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_0btag': ROOT.TH1F("DetReco_0btag_Ele_Wprime_mass", "DetReco_0btag_Ele_Wprime_mass;0btagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_1btag': ROOT.TH1F("DetReco_1btag_Ele_Wprime_mass", "DetReco_1btag_Ele_Wprime_mass;1btagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_2btag': ROOT.TH1F("DetReco_2btag_Ele_Wprime_mass", "DetReco_2btag_Ele_Wprime_mass;2btagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_0btag': ROOT.TH1F("DetReco_0btag_Mu_Wprime_mass", "DetReco_0btag_Mu_Wprime_mass;0btagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_1btag': ROOT.TH1F("DetReco_1btag_Mu_Wprime_mass", "DetReco_1btag_Mu_Wprime_mass;1btagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_2btag': ROOT.TH1F("DetReco_2btag_Mu_Wprime_mass", "DetReco_2btag_Mu_Wprime_mass;2btagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-            })
         h_Wprime_mass_closest = copy.deepcopy(h_Wprime_mass_sublead)
         for value in h_Wprime_mass_closest.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
-            #new_title = 'closest_' + old_title
-            #new_name = 'closest_' + old_name
             new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
             new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
             value.SetTitle(new_title)
@@ -710,6 +1029,138 @@ for i in range(len(inpfiles)):
             value.SetTitle(new_title)
             value.SetName(new_name)
 
+        if BTagging:
+            h_Wprime_mass_sublead_L = {
+                         'all_0btag': ROOT.TH1F("DetReco_0Lbtag_Lep_Wprime_mass", "DetReco_0Lbtag_Lep_Wprime_mass;0Lbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Lbtag_Lep_Wprime_mass", "DetReco_1Lbtag_Lep_Wprime_mass;1Lbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Lbtag_Lep_Wprime_mass", "DetReco_2Lbtag_Lep_Wprime_mass;2Lbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_0btag': ROOT.TH1F("DetReco_0Lbtag_Ele_Wprime_mass", "DetReco_0Lbtag_Ele_Wprime_mass;0Lbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_1btag': ROOT.TH1F("DetReco_1Lbtag_Ele_Wprime_mass", "DetReco_1Lbtag_Ele_Wprime_mass;1Lbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_2btag': ROOT.TH1F("DetReco_2Lbtag_Ele_Wprime_mass", "DetReco_2Lbtag_Ele_Wprime_mass;2Lbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_0btag': ROOT.TH1F("DetReco_0Lbtag_Mu_Wprime_mass", "DetReco_0Lbtag_Mu_Wprime_mass;0Lbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_1btag': ROOT.TH1F("DetReco_1Lbtag_Mu_Wprime_mass", "DetReco_1Lbtag_Mu_Wprime_mass;1Lbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_2btag': ROOT.TH1F("DetReco_2Lbtag_Mu_Wprime_mass", "DetReco_2Lbtag_Mu_Wprime_mass;2Lbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+            }
+            h_Wprime_mass_sublead_M = {
+                         'all_0btag': ROOT.TH1F("DetReco_0Mbtag_Lep_Wprime_mass", "DetReco_0Mbtag_Lep_Wprime_mass;0Mbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Mbtag_Lep_Wprime_mass", "DetReco_1Mbtag_Lep_Wprime_mass;1Mbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Mbtag_Lep_Wprime_mass", "DetReco_2Mbtag_Lep_Wprime_mass;2Mbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_0btag': ROOT.TH1F("DetReco_0Mbtag_Ele_Wprime_mass", "DetReco_0Mbtag_Ele_Wprime_mass;0Mbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_1btag': ROOT.TH1F("DetReco_1Mbtag_Ele_Wprime_mass", "DetReco_1Mbtag_Ele_Wprime_mass;1Mbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_2btag': ROOT.TH1F("DetReco_2Mbtag_Ele_Wprime_mass", "DetReco_2Mbtag_Ele_Wprime_mass;2Mbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_0btag': ROOT.TH1F("DetReco_0Mbtag_Mu_Wprime_mass", "DetReco_0Mbtag_Mu_Wprime_mass;0Mbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_1btag': ROOT.TH1F("DetReco_1Mbtag_Mu_Wprime_mass", "DetReco_1Mbtag_Mu_Wprime_mass;1Mbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_2btag': ROOT.TH1F("DetReco_2Mbtag_Mu_Wprime_mass", "DetReco_2Mbtag_Mu_Wprime_mass;2Mbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+            }
+            h_Wprime_mass_sublead_T = {
+                         'all_0btag': ROOT.TH1F("DetReco_0Tbtag_Lep_Wprime_mass", "DetReco_0Tbtag_Lep_Wprime_mass;0Tbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Tbtag_Lep_Wprime_mass", "DetReco_1Tbtag_Lep_Wprime_mass;1Tbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Tbtag_Lep_Wprime_mass", "DetReco_2Tbtag_Lep_Wprime_mass;2Tbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_0btag': ROOT.TH1F("DetReco_0Tbtag_Ele_Wprime_mass", "DetReco_0Tbtag_Ele_Wprime_mass;0Tbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_1btag': ROOT.TH1F("DetReco_1Tbtag_Ele_Wprime_mass", "DetReco_1Tbtag_Ele_Wprime_mass;1Tbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_2btag': ROOT.TH1F("DetReco_2Tbtag_Ele_Wprime_mass", "DetReco_2Tbtag_Ele_Wprime_mass;2Tbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_0btag': ROOT.TH1F("DetReco_0Tbtag_Mu_Wprime_mass", "DetReco_0Tbtag_Mu_Wprime_mass;0Tbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_1btag': ROOT.TH1F("DetReco_1Tbtag_Mu_Wprime_mass", "DetReco_1Tbtag_Mu_Wprime_mass;1Tbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_2btag': ROOT.TH1F("DetReco_2Tbtag_Mu_Wprime_mass", "DetReco_2Tbtag_Mu_Wprime_mass;2Tbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+            }
+
+            h_Wprime_mass_closest_L = copy.deepcopy(h_Wprime_mass_sublead_L)
+            for value in h_Wprime_mass_closest_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_mass_closest_M = copy.deepcopy(h_Wprime_mass_sublead_M)
+            for value in h_Wprime_mass_closest_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_mass_closest_T = copy.deepcopy(h_Wprime_mass_sublead_T)
+            for value in h_Wprime_mass_closest_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+            h_Wprime_mass_best_L = copy.deepcopy(h_Wprime_mass_sublead_L)
+            for value in h_Wprime_mass_best_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_mass_best_M = copy.deepcopy(h_Wprime_mass_sublead_M)
+            for value in h_Wprime_mass_best_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_mass_best_T = copy.deepcopy(h_Wprime_mass_sublead_T)
+            for value in h_Wprime_mass_best_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+            h_Wprime_mass_chi_L = copy.deepcopy(h_Wprime_mass_sublead)
+            for value in h_Wprime_mass_chi_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_mass_chi_M = copy.deepcopy(h_Wprime_mass_sublead)
+            for value in h_Wprime_mass_chi_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_mass_chi_T = copy.deepcopy(h_Wprime_mass_sublead)
+            for value in h_Wprime_mass_chi_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+            for value in h_Wprime_mass_sublead_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_Wprime_mass_sublead_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_Wprime_mass_sublead_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
         if DeltaFilter:
             h_Wprime_mass_best_IsNeg = copy.deepcopy(h_Wprime_mass_best)
             for value in h_Wprime_mass_best_IsNeg.values():
@@ -719,7 +1170,6 @@ for i in range(len(inpfiles)):
                 new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
                 value.SetTitle(new_title)
                 value.SetName(new_name)
-
             h_Wprime_mass_closest_IsNeg = copy.deepcopy(h_Wprime_mass_closest)
             for value in h_Wprime_mass_closest_IsNeg.values():
                 old_title = value.GetTitle()
@@ -728,7 +1178,6 @@ for i in range(len(inpfiles)):
                 new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
                 value.SetTitle(new_title)
                 value.SetName(new_name)
-
             h_Wprime_mass_chi_IsNeg = copy.deepcopy(h_Wprime_mass_chi)
             for value in h_Wprime_mass_chi_IsNeg.values():
                 old_title = value.GetTitle()
@@ -737,7 +1186,6 @@ for i in range(len(inpfiles)):
                 new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
                 value.SetTitle(new_title)
                 value.SetName(new_name)
-
             h_Wprime_mass_sublead_IsNeg = copy.deepcopy(h_Wprime_mass_sublead)
             for value in h_Wprime_mass_sublead_IsNeg.values():
                 old_title = value.GetTitle()
@@ -746,48 +1194,405 @@ for i in range(len(inpfiles)):
                 new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
                 value.SetTitle(new_title)
                 value.SetName(new_name)
+            if BTagging:
+                h_Wprime_mass_best_IsNeg_L = copy.deepcopy(h_Wprime_mass_best_L)
+                for value in h_Wprime_mass_best_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_closest_IsNeg_L = copy.deepcopy(h_Wprime_mass_closest_L)
+                for value in h_Wprime_mass_closest_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_chi_IsNeg_L = copy.deepcopy(h_Wprime_mass_chi_L)
+                for value in h_Wprime_mass_chi_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_sublead_IsNeg_L = copy.deepcopy(h_Wprime_mass_sublead_L)
+                for value in h_Wprime_mass_sublead_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_best_IsNeg_M = copy.deepcopy(h_Wprime_mass_best_M)
+                for value in h_Wprime_mass_best_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_closest_IsNeg_M = copy.deepcopy(h_Wprime_mass_closest_M)
+                for value in h_Wprime_mass_closest_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_chi_IsNeg_M = copy.deepcopy(h_Wprime_mass_chi_M)
+                for value in h_Wprime_mass_chi_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_sublead_IsNeg_M = copy.deepcopy(h_Wprime_mass_sublead_M)
+                for value in h_Wprime_mass_sublead_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_best_IsNeg_T = copy.deepcopy(h_Wprime_mass_best_T)
+                for value in h_Wprime_mass_best_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_closest_IsNeg_T = copy.deepcopy(h_Wprime_mass_closest_T)
+                for value in h_Wprime_mass_closest_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_chi_IsNeg_T = copy.deepcopy(h_Wprime_mass_chi_T)
+                for value in h_Wprime_mass_chi_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_mass_sublead_IsNeg_T = copy.deepcopy(h_Wprime_mass_sublead_T)
+                for value in h_Wprime_mass_sublead_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
 
-        '''
+        
         h_Wprime_tmass_sublead = {'all': ROOT.TH1F("DetReco_Lep_Wprime_transverse_mass", "DetReco_Lep_Wprime_transverse_mass;DetReco Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
                           'ele_all': ROOT.TH1F("DetReco_Ele_Wprime_transverse_mass", "DetReco_Ele_Wprime_transverse_mass;DetReco Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
                           'mu_all': ROOT.TH1F("DetReco_Mu_Wprime_transverse_mass", "DetReco_Mu_Wprime_transverse_mass;DetReco Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax)
         }
-        if BTagging:
-            h_Wprime_tmass_sublead.update({
-                         'all_0btag': ROOT.TH1F("DetReco_0btag_Lep_Wprime_transverse_mass", "DetReco_0btag_Lep_Wprime_transverse_mass;DetReco 0btagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_1btag': ROOT.TH1F("DetReco_1btag_Lep_transverse_Wprime_mass", "DetReco_1btag_Lep_Wprime_transverse_mass;DetReco 1btagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_2btag': ROOT.TH1F("DetReco_2btag_Lep_Wprime_transverse_mass", "DetReco_2btag_Lep_Wprime_transverse_mass;DetReco 2btagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                          'ele_all_0btag': ROOT.TH1F("DetReco_0btag_Ele_Wprime_transverse_mass", "DetReco_0btag_Ele_Wprime_transverse_mass;DetReco 0btagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_1btag': ROOT.TH1F("DetReco_1btag_Ele_Wprime_transverse_mass", "DetReco_1btag_Ele_Wprime_transverse_mass;DetReco 1btagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_2btag': ROOT.TH1F("DetReco_2btag_Ele_Wprime_transverse_mass", "DetReco_2btag_Ele_Wprime_transverse_mass;DetReco 2btagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                          'mu_all_0btag': ROOT.TH1F("DetReco_0btag_Mu_Wprime_transverse_mass", "DetReco_0btag_Mu_Wprime_transverse_mass;DetReco 0btagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_1btag': ROOT.TH1F("DetReco_1btag_Mu_Wprime_transverse_mass", "DetReco_1btag_Mu_Wprime_transverse_mass;DetReco 1btagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_2btag': ROOT.TH1F("DetReco_2btag_Mu_Wprime_transverse_mass", "DetReco_2btag_Mu_Wprime_transverse_mass;DetReco 2btagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-            })
         h_Wprime_tmass_closest = copy.deepcopy(h_Wprime_tmass_sublead)
         for value in h_Wprime_tmass_closest.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
-            new_title = 'closest_' + old_title
-            new_name = 'closest_' + old_name
+            new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
         h_Wprime_tmass_chi = copy.deepcopy(h_Wprime_tmass_sublead)
         for value in h_Wprime_tmass_chi.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
-            new_title = 'chimass_' + old_title
-            new_name = 'chimass_' + old_name
+            new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+            value.SetTitle(new_title)
+            value.SetName(new_name)
+        h_Wprime_tmass_best = copy.deepcopy(h_Wprime_tmass_sublead)
+        for value in h_Wprime_tmass_best.values():
+            old_title = value.GetTitle()
+            old_name = value.GetName()
+            new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
         for value in h_Wprime_tmass_sublead.values():
             old_title = value.GetTitle()
             old_name = value.GetName()
-            new_title = 'sublead_' + old_title
-            new_name = 'sublead_' + old_name
+            new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+            new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
             value.SetTitle(new_title)
             value.SetName(new_name)
-        '''
+        
+        if BTagging:
+            h_Wprime_tmass_sublead_L = {
+                         'all_0btag': ROOT.TH1F("DetReco_0Lbtag_Lep_Wprime_transverse_mass", "DetReco_0Lbtag_Lep_Wprime_transverse_mass;0Lbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Lbtag_Lep_Wprime_transverse_mass", "DetReco_1Lbtag_Lep_Wprime_transverse_mass;1Lbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Lbtag_Lep_Wprime_transverse_mass", "DetReco_2Lbtag_Lep_Wprime_transverse_mass;2Lbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_0btag': ROOT.TH1F("DetReco_0Lbtag_Ele_Wprime_transverse_mass", "DetReco_0Lbtag_Ele_Wprime_transverse_mass;0Lbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_1btag': ROOT.TH1F("DetReco_1Lbtag_Ele_Wprime_transverse_mass", "DetReco_1Lbtag_Ele_Wprime_transverse_mass;1Lbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_2btag': ROOT.TH1F("DetReco_2Lbtag_Ele_Wprime_transverse_mass", "DetReco_2Lbtag_Ele_Wprime_transverse_mass;2Lbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_0btag': ROOT.TH1F("DetReco_0Lbtag_Mu_Wprime_transverse_mass", "DetReco_0Lbtag_Mu_Wprime_transverse_mass;0Lbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_1btag': ROOT.TH1F("DetReco_1Lbtag_Mu_Wprime_transverse_mass", "DetReco_1Lbtag_Mu_Wprime_transverse_mass;1Lbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_2btag': ROOT.TH1F("DetReco_2Lbtag_Mu_Wprime_transverse_mass", "DetReco_2Lbtag_Mu_Wprime_transverse_mass;2Lbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+            }
+            h_Wprime_tmass_sublead_M = {
+                         'all_0btag': ROOT.TH1F("DetReco_0Mbtag_Lep_Wprime_transverse_mass", "DetReco_0Mbtag_Lep_Wprime_transverse_mass;0Mbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Mbtag_Lep_Wprime_transverse_mass", "DetReco_1Mbtag_Lep_Wprime_transverse_mass;1Mbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Mbtag_Lep_Wprime_transverse_mass", "DetReco_2Mbtag_Lep_Wprime_transverse_mass;2Mbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_0btag': ROOT.TH1F("DetReco_0Mbtag_Ele_Wprime_transverse_mass", "DetReco_0Mbtag_Ele_Wprime_transverse_mass;0Mbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_1btag': ROOT.TH1F("DetReco_1Mbtag_Ele_Wprime_transverse_mass", "DetReco_1Mbtag_Ele_Wprime_transverse_mass;1Mbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_2btag': ROOT.TH1F("DetReco_2Mbtag_Ele_Wprime_transverse_mass", "DetReco_2Mbtag_Ele_Wprime_transverse_mass;2Mbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_0btag': ROOT.TH1F("DetReco_0Mbtag_Mu_Wprime_transverse_mass", "DetReco_0Mbtag_Mu_Wprime_transverse_mass;0Mbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_1btag': ROOT.TH1F("DetReco_1Mbtag_Mu_Wprime_transverse_mass", "DetReco_1Mbtag_Mu_Wprime_transverse_mass;1Mbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_2btag': ROOT.TH1F("DetReco_2Mbtag_Mu_Wprime_transverse_mass", "DetReco_2Mbtag_Mu_Wprime_transverse_mass;2Mbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+            }
+            h_Wprime_tmass_sublead_T = {
+                         'all_0btag': ROOT.TH1F("DetReco_0Tbtag_Lep_Wprime_transverse_mass", "DetReco_0Tbtag_Lep_Wprime_transverse_mass;0Tbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Tbtag_Lep_Wprime_transverse_mass", "DetReco_1Tbtag_Lep_Wprime_transverse_mass;1Tbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Tbtag_Lep_Wprime_transverse_mass", "DetReco_2Tbtag_Lep_Wprime_transverse_mass;2Tbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_0btag': ROOT.TH1F("DetReco_0Tbtag_Ele_Wprime_transverse_mass", "DetReco_0Tbtag_Ele_Wprime_transverse_mass;0Tbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_1btag': ROOT.TH1F("DetReco_1Tbtag_Ele_Wprime_transverse_mass", "DetReco_1Tbtag_Ele_Wprime_transverse_mass;1Tbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_all_2btag': ROOT.TH1F("DetReco_2Tbtag_Ele_Wprime_transverse_mass", "DetReco_2Tbtag_Ele_Wprime_transverse_mass;2Tbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_0btag': ROOT.TH1F("DetReco_0Tbtag_Mu_Wprime_transverse_mass", "DetReco_0Tbtag_Mu_Wprime_transverse_mass;0Tbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_1btag': ROOT.TH1F("DetReco_1Tbtag_Mu_Wprime_transverse_mass", "DetReco_1Tbtag_Mu_Wprime_transverse_mass;1Tbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_all_2btag': ROOT.TH1F("DetReco_2Tbtag_Mu_Wprime_transverse_mass", "DetReco_2Tbtag_Mu_Wprime_transverse_mass;2Tbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+            }
+
+            h_Wprime_tmass_closest_L = copy.deepcopy(h_Wprime_tmass_sublead_L)
+            for value in h_Wprime_tmass_closest_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_tmass_closest_M = copy.deepcopy(h_Wprime_tmass_sublead_M)
+            for value in h_Wprime_tmass_closest_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_tmass_closest_T = copy.deepcopy(h_Wprime_tmass_sublead_T)
+            for value in h_Wprime_tmass_closest_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'closest_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'closest_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+            h_Wprime_tmass_best_L = copy.deepcopy(h_Wprime_tmass_sublead_L)
+            for value in h_Wprime_tmass_best_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_tmass_best_M = copy.deepcopy(h_Wprime_tmass_sublead_M)
+            for value in h_Wprime_tmass_best_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_tmass_best_T = copy.deepcopy(h_Wprime_tmass_sublead_T)
+            for value in h_Wprime_tmass_best_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'best_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'best_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+            h_Wprime_tmass_chi_L = copy.deepcopy(h_Wprime_tmass_sublead)
+            for value in h_Wprime_tmass_chi_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_tmass_chi_M = copy.deepcopy(h_Wprime_tmass_sublead)
+            for value in h_Wprime_tmass_chi_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_tmass_chi_T = copy.deepcopy(h_Wprime_tmass_sublead)
+            for value in h_Wprime_tmass_chi_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'chimass_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+            for value in h_Wprime_tmass_sublead_L.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_Wprime_tmass_sublead_M.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            for value in h_Wprime_tmass_sublead_T.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_'), 'sublead_', old_title)
+                new_name = insert_char_into_string(len('DetReco_'), 'sublead_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
+        if DeltaFilter:
+            h_Wprime_tmass_best_IsNeg = copy.deepcopy(h_Wprime_tmass_best)
+            for value in h_Wprime_tmass_best_IsNeg.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_title)
+                new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_tmass_closest_IsNeg = copy.deepcopy(h_Wprime_tmass_closest)
+            for value in h_Wprime_tmass_closest_IsNeg.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_title)
+                new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_tmass_chi_IsNeg = copy.deepcopy(h_Wprime_tmass_chi)
+            for value in h_Wprime_tmass_chi_IsNeg.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_title)
+                new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            h_Wprime_tmass_sublead_IsNeg = copy.deepcopy(h_Wprime_tmass_sublead)
+            for value in h_Wprime_tmass_sublead_IsNeg.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_title)
+                new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+            if BTagging:
+                h_Wprime_tmass_best_IsNeg_L = copy.deepcopy(h_Wprime_tmass_best_L)
+                for value in h_Wprime_tmass_best_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_closest_IsNeg_L = copy.deepcopy(h_Wprime_tmass_closest_L)
+                for value in h_Wprime_tmass_closest_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_chi_IsNeg_L = copy.deepcopy(h_Wprime_tmass_chi_L)
+                for value in h_Wprime_tmass_chi_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_sublead_IsNeg_L = copy.deepcopy(h_Wprime_tmass_sublead_L)
+                for value in h_Wprime_tmass_sublead_IsNeg_L.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_best_IsNeg_M = copy.deepcopy(h_Wprime_tmass_best_M)
+                for value in h_Wprime_tmass_best_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_closest_IsNeg_M = copy.deepcopy(h_Wprime_tmass_closest_M)
+                for value in h_Wprime_tmass_closest_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_chi_IsNeg_M = copy.deepcopy(h_Wprime_tmass_chi_M)
+                for value in h_Wprime_tmass_chi_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_sublead_IsNeg_M = copy.deepcopy(h_Wprime_tmass_sublead_M)
+                for value in h_Wprime_tmass_sublead_IsNeg_M.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_best_IsNeg_T = copy.deepcopy(h_Wprime_tmass_best_T)
+                for value in h_Wprime_tmass_best_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_best_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_closest_IsNeg_T = copy.deepcopy(h_Wprime_tmass_closest_T)
+                for value in h_Wprime_tmass_closest_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_closest_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_chi_IsNeg_T = copy.deepcopy(h_Wprime_tmass_chi_T)
+                for value in h_Wprime_tmass_chi_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_chimass_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+                h_Wprime_tmass_sublead_IsNeg_T = copy.deepcopy(h_Wprime_tmass_sublead_T)
+                for value in h_Wprime_tmass_sublead_IsNeg_T.values():
+                    old_title = value.GetTitle()
+                    old_name = value.GetName()
+                    new_title = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_sublead_'), 'IsNeg_', old_name)
+                    value.SetTitle(new_title)
+                    value.SetName(new_name)
+
+
         h_met_q = {'pt': ROOT.TH1F("DetReco_MET_pt", "DetReco_MET_pt;MET pt [GeV];Countings", nbins, nmin, nmax),
                    'Et': ROOT.TH1F("DetReco_MET_Et", "DetReco_MET_Et;MET Et [GeV];Countings", wnbins, wnmin, wnmax),
                    'phi': ROOT.TH1F("DetReco_MET_phi", "DetReco_MET_phi;MET phi;Countings", 50, 0, 4),
