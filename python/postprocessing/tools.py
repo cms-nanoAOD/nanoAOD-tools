@@ -139,16 +139,20 @@ def presel(PV, muons, electrons, jets): #returns three booleans: goodEvent assur
     goodEleEvt = isGoodPV and isElectron
     return goodEvent, goodMuEvt, goodEleEvt
  
-def print_hist(infile, plotpath, hist, option = "HIST", log = False):
+def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = False):
     if not(isinstance(hist, list)):
         c1 = ROOT.TCanvas(infile + "_" + hist.GetName(), "c1", 50,50,700,600)
+        hist.Draw(option)            
         if log:
             c1.SetLogy()
-        hist.Draw(option)            
         c1.Print(plotpath + "/" + infile + "_" + hist.GetName() + ".png")
         c1.Print(plotpath + "/" + infile + "_" + hist.GetName() + ".root")
     else:
-        c1 = ROOT.TCanvas(infile + "_" + hist[0].GetName() + '_comparison', "c1", 50,50,700,600)
+        if not (infile == ""):
+            c1 = ROOT.TCanvas(infile + "_" + hist[0].GetName() + '_comparison', "c1", 50,50,700,600)
+        else:
+            c1 = ROOT.TCanvas('comparison', "c1", 50,50,700,600)
+
         if isinstance(hist[0], ROOT.TGraph) or isinstance(hist[0], ROOT.TGraphAsymmErrors):
             i = 0
             mg = ROOT.TMultiGraph('mg', hist[0].GetTitle()+';'+hist[0].GetXaxis().GetTitle()+';'+hist[0].GetYaxis().GetTitle())
@@ -179,6 +183,8 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False):
             i = 0
             for h in hist:
                 h.SetLineColor(colors[i])
+                if stack:
+                    h.SetFillColor(colors[i])
                 mg.Add(h)
                 i += 1
             mg.Draw(option)
@@ -192,8 +198,14 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False):
         c1.BuildLegend()
         c1.Modified()
         c1.Update()
-        c1.Print(plotpath + infile + "_" + hist[0].GetName() + '_comparison.png')
-        c1.Print(plotpath + infile + "_" + hist[0].GetName() + '_comparison.root')
+        if log:
+            c1.SetLogy()
+        if not (infile == ""):
+            c1.Print(plotpath + "/" + infile + "_" + hist[0].GetName() + '_comparison.png')
+            c1.Print(plotpath + "/" + infile + "_" + hist[0].GetName() + '_comparison.root')
+        else:
+            c1.Print(plotpath + "/" + 'comparison.png')
+            c1.Print(plotpath + "/" + 'comparison.root')
 
 def save_hist(infile, plotpath, hist, option = "HIST"):
      fout = ROOT.TFile.Open(plotpath + "/" + infile +".root", "UPDATE")
