@@ -5,7 +5,6 @@ from array import array
 from PhysicsTools.NanoAODTools.postprocessing.tools import *
 import copy
 
-from PhysicsTools.NanoAODTools.postprocessing.preliminary_tools import *
 print "Agostino's tools implemented"
 
 ROOT.gStyle.SetOptStat(0)
@@ -15,13 +14,13 @@ ROOT.TGaxis.SetMaxDigits(3)
 
 inputpath = "./"
 
-inpfiles = ["TT_Mtt-700to1000",
+inpfiles = [#"TT_Mtt-700to1000",
             #"WJets",  
             #"QCD_Pt_600to800_1",
             #"SingleMuon_Run2016G_1",
             #"Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8",
             #"Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
-            #"Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
+            "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
 ]
 
 ptcuts = [#"250",
@@ -80,8 +79,11 @@ plotnt = [#"MC_recotop_Wprime_massesratio",
           #"DetReco_sublead_Lep_Wprime_mass",
           #"DetReco_closest_Lep_Wprime_mass",
           #"DetReco_chimass_Lep_Wprime_mass",
-          "DetReco_best_Lep_Wprime_mass",   
-          "DetReco_best_IsNeg_Lep_Wprime_mass",   
+          #"DetReco_best_Lep_Wprime_mass",   
+          "DetReco_best_0Tbtag_Lep_Wprime_mass",   
+          "DetReco_best_1Tbtag_Lep_Wprime_mass",
+          "DetReco_best_2Tbtag_Lep_Wprime_mass",   
+          #"DetReco_best_IsNeg_Lep_Wprime_mass",   
           #"MC_Ele_Wprime_mass",
           #"DetReco_sublead_Ele_Wprime_mass",
           #"DetReco_closest_Ele_Wprime_mass",
@@ -110,21 +112,52 @@ samplelabels = {"Wprimetotb_M4000W400_RH": "W'RH m=4TeV w=0.4TeV",
                 "TT_Mtt-700to1000": "ttbar 0.7to1.0"
 }
 
-LogSc=False
+btaggerlabels = {#"DeepFlv": "DeepFlv",
+                 "DeepCSV": "DeepCSV"
+}
+
+wplabels = {"L": "Loose",
+            "M": "Medium",
+            "T": "Tight"
+}
+
+nbtaglabels = {"noLbtag": "not Lbtagged",
+               "_Lbtag": "Lbtagged",
+               "noMbtag": "not Mbtagged",
+               "_Mbtag": "Mbtagged",
+               "noTbtag": "not Tbtagged",
+               "_Tbtag": "Tbtagged",
+               "0Lbtag": "0 Lbtagged",
+               "1Lbtag": "1 Lbtagged",
+               "2Lbtag": "2 Lbtagged",
+               "0Mbtag": "0 Mbtagged",
+               "1Mbtag": "1 Mbtagged",
+               "2Mbtag": "2 Mbtagged",
+               "0Tbtag": "0 Tbtagged",
+               "1Tbtag": "1 Tbtagged",
+               "2Tbtag": "2 Tbtagged"
+}
+
+LogSc = False
 
 isPtCut = True
 isMassCut = False
 isTopMassCut = False
 NoNeg = True
+BTagging = True
 SampleLabels = False
-NoNegLabels = True
-IsNegLabels = True
+NoNegLabels = False
+IsNegLabels = False
 CatLabels = True
 PtLabels = False
 MassLabels = False
 TopMassLabels = False
-Together = True #flag to take or not the sample with only pt cut
+BTagLabels = True
+WPLabels = False
+NBTagLabels = True
+Together = False #flag to take or not the sample with only pt cut
 toScale = False
+Stack = True
 
 for inpfile in inpfiles:
     nfile = None
@@ -137,7 +170,7 @@ for inpfile in inpfiles:
             ftoopen = fptcut + '.root'
             if Together:
                 infiles.append(ftoopen)
-            print ftoopen
+                print ftoopen
             if NoNeg:
                 for key in noneg.keys():
                     ftoopen = fptcut + '_' + key + '.root'
@@ -149,8 +182,12 @@ for inpfile in inpfiles:
                         infiles.append(ftoopen)
             if isTopMassCut:
                 for key, value in topmasscuts.items():
-                    #if ('mt' + str(key)) in inpfile:
                     ftoopen = fptcut + '_mt' + key + '.root'
+                    print ftoopen
+                    infiles.append(ftoopen)
+            if BTagging:
+                for key, value in btaggerlabels.items():
+                    ftoopen = fptcut + '_' + value + '.root'
                     print ftoopen
                     infiles.append(ftoopen)
 
@@ -231,6 +268,37 @@ for inpfile in inpfiles:
                         new_title = new_title + string
                         new_name = new_name + label
 
+            if BTagLabels:
+                for label, string in btaggerlabels.items():
+                    if label in infile:
+                        if new_title != "":
+                            new_title = new_title + " "
+                        if new_name != "":
+                            new_name = new_name + "_"
+                        new_title = new_title + string
+                        new_name = new_name + label
+
+            if WPLabels:
+                for label, string in wplabels.items():
+                    if label in str(plot.GetName()):
+                        if new_title != "":
+                            new_title = new_title + " "
+                        if new_name != "":
+                            new_name = new_name + "_"
+                        new_title = new_title + string
+                        new_name = new_name + label
+
+            if NBTagLabels:
+                for label, string in nbtaglabels.items():
+                    if label in str(plot.GetName()):
+                        print label
+                        if new_title != "":
+                            new_title = new_title + " "
+                        if new_name != "":
+                            new_name = new_name + "_"
+                        new_title = new_title + string
+                        new_name = new_name + label
+
             plot.SetTitle(new_title)
             plot.SetName(new_name)
             if toScale:
@@ -242,7 +310,10 @@ for inpfile in inpfiles:
 print plotstodraw
 
 if isinstance(plotstodraw[0], ROOT.TH1F):
-    print_hist("", "boh", plotstodraw, "nostack hist", LogSc)
+    if Stack:
+        print_hist("", "plots", plotstodraw, "hist", LogSc, Stack)
+    else:
+        print_hist("", "plots", plotstodraw, "nostack hist", LogSc, Stack)
 else:
-    print_hist("", "boh", plotstodraw, "AP", LogSc)
+    print_hist("", "plots", plotstodraw, "AP", LogSc)
 
