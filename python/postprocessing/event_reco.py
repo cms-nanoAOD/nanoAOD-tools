@@ -29,24 +29,33 @@ inpfiles = [#"Wprime_4000_RH"
 
 '''
 inputpath = "/eos/home-a/apiccine/private/Wprime_BkgSample/merged/"
-inpfiles = [#"Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8",
-            "Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
-            "Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8"
+inpfiles = ["Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8",
+            #"Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
+            #"Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8"
 ]
 
 subfolds = [#"plots/Wp_m4000w400_pt350_mt500",
            #"plots/Wp_m4000w400_pt350_mt400",
-           #"plots/Wp_m4000w400_pt350",
+           "plots/Wp_m4000w400_pt350",
            #"plots/Wp_m3000w300_pt350_mt500",
            #"plots/Wp_m3000w300_pt350_mt400",
-           "plots/Wp_m3000w300_pt350",
+           #"plots/Wp_m3000w300_pt350",
            #"plots/Wp_m2000w20_pt350_mt500",
            #"plots/Wp_m2000w20_pt350_mt400",
-           "plots/Wp_m2000w20_pt350",
+           #"plots/Wp_m2000w20_pt350",
            #"plots/TT_mtt700to1000_pt350_mt500",
            #"plots/TT_mtt700to1000_pt350_mt400",
            #"plots/TT_mtt700to1000_pt350",
 ]
+
+# b-tag working points: mistagging efficiency tight = 0.1%, medium 1% and loose = 10%                                                        
+WPbtagger = {'deepFlv_T': 0.7264,
+             'deepFlv_M': 0.2770,
+             'deepFlv_L': 0.0494,
+             'deepCSV_T': 0.7527,
+             'deepCSV_M': 0.4184,
+             'deepCSV_L': 0.1241
+}
 
 print "input pathed"
 
@@ -113,8 +122,23 @@ def insert_char_into_string(position, char, string):
     new_string = string[:position] + str(char) + string[position:]
     return new_string
 
+def btagger(algo, score):
+    if not (algo == 'deepFlv' or algo == 'deepCSV'):
+        print "only 'deepFlv' and 'deepCSV' are accepted here"
+        return None
+    else:
+        x = 0
+        if score > WPbtagger[algo+'_L']:
+            x = x + 1
+        if score > WPbtagger[algo+'_M']:
+            x = x + 1
+        if score > WPbtagger[algo+'_T']:
+            x = x + 1
+        return x
+   
+
 Debug = False
-print Debug
+print "Is Debugging? ", Debug
 
 #Step control booleans
 HLTrig = True
@@ -123,8 +147,13 @@ HadHLTrig = False
 AK8Reco = False
 MCReco = True
 DetReco = True
-BTagging = False
+BTagging = True
 DeltaFilter = True
+DeepFlv = False*BTagging
+DeepCSV = True*BTagging
+
+if DeepCSV == DeepFlv:
+    "Choose one only BTagger!"
 
 #tresholds
 miniIso_cut = 0.1
@@ -320,6 +349,16 @@ for i in range(len(inpfiles)):
                             'ele_all': ROOT.TH1F("MC_Ele_Wprime_transverse_mass", "MC_Ele_Wprime_transverse_mass;Ele W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
                             'mu_all': ROOT.TH1F("MC_Mu_Wprime_transverse_mass", "MC_Mu_Wprime_transverse_mass;Mu W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
         }
+        if DeltaFilter:
+            h_mcWprime_tmass_IsNeg = copy.deepcopy(h_mcWprime_tmass)
+            for value in h_mcWprime_tmass_IsNeg.values():
+                old_title = value.GetTitle()
+                old_name = value.GetName()
+                new_title = insert_char_into_string(len('MC_'), 'IsNeg_', old_title)
+                new_name = insert_char_into_string(len('MC_'), 'IsNeg_', old_name)
+                value.SetTitle(new_title)
+                value.SetName(new_name)
+
         h_mcWprime_tmass_unHLT = copy.deepcopy(h_mcWprime_tmass)
         for value in h_mcWprime_tmass_unHLT.values():
             old_title = value.GetTitle()
@@ -1114,7 +1153,7 @@ for i in range(len(inpfiles)):
                 value.SetTitle(new_title)
                 value.SetName(new_name)
 
-            h_Wprime_mass_chi_L = copy.deepcopy(h_Wprime_mass_sublead)
+            h_Wprime_mass_chi_L = copy.deepcopy(h_Wprime_mass_sublead_L)
             for value in h_Wprime_mass_chi_L.values():
                 old_title = value.GetTitle()
                 old_name = value.GetName()
@@ -1122,7 +1161,7 @@ for i in range(len(inpfiles)):
                 new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
                 value.SetTitle(new_title)
                 value.SetName(new_name)
-            h_Wprime_mass_chi_M = copy.deepcopy(h_Wprime_mass_sublead)
+            h_Wprime_mass_chi_M = copy.deepcopy(h_Wprime_mass_sublead_M)
             for value in h_Wprime_mass_chi_M.values():
                 old_title = value.GetTitle()
                 old_name = value.GetName()
@@ -1130,7 +1169,7 @@ for i in range(len(inpfiles)):
                 new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
                 value.SetTitle(new_title)
                 value.SetName(new_name)
-            h_Wprime_mass_chi_T = copy.deepcopy(h_Wprime_mass_sublead)
+            h_Wprime_mass_chi_T = copy.deepcopy(h_Wprime_mass_sublead_T)
             for value in h_Wprime_mass_chi_T.values():
                 old_title = value.GetTitle()
                 old_name = value.GetName()
@@ -1414,7 +1453,7 @@ for i in range(len(inpfiles)):
                 value.SetTitle(new_title)
                 value.SetName(new_name)
 
-            h_Wprime_tmass_chi_L = copy.deepcopy(h_Wprime_tmass_sublead)
+            h_Wprime_tmass_chi_L = copy.deepcopy(h_Wprime_tmass_sublead_L)
             for value in h_Wprime_tmass_chi_L.values():
                 old_title = value.GetTitle()
                 old_name = value.GetName()
@@ -1422,7 +1461,7 @@ for i in range(len(inpfiles)):
                 new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
                 value.SetTitle(new_title)
                 value.SetName(new_name)
-            h_Wprime_tmass_chi_M = copy.deepcopy(h_Wprime_tmass_sublead)
+            h_Wprime_tmass_chi_M = copy.deepcopy(h_Wprime_tmass_sublead_M)
             for value in h_Wprime_tmass_chi_M.values():
                 old_title = value.GetTitle()
                 old_name = value.GetName()
@@ -1430,7 +1469,7 @@ for i in range(len(inpfiles)):
                 new_name = insert_char_into_string(len('DetReco_'), 'chimass_', old_name)
                 value.SetTitle(new_title)
                 value.SetName(new_name)
-            h_Wprime_tmass_chi_T = copy.deepcopy(h_Wprime_tmass_sublead)
+            h_Wprime_tmass_chi_T = copy.deepcopy(h_Wprime_tmass_sublead_T)
             for value in h_Wprime_tmass_chi_T.values():
                 old_title = value.GetTitle()
                 old_name = value.GetName()
@@ -1597,6 +1636,7 @@ for i in range(len(inpfiles)):
                    'Et': ROOT.TH1F("DetReco_MET_Et", "DetReco_MET_Et;MET Et [GeV];Countings", wnbins, wnmin, wnmax),
                    'phi': ROOT.TH1F("DetReco_MET_phi", "DetReco_MET_phi;MET phi;Countings", 50, 0, 4),
         }
+        '''
         if BTagging:
             h_met_q.update({
                 'pt_0btag': ROOT.TH1F("DetReco_0btag_MET_pt", "DetReco_0btag_MET_pt;0btagged MET pt [GeV];Countings", nbins, nmin, nmax),
@@ -1609,7 +1649,8 @@ for i in range(len(inpfiles)):
                 'Et_2btag': ROOT.TH1F("DetReco_2btag_MET_Et", "DetReco_2btag_MET_Et;2btagged MET Et [GeV];Countings", wnbins, wnmin, wnmax),
                 'phi_2btag': ROOT.TH1F("DetReco_2btag_MET_phi", "DetReco_2btag_MET_phi;2btagged MET phi;Countings", 50, 0, 4),
             })
-
+        
+        
         if DeltaFilter:
             h_met_q_IsNeg = copy.deepcopy(h_met_q)
             for value in h_met_q_IsNeg.values():
@@ -1619,7 +1660,7 @@ for i in range(len(inpfiles)):
                 new_name = insert_char_into_string(len('DetReco_MET_'), 'IsNeg_', old_name)
                 value.SetTitle(new_title)
                 value.SetName(new_name)
-
+        '''
         #histo cut_and_count
         h_countings = ROOT.TH1F("DetReco_countings", "DetReco_countings", 8, 0, 8)
         h_eff_benchmark = ROOT.TH1F("DetReco_bmeff", "DetReco_bmeff", 8, 0, 8)
@@ -1646,7 +1687,7 @@ for i in range(len(inpfiles)):
     nentries = tree.GetEntries()
     
     if Debug:
-        nentries = 5000
+        nentries = 10000
 
     print 'n entries: %i' %(nentries)
    
@@ -1709,7 +1750,7 @@ for i in range(len(inpfiles)):
                
             h_mcWprime_mass_unHLT['gen'].Fill(GenWprime_p4.M())
         
-        #RecoPart spectrum reco
+        #Lepton preselections
         if not pass_MET(Flag):
             badflag += 1
             continue
@@ -1954,10 +1995,13 @@ for i in range(len(inpfiles)):
                         if IsmcNeg:
                             h_mcrecotop_vs_mcWprime_mass_IsNeg.Fill(mctop_p4.M()/MCWprime_p4.M())
                             h_mcWprime_mass_IsNeg['all'].Fill(MCWprime_p4.M())
+                            h_mcWprime_tmass_IsNeg['all'].Fill(MCWprime_p4t.M())
                             if isEle:
                                 h_mcWprime_mass_IsNeg['ele_all'].Fill(MCWprime_p4.M())
+                                h_mcWprime_mass_IsNeg['ele_all'].Fill(MCWprime_p4t.M())
                             elif isMu:
                                 h_mcWprime_mass_IsNeg['mu_all'].Fill(MCWprime_p4.M())
+                                h_mcWprime_mass_IsNeg['mu_all'].Fill(MCWprime_p4t.M())
                         
                     if isLepHLT and LepHLTrig:
                         h_mcWprime_mass_lepHLT['all'].Fill(MCWprime_p4.M())
@@ -2087,26 +2131,52 @@ for i in range(len(inpfiles)):
 
         isJetSel = True
         closest_promptjet = None
+        closest_promptjet_p4t = None
         closest_jet_p4 = None
+        closest_jet_p4t = None
         closest_jet_p4_pre = None
         chi_promptjet = None
+        chi_promptjet_p4t = None
         chi_jet_p4 = None
+        chi_jet_p4t = None
         chi_jet_p4_pre = None
         sublead_promptjet = highptjets[0]
+        sublead_promptjet_p4t = None
         sublead_jet_p4 = None
+        sublead_jet_p4t = None
         sublead_jet_p4_pre = None
         best_promptjet = None
+        best_promptjet_p4t = None
         best_jet_p4 = None
+        best_jet_p4t = None
         DeltaR_nujet = 100.
         DeltaR_Idx = 0
         tm_chi = 1000.
         tm_Idx = 0
         mtop_p4 = None
+        algo = 'deepFlv'*DeepFlv + 'deepCSV'*DeepCSV
 
         closestTrig = False
         chiTrig = False
         subleadTrig = False
         bestTrig = False
+
+        btag_countings_sublead = {'Loose': 0,
+                          'Medium': 1,
+                          'Tight': 2
+        }
+        btag_countings_closest = {'Loose': 0,
+                          'Medium': 1,
+                          'Tight': 2
+        }
+        btag_countings_chi = {'Loose': 0,
+                          'Medium': 1,
+                          'Tight': 2
+        }
+        btag_countings_best = {'Loose': 0,
+                          'Medium': 1,
+                          'Tight': 2
+        }
 
         for k in range(len(goodjets)):
             '''
@@ -2122,7 +2192,12 @@ for i in range(len(inpfiles)):
             if chi < tm_chi:
                 tm_chi = chi
                 tm_Idx = k
-            
+         
+        sellepton_p4t = copy.deepcopy(sellepton.p4())
+        sellepton_p4t.SetPz(0.)
+        recomet_p4t = ROOT.TLorentzVector()
+        recomet_p4t.SetPtEtaPhiM(met.pt, 0., met.phi, 0)         
+
         #jet closest to MET p4
         closest_jet, detrecodR = closest(sellepton, goodjets)
         closest_jet_p4_pre = closest_jet.p4()
@@ -2139,10 +2214,19 @@ for i in range(len(inpfiles)):
             closest_promptjet = highptjets[0]
         closest_recotop_p4, IsNeg_closest = recotop.top4Momentum(sellepton.p4(), closest_jet_p4, MET['metPx'], MET['metPy'])
         IsNeg_closest = IsNeg_closest * DeltaFilter            
-        #print closest_jet.btagDeepFlavB, closest_promptjet.btagDeepFlavB
 
-        #jet reconstructing top with the least chi2 p4
+        for key, value in btag_countings_closest.items():
+            btag_countings_closest[key] = 10*(btagger(algo, closest_jet.btagDeepFlavB*DeepFlv + closest_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, closest_promptjet.btagDeepFlavB*DeepFlv + closest_promptjet.btagDeepB*DeepCSV) > value)
+
+        closest_jet_p4t = copy.deepcopy(closest_jet_p4)
+        closest_jet_p4t.SetPz(0.)
+        closest_recotop_p4t = sellepton_p4t + closest_jet_p4t + recomet_p4t
+        closest_promptjet_p4t = copy.deepcopy(closest_promptjet.p4())
+        closest_promptjet_p4t.SetPz(0.)
+            
+        #jet reconstructing top with the smallest chi2 p4
         chi_jet_p4_pre = goodjets[tm_Idx].p4()
+        chi_jet = goodjets[tm_Idx]
         if deltaR(chi_jet_p4_pre.Eta(), chi_jet_p4_pre.Phi(), sellepton.eta, sellepton.phi) < 0.4:
             chi_jet_p4 = chi_jet_p4_pre - sellepton.p4()
         else:
@@ -2157,11 +2241,22 @@ for i in range(len(inpfiles)):
         chi_recotop_p4, IsNeg_chi = recotop.top4Momentum(sellepton.p4(), chi_jet_p4, MET['metPx'], MET['metPy'])
         IsNeg_chi = IsNeg_chi * DeltaFilter
 
+        for key, value in btag_countings_chi.items():
+            btag_countings_chi[key] = 10*(btagger(algo, chi_jet.btagDeepFlavB*DeepFlv + chi_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, chi_promptjet.btagDeepFlavB*DeepFlv + chi_promptjet.btagDeepB*DeepCSV) > value)
+
+        chi_jet_p4t = copy.deepcopy(chi_jet_p4)
+        chi_jet_p4t.SetPz(0.)
+        chi_recotop_p4t = sellepton_p4t + chi_jet_p4t + recomet_p4t
+        chi_promptjet_p4t = copy.deepcopy(chi_promptjet.p4())
+        chi_promptjet_p4t.SetPz(0.)
+
         #subleading jet reconstruction
         if len(highptjets) > 1:
             sublead_jet_p4_pre = highptjets[1].p4()
+            sublead_jet = highptjets[1]
         else:
             sublead_jet_p4_pre = goodjets[1].p4()
+            sublead_jet = goodjets[1]
         if deltaR(sublead_jet_p4_pre.Eta(), sublead_jet_p4_pre.Phi(), sellepton.eta, sellepton.phi) < 0.4:
             sublead_jet_p4 = sublead_jet_p4_pre - sellepton.p4()
         else:
@@ -2169,6 +2264,16 @@ for i in range(len(inpfiles)):
         sublead_recotop_p4, IsNeg_sublead = recotop.top4Momentum(sellepton.p4(), sublead_jet_p4, MET['metPx'], MET['metPy'])
         IsNeg_sublead = IsNeg_sublead * DeltaFilter
 
+        for key, value in btag_countings_sublead.items():
+            btag_countings_sublead[key] = copy.deepcopy(10*(btagger(algo, sublead_jet.btagDeepFlavB*DeepFlv + sublead_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, sublead_promptjet.btagDeepFlavB*DeepFlv + sublead_promptjet.btagDeepB*DeepCSV) > value))
+
+        sublead_jet_p4t = copy.deepcopy(sublead_jet_p4)
+        sublead_jet_p4t.SetPz(0.)
+        sublead_recotop_p4t = sellepton_p4t + sublead_jet_p4t + recomet_p4t
+        sublead_promptjet_p4t = copy.deepcopy(sublead_promptjet.p4())
+        sublead_promptjet_p4t.SetPz(0.)
+
+        #recotop mass cut
         if not (sublead_recotop_p4 is None):
             if mass_cut_inf < sublead_recotop_p4.M() < mass_cut:#sublead_Wprime_p4.M() > mass_cut:
                 subleadTrig = True
@@ -2187,49 +2292,70 @@ for i in range(len(inpfiles)):
         IsNeg_best = None
         if sublead_jet_p4_pre == closest_jet_p4_pre:
             best_jet_p4 = sublead_jet_p4
+            best_jet = sublead_jet
             best_promptjet = sublead_promptjet
             BestFound = True
         elif sublead_jet_p4_pre == chi_jet_p4_pre:
             best_jet_p4 = sublead_jet_p4
+            best_jet = sublead_jet
             best_promptjet = sublead_promptjet
             BestFound = True
         elif chi_jet_p4_pre == closest_jet_p4_pre:
             best_jet_p4 = chi_jet_p4
+            best_jet = chi_jet
             best_promptjet = chi_promptjet
             BestFound = True
 
         if not BestFound:
-            if chiTrig:
-                best_jet_p4 = chi_jet_p4
-                best_promptjet = chi_promptjet
-                BestFound = True
+            #if chiTrig:
+            best_jet_p4 = chi_jet_p4
+            best_jet = chi_jet
+            best_promptjet = chi_promptjet
+            BestFound = True
+            '''
             elif subleadTrig:
                 best_jet_p4 = sublead_jet_p4
+                best_jet = sublead_jet
                 best_promptjet = sublead_promptjet
                 BestFound = True
             elif closestTrig:
                 best_jet_p4 = closest_jet_p4
+                best_jet = closest_jet
                 best_promptjet = closest_promptjet
                 BestFound = True
+            '''
 
         if BestFound:
             best_recotop_p4, IsNeg_best = recotop.top4Momentum(sellepton.p4(), best_jet_p4, MET['metPx'], MET['metPy'])
             IsNeg_best = IsNeg_best * DeltaFilter
+            best_jet_p4t = copy.deepcopy(best_jet_p4)
+            best_jet_p4t.SetPz(0.)
+            best_recotop_p4t = sellepton_p4t + best_jet_p4t + recomet_p4t
+            best_promptjet_p4t = copy.deepcopy(best_promptjet.p4())
+            best_promptjet_p4t.SetPz(0.)
+
+            for key, value in btag_countings_best.items():
+                btag_countings_best[key] = 10*(btagger(algo, best_jet.btagDeepFlavB*DeepFlv + best_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, best_promptjet.btagDeepFlavB*DeepFlv + best_promptjet.btagDeepB*DeepCSV) > value)
 
         if not (best_recotop_p4 is None):
             if mass_cut_inf < best_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
                 bestTrig = True
-
+        
         #Wprime reco
         if closestTrig:
             closest_Wprime_p4 = closest_recotop_p4 + closest_promptjet.p4()
+            closest_Wprime_p4t = closest_recotop_p4t + closest_promptjet_p4t
         if chiTrig:
             chi_Wprime_p4 = chi_recotop_p4 + chi_promptjet.p4()
+            chi_Wprime_p4t = chi_recotop_p4t + chi_promptjet_p4t
         if subleadTrig:
             sublead_Wprime_p4 = sublead_recotop_p4 + sublead_promptjet.p4()
+            sublead_Wprime_p4t = sublead_recotop_p4t + sublead_promptjet_p4t
+
         best_Wprime_p4 = None
         if bestTrig:
             best_Wprime_p4 = best_recotop_p4 + best_promptjet.p4()
+            best_Wprime_p4t = best_recotop_p4t + best_promptjet_p4t
 
         if not (sublead_recotop_p4 is None) and not IsNeg_sublead:
             h_criteria_quant['sublead'].Fill(sublead_jet_p4.Pt())
@@ -2280,23 +2406,30 @@ for i in range(len(inpfiles)):
                 sublead_ev += 1
                 h_recotop_vs_Wprime_mass_sublead['nobtag'].Fill(sublead_recotop_p4.M()/sublead_Wprime_p4.M())
                 h_jet_pt_sublead['topbjet'].Fill(sublead_jet_p4.Pt())
-                h_jet_pt_sublead['Wbjet'].Fill(sublead_promptjet.pt)
-                h_jet_pt_sublead['top'].Fill(sublead_recotop_p4.Pt())
                 h_recotop_mass_sublead['top'].Fill(sublead_recotop_p4.M())
+                h_jet_pt_sublead['top'].Fill(sublead_recotop_p4.Pt())
+                h_jet_pt_sublead['Wbjet'].Fill(sublead_promptjet.pt)
+                
                 h_Wprime_mass_sublead['all'].Fill(sublead_Wprime_p4.M())
+                h_Wprime_tmass_sublead['all'].Fill(sublead_Wprime_p4t.M())
                 if isEle:
                     h_Wprime_mass_sublead['ele_all'].Fill(sublead_Wprime_p4.M())
+                    h_Wprime_tmass_sublead['ele_all'].Fill(sublead_Wprime_p4t.M())
                 if isMu:
                     h_Wprime_mass_sublead['mu_all'].Fill(sublead_Wprime_p4.M())
+                    h_Wprime_tmass_sublead['mu_all'].Fill(sublead_Wprime_p4t.M())
             
             if IsNeg_sublead:
                 h_recotop_vs_Wprime_mass_sublead_IsNeg['nobtag'].Fill(sublead_recotop_p4.M()/sublead_Wprime_p4.M())
                 h_recotop_mass_sublead_IsNeg['top'].Fill(sublead_recotop_p4.M())
                 h_Wprime_mass_sublead_IsNeg['all'].Fill(sublead_Wprime_p4.M())
+                h_Wprime_tmass_sublead_IsNeg['all'].Fill(sublead_Wprime_p4t.M())
                 if isEle:
                     h_Wprime_mass_sublead_IsNeg['ele_all'].Fill(sublead_Wprime_p4.M())
+                    h_Wprime_tmass_sublead_IsNeg['ele_all'].Fill(sublead_Wprime_p4t.M())
                 if isMu:
                     h_Wprime_mass_sublead_IsNeg['mu_all'].Fill(sublead_Wprime_p4.M())
+                    h_Wprime_tmass_sublead_IsNeg['mu_all'].Fill(sublead_Wprime_p4t.M())
             
         if closestTrig:
             if not IsNeg_closest:
@@ -2307,19 +2440,25 @@ for i in range(len(inpfiles)):
                 h_jet_pt_closest['top'].Fill(closest_recotop_p4.Pt())
                 h_recotop_mass_closest['top'].Fill(closest_recotop_p4.M())
                 h_Wprime_mass_closest['all'].Fill(closest_Wprime_p4.M())
+                h_Wprime_tmass_closest['all'].Fill(closest_Wprime_p4t.M())
                 if isEle:
                     h_Wprime_mass_closest['ele_all'].Fill(closest_Wprime_p4.M())
+                    h_Wprime_tmass_closest['ele_all'].Fill(closest_Wprime_p4t.M())
                 if isMu:
                     h_Wprime_mass_closest['mu_all'].Fill(closest_Wprime_p4.M())
+                    h_Wprime_tmass_closest['mu_all'].Fill(closest_Wprime_p4t.M())
             
             if IsNeg_closest:
                 h_recotop_vs_Wprime_mass_closest_IsNeg['nobtag'].Fill(closest_recotop_p4.M()/closest_Wprime_p4.M())
                 h_recotop_mass_closest_IsNeg['top'].Fill(closest_recotop_p4.M())
                 h_Wprime_mass_closest_IsNeg['all'].Fill(closest_Wprime_p4.M())
+                h_Wprime_tmass_closest_IsNeg['all'].Fill(closest_Wprime_p4t.M())
                 if isEle:
                     h_Wprime_mass_closest_IsNeg['ele_all'].Fill(closest_Wprime_p4.M())
+                    h_Wprime_tmass_closest_IsNeg['ele_all'].Fill(closest_Wprime_p4t.M())
                 if isMu:
                     h_Wprime_mass_closest_IsNeg['mu_all'].Fill(closest_Wprime_p4.M())
+                    h_Wprime_tmass_closest_IsNeg['mu_all'].Fill(closest_Wprime_p4t.M())
             
         if chiTrig:
             if not IsNeg_chi:
@@ -2330,19 +2469,25 @@ for i in range(len(inpfiles)):
                 h_jet_pt_chi['top'].Fill(chi_recotop_p4.Pt())
                 h_recotop_mass_chi['top'].Fill(chi_recotop_p4.M())
                 h_Wprime_mass_chi['all'].Fill(chi_Wprime_p4.M())
+                h_Wprime_tmass_chi['all'].Fill(chi_Wprime_p4t.M())
                 if isEle:
                     h_Wprime_mass_chi['ele_all'].Fill(chi_Wprime_p4.M())
+                    h_Wprime_tmass_chi['ele_all'].Fill(chi_Wprime_p4t.M())
                 if isMu:
                     h_Wprime_mass_chi['mu_all'].Fill(chi_Wprime_p4.M())
+                    h_Wprime_tmass_chi['mu_all'].Fill(chi_Wprime_p4t.M())
             
             if IsNeg_chi:
                 h_recotop_vs_Wprime_mass_chi_IsNeg['nobtag'].Fill(chi_recotop_p4.M()/chi_Wprime_p4.M())
                 h_recotop_mass_chi_IsNeg['top'].Fill(chi_recotop_p4.M())
                 h_Wprime_mass_chi_IsNeg['all'].Fill(chi_Wprime_p4.M())
+                h_Wprime_tmass_chi_IsNeg['all'].Fill(chi_Wprime_p4t.M())
                 if isEle:
                     h_Wprime_mass_chi_IsNeg['ele_all'].Fill(chi_Wprime_p4.M())
+                    h_Wprime_tmass_chi_IsNeg['ele_all'].Fill(chi_Wprime_p4t.M())
                 if isMu:
                     h_Wprime_mass_chi_IsNeg['mu_all'].Fill(chi_Wprime_p4.M())
+                    h_Wprime_tmass_chi_IsNeg['mu_all'].Fill(chi_Wprime_p4t.M())
             
         if bestTrig:
             if not IsNeg_best:
@@ -2353,20 +2498,27 @@ for i in range(len(inpfiles)):
                 h_jet_pt_best['top'].Fill(best_recotop_p4.Pt())
                 h_recotop_mass_best['top'].Fill(best_recotop_p4.M())
                 h_Wprime_mass_best['all'].Fill(best_Wprime_p4.M())
+                h_Wprime_tmass_best['all'].Fill(best_Wprime_p4t.M())
                 if isEle:
                     h_Wprime_mass_best['ele_all'].Fill(best_Wprime_p4.M())
+                    h_Wprime_tmass_best['ele_all'].Fill(best_Wprime_p4t.M())
                 if isMu:
                     h_Wprime_mass_best['mu_all'].Fill(best_Wprime_p4.M())
+                    h_Wprime_tmass_best['mu_all'].Fill(best_Wprime_p4t.M())
             
             if IsNeg_best:
                 h_recotop_vs_Wprime_mass_best_IsNeg['nobtag'].Fill(best_recotop_p4.M()/best_Wprime_p4.M())
                 h_recotop_mass_best_IsNeg['top'].Fill(best_recotop_p4.M())
                 h_Wprime_mass_best_IsNeg['all'].Fill(best_Wprime_p4.M())
+                h_Wprime_tmass_best_IsNeg['all'].Fill(best_Wprime_p4t.M())
                 if isEle:
                     h_Wprime_mass_best_IsNeg['ele_all'].Fill(best_Wprime_p4.M())
+                    h_Wprime_tmass_best_IsNeg['ele_all'].Fill(best_Wprime_p4t.M())
                 if isMu:
                     h_Wprime_mass_best_IsNeg['mu_all'].Fill(best_Wprime_p4.M())
+                    h_Wprime_tmass_best_IsNeg['mu_all'].Fill(best_Wprime_p4t.M())
             
+        '''
         if subleadTrig or closestTrig or chiTrig:
             if not (IsNeg_sublead or IsNeg_closest or IsNeg_chi):
                 h_met_q['pt'].Fill(met.pt)
@@ -2381,15 +2533,875 @@ for i in range(len(inpfiles)):
                 h_met_q_IsNeg['pt'].Fill(met.pt)
                 h_met_q_IsNeg['Et'].Fill(met.sumEt)
                 h_met_q_IsNeg['phi'].Fill(met.phi)
+        '''    
+        if BTagging:
+            if subleadTrig:
+                if not IsNeg_sublead:
+                    if btag_countings_sublead['Loose']/10 == 1:
+                        h_jet_pt_sublead_L['topbjet_btag'].Fill(sublead_jet_p4.Pt())
+                        h_recotop_mass_sublead_L['top_btag'].Fill(sublead_recotop_p4.M())
+                    elif btag_countings_sublead['Loose']/10 == 0:
+                        h_jet_pt_sublead_L['topbjet_nobtag'].Fill(sublead_jet_p4.Pt())
+                        h_recotop_mass_sublead_L['top_nobtag'].Fill(sublead_recotop_p4.M())
+                    if btag_countings_sublead['Medium']/10 == 1:
+                        h_jet_pt_sublead_M['topbjet_btag'].Fill(sublead_jet_p4.Pt())
+                        h_recotop_mass_sublead_M['top_btag'].Fill(sublead_recotop_p4.M())
+                    elif btag_countings_sublead['Medium']/10 == 0:
+                        h_jet_pt_sublead_M['topbjet_nobtag'].Fill(sublead_jet_p4.Pt())
+                        h_recotop_mass_sublead_M['top_nobtag'].Fill(sublead_recotop_p4.M())
+                    if btag_countings_sublead['Tight']/10 == 1:
+                        h_jet_pt_sublead_T['topbjet_btag'].Fill(sublead_jet_p4.Pt())
+                        h_recotop_mass_sublead_T['top_btag'].Fill(sublead_recotop_p4.M())
+                    elif btag_countings_sublead['Tight']/10 == 0:
+                        h_jet_pt_sublead_T['topbjet_nobtag'].Fill(sublead_jet_p4.Pt())
+                        h_recotop_mass_sublead_T['top_nobtag'].Fill(sublead_recotop_p4.M())
+
+                    if btag_countings_sublead['Loose']%10 == 1:
+                        h_jet_pt_sublead_L['Wbjet_btag'].Fill(sublead_promptjet.pt)
+                    elif btag_countings_sublead['Loose']%10 == 0:
+                        h_jet_pt_sublead_L['Wbjet_nobtag'].Fill(sublead_promptjet.pt)
+                    if btag_countings_sublead['Medium']%10 == 1:
+                        h_jet_pt_sublead_M['Wbjet_btag'].Fill(sublead_promptjet.pt)
+                    elif btag_countings_sublead['Medium']%10 == 0:
+                        h_jet_pt_sublead_M['Wbjet_nobtag'].Fill(sublead_promptjet.pt)
+                    if btag_countings_sublead['Tight']%10 == 1:
+                        h_jet_pt_sublead_T['Wbjet_btag'].Fill(sublead_promptjet.pt)
+                    elif btag_countings_sublead['Tight']%10 == 0:
+                        h_jet_pt_sublead_T['Wbjet_nobtag'].Fill(sublead_promptjet.pt)
+
+                    if btag_countings_sublead['Loose'] == 0:
+                        h_Wprime_mass_sublead_L['all_0btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_L['all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_L['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_L['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                    elif bool(btag_countings_sublead['Loose'] == 10) != bool(btag_countings_sublead['Loose'] == 1):
+                        h_Wprime_mass_sublead_L['all_1btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_L['all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_L['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_L['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                    elif btag_countings_sublead['Loose'] == 11:
+                        h_Wprime_mass_sublead_L['all_2btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_L['all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_L['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_L['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+
+                    if btag_countings_sublead['Medium'] == 0:
+                        h_Wprime_mass_sublead_M['all_0btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_M['all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_M['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_M['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                    elif bool(btag_countings_sublead['Medium'] == 10) != bool(btag_countings_sublead['Medium'] == 1):
+                        h_Wprime_mass_sublead_M['all_1btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_M['all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_M['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_M['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                    elif btag_countings_sublead['Medium'] == 11:
+                        h_Wprime_mass_sublead_M['all_2btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_M['all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_M['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_M['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+
+                    if btag_countings_sublead['Tight'] == 0:
+                        h_Wprime_mass_sublead_T['all_0btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_T['all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_T['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_T['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                    elif bool(btag_countings_sublead['Tight'] == 10) != bool(btag_countings_sublead['Tight'] == 1):
+                        h_Wprime_mass_sublead_T['all_1btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_T['all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_T['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_T['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                    elif btag_countings_sublead['Tight'] == 11:
+                        h_Wprime_mass_sublead_T['all_2btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_T['all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_T['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_T['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+
             
+                if IsNeg_sublead:
+                    if btag_countings_sublead['Loose']/10 == 1:
+                        h_recotop_mass_sublead_IsNeg_L['top_btag'].Fill(sublead_recotop_p4.M())
+                    elif btag_countings_sublead['Loose']/10 == 0:
+                        h_recotop_mass_sublead_IsNeg_L['top_nobtag'].Fill(sublead_recotop_p4.M())
+                    if btag_countings_sublead['Medium']/10 == 1:
+                        h_recotop_mass_sublead_IsNeg_M['top_btag'].Fill(sublead_recotop_p4.M())
+                    elif btag_countings_sublead['Medium']/10 == 0:
+                        h_recotop_mass_sublead_IsNeg_M['top_nobtag'].Fill(sublead_recotop_p4.M())
+                    if btag_countings_sublead['Tight']/10 == 1:
+                        h_recotop_mass_sublead_IsNeg_T['top_btag'].Fill(sublead_recotop_p4.M())
+                    elif btag_countings_sublead['Tight']/10 == 0:
+                        h_recotop_mass_sublead_IsNeg_T['top_nobtag'].Fill(sublead_recotop_p4.M())
+
+                    if btag_countings_sublead['Loose'] == 0:
+                        h_Wprime_mass_sublead_IsNeg_L['all_0btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_IsNeg_L['all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_IsNeg_L['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_IsNeg_L['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                    elif bool(btag_countings_sublead['Loose'] == 10) != bool(btag_countings_sublead['Loose'] == 1):
+                        h_Wprime_mass_sublead_IsNeg_L['all_1btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_IsNeg_L['all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_IsNeg_L['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_IsNeg_L['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                    elif btag_countings_sublead['Loose'] == 11:
+                        h_Wprime_mass_sublead_IsNeg_L['all_2btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_IsNeg_L['all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_IsNeg_L['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_IsNeg_L['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+
+                    if btag_countings_sublead['Medium'] == 0:
+                        h_Wprime_mass_sublead_IsNeg_M['all_0btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_IsNeg_M['all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_IsNeg_M['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_IsNeg_M['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                    elif bool(btag_countings_sublead['Medium'] == 10) != bool(btag_countings_sublead['Medium'] == 1):
+                        h_Wprime_mass_sublead_IsNeg_M['all_1btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_IsNeg_M['all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_IsNeg_M['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_IsNeg_M['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                    elif btag_countings_sublead['Medium'] == 11:
+                        h_Wprime_mass_sublead_IsNeg_M['all_2btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_IsNeg_M['all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_IsNeg_M['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_IsNeg_M['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+
+                    if btag_countings_sublead['Tight'] == 0:
+                        h_Wprime_mass_sublead_IsNeg_T['all_0btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_IsNeg_T['all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_IsNeg_T['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_IsNeg_T['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                    elif bool(btag_countings_sublead['Tight'] == 10) != bool(btag_countings_sublead['Tight'] == 1):
+                        h_Wprime_mass_sublead_IsNeg_T['all_1btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_IsNeg_T['all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_IsNeg_T['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_IsNeg_T['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                    elif btag_countings_sublead['Tight'] == 11:
+                        h_Wprime_mass_sublead_IsNeg_T['all_2btag'].Fill(sublead_Wprime_p4.M())
+                        h_Wprime_tmass_sublead_IsNeg_T['all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_sublead_IsNeg_T['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_sublead_IsNeg_T['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+            
+            if closestTrig:
+                if not IsNeg_closest:
+                    if btag_countings_closest['Loose']/10 == 1:
+                        h_jet_pt_closest_L['topbjet_btag'].Fill(closest_jet_p4.Pt())
+                        h_recotop_mass_closest_L['top_btag'].Fill(closest_recotop_p4.M())
+                    elif btag_countings_closest['Loose']/10 == 0:
+                        h_jet_pt_closest_L['topbjet_nobtag'].Fill(closest_jet_p4.Pt())
+                        h_recotop_mass_closest_L['top_nobtag'].Fill(closest_recotop_p4.M())
+                    if btag_countings_closest['Medium']/10 == 1:
+                        h_jet_pt_closest_M['topbjet_btag'].Fill(closest_jet_p4.Pt())
+                        h_recotop_mass_closest_M['top_btag'].Fill(closest_recotop_p4.M())
+                    elif btag_countings_closest['Medium']/10 == 0:
+                        h_jet_pt_closest_M['topbjet_nobtag'].Fill(closest_jet_p4.Pt())
+                        h_recotop_mass_closest_M['top_nobtag'].Fill(closest_recotop_p4.M())
+                    if btag_countings_closest['Tight']/10 == 1:
+                        h_jet_pt_closest_T['topbjet_btag'].Fill(closest_jet_p4.Pt())
+                        h_recotop_mass_closest_T['top_btag'].Fill(closest_recotop_p4.M())
+                    elif btag_countings_closest['Tight']/10 == 0:
+                        h_jet_pt_closest_T['topbjet_nobtag'].Fill(closest_jet_p4.Pt())
+                        h_recotop_mass_closest_T['top_nobtag'].Fill(closest_recotop_p4.M())
+
+                    if btag_countings_closest['Loose']%10 == 1:
+                        h_jet_pt_closest_L['Wbjet_btag'].Fill(closest_promptjet.pt)
+                    elif btag_countings_closest['Loose']%10 == 0:
+                        h_jet_pt_closest_L['Wbjet_nobtag'].Fill(closest_promptjet.pt)
+                    if btag_countings_closest['Medium']%10 == 1:
+                        h_jet_pt_closest_M['Wbjet_btag'].Fill(closest_promptjet.pt)
+                    elif btag_countings_closest['Medium']%10 == 0:
+                        h_jet_pt_closest_M['Wbjet_nobtag'].Fill(closest_promptjet.pt)
+                    if btag_countings_closest['Tight']%10 == 1:
+                        h_jet_pt_closest_T['Wbjet_btag'].Fill(closest_promptjet.pt)
+                    elif btag_countings_closest['Tight']%10 == 0:
+                        h_jet_pt_closest_T['Wbjet_nobtag'].Fill(closest_promptjet.pt)
+
+                    if btag_countings_closest['Loose'] == 0:
+                        h_Wprime_mass_closest_L['all_0btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_L['all_0btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_L['ele_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_L['mu_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                    elif bool(btag_countings_closest['Loose'] == 10) != bool(btag_countings_closest['Loose'] == 1):
+                        h_Wprime_mass_closest_L['all_1btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_L['all_1btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_L['ele_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_L['mu_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                    elif btag_countings_closest['Loose'] == 11:
+                        h_Wprime_mass_closest_L['all_2btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_L['all_2btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_L['ele_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_L['mu_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+
+                    if btag_countings_closest['Medium'] == 0:
+                        h_Wprime_mass_closest_M['all_0btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_M['all_0btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_M['ele_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_M['mu_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                    elif bool(btag_countings_closest['Medium'] == 10) != bool(btag_countings_closest['Medium'] == 1):
+                        h_Wprime_mass_closest_M['all_1btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_M['all_1btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_M['ele_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_M['mu_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                    elif btag_countings_closest['Medium'] == 11:
+                        h_Wprime_mass_closest_M['all_2btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_M['all_2btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_M['ele_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_M['mu_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+
+                    if btag_countings_closest['Tight'] == 0:
+                        h_Wprime_mass_closest_T['all_0btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_T['all_0btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_T['ele_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_T['mu_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                    elif bool(btag_countings_closest['Tight'] == 10) != bool(btag_countings_closest['Tight'] == 1):
+                        h_Wprime_mass_closest_T['all_1btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_T['all_1btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_T['ele_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_T['mu_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                    elif btag_countings_closest['Tight'] == 11:
+                        h_Wprime_mass_closest_T['all_2btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_T['all_2btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_T['ele_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                        if isMu:
+                            h_Wprime_mass_closest_T['mu_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+            
+                if IsNeg_closest:
+                    if btag_countings_closest['Loose']/10 == 1:
+                        h_recotop_mass_closest_IsNeg_L['top_btag'].Fill(closest_recotop_p4.M())
+                    elif btag_countings_closest['Loose']/10 == 0:
+                        h_recotop_mass_closest_IsNeg_L['top_nobtag'].Fill(closest_recotop_p4.M())
+                    if btag_countings_closest['Medium']/10 == 1:
+                        h_recotop_mass_closest_IsNeg_M['top_btag'].Fill(closest_recotop_p4.M())
+                    elif btag_countings_closest['Medium']/10 == 0:
+                        h_recotop_mass_closest_IsNeg_M['top_nobtag'].Fill(closest_recotop_p4.M())
+                    if btag_countings_closest['Tight']/10 == 1:
+                        h_recotop_mass_closest_IsNeg_T['top_btag'].Fill(closest_recotop_p4.M())
+                    elif btag_countings_closest['Tight']/10 == 0:
+                        h_recotop_mass_closest_IsNeg_T['top_nobtag'].Fill(closest_recotop_p4.M())
+
+                    if btag_countings_closest['Loose'] == 0:
+                        h_Wprime_mass_closest_IsNeg_L['all_0btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_IsNeg_L['all_0btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_IsNeg_L['ele_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_IsNeg_L['mu_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                    elif bool(btag_countings_closest['Loose'] == 10) != bool(btag_countings_closest['Loose'] == 1):
+                        h_Wprime_mass_closest_IsNeg_L['all_1btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_IsNeg_L['all_1btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_IsNeg_L['ele_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_IsNeg_L['mu_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                    elif btag_countings_closest['Loose'] == 11:
+                        h_Wprime_mass_closest_IsNeg_L['all_2btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_IsNeg_L['all_2btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_IsNeg_L['ele_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_IsNeg_L['mu_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+
+                    if btag_countings_closest['Medium'] == 0:
+                        h_Wprime_mass_closest_IsNeg_M['all_0btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_IsNeg_M['all_0btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_IsNeg_M['ele_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_IsNeg_M['mu_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                    elif bool(btag_countings_closest['Medium'] == 10) != bool(btag_countings_closest['Medium'] == 1):
+                        h_Wprime_mass_closest_IsNeg_M['all_1btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_IsNeg_M['all_1btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_IsNeg_M['ele_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_IsNeg_M['mu_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                    elif btag_countings_closest['Medium'] == 11:
+                        h_Wprime_mass_closest_IsNeg_M['all_2btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_IsNeg_M['all_2btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_IsNeg_M['ele_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_IsNeg_M['mu_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+
+                    if btag_countings_closest['Tight'] == 0:
+                        h_Wprime_mass_closest_IsNeg_T['all_0btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_IsNeg_T['all_0btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_IsNeg_T['ele_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_IsNeg_T['mu_all_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                    elif bool(btag_countings_closest['Tight'] == 10) != bool(btag_countings_closest['Tight'] == 1):
+                        h_Wprime_mass_closest_IsNeg_T['all_1btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_IsNeg_T['all_1btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_IsNeg_T['ele_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_IsNeg_T['mu_all_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                    elif btag_countings_closest['Tight'] == 11:
+                        h_Wprime_mass_closest_IsNeg_T['all_2btag'].Fill(closest_Wprime_p4.M())
+                        h_Wprime_tmass_closest_IsNeg_T['all_2btag'].Fill(closest_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_closest_IsNeg_T['ele_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_closest_IsNeg_T['mu_all_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+            
+            if chiTrig:
+                if not IsNeg_chi:
+                    if btag_countings_chi['Loose']/10 == 1:
+                        h_jet_pt_chi_L['topbjet_btag'].Fill(chi_jet_p4.Pt())
+                        h_recotop_mass_chi_L['top_btag'].Fill(chi_recotop_p4.M())
+                    elif btag_countings_chi['Loose']/10 == 0:
+                        h_jet_pt_chi_L['topbjet_nobtag'].Fill(chi_jet_p4.Pt())
+                        h_recotop_mass_chi_L['top_nobtag'].Fill(chi_recotop_p4.M())
+                    if btag_countings_chi['Medium']/10 == 1:
+                        h_jet_pt_chi_M['topbjet_btag'].Fill(chi_jet_p4.Pt())
+                        h_recotop_mass_chi_M['top_btag'].Fill(chi_recotop_p4.M())
+                    elif btag_countings_chi['Medium']/10 == 0:
+                        h_jet_pt_chi_M['topbjet_nobtag'].Fill(chi_jet_p4.Pt())
+                        h_recotop_mass_chi_M['top_nobtag'].Fill(chi_recotop_p4.M())
+                    if btag_countings_chi['Tight']/10 == 1:
+                        h_jet_pt_chi_T['topbjet_btag'].Fill(chi_jet_p4.Pt())
+                        h_recotop_mass_chi_T['top_btag'].Fill(chi_recotop_p4.M())
+                    elif btag_countings_chi['Tight']/10 == 0:
+                        h_jet_pt_chi_T['topbjet_nobtag'].Fill(chi_jet_p4.Pt())
+                        h_recotop_mass_chi_T['top_nobtag'].Fill(chi_recotop_p4.M())
+
+                    if btag_countings_chi['Loose']%10 == 1:
+                        h_jet_pt_chi_L['Wbjet_btag'].Fill(chi_promptjet.pt)
+                    elif btag_countings_chi['Loose']%10 == 0:
+                        h_jet_pt_chi_L['Wbjet_nobtag'].Fill(chi_promptjet.pt)
+                    if btag_countings_chi['Medium']%10 == 1:
+                        h_jet_pt_chi_M['Wbjet_btag'].Fill(chi_promptjet.pt)
+                    elif btag_countings_chi['Medium']%10 == 0:
+                        h_jet_pt_chi_M['Wbjet_nobtag'].Fill(chi_promptjet.pt)
+                    if btag_countings_chi['Tight']%10 == 1:
+                        h_jet_pt_chi_T['Wbjet_btag'].Fill(chi_promptjet.pt)
+                    elif btag_countings_chi['Tight']%10 == 0:
+                        h_jet_pt_chi_T['Wbjet_nobtag'].Fill(chi_promptjet.pt)
+
+                    if btag_countings_chi['Loose'] == 0:
+                        h_Wprime_mass_chi_L['all_0btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_L['all_0btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_L['ele_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_L['mu_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                    elif bool(btag_countings_chi['Loose'] == 10) != bool(btag_countings_chi['Loose'] == 1):
+                        h_Wprime_mass_chi_L['all_1btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_L['all_1btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_L['ele_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_L['mu_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                    elif btag_countings_chi['Loose'] == 11:
+                        h_Wprime_mass_chi_L['all_2btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_L['all_2btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_L['ele_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_L['mu_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+
+                    if btag_countings_chi['Medium'] == 0:
+                        h_Wprime_mass_chi_M['all_0btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_M['all_0btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_M['ele_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_M['mu_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                    elif bool(btag_countings_chi['Medium'] == 10) != bool(btag_countings_chi['Medium'] == 1):
+                        h_Wprime_mass_chi_M['all_1btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_M['all_1btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_M['ele_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_M['mu_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                    elif btag_countings_chi['Medium'] == 11:
+                        h_Wprime_mass_chi_M['all_2btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_M['all_2btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_M['ele_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_M['mu_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+
+                    if btag_countings_chi['Tight'] == 0:
+                        h_Wprime_mass_chi_T['all_0btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_T['all_0btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_T['ele_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_T['mu_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                    elif bool(btag_countings_chi['Tight'] == 10) != bool(btag_countings_chi['Tight'] == 1):
+                        h_Wprime_mass_chi_T['all_1btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_T['all_1btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_T['ele_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_T['mu_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                    elif btag_countings_chi['Tight'] == 11:
+                        h_Wprime_mass_chi_T['all_2btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_T['all_2btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_T['ele_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_T['mu_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+            
+                if IsNeg_chi:
+                    if btag_countings_chi['Loose']/10 == 1:
+                        h_recotop_mass_chi_IsNeg_L['top_btag'].Fill(chi_recotop_p4.M())
+                    elif btag_countings_chi['Loose']/10 == 0:
+                        h_recotop_mass_chi_IsNeg_L['top_nobtag'].Fill(chi_recotop_p4.M())
+                    if btag_countings_chi['Medium']/10 == 1:
+                        h_recotop_mass_chi_IsNeg_M['top_btag'].Fill(chi_recotop_p4.M())
+                    elif btag_countings_chi['Medium']/10 == 0:
+                        h_recotop_mass_chi_IsNeg_M['top_nobtag'].Fill(chi_recotop_p4.M())
+                    if btag_countings_chi['Tight']/10 == 1:
+                        h_recotop_mass_chi_IsNeg_T['top_btag'].Fill(chi_recotop_p4.M())
+                    elif btag_countings_chi['Tight']/10 == 0:
+                        h_recotop_mass_chi_IsNeg_T['top_nobtag'].Fill(chi_recotop_p4.M())
+
+                    if btag_countings_chi['Loose'] == 0:
+                        h_Wprime_mass_chi_IsNeg_L['all_0btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_IsNeg_L['all_0btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_IsNeg_L['ele_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_IsNeg_L['mu_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                    elif bool(btag_countings_chi['Loose'] == 10) != bool(btag_countings_chi['Loose'] == 1):
+                        h_Wprime_mass_chi_IsNeg_L['all_1btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_IsNeg_L['all_1btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_IsNeg_L['ele_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_IsNeg_L['mu_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                    elif btag_countings_chi['Loose'] == 11:
+                        h_Wprime_mass_chi_IsNeg_L['all_2btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_IsNeg_L['all_2btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_IsNeg_L['ele_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_IsNeg_L['mu_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+
+                    if btag_countings_chi['Medium'] == 0:
+                        h_Wprime_mass_chi_IsNeg_M['all_0btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_IsNeg_M['all_0btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_IsNeg_M['ele_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_IsNeg_M['mu_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                    elif bool(btag_countings_chi['Medium'] == 10) != bool(btag_countings_chi['Medium'] == 1):
+                        h_Wprime_mass_chi_IsNeg_M['all_1btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_IsNeg_M['all_1btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_IsNeg_M['ele_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_IsNeg_M['mu_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                    elif btag_countings_chi['Medium'] == 11:
+                        h_Wprime_mass_chi_IsNeg_M['all_2btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_IsNeg_M['all_2btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_IsNeg_M['ele_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_IsNeg_M['mu_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+
+                    if btag_countings_chi['Tight'] == 0:
+                        h_Wprime_mass_chi_IsNeg_T['all_0btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_IsNeg_T['all_0btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_IsNeg_T['ele_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_IsNeg_T['mu_all_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                    elif bool(btag_countings_chi['Tight'] == 10) != bool(btag_countings_chi['Tight'] == 1):
+                        h_Wprime_mass_chi_IsNeg_T['all_1btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_IsNeg_T['all_1btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_IsNeg_T['ele_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_IsNeg_T['mu_all_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                    elif btag_countings_chi['Tight'] == 11:
+                        h_Wprime_mass_chi_IsNeg_T['all_2btag'].Fill(chi_Wprime_p4.M())
+                        h_Wprime_tmass_chi_IsNeg_T['all_2btag'].Fill(chi_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_chi_IsNeg_T['ele_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_chi_IsNeg_T['mu_all_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+            
+            if bestTrig:
+                if not IsNeg_best:
+                    if btag_countings_best['Loose']/10 == 1:
+                        h_jet_pt_best_L['topbjet_btag'].Fill(best_jet_p4.Pt())
+                        h_recotop_mass_best_L['top_btag'].Fill(best_recotop_p4.M())
+                    elif btag_countings_best['Loose']/10 == 0:
+                        h_jet_pt_best_L['topbjet_nobtag'].Fill(best_jet_p4.Pt())
+                        h_recotop_mass_best_L['top_nobtag'].Fill(best_recotop_p4.M())
+                    if btag_countings_best['Medium']/10 == 1:
+                        h_jet_pt_best_M['topbjet_btag'].Fill(best_jet_p4.Pt())
+                        h_recotop_mass_best_M['top_btag'].Fill(best_recotop_p4.M())
+                    elif btag_countings_best['Medium']/10 == 0:
+                        h_jet_pt_best_M['topbjet_nobtag'].Fill(best_jet_p4.Pt())
+                        h_recotop_mass_best_M['top_nobtag'].Fill(best_recotop_p4.M())
+                    if btag_countings_best['Tight']/10 == 1:
+                        h_jet_pt_best_T['topbjet_btag'].Fill(best_jet_p4.Pt())
+                        h_recotop_mass_best_T['top_btag'].Fill(best_recotop_p4.M())
+                    elif btag_countings_best['Tight']/10 == 0:
+                        h_jet_pt_best_T['topbjet_nobtag'].Fill(best_jet_p4.Pt())
+                        h_recotop_mass_best_T['top_nobtag'].Fill(best_recotop_p4.M())
+
+                    if btag_countings_best['Loose']%10 == 1:
+                        h_jet_pt_best_L['Wbjet_btag'].Fill(best_promptjet.pt)
+                    elif btag_countings_best['Loose']%10 == 0:
+                        h_jet_pt_best_L['Wbjet_nobtag'].Fill(best_promptjet.pt)
+                    if btag_countings_best['Medium']%10 == 1:
+                        h_jet_pt_best_M['Wbjet_btag'].Fill(best_promptjet.pt)
+                    elif btag_countings_best['Medium']%10 == 0:
+                        h_jet_pt_best_M['Wbjet_nobtag'].Fill(best_promptjet.pt)
+                    if btag_countings_best['Tight']%10 == 1:
+                        h_jet_pt_best_T['Wbjet_btag'].Fill(best_promptjet.pt)
+                    elif btag_countings_best['Tight']%10 == 0:
+                        h_jet_pt_best_T['Wbjet_nobtag'].Fill(best_promptjet.pt)
+
+                    if btag_countings_best['Loose'] == 0:
+                        h_Wprime_mass_best_L['all_0btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_L['all_0btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_L['ele_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_L['mu_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                    elif bool(btag_countings_best['Loose'] == 10) != bool(btag_countings_best['Loose'] == 1):
+                        h_Wprime_mass_best_L['all_1btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_L['all_1btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_L['ele_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_L['mu_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                    elif btag_countings_best['Loose'] == 11:
+                        h_Wprime_mass_best_L['all_2btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_L['all_2btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_L['ele_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_L['mu_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+
+                    if btag_countings_best['Medium'] == 0:
+                        h_Wprime_mass_best_M['all_0btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_M['all_0btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_M['ele_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_M['mu_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                    elif bool(btag_countings_best['Medium'] == 10) != bool(btag_countings_best['Medium'] == 1):
+                        h_Wprime_mass_best_M['all_1btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_M['all_1btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_M['ele_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_M['mu_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                    elif btag_countings_best['Medium'] == 11:
+                        h_Wprime_mass_best_M['all_2btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_M['all_2btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_M['ele_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_M['mu_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+
+                    if btag_countings_best['Tight'] == 0:
+                        h_Wprime_mass_best_T['all_0btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_T['all_0btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_T['ele_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_T['mu_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                    elif bool(btag_countings_best['Tight'] == 10) != bool(btag_countings_best['Tight'] == 1):
+                        h_Wprime_mass_best_T['all_1btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_T['all_1btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_T['ele_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_T['mu_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                    elif btag_countings_best['Tight'] == 11:
+                        h_Wprime_mass_best_T['all_2btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_T['all_2btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_T['ele_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_T['mu_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+            
+                if IsNeg_best:
+                    if btag_countings_best['Loose']/10 == 1:
+                        h_recotop_mass_best_IsNeg_L['top_btag'].Fill(best_recotop_p4.M())
+                    elif btag_countings_best['Loose']/10 == 0:
+                        h_recotop_mass_best_IsNeg_L['top_nobtag'].Fill(best_recotop_p4.M())
+                    if btag_countings_best['Medium']/10 == 1:
+                        h_recotop_mass_best_IsNeg_M['top_btag'].Fill(best_recotop_p4.M())
+                    elif btag_countings_best['Medium']/10 == 0:
+                        h_recotop_mass_best_IsNeg_M['top_nobtag'].Fill(best_recotop_p4.M())
+                    if btag_countings_best['Tight']/10 == 1:
+                        h_recotop_mass_best_IsNeg_T['top_btag'].Fill(best_recotop_p4.M())
+                    elif btag_countings_best['Tight']/10 == 0:
+                        h_recotop_mass_best_IsNeg_T['top_nobtag'].Fill(best_recotop_p4.M())
+
+                    if btag_countings_best['Loose'] == 0:
+                        h_Wprime_mass_best_IsNeg_L['all_0btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_IsNeg_L['all_0btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_IsNeg_L['ele_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_IsNeg_L['mu_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                    elif bool(btag_countings_best['Loose'] == 10) != bool(btag_countings_best['Loose'] == 1):
+                        h_Wprime_mass_best_IsNeg_L['all_1btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_IsNeg_L['all_1btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_IsNeg_L['ele_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_IsNeg_L['mu_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                    elif btag_countings_best['Loose'] == 11:
+                        h_Wprime_mass_best_IsNeg_L['all_2btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_IsNeg_L['all_2btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_IsNeg_L['ele_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_IsNeg_L['mu_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+
+                    if btag_countings_best['Medium'] == 0:
+                        h_Wprime_mass_best_IsNeg_M['all_0btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_IsNeg_M['all_0btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_IsNeg_M['ele_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_IsNeg_M['mu_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                    elif bool(btag_countings_best['Medium'] == 10) != bool(btag_countings_best['Medium'] == 1):
+                        h_Wprime_mass_best_IsNeg_M['all_1btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_IsNeg_M['all_1btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_IsNeg_M['ele_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_IsNeg_M['mu_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                    elif btag_countings_best['Medium'] == 11:
+                        h_Wprime_mass_best_IsNeg_M['all_2btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_IsNeg_M['all_2btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_IsNeg_M['ele_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_IsNeg_M['mu_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+
+                    if btag_countings_best['Tight'] == 0:
+                        h_Wprime_mass_best_IsNeg_T['all_0btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_IsNeg_T['all_0btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_IsNeg_T['ele_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_IsNeg_T['mu_all_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                    elif bool(btag_countings_best['Tight'] == 10) != bool(btag_countings_best['Tight'] == 1):
+                        h_Wprime_mass_best_IsNeg_T['all_1btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_IsNeg_T['all_1btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_IsNeg_T['ele_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_IsNeg_T['mu_all_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                    elif btag_countings_best['Tight'] == 11:
+                        h_Wprime_mass_best_IsNeg_T['all_2btag'].Fill(best_Wprime_p4.M())
+                        h_Wprime_tmass_best_IsNeg_T['all_2btag'].Fill(best_Wprime_p4t.M())
+                        if isEle:
+                            h_Wprime_mass_best_IsNeg_T['ele_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                        elif isMu:
+                            h_Wprime_mass_best_IsNeg_T['mu_all_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+           
+
         #cut_and_count efficiences
-        '''
-        h_efficiencies.Fill(isEvent, 1)
-        h_efficiencies.Fill(isPreSel, 2)
-        h_efficiencies.Fill(isHLT, 3)
-        h_efficiencies.Fill(isLepSel, 4)
-        h_efficiencies.Fill(isJetSel, 5)
-        '''
         if (i%100) == 0:
             print i
     #efficiencies histos
@@ -2804,51 +3816,21 @@ for i in range(len(inpfiles)):
         for value in h_Wprime_mass_chi.values():
             print_hist(inpfile, subfold, value)
             save_hist(inpfile, subfold, value)
-        if DeltaFilter:
-            for value in h_Wprime_mass_sublead_IsNeg.values():
-                print_hist(inpfile, subfold, value)
-                save_hist(inpfile, subfold, value)
-            for value in h_Wprime_mass_closest_IsNeg.values():
-                print_hist(inpfile, subfold, value)
-                save_hist(inpfile, subfold, value)
-            for value in h_Wprime_mass_best_IsNeg.values():
-                print_hist(inpfile, subfold, value)
-                save_hist(inpfile, subfold, value)
-            for value in h_Wprime_mass_chi_IsNeg.values():
-                print_hist(inpfile, subfold, value)
-                save_hist(inpfile, subfold, value)
-        if MCReco:
-            for value in h_notmatch_criteria_quant.values():
-                print_hist(inpfile, subfold, value)
-                save_hist(inpfile, subfold, value)
-            for value in h_match_criteria_quant.values():
-                print_hist(inpfile, subfold, value)
-                save_hist(inpfile, subfold, value)
-            for value in h_notmatch_2dcriteria.values():
-                print_hist(inpfile, subfold, value, "COLZ")
-                save_hist(inpfile, subfold, value, "COLZ")
-            for value in h_match_2dcriteria.values():
-                print_hist(inpfile, subfold, value, "COLZ")
-                save_hist(inpfile, subfold, value, "COLZ")
-
-        '''
         for value in h_Wprime_tmass_sublead.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_Wprime_tmass_closest.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_Wprime_tmass_chi.values():
-            print_hist(inpfile, value)
-            save_hist(inpfile, value)
-        '''
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
+        for value in h_Wprime_tmass_best.values():
+            print_hist(inpfile, subfold, value)
+            save_hist(inpfile, subfold, value)
         for value in h_met_q.values():
             print_hist(inpfile, subfold, value)
             save_hist(inpfile, subfold, value)
-        if DeltaFilter:
-            for value in h_met_q_IsNeg.values():
-                print_hist(inpfile, subfold, value)
-                save_hist(inpfile, subfold, value)
 
         print_hist(inpfile, subfold, h_countings, "HIST0")
         save_hist(inpfile, subfold, h_countings, "HIST0")
@@ -2863,7 +3845,37 @@ for i in range(len(inpfiles)):
         save_hist(inpfile, subfold, h_recotop_mass_chi['top'], "HIST0")
         print_hist(inpfile, subfold, h_recotop_mass_best['top'], "HIST0")
         save_hist(inpfile, subfold, h_recotop_mass_best['top'], "HIST0")
+        
         if DeltaFilter:
+            for value in h_Wprime_mass_sublead_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_closest_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_best_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_chi_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_sublead_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_closest_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_best_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_chi_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            '''
+            for value in h_met_q_IsNeg.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            '''
             print_hist(inpfile, subfold, h_recotop_mass_sublead_IsNeg['top'], "HIST0")
             save_hist(inpfile, subfold, h_recotop_mass_sublead_IsNeg['top'], "HIST0")
             print_hist(inpfile, subfold, h_recotop_mass_closest_IsNeg['top'], "HIST0")
@@ -2873,7 +3885,281 @@ for i in range(len(inpfiles)):
             print_hist(inpfile, subfold, h_recotop_mass_best_IsNeg['top'], "HIST0")
             save_hist(inpfile, subfold, h_recotop_mass_best_IsNeg['top'], "HIST0")
 
-    
+        if MCReco:
+            for value in h_notmatch_criteria_quant.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_match_criteria_quant.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_notmatch_2dcriteria.values():
+                print_hist(inpfile, subfold, value, "COLZ")
+                save_hist(inpfile, subfold, value, "COLZ")
+            for value in h_match_2dcriteria.values():
+                print_hist(inpfile, subfold, value, "COLZ")
+                save_hist(inpfile, subfold, value, "COLZ")
+
+
+        if BTagging:
+            for value in h_jet_pt_sublead_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_jet_pt_closest_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_jet_pt_chi_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_jet_pt_best_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_sublead_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_closest_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_best_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_chi_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_sublead_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_closest_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_best_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_chi_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_sublead_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_closest_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_best_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_chi_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+
+            for value in h_jet_pt_sublead_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_jet_pt_closest_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_jet_pt_chi_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_jet_pt_best_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_sublead_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_closest_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_best_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_chi_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_sublead_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_closest_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_best_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_chi_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_sublead_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_closest_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_best_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_chi_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+
+            for value in h_jet_pt_sublead_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_jet_pt_closest_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_jet_pt_chi_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_jet_pt_best_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_sublead_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_closest_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_best_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_mass_chi_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_sublead_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_closest_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_best_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_Wprime_tmass_chi_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_sublead_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_closest_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_best_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in h_recotop_mass_chi_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+
+            if DeltaFilter:
+                for value in h_Wprime_mass_sublead_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_mass_closest_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_mass_best_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_mass_chi_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_sublead_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_closest_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_best_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_chi_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_sublead_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_closest_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_best_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_chi_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+
+                for value in h_Wprime_mass_sublead_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_mass_closest_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_mass_best_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_mass_chi_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_sublead_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_closest_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_best_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_chi_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_sublead_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_closest_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_best_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_chi_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+
+                for value in h_Wprime_mass_sublead_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_mass_closest_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_mass_best_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_mass_chi_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_sublead_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_closest_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_best_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_Wprime_tmass_chi_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_sublead_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_closest_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_best_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in h_recotop_mass_chi_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+
     print 'Total events: %d   ||   Bad MET flag events %d   ||   Bad events %d   ||   LepPreSel %d    ||   MC Events %d    ||    HLTriggered %d   ||   JetTriggered %d   ||' %(tree.GetEntries(), badflag, badevt, PreSelEvt, MCEvents, HLTriggered, JetTriggered)
 
 
