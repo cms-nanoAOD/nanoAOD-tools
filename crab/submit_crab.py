@@ -2,16 +2,20 @@ from PhysicsTools.NanoAODTools.postprocessing.samples.samples import *
 import os
 import optparse
 
-#usage = 'python submit_crab.py -d dataset_name'
-#parser = optparse.OptionParser(usage)
+usage = 'python submit_crab.py -d dataset_name'
+parser = optparse.OptionParser(usage)
 #parser.add_option('-d', '--dat', dest='dat', type=sample, default = '', help='Please enter a dataset name')
-#(opt, args) = parser.parse_args()
+parser.add_option('--status', dest = 'status', default = False, action = 'store_true', help = 'Default do not submit')
+parser.add_option('-s', '--sub', dest = 'sub', default = False, action = 'store_true', help = 'Default do not submit')
+parser.add_option('-k', '--kill', dest = 'kill', default = False, action = 'store_true', help = 'Default do not kill')
+parser.add_option('-r', '--resub', dest = 'resub', default = False, action = 'store_true', help = 'Default do not resubmit')
+(opt, args) = parser.parse_args()
 
 
 def cfg_writer(label, dataset, outdir):
     f = open("crab_cfg.py", "w")
     f.write("from WMCore.Configuration import Configuration\n")
-    f.write("from CRABClient.UserUtilities import config, getUsernameFromSiteDB\n")
+    #f.write("from CRABClient.UserUtilities import config, getUsernameFromSiteDB\n")
     f.write("\nconfig = Configuration()\n")
     f.write("config.section_('General')\n")
     f.write("config.General.requestName = '"+label+"'\n")
@@ -32,7 +36,7 @@ def cfg_writer(label, dataset, outdir):
     #f.write("config.Data.splitting = 'EventAwareLumiBased'")
     f.write("config.Data.unitsPerJob = 3\n")
     #f.write("config.Data.totalUnits = 10\n")
-    f.write("config.Data.outLFNDirBase = '/store/user/%s/%s' % (getUsernameFromSiteDB(), '" +outdir+"')\n")
+    f.write("config.Data.outLFNDirBase = '/store/user/%s/%s' % ('"+str(os.environ.get('USER'))+"', '" +outdir+"')\n")
     f.write("config.Data.publication = False\n")
     f.write("config.Data.outputDatasetTag = '"+label+"'\n")
     f.write("config.section_('Site')\n")
@@ -57,13 +61,16 @@ def crab_script_writer(sample, outpath, isMC, year, modules):
     f.write("from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import *\n")
 
-    f.write("metCorrector = createJMECorrector(isMC="+isMC+", dataYear="+year+", jesUncert='All', redojec=True)\n")
-    f.write("fatJetCorrector = createJMECorrector(isMC="+isMC+", dataYear="+year+", jesUncert='All', redojec=True, jetType = 'AK8PFchs')\n")
+    f.write("metCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+year+", jesUncert='All', redojec=True)\n")
+    f.write("fatJetCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+year+", jesUncert='All', redojec=True, jetType = 'AK8PFchs')\n")
 
     #f.write("infile = "+str(sample.files)+"\n")
     #f.write("outpath = '"+ outpath+"'\n")
     #Deafult PostProcessor(outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression='LZMA:9',friend=False,postfix=None, jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,firstEntry=0, prefetch=False,longTermCache=False)\n")
-    f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, fwkJobReport=True, histFileName='"+sample.label+"_hist.root', histDirName='plots')\n")#, outputbranchsel="+os.path.abspath('../python/postprocessing/examples/keep_and_drop.txt')+" , jsonInput=runsAndLumis(), haddFileName='"+sample.label+".root'
+    if isMC:
+        f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, fwkJobReport=True, histFileName='hist.root', histDirName='plots')\n")#, outputbranchsel="+os.path.abspath('../python/postprocessing/examples/keep_and_drop.txt')+" , jsonInput=runsAndLumis(), haddFileName='"+sample.label+".root'
+    else: 
+        f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, jsonInput=runsAndLumis(), fwkJobReport=True, histFileName='hist.root', histDirName='plots')\n")#, outputbranchsel="+os.path.abspath('../python/postprocessing/examples/keep_and_drop.txt')+" , haddFileName='"+sample.label+".root'
     f.write("p.run()\n")
     f.write("print 'DONE'\n")
     f.close()
@@ -83,44 +90,70 @@ def PSet_writer(sample):
     f.write("process.out = cms.EndPath(process.output)\n")
     f.close()
     
-dataset = WJets_2017
+#dataset = WJets_2017
+dataset = DataMu_2017
 #sample = TT_Mtt1000toInf_2017
+#sample = TT_Mtt700to1000_2017
+
+submit = opt.sub
+status = opt.status
+kill = opt.kill
+resubmit = opt.resub
 #Writing the configuration file
 for sample in dataset.components:
     print 'Launching sample ' + sample.label
-    print "Producing crab configuration file"
-    cfg_writer(sample.label, sample.dataset, "OutDir")
-
-    #Writing the script file 
-    if '2016' in sample.label:
-        year = '2016'
-        lep_mod = 'lepSF_2016()'
-        btag_mod = 'btagSF2016()'
-        met_hlt_mod = 'MET_HLT_Filter_2016()'
-    if '2017' in sample.label:
-        year = '2017'
-        lep_mod = 'lepSF_2017()'
-        btag_mod = 'btagSF2017()'
-        met_hlt_mod = 'MET_HLT_Filter_2017()'
-    if '2018' in sample.label:
-        year = '2018'
-        lep_mod = 'lepSF_2018()'
-        btag_mod = 'btagSF2018()'
-        met_hlt_mod = 'MET_HLT_Filter_2018()'
-
-    if ('SingleMuon' in sample.label) or ('SingleElectron' in sample.label):
-        isMC = 'False'
-    else:
-        isMC = 'True'
+    if submit:
+        print "Producing crab configuration file"
+        cfg_writer(sample.label, sample.dataset, "OutDir")
         
-    if isMC:
-        modules = "MCweight_writer(),  " + met_hlt_mod + ", " + lep_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
-    else:
-        modules = "MET_HLT_Filter(), PrefCorr()" # Put here all the modules you want to be runned by crab
+        #Writing the script file 
+        if '2016' in sample.label:
+            year = '2016'
+            lep_mod = 'lepSF_2016()'
+            btag_mod = 'btagSF2016()'
+            met_hlt_mod = 'MET_HLT_Filter_2016()'
+        elif '2017' in sample.label:
+            year = '2017'
+            lep_mod = 'lepSF_2017()'
+            btag_mod = 'btagSF2017()'
+            met_hlt_mod = 'MET_HLT_Filter_2017()'
+        elif '2018' in sample.label:
+            year = '2018'
+            lep_mod = 'lepSF_2018()'
+            btag_mod = 'btagSF2018()'
+            met_hlt_mod = 'MET_HLT_Filter_2018()'
+        else:
+            print 'Please enter the name of a valid dataset'
+            
+        if ('Data' in sample.label):
+            isMC = False
+        else:
+            isMC = True
+                
+        print 'The flag isMC is: ' + str(isMC)
+        
+        if isMC:
+            modules = "MCweight_writer(),  " + met_hlt_mod + ", " + lep_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
+        else:
+            modules = "MET_HLT_Filter()" # Put here all the modules you want to be runned by crab
+            
+        print "Producing crab script"
+        crab_script_writer(sample,'/eos/user/a/adeiorio/Wprime/nosynch/', isMC, year, modules)
+        
+        #Launching crab
+        print "Submitting crab jobs..."
+        os.system("crab submit -c crab_cfg.py")
 
-    print "Producing crab script"
-    crab_script_writer(sample,'/eos/user/a/adeiorio/Wprime/nosynch/', isMC, year, modules)
+    elif kill:
+        print "Killing crab jobs..."
+        os.system("crab kill -d crab_" + sample.label)
+        os.system("rm -rf crab_" + sample.label)
 
-    #Launching crab
-    print "Submitting crab jobs..."
-    os.system("crab submit -c crab_cfg.py")
+    elif resubmit:
+        print "Resubmitting crab jobs..."
+        os.system("crab resubmit -d crab_" + sample.label)
+        
+    elif status:
+        print "Checking crab jobs status..."
+        os.system("crab status -d crab_" + sample.label)
+        

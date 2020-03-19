@@ -25,4 +25,5 @@ mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
 python crab_script_prova.py $1
+hadd tree_hadd.root tree.root hist.root
 fi
