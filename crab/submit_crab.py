@@ -1,8 +1,9 @@
 from PhysicsTools.NanoAODTools.postprocessing.samples.samples import *
 import os
 import optparse
+import sys
 
-usage = 'python submit_crab.py -d dataset_name'
+usage = 'python submit_crab.py'
 parser = optparse.OptionParser(usage)
 #parser.add_option('-d', '--dat', dest='dat', type=sample, default = '', help='Please enter a dataset name')
 parser.add_option('--status', dest = 'status', default = False, action = 'store_true', help = 'Default do not submit')
@@ -11,34 +12,42 @@ parser.add_option('-k', '--kill', dest = 'kill', default = False, action = 'stor
 parser.add_option('-r', '--resub', dest = 'resub', default = False, action = 'store_true', help = 'Default do not resubmit')
 (opt, args) = parser.parse_args()
 
-
-def cfg_writer(label, dataset, outdir):
+def cfg_writer(sample, isMC, year, outdir):
     f = open("crab_cfg.py", "w")
     f.write("from WMCore.Configuration import Configuration\n")
     #f.write("from CRABClient.UserUtilities import config, getUsernameFromSiteDB\n")
     f.write("\nconfig = Configuration()\n")
     f.write("config.section_('General')\n")
-    f.write("config.General.requestName = '"+label+"'\n")
+    f.write("config.General.requestName = '"+sample.label+"'\n")
     f.write("config.General.transferLogs=True\n")
     f.write("config.section_('JobType')\n")
     f.write("config.JobType.pluginName = 'Analysis'\n")
     f.write("config.JobType.psetName = 'PSet.py'\n")
     f.write("config.JobType.scriptExe = 'crab_script.sh'\n")
-    f.write("config.JobType.inputFiles = ['crab_script_prova.py','../scripts/haddnano.py']\n") #hadd nano will not be needed once nano tools are in cmssw
+    f.write("config.JobType.inputFiles = ['crab_script.py','../scripts/haddnano.py', '../scripts/keep_and_drop.txt']\n") #hadd nano will not be needed once nano tools are in cmssw
     f.write("config.JobType.sendPythonFolder = True\n")
     f.write("config.section_('Data')\n")
-    f.write("config.Data.inputDataset = '"+dataset+"'\n")
+    f.write("config.Data.inputDataset = '"+sample.dataset+"'\n")
     #f.write("config.Data.inputDBS = 'phys03'")
     f.write("config.Data.inputDBS = 'global'\n")
-    f.write("config.Data.splitting = 'FileBased'\n")
+    if not isMC:
+        f.write("config.Data.splitting = 'LumiBased'\n")
+        if year == '2016':
+            f.write("config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt'\n")
+        elif year == '2017':
+            f.write("config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'\n")
+        elif year == '2018':
+            f.write("config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt'\n")
+        f.write("config.Data.unitsPerJob = 25\n")
+    else:
+        f.write("config.Data.splitting = 'FileBased'\n")
+        f.write("config.Data.unitsPerJob = 2\n")
     #config.Data.runRange = ''
-    #config.Data.lumiMask  = ''
     #f.write("config.Data.splitting = 'EventAwareLumiBased'")
-    f.write("config.Data.unitsPerJob = 3\n")
     #f.write("config.Data.totalUnits = 10\n")
     f.write("config.Data.outLFNDirBase = '/store/user/%s/%s' % ('"+str(os.environ.get('USER'))+"', '" +outdir+"')\n")
     f.write("config.Data.publication = False\n")
-    f.write("config.Data.outputDatasetTag = '"+label+"'\n")
+    f.write("config.Data.outputDatasetTag = '"+sample.label+"'\n")
     f.write("config.section_('Site')\n")
     f.write("config.Site.storageSite = 'T2_IT_Pisa'\n")
     #f.write("config.Site.storageSite = "T2_CH_CERN"
@@ -46,8 +55,8 @@ def cfg_writer(label, dataset, outdir):
     #f.write("config.User.voGroup = 'dcms'
     f.close()
 
-def crab_script_writer(sample, outpath, isMC, year, modules):
-    f = open("crab_script_prova.py", "w")
+def crab_script_writer(sample, outpath, isMC, year, modules, presel):
+    f = open("crab_script.py", "w")
     f.write("#!/usr/bin/env python\n")
     f.write("import os\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import *\n")
@@ -68,12 +77,42 @@ def crab_script_writer(sample, outpath, isMC, year, modules):
     #f.write("outpath = '"+ outpath+"'\n")
     #Deafult PostProcessor(outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression='LZMA:9',friend=False,postfix=None, jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,firstEntry=0, prefetch=False,longTermCache=False)\n")
     if isMC:
-        f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, fwkJobReport=True, histFileName='hist.root', histDirName='plots')\n")#, outputbranchsel="+os.path.abspath('../python/postprocessing/examples/keep_and_drop.txt')+" , jsonInput=runsAndLumis(), haddFileName='"+sample.label+".root'
+        f.write("p=PostProcessor('.', inputFiles(), "+presel+", modules=["+modules+"], provenance=True, fwkJobReport=True, histFileName='hist.root', histDirName='plots', outputbranchsel='keep_and_drop.txt')\n")# haddFileName='"+sample.label+".root'
     else: 
-        f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, jsonInput=runsAndLumis(), fwkJobReport=True, histFileName='hist.root', histDirName='plots')\n")#, outputbranchsel="+os.path.abspath('../python/postprocessing/examples/keep_and_drop.txt')+" , haddFileName='"+sample.label+".root'
+        f.write("p=PostProcessor('.', inputFiles(), "+presel+", modules=["+modules+"], provenance=True, fwkJobReport=True, jsonInput=runsAndLumis(), haddFileName='tree_hadd.root')\n")#, outputbranchsel='keep_and_drop.txt' 
     f.write("p.run()\n")
     f.write("print 'DONE'\n")
     f.close()
+
+    f_sh = open("crab_script.sh", "w")
+    f_sh.write("#!/bin/bash\n")
+    f_sh.write("echo Check if TTY\n")
+    f_sh.write("if [\"`tty`\" != \"not a tty\" ]; then\n")
+    f_sh.write("  echo \"YOU SHOULD NOT RUN THIS IN INTERACTIVE, IT DELETES YOUR LOCAL FILES\"\n")
+    f_sh.write("else\n\n")
+    f_sh.write("echo \"ENV...................................\"\n")
+    f_sh.write("env\n")
+    f_sh.write("echo \"VOMS\"\n")
+    f_sh.write("voms-proxy-info -all\n")
+    f_sh.write("echo \"CMSSW BASE, python path, pwd\"\n")
+    f_sh.write("echo $CMSSW_BASE\n")
+    f_sh.write("echo $PYTHON_PATH\n")
+    f_sh.write("echo $PWD\n")
+    f_sh.write("rm -rf $CMSSW_BASE/lib/\n")
+    f_sh.write("rm -rf $CMSSW_BASE/src/\n")
+    f_sh.write("rm -rf $CMSSW_BASE/module/\n")
+    f_sh.write("rm -rf $CMSSW_BASE/python/\n")
+    f_sh.write("mv lib $CMSSW_BASE/lib\n")
+    f_sh.write("mv src $CMSSW_BASE/src\n")
+    f_sh.write("mv module $CMSSW_BASE/module\n")
+    f_sh.write("mv python $CMSSW_BASE/python\n")
+
+    f_sh.write("echo Found Proxy in: $X509_USER_PROXY\n")
+    f_sh.write("python crab_script.py $1\n")
+    if isMC:
+        f_sh.write("hadd tree_hadd.root tree.root hist.root\n")
+    f_sh.write("fi\n")
+    f_sh.close()
 
 def PSet_writer(sample):
     f = open("PSet.py", "w")
@@ -89,23 +128,30 @@ def PSet_writer(sample):
     f.write("process.output = cms.OutputModule('PoolOutputModule', fileName = cms.untracked.string('"+sample.label+".root'))\n")
     f.write("process.out = cms.EndPath(process.output)\n")
     f.close()
-    
+
+dataset = MuB_2017
 #dataset = WJets_2017
-dataset = DataMu_2017
+#dataset = DataMu_2017
+#dataset = DataEle_2017
+#dataset = TT_Mtt_2017
 #sample = TT_Mtt1000toInf_2017
 #sample = TT_Mtt700to1000_2017
+samples = []
+
+if hasattr(dataset, 'components'): # How to check whether this exists or not
+    samples = [sample for sample in dataset.components]# Method exists and was used.  
+else:
+    print "You are launching a single sample and not an entire bunch of samples"
+    samples.append(dataset)
 
 submit = opt.sub
 status = opt.status
 kill = opt.kill
 resubmit = opt.resub
 #Writing the configuration file
-for sample in dataset.components:
+for sample in samples:
     print 'Launching sample ' + sample.label
     if submit:
-        print "Producing crab configuration file"
-        cfg_writer(sample.label, sample.dataset, "OutDir")
-        
         #Writing the script file 
         if '2016' in sample.label:
             year = '2016'
@@ -127,18 +173,39 @@ for sample in dataset.components:
             
         if ('Data' in sample.label):
             isMC = False
+            presel = "flag_goodVertices && flag_globalSuperTightHalo2016Filter && flag_HBHENoiseFilter && flag_HBHENoiseIsoFilter && flag_EcalDeadCellTriggerPrimitiveFilter && flag_BadPFMuonFilter "
+            if 'Mu' in sample.label:
+                if year == '2016':
+                    presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50)"
+                elif year == '2017':
+                    presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50)"
+                elif year == '2018':
+                    presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50)"
+            elif 'Ele' in sample.label:
+                if year == '2016':
+                    presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
+                elif year == '2017':
+                    presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
+                elif year == '2018':
+                    presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
         else:
             isMC = True
+            presel = ""
                 
         print 'The flag isMC is: ' + str(isMC)
+
+        print "Producing crab configuration file"
+        cfg_writer(sample, isMC, year, "OutDir")
+        
         
         if isMC:
-            modules = "MCweight_writer(),  " + met_hlt_mod + ", " + lep_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
+            modules = "MCweight_writer(),  " + met_hlt_mod + ", " + lep_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector(), preselection()" # Put here all the modules you want to be runned by crab
         else:
-            modules = "MET_HLT_Filter()" # Put here all the modules you want to be runned by crab
+            modules = "metCorrector(), fatJetCorrector(), preselection()" # Put here all the modules you want to be runned by crab
             
         print "Producing crab script"
-        crab_script_writer(sample,'/eos/user/a/adeiorio/Wprime/nosynch/', isMC, year, modules)
+        crab_script_writer(sample,'/eos/user/a/adeiorio/Wprime/nosynch/', isMC, year, modules, presel)
+        os.system("chmod +x crab_script.sh")
         
         #Launching crab
         print "Submitting crab jobs..."

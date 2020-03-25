@@ -12,6 +12,6 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer impor
 from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import *
 metCorrector = createJMECorrector(isMC=False, dataYear=2017, jesUncert='All', redojec=True)
 fatJetCorrector = createJMECorrector(isMC=False, dataYear=2017, jesUncert='All', redojec=True, jetType = 'AK8PFchs')
-p=PostProcessor('.', inputFiles(), '', modules=[MET_HLT_Filter()], provenance=True, jsonInput=runsAndLumis(), fwkJobReport=True, histFileName='hist.root', histDirName='plots')
+p=PostProcessor('.', inputFiles(), flag_goodVertices && flag_globalSuperTightHalo2016Filter && flag_HBHENoiseFilter && flag_HBHENoiseIsoFilter && flag_EcalDeadCellTriggerPrimitiveFilter && flag_BadPFMuonFilter  && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50), modules=[metCorrector(), fatJetCorrector(), preselection()], provenance=True, fwkJobReport=True, jsonInput=runsAndLumis(), haddFileName='tree_hadd.root')
 p.run()
 print 'DONE'
