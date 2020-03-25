@@ -14,12 +14,13 @@ ROOT.TGaxis.SetMaxDigits(3)
 
 inputpath = "./"
 
-inpfiles = [#"TT_Mtt-700to1000",
-            #"WJets",  
+inpfiles = ["TT_Mtt-700to1000",
+            "WJets_2016",  
+            "WJets_2017",  
             #"QCD_Pt_600to800_1",
             #"SingleMuon_Run2016G_1",
-            #"Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8",
-            #"Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
+            "Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8",
+            "Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
             "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
 ]
 
@@ -39,7 +40,7 @@ ptlabels = {'250': 'pt > 250 GeV',
 masscuts = {'Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8': "5200",
             'Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8': "3900",
             'Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8': "2060",
-            'TT_Mtt-700to1000': "1200"
+            'TT_Mtt-700to1000': "1200",
 }
 
 topmasscuts = {#'400': 'm_{top} < 400 GeV',
@@ -75,14 +76,27 @@ plotnt = [#"MC_recotop_Wprime_massesratio",
           #"DetReco_efficiencies",
           #"MCEff_sublead_Lep_Wprime_mass": 'TGraphAsymmErrors',
           #"MC_Lep_Wprime_mass",
+          #"MC_IsNeg_Lep_Wprime_transverse_mass",
           #"MC_IsNeg_Lep_Wprime_mass",
           #"DetReco_sublead_Lep_Wprime_mass",
           #"DetReco_closest_Lep_Wprime_mass",
           #"DetReco_chimass_Lep_Wprime_mass",
-          #"DetReco_best_Lep_Wprime_mass",   
-          "DetReco_best_0Tbtag_Lep_Wprime_mass",   
-          "DetReco_best_1Tbtag_Lep_Wprime_mass",
-          "DetReco_best_2Tbtag_Lep_Wprime_mass",   
+          #"DetReco_best_Lep_Wprime_mass",
+          #"DetReco_best_IsNeg_Lep_Wprime_transverse_mass",   
+          #"DetReco_BTagEff_best_0Mbtag_Lep_Wprime_mass",
+          #"DetReco_BTagEff_best_1Mbtag_Lep_Wprime_mass",
+          #"DetReco_BTagEff_best_IsNeg_0Mbtag_Lep_Wprime_transverse_mass",
+          #"DetReco_BTagEff_best_IsNeg_1Mbtag_Lep_Wprime_transverse_mass",
+          #"DetReco_BTagEff_best_IsNeg_2Mbtag_Lep_Wprime_transverse_mass",
+          "DetReco_BTagEff_best_2Mbtag_Lep_Wprime_mass",
+          #"DetReco_best_0Mbtag_Lep_Wprime_mass",   
+          #"DetReco_best_1Mbtag_Lep_Wprime_mass",   
+          #"DetReco_best_2Mbtag_Lep_Wprime_mass",   
+          #"DetReco_best_IsNeg_0Mbtag_Lep_Wprime_transverse_mass",   
+          #"DetReco_best_IsNeg_1Mbtag_Lep_Wprime_transverse_mass",
+          #"DetReco_best_IsNeg_2Mbtag_Lep_Wprime_transverse_mass",
+          #"DetReco_btag_efficiencies_best",
+          #"DetReco_best_2Mbtag_Lep_Wprime_mass",   
           #"DetReco_best_IsNeg_Lep_Wprime_mass",   
           #"MC_Ele_Wprime_mass",
           #"DetReco_sublead_Ele_Wprime_mass",
@@ -109,7 +123,9 @@ recocatlabels = ["MC",
 samplelabels = {"Wprimetotb_M4000W400_RH": "W'RH m=4TeV w=0.4TeV",
                 "Wprimetotb_M3000W300_RH": "W'RH m=3TeV w=0.3TeV",
                 "Wprimetotb_M2000W20_RH": "W'RH m=2TeV w=20GeV",
-                "TT_Mtt-700to1000": "ttbar 0.7to1.0"
+                "TT_Mtt-700to1000": "ttbar 0.7to1.0",
+                "WJets_2016": "W+jets (2016)",
+                "WJets_2017": "W+jets (2017)"
 }
 
 btaggerlabels = {#"DeepFlv": "DeepFlv",
@@ -138,26 +154,26 @@ nbtaglabels = {"noLbtag": "not Lbtagged",
                "2Tbtag": "2 Tbtagged"
 }
 
-LogSc = False
+LogSc = True
 
 isPtCut = True
 isMassCut = False
 isTopMassCut = False
-NoNeg = True
+NoNeg = False
 BTagging = True
-SampleLabels = False
+SampleLabels = True
 NoNegLabels = False
 IsNegLabels = False
-CatLabels = True
+CatLabels = False
 PtLabels = False
 MassLabels = False
 TopMassLabels = False
-BTagLabels = True
+BTagLabels = False
 WPLabels = False
 NBTagLabels = True
 Together = False #flag to take or not the sample with only pt cut
-toScale = False
-Stack = True
+toScale = True
+Stack = False
 
 for inpfile in inpfiles:
     nfile = None
@@ -270,7 +286,7 @@ for inpfile in inpfiles:
 
             if BTagLabels:
                 for label, string in btaggerlabels.items():
-                    if label in infile:
+                    if label in str(plot.GetName()):
                         if new_title != "":
                             new_title = new_title + " "
                         if new_name != "":
@@ -291,7 +307,6 @@ for inpfile in inpfiles:
             if NBTagLabels:
                 for label, string in nbtaglabels.items():
                     if label in str(plot.GetName()):
-                        print label
                         if new_title != "":
                             new_title = new_title + " "
                         if new_name != "":
@@ -301,8 +316,12 @@ for inpfile in inpfiles:
 
             plot.SetTitle(new_title)
             plot.SetName(new_name)
-            if toScale:
-                entries = 1./plot.GetEntries()
+            if toScale and not (isinstance(plot, ROOT.TEfficiency) or isinstance(plot, ROOT.TGraphAsymmErrors)):
+                key = 'DetReco_countings'
+                entries_plot = None
+                entries_plot = copy.deepcopy(ROOT.gROOT.FindObject(str(key)).Clone())
+                entries = 1./entries_plot.GetBinContent(1)
+                #print entries_plot.GetBinContent(1)
                 plot.Scale(entries)
                 plot.GetYaxis().SetTitle("#varepsilon")
             plotstodraw.append(copy.deepcopy(plot))
