@@ -1,4 +1,5 @@
 import ROOT
+import copy as copy
 from math import *
 from array import array
 from PhysicsTools.NanoAODTools.postprocessing.tools import *
@@ -143,11 +144,10 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
     if not(isinstance(hist, list)):
         c1 = ROOT.TCanvas(infile + "_" + hist.GetName(), "c1", 50,50,700,600)
         hist.Draw(option)            
-        if log:
-            c1.SetLogy()
         c1.Print(plotpath + "/" + infile + "_" + hist.GetName() + ".png")
         c1.Print(plotpath + "/" + infile + "_" + hist.GetName() + ".root")
-    else:
+    elif isinstance(hist, list) and len(hist) > 1:
+        c1 = ROOT.TCanvas(infile + "_" + hist[0].GetName(), "c1", 50,50,700,600)
         if not (infile == ""):
             c1 = ROOT.TCanvas(infile + "_" + hist[0].GetName() + '_comparison', "c1", 50,50,700,600)
         else:
@@ -160,24 +160,33 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
                 h.SetLineColor(colors[i])
                 mg.Add(h)
                 i += 1
-            cap = hist[0].GetXaxis().GetTitle()
+            print mg
+            
+            #cap = hist[0].GetXaxis().GetTitle()
+            mg.SetMinimum(0.001)
             mg.Draw(option)
             Low = hist[0].GetXaxis().GetBinLowEdge(1)
             Nbin = hist[0].GetXaxis().GetNbins()
             High = hist[0].GetXaxis().GetBinUpEdge(Nbin)
             mg.GetXaxis().Set(Nbin, Low, High)
+            
             for i in range(hist[0].GetXaxis().GetNbins()):
                 u = i + 1
                 mg.GetXaxis().SetBinLabel(u, hist[0].GetXaxis().GetBinLabel(u))
+            
         elif isinstance(hist[0], ROOT.TEfficiency):
             i = 0
-            mg = ROOT.TMultiGraph('mg', hist[0].GetTitle()+';'+hist[0].GetPaintedGraph().GetXaxis().GetTitle()+';'+hist[0].GetPaintedGraph().GetYaxis().GetTitle())
+            mg = ROOT.TMultiGraph('mg', hist[0].GetTitle()+';'+hist[0].CreateGraph().GetXaxis().GetTitle()+';'+hist[0].CreateGraph().GetYaxis().GetTitle())
+
             for h in hist:
+                print h
                 h.SetLineColor(colors[i])
                 mg.Add(h.CreateGraph())
                 i += 1
             mg.SetMaximum(1.1)
+            mg.SetMinimum(0.001)
             mg.Draw(option)
+            
         elif isinstance(hist[0], ROOT.TH1F):
             mg = ROOT.THStack()
             i = 0
@@ -193,13 +202,19 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
         else:
             for h in hist:
                 h.Draw(option+'SAME')
-        c1.Modified()
-        c1.Update()
-        c1.BuildLegend()
-        c1.Modified()
-        c1.Update()
+
+        #c1.Modified()
+        #c1.Update()
         if log:
-            c1.SetLogy()
+            c1.SetLogy(1)
+        c1.Pad().Modified()
+        c1.Pad().Update()
+        c1.BuildLegend()
+        #c1.Modified()
+        #c1.Update()
+        c1.Pad().Modified()
+        c1.Pad().Update()
+        
         if not (infile == ""):
             c1.Print(plotpath + "/" + infile + "_" + hist[0].GetName() + '_comparison.png')
             c1.Print(plotpath + "/" + infile + "_" + hist[0].GetName() + '_comparison.root')
