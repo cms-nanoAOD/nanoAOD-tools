@@ -1,23 +1,23 @@
 from WMCore.Configuration import Configuration
-from CRABClient.UserUtilities import config, getUsernameFromSiteDB
 
 config = Configuration()
 config.section_('General')
-config.General.requestName = 'TT_Mtt1000toInf_2017'
+config.General.requestName = 'DataMu_RunB2017'
 config.General.transferLogs=True
 config.section_('JobType')
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
 config.JobType.scriptExe = 'crab_script.sh'
-config.JobType.inputFiles = ['crab_script_prova.py','../scripts/haddnano.py']
+config.JobType.inputFiles = ['crab_script.py','../scripts/haddnano.py', '../scripts/keep_and_drop.txt']
 config.JobType.sendPythonFolder = True
 config.section_('Data')
-config.Data.inputDataset = '/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/RunIIFall17NanoAODv6-PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/NANOAODSIM'
+config.Data.inputDataset = '/SingleMuon/Run2017B-Nano25Oct2019-v1/NANOAOD'
 config.Data.inputDBS = 'global'
-config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 3
-config.Data.outLFNDirBase = '/store/user/%s/%s' % (getUsernameFromSiteDB(), 'OutDir')
+config.Data.splitting = 'LumiBased'
+config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'
+config.Data.unitsPerJob = 25
+config.Data.outLFNDirBase = '/store/user/%s/%s' % ('adeiorio', 'OutDir')
 config.Data.publication = False
-config.Data.outputDatasetTag = 'TT_Mtt1000toInf_2017'
+config.Data.outputDatasetTag = 'DataMu_RunB2017'
 config.section_('Site')
 config.Site.storageSite = 'T2_IT_Pisa'

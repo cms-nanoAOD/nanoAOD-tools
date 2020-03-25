@@ -10,6 +10,6 @@ process.source.fileNames = [
 	'../../NanoAOD/test/lzma.root' ##you can change only this line
 ]
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
-process.output = cms.OutputModule("PoolOutputModule", fileName = cms.untracked.string('tree.root'))
+process.output = cms.OutputModule("PoolOutputModule", fileName = cms.untracked.string('tree_hadd.root'))
 process.out = cms.EndPath(process.output)
 
