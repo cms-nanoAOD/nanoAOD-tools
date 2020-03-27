@@ -6,10 +6,11 @@ import sys
 usage = 'python submit_crab.py'
 parser = optparse.OptionParser(usage)
 #parser.add_option('-d', '--dat', dest='dat', type=sample, default = '', help='Please enter a dataset name')
-parser.add_option('--status', dest = 'status', default = False, action = 'store_true', help = 'Default do not submit')
+parser.add_option('--status', dest = 'status', default = False, action = 'store_true', help = 'Default do not check the status')
 parser.add_option('-s', '--sub', dest = 'sub', default = False, action = 'store_true', help = 'Default do not submit')
 parser.add_option('-k', '--kill', dest = 'kill', default = False, action = 'store_true', help = 'Default do not kill')
 parser.add_option('-r', '--resub', dest = 'resub', default = False, action = 'store_true', help = 'Default do not resubmit')
+parser.add_option('-g', '--gout', dest = 'gout', default = False, action = 'store_true', help = 'Default do not do getoutput')
 (opt, args) = parser.parse_args()
 
 def cfg_writer(sample, isMC, year, outdir):
@@ -38,7 +39,7 @@ def cfg_writer(sample, isMC, year, outdir):
             f.write("config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'\n")
         elif year == '2018':
             f.write("config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt'\n")
-        f.write("config.Data.unitsPerJob = 25\n")
+        f.write("config.Data.unitsPerJob = 50\n")
     else:
         f.write("config.Data.splitting = 'FileBased'\n")
         f.write("config.Data.unitsPerJob = 2\n")
@@ -72,14 +73,13 @@ def crab_script_writer(sample, outpath, isMC, year, modules, presel):
 
     f.write("metCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+year+", jesUncert='All', redojec=True)\n")
     f.write("fatJetCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+year+", jesUncert='All', redojec=True, jetType = 'AK8PFchs')\n")
-
     #f.write("infile = "+str(sample.files)+"\n")
     #f.write("outpath = '"+ outpath+"'\n")
     #Deafult PostProcessor(outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression='LZMA:9',friend=False,postfix=None, jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,firstEntry=0, prefetch=False,longTermCache=False)\n")
     if isMC:
-        f.write("p=PostProcessor('.', inputFiles(), "+presel+", modules=["+modules+"], provenance=True, fwkJobReport=True, histFileName='hist.root', histDirName='plots', outputbranchsel='keep_and_drop.txt')\n")# haddFileName='"+sample.label+".root'
+        f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, fwkJobReport=True, histFileName='hist.root', histDirName='plots', outputbranchsel='keep_and_drop.txt')\n")# haddFileName='"+sample.label+".root'
     else: 
-        f.write("p=PostProcessor('.', inputFiles(), "+presel+", modules=["+modules+"], provenance=True, fwkJobReport=True, jsonInput=runsAndLumis(), haddFileName='tree_hadd.root')\n")#, outputbranchsel='keep_and_drop.txt' 
+        f.write("p=PostProcessor('.', inputFiles(), '"+presel+"', modules=["+modules+"], provenance=True, fwkJobReport=True, jsonInput=runsAndLumis(), haddFileName='tree_hadd.root', outputbranchsel='keep_and_drop.txt')\n")#
     f.write("p.run()\n")
     f.write("print 'DONE'\n")
     f.close()
@@ -129,11 +129,11 @@ def PSet_writer(sample):
     f.write("process.out = cms.EndPath(process.output)\n")
     f.close()
 
-dataset = MuB_2017
+#dataset = MuB_2017
 #dataset = WJets_2017
 #dataset = DataMu_2017
 #dataset = DataEle_2017
-#dataset = TT_Mtt_2017
+dataset = TT_Mtt_2017
 #sample = TT_Mtt1000toInf_2017
 #sample = TT_Mtt700to1000_2017
 samples = []
@@ -148,6 +148,7 @@ submit = opt.sub
 status = opt.status
 kill = opt.kill
 resubmit = opt.resub
+getout = opt.gout
 #Writing the configuration file
 for sample in samples:
     print 'Launching sample ' + sample.label
@@ -173,14 +174,14 @@ for sample in samples:
             
         if ('Data' in sample.label):
             isMC = False
-            presel = "flag_goodVertices && flag_globalSuperTightHalo2016Filter && flag_HBHENoiseFilter && flag_HBHENoiseIsoFilter && flag_EcalDeadCellTriggerPrimitiveFilter && flag_BadPFMuonFilter "
+            presel = "Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter "
             if 'Mu' in sample.label:
                 if year == '2016':
                     presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50)"
                 elif year == '2017':
-                    presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50)"
+                    presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50)"
                 elif year == '2018':
-                    presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50)"
+                    presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50)"
             elif 'Ele' in sample.label:
                 if year == '2016':
                     presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
@@ -224,3 +225,7 @@ for sample in samples:
         print "Checking crab jobs status..."
         os.system("crab status -d crab_" + sample.label)
         
+    elif getout:
+        if not os.path.exists("$EOSSPACE/Wprime/nosynch/" + sample.label):
+            os.makedirs("$EOSSPACE/Wprime/nosynch/" + sample.label)
+        os.system("crab getoutput -d crab_" + sample.label + " --outputpath=$EOSSPACE/Wprime/nosynch/" + sample.label)

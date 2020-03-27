@@ -14,7 +14,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import 
 metCorrector = createJMECorrector(isMC=True, dataYear=2016, jesUncert='All', redojec=True)
 fatJetCorrector = createJMECorrector(isMC=True, dataYear=2016, jesUncert='All', redojec=True, jetType = 'AK8PFchs')
 
-p = PostProcessor('.', ['/eos/home-a/adeiorio/Wprime/nosynch/TT_Mtt-1000toInf_2016_1.root'], '', modules=[MCweight_writer(), MET_HLT_Filter_2016(), lepSF_2017(), btagSF2016() ], outputbranchsel=os.path.abspath('../python/postprocessing/examples/keep_and_drop.txt'),maxEntries=10000, histFileName="histOut.root",histDirName="plots", provenance=True, fwkJobReport=True)
+p = PostProcessor('.', ['root://cms-xrd-global.cern.ch//store/mc/RunIIFall17NanoAODv6/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/PU2017_12Apr2018_Nano25Oct2019_102X_mc2017_realistic_v7-v1/270000/B8DF881B-B8F5-7540-863A-C2DF5E5B1CC8.root'], '', modules=[MCweight_writer(), MET_HLT_Filter_2017(), lepSF_2017(), btagSF2016() ], outputbranchsel=os.path.abspath('../python/postprocessing/examples/keep_and_drop.txt'), histFileName="histOut.root",histDirName="plots", provenance=True, maxEntries=100, fwkJobReport=True)#
 p.run()
 print 'DONE'
 #, Prefcorr(), metCorrector(), fatJetCorrector()
