@@ -200,12 +200,12 @@ for sample in samples:
         
         
         if isMC:
-            modules = "MCweight_writer(),  " + met_hlt_mod + ", " + lep_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector(), preselection()" # Put here all the modules you want to be runned by crab
+            modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), " + lep_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
         else:
-            modules = "metCorrector(), fatJetCorrector(), preselection()" # Put here all the modules you want to be runned by crab
+            modules = "preselection(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
             
         print "Producing crab script"
-        crab_script_writer(sample,'/eos/user/a/adeiorio/Wprime/nosynch/', isMC, year, modules, presel)
+        crab_script_writer(sample,'/eos/user/'+str(os.environ.get('USER')[0]) + '/'+str(os.environ.get('USER'))+'/Wprime/nosynch/', isMC, year, modules, presel)
         os.system("chmod +x crab_script.sh")
         
         #Launching crab
@@ -226,6 +226,6 @@ for sample in samples:
         os.system("crab status -d crab_" + sample.label)
         
     elif getout:
-        if not os.path.exists("$EOSSPACE/Wprime/nosynch/" + sample.label):
-            os.makedirs("$EOSSPACE/Wprime/nosynch/" + sample.label)
-        os.system("crab getoutput -d crab_" + sample.label + " --outputpath=$EOSSPACE/Wprime/nosynch/" + sample.label)
+        if not os.path.exists("/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label):
+            os.makedirs("/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label)
+        os.system("crab getoutput -d crab_" + sample.label + " --outputpath=/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label + "/")

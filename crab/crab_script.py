@@ -10,8 +10,8 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.PrefireCorr import 
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import *
-metCorrector = createJMECorrector(isMC=False, dataYear=2017, jesUncert='All', redojec=True)
-fatJetCorrector = createJMECorrector(isMC=False, dataYear=2017, jesUncert='All', redojec=True, jetType = 'AK8PFchs')
-p=PostProcessor('.', inputFiles(), 'Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter  && (HLT_PFHT780 || HLT_PFHT890 || HLT_Ele115_CaloIdVT_GsfTrkIdT)', modules=[metCorrector(), fatJetCorrector(), preselection()], provenance=True, fwkJobReport=True, jsonInput=runsAndLumis(), haddFileName='tree_hadd.root', outputbranchsel='keep_and_drop.txt')
+metCorrector = createJMECorrector(isMC=True, dataYear=2017, jesUncert='All', redojec=True)
+fatJetCorrector = createJMECorrector(isMC=True, dataYear=2017, jesUncert='All', redojec=True, jetType = 'AK8PFchs')
+p=PostProcessor('.', inputFiles(), '', modules=[MCweight_writer(),  MET_HLT_Filter_2017(), lepSF_2017(), btagSF2017(), PrefCorr(), metCorrector(), fatJetCorrector(), preselection()], provenance=True, fwkJobReport=True, histFileName='hist.root', histDirName='plots', outputbranchsel='keep_and_drop.txt')
 p.run()
 print 'DONE'
