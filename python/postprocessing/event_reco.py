@@ -1,6 +1,7 @@
 import ROOT
 import ROOT.TMath as TMath
 import math
+from os import path
 from array import array
 from PhysicsTools.NanoAODTools.postprocessing.tools import *
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object, Event
@@ -21,32 +22,32 @@ inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/"
 inpfiles = [#"Wprime_4000_RH"
             #"Wprimetotb_M2000W20_RH_MG_1",
             #"Wprimetotb_M4000W400_RH_MG_1"
-            "TT_Mtt-700to1000"
-            #,"WJets"
+            "TT_Mtt-700to1000",
+            #"WJets"
             #,"QCD_Pt_600to800_1"
             #,"SingleMuon_Run2016G_1"
 ]
 
-'''
-inputpath = "/eos/home-a/apiccine/private/Wprime_BkgSample/merged/"
-inpfiles = ["Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8",
-            #"Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
-            #"Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8"
+
+subfolds = ["plots/TT_mtt700to1000_pt350",
 ]
 
-subfolds = [#"plots/Wp_m4000w400_pt350_mt500",
-           #"plots/Wp_m4000w400_pt350_mt400",
-           "plots/Wp_m4000w400_pt350",
-           #"plots/Wp_m3000w300_pt350_mt500",
-           #"plots/Wp_m3000w300_pt350_mt400",
-           #"plots/Wp_m3000w300_pt350",
-           #"plots/Wp_m2000w20_pt350_mt500",
-           #"plots/Wp_m2000w20_pt350_mt400",
-           #"plots/Wp_m2000w20_pt350",
-           #"plots/TT_mtt700to1000_pt350_mt500",
-           #"plots/TT_mtt700to1000_pt350_mt400",
-           #"plots/TT_mtt700to1000_pt350",
+'''
+inputpath = "/eos/home-a/apiccine/private/Wprime_BkgSample/merged/"
+inpfiles = [#"Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8",
+            #"Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
+            #"Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8",
+            #"WJets_2016"
+            "WJets_2017"
 ]
+
+subfolds = [#"plots/Wp_m4000w400_pt350",
+            #"plots/Wp_m3000w300_pt350",
+            #"plots/Wp_m2000w20_pt350",
+            #"plots/WJets_2016_pt350"
+            "plots/WJets_2017_pt350"
+]
+
 
 # b-tag working points: mistagging efficiency tight = 0.1%, medium 1% and loose = 10%                                                        
 WPbtagger = {'deepFlv_T': 0.7264,
@@ -136,7 +137,6 @@ def btagger(algo, score):
             x = x + 1
         return x
    
-
 Debug = False
 print "Is Debugging? ", Debug
 
@@ -147,23 +147,46 @@ HadHLTrig = False
 AK8Reco = False
 MCReco = True
 DetReco = True
+DeltaFilter = False
+TopMassCut = True
 BTagging = True
-DeltaFilter = True
-DeepFlv = False*BTagging
-DeepCSV = True*BTagging
-
-if DeepCSV == DeepFlv:
-    "Choose one only BTagger!"
+DeepFlv = True*BTagging
+DeepCSV = (not DeepFlv)*BTagging
 
 #tresholds
 miniIso_cut = 0.1
 jet_ptcut = 35.
 leadingjet_ptcut = 350.
-mass_cut = 500000000.
+mass_cut = None
+if not TopMassCut:
+    mass_cut = 500000000.
+else:
+    mass_cut = 500.
+    for n, i in enumerate(subfolds):
+        subfolds[n] = i + "_mt500"
+
 mass_cut_inf = -100.
+
+if DeepCSV == DeepFlv and BTagging:
+    raise KeyboardInterrupt
+    print "Choose one only BTagger!"
+
+if DeepFlv:
+    for n, i in enumerate(subfolds):
+        subfolds[n] = i + "_DeepFlv"
+elif DeepCSV:
+    for n, i in enumerate(subfolds):
+        subfolds[n] = i + "_DeepCSV"
+
+for subfold in subfolds:
+    print subfold
+    if not path.exists(subfold):
+        print "\nWARNING: subfolder does not exist"
+        raise KeyboardInterrupt
 
 jetptcut_str = "JetPtCuts" + str(leadingjet_ptcut)
 naeff = ["nEvents", "LepPreSel", "HLTrigger", jetptcut_str, "sublead", "chimass", "closest", "best"]
+bnaeff = ["0Lbtagged", "0Mbtagged", "0Tbtagged", "1Lbtagged", "1Mbtagged", "1Tbtagged", "2Lbtagged", "2Mbtagged", "2Tbtagged"]
 
 for i in range(len(inpfiles)):
     inpfile = inpfiles[i]
@@ -305,8 +328,8 @@ for i in range(len(inpfiles)):
             
         h_mcWprime_mass = {'gen': ROOT.TH1F("MC_GenPart_Wprime_mass", "MC_GenPart_Wprime_mas;GenPart W' mass [GeV];Countings", wnbins, wnmin, wnmax),
                            'all': ROOT.TH1F("MC_Lep_Wprime_mass", "MC_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                           'ele_all': ROOT.TH1F("MC_Ele_Wprime_mass", "MC_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                           'mu_all': ROOT.TH1F("MC_Mu_Wprime_mass", "MC_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                           'ele': ROOT.TH1F("MC_Ele_Wprime_mass", "MC_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                           'mu': ROOT.TH1F("MC_Mu_Wprime_mass", "MC_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
         }
         if DeltaFilter:
             h_mcWprime_mass_IsNeg = copy.deepcopy(h_mcWprime_mass)
@@ -346,8 +369,8 @@ for i in range(len(inpfiles)):
                 value.SetName(new_name)
         
         h_mcWprime_tmass = {'all': ROOT.TH1F("MC_Lep_Wprime_transverse_mass", "MC_Lep_Wprime_transverse_mass;Lep W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
-                            'ele_all': ROOT.TH1F("MC_Ele_Wprime_transverse_mass", "MC_Ele_Wprime_transverse_mass;Ele W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
-                            'mu_all': ROOT.TH1F("MC_Mu_Wprime_transverse_mass", "MC_Mu_Wprime_transverse_mass;Mu W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
+                            'ele': ROOT.TH1F("MC_Ele_Wprime_transverse_mass", "MC_Ele_Wprime_transverse_mass;Ele W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
+                            'mu': ROOT.TH1F("MC_Mu_Wprime_transverse_mass", "MC_Mu_Wprime_transverse_mass;Mu W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
         }
         if DeltaFilter:
             h_mcWprime_tmass_IsNeg = copy.deepcopy(h_mcWprime_tmass)
@@ -441,13 +464,13 @@ for i in range(len(inpfiles)):
             }
 
             h_mcfatWprime_mass = {'all': ROOT.TH1F("MC_Lep_fatWprime_mass", "MC_Lep_fatWprime_mass;fatMCReco Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                                  'ele_all': ROOT.TH1F("MC_Ele_fatWprime_mass", "MC_Ele_fatWprime_mass;fatMCReco Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                                  'mu_all': ROOT.TH1F("MC_Mu_fatWprime_mass", "MC_Mu_fatWprime_mass;fatMCReco Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                                  'ele': ROOT.TH1F("MC_Ele_fatWprime_mass", "MC_Ele_fatWprime_mass;fatMCReco Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                                  'mu': ROOT.TH1F("MC_Mu_fatWprime_mass", "MC_Mu_fatWprime_mass;fatMCReco Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
             }
 
             h_mcfatWprime_tmass = {'all': ROOT.TH1F("MC_Lep_fatWprime_transverse_mass", "MC_Lep_fatWprime_transverse_mass;fatMCReco Lep W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
-                                   'ele_all': ROOT.TH1F("MC_Ele_fatWprime_transverse_mass", "MC_Ele_fatWprime_transverse_mass;fatMCReco Ele W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
-                                   'mu_all': ROOT.TH1F("MC_Mu_fatWprime_transverse_mass", "MC_Mu_fatWprime_transverse_mass;fatMCReco Mu W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
+                                   'ele': ROOT.TH1F("MC_Ele_fatWprime_transverse_mass", "MC_Ele_fatWprime_transverse_mass;fatMCReco Ele W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
+                                   'mu': ROOT.TH1F("MC_Mu_fatWprime_transverse_mass", "MC_Mu_fatWprime_transverse_mass;fatMCReco Mu W' M_{T} [GeV];Countings", wnbins, wnmin, wnmax),
             }
 
             h_mcfatmet_q = {'pt': ROOT.TH1F("MC_fatMET_pt", "MC_fatMET_pt;fat MET pt [GeV];Countings", nbins, nmin, nmax),
@@ -460,6 +483,7 @@ for i in range(len(inpfiles)):
         h_lepton_pt = {'electron': ROOT.TH1F("DetReco_Ele_pt", "DetReco_Ele_pt;electron pt [GeV];Countings", nbins, nmin, nmax),
                        'muon': ROOT.TH1F("DetReco_Mu_pt", "DetReco_Mu_pt;muon pt [GeV];Countings", nbins, nmin, nmax),
         }
+        '''
         if BTagging:
             h_lepton_pt_L = {
                 'electron_0btag': ROOT.TH1F("DetReco_0Lbtag_Ele_pt", "DetReco_0Lbtag_Ele_pt;0Lbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
@@ -485,7 +509,7 @@ for i in range(len(inpfiles)):
                 'electron_2btag': ROOT.TH1F("DetReco_2Tbtag_Ele_pt", "DetReco_2Tbtag_Ele_pt;2Tbtagged electron pt [GeV];Countings", nbins, nmin, nmax),
                 'muon_2btag': ROOT.TH1F("DetReco_2Tbtag_Mu_pt", "DetReco_2Tbtag_Mu_pt;2Tbtagged muon pt [GeV];Countings", nbins, nmin, nmax),
             }
-                
+        '''        
         h_jet_pt_sublead = {
             'Wbjet': ROOT.TH1F("DetReco_Wjet_pt", "DetReco_Wjet_pt;prompt jet pt [GeV];Countings", nbins, nmin, nmax),
             'topbjet': ROOT.TH1F("DetReco_topbjet_pt", "DetReco_topjet_pt;top jet pt [GeV];Countings", nbins, nmin, nmax),
@@ -548,46 +572,46 @@ for i in range(len(inpfiles)):
 
         if BTagging:
             h_jet_pt_sublead_L = {
-                'Wbjet_nobtag': ROOT.TH1F("DetReco_noLbtag_Wjet_pt", "DetReco_noLbtag_Wjet_pt;prompt noLbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'Wbjet_btag': ROOT.TH1F("DetReco_Lbtag_Wjet_pt", "DetReco_Lbtag_Wjet_pt;prompt Lbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'Wbjet_nobtag': ROOT.TH1F("DetReco_noLbtag_Wjet_pt", "DetReco_noLbtag_Wjet_pt;prompt jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'Wbjet_btag': ROOT.TH1F("DetReco_Lbtag_Wjet_pt", "DetReco_Lbtag_Wjet_pt;prompt jet pt [GeV];Countings", nbinst, nmint, nmaxt),
             
-                'topbjet_nobtag': ROOT.TH1F("DetReco_noLbtag_topjet_pt", "DetReco_noLbtag_topjet_pt;top noLbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'topbjet_btag': ROOT.TH1F("DetReco_Lbtag_topjet_pt", "DetReco_Lbtag_topjet_pt;top Lbtagged jet pt [GeV];Countings", nbins, nmin, nmaxt),
+                'topbjet_nobtag': ROOT.TH1F("DetReco_noLbtag_topjet_pt", "DetReco_noLbtag_topjet_pt;top jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'topbjet_btag': ROOT.TH1F("DetReco_Lbtag_topjet_pt", "DetReco_Lbtag_topjet_pt;top jet pt [GeV];Countings", nbins, nmin, nmaxt),
             
-                'top_nobtag': ROOT.TH1F("DetReco_noLbtag_recotop_pt", "DetReco_noLbtag_recotop_pt;noLbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'top_btag': ROOT.TH1F("DetReco_Lbtag_recotop_pt", "DetReco_Lbtag_recotop_pt;Lbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
+                'top_nobtag': ROOT.TH1F("DetReco_noLbtag_recotop_pt", "DetReco_noLbtag_recotop_pt;recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Lbtag_recotop_pt", "DetReco_Lbtag_recotop_pt;recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
             }
             h_recotop_mass_sublead_L = {
-                'top_nobtag': ROOT.TH1F("DetReco_noLbtag_recotop_mass", "DetReco_noLbtag_recotop_mass;noLbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
-                'top_btag': ROOT.TH1F("DetReco_Lbtag_recotop_mass", "DetReco_Lbtag_recotop_mass;Lbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
+                'top_nobtag': ROOT.TH1F("DetReco_noLbtag_recotop_mass", "DetReco_noLbtag_recotop_mass;recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Lbtag_recotop_mass", "DetReco_Lbtag_recotop_mass;recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
             }
             h_jet_pt_sublead_M = {
-                'Wbjet_nobtag': ROOT.TH1F("DetReco_noMbtag_Wjet_pt", "DetReco_noMbtag_Wjet_pt;prompt noMbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'Wbjet_btag': ROOT.TH1F("DetReco_Mbtag_Wjet_pt", "DetReco_Mbtag_Wjet_pt;prompt Mbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'Wbjet_nobtag': ROOT.TH1F("DetReco_noMbtag_Wjet_pt", "DetReco_noMbtag_Wjet_pt;prompt jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'Wbjet_btag': ROOT.TH1F("DetReco_Mbtag_Wjet_pt", "DetReco_Mbtag_Wjet_pt;prompt jet pt [GeV];Countings", nbinst, nmint, nmaxt),
             
-                'topbjet_nobtag': ROOT.TH1F("DetReco_noMbtag_topjet_pt", "DetReco_noMbtag_topjet_pt;top noMbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'topbjet_btag': ROOT.TH1F("DetReco_Mbtag_topjet_pt", "DetReco_Mbtag_topjet_pt;top Mbtagged jet pt [GeV];Countings", nbins, nmin, nmaxt),
+                'topbjet_nobtag': ROOT.TH1F("DetReco_noMbtag_topjet_pt", "DetReco_noMbtag_topjet_pt;top jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'topbjet_btag': ROOT.TH1F("DetReco_Mbtag_topjet_pt", "DetReco_Mbtag_topjet_pt;top jet pt [GeV];Countings", nbins, nmin, nmaxt),
             
-                'top_nobtag': ROOT.TH1F("DetReco_noMbtag_recotop_pt", "DetReco_noMbtag_recotop_pt;noMbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'top_btag': ROOT.TH1F("DetReco_Mbtag_recotop_pt", "DetReco_Mbtag_recotop_pt;Mbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
+                'top_nobtag': ROOT.TH1F("DetReco_noMbtag_recotop_pt", "DetReco_noMbtag_recotop_pt;recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Mbtag_recotop_pt", "DetReco_Mbtag_recotop_pt;recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
             }
             h_recotop_mass_sublead_M = {
-                'top_nobtag': ROOT.TH1F("DetReco_noMbtag_recotop_mass", "DetReco_noMbtag_recotop_mass;noMbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
-                'top_btag': ROOT.TH1F("DetReco_Mbtag_recotop_mass", "DetReco_Mbtag_recotop_mass;Mbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
+                'top_nobtag': ROOT.TH1F("DetReco_noMbtag_recotop_mass", "DetReco_noMbtag_recotop_mass;recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Mbtag_recotop_mass", "DetReco_Mbtag_recotop_mass;recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
             }
             h_jet_pt_sublead_T = {
-                'Wbjet_nobtag': ROOT.TH1F("DetReco_noTbtag_Wjet_pt", "DetReco_noTbtag_Wjet_pt;prompt noTbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'Wbjet_btag': ROOT.TH1F("DetReco_Tbtag_Wjet_pt", "DetReco_Tbtag_Wjet_pt;prompt Tbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'Wbjet_nobtag': ROOT.TH1F("DetReco_noTbtag_Wjet_pt", "DetReco_noTbtag_Wjet_pt;prompt jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'Wbjet_btag': ROOT.TH1F("DetReco_Tbtag_Wjet_pt", "DetReco_Tbtag_Wjet_pt;prompt jet pt [GeV];Countings", nbinst, nmint, nmaxt),
             
-                'topbjet_nobtag': ROOT.TH1F("DetReco_noTbtag_topjet_pt", "DetReco_noTbtag_topjet_pt;top noTbtagged jet pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'topbjet_btag': ROOT.TH1F("DetReco_Tbtag_topjet_pt", "DetReco_Tbtag_topjet_pt;top Tbtagged jet pt [GeV];Countings", nbins, nmin, nmaxt),
+                'topbjet_nobtag': ROOT.TH1F("DetReco_noTbtag_topjet_pt", "DetReco_noTbtag_topjet_pt;top jet pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'topbjet_btag': ROOT.TH1F("DetReco_Tbtag_topjet_pt", "DetReco_Tbtag_topjet_pt;top jet pt [GeV];Countings", nbins, nmin, nmaxt),
             
-                'top_nobtag': ROOT.TH1F("DetReco_noTbtag_recotop_pt", "DetReco_noTbtag_recotop_pt;noTbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
-                'top_btag': ROOT.TH1F("DetReco_Tbtag_recotop_pt", "DetReco_Tbtag_recotop_pt;Tbtagged recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
+                'top_nobtag': ROOT.TH1F("DetReco_noTbtag_recotop_pt", "DetReco_noTbtag_recotop_pt;recotop pt [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Tbtag_recotop_pt", "DetReco_Tbtag_recotop_pt;recotop pt [GeV];Countings", nbinst, nmint, nmaxt)
             }
             h_recotop_mass_sublead_T = {
-                'top_nobtag': ROOT.TH1F("DetReco_noTbtag_recotop_mass", "DetReco_noTbtag_recotop_mass;noTbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
-                'top_btag': ROOT.TH1F("DetReco_Tbtag_recotop_mass", "DetReco_Tbtag_recotop_mass;Tbtagged recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
+                'top_nobtag': ROOT.TH1F("DetReco_noTbtag_recotop_mass", "DetReco_noTbtag_recotop_mass;recotop mass [GeV];Countings", nbinst, nmint, nmaxt),
+                'top_btag': ROOT.TH1F("DetReco_Tbtag_recotop_mass", "DetReco_Tbtag_recotop_mass;recotop mass [GeV];Countings", nbinst, nmint, nmaxt)
             }
 
             h_jet_pt_closest_L = copy.deepcopy(h_jet_pt_sublead_L)
@@ -1033,8 +1057,8 @@ for i in range(len(inpfiles)):
                 value.SetName(new_name)
             
         h_Wprime_mass_sublead = {'all': ROOT.TH1F("DetReco_Lep_Wprime_mass", "DetReco_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all': ROOT.TH1F("DetReco_Ele_Wprime_mass", "DetReco_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all': ROOT.TH1F("DetReco_Mu_Wprime_mass", "DetReco_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax)
+                         'ele': ROOT.TH1F("DetReco_Ele_Wprime_mass", "DetReco_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu': ROOT.TH1F("DetReco_Mu_Wprime_mass", "DetReco_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax)
         }
         h_Wprime_mass_closest = copy.deepcopy(h_Wprime_mass_sublead)
         for value in h_Wprime_mass_closest.values():
@@ -1070,37 +1094,37 @@ for i in range(len(inpfiles)):
 
         if BTagging:
             h_Wprime_mass_sublead_L = {
-                         'all_0btag': ROOT.TH1F("DetReco_0Lbtag_Lep_Wprime_mass", "DetReco_0Lbtag_Lep_Wprime_mass;0Lbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_1btag': ROOT.TH1F("DetReco_1Lbtag_Lep_Wprime_mass", "DetReco_1Lbtag_Lep_Wprime_mass;1Lbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_2btag': ROOT.TH1F("DetReco_2Lbtag_Lep_Wprime_mass", "DetReco_2Lbtag_Lep_Wprime_mass;2Lbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_0btag': ROOT.TH1F("DetReco_0Lbtag_Ele_Wprime_mass", "DetReco_0Lbtag_Ele_Wprime_mass;0Lbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_1btag': ROOT.TH1F("DetReco_1Lbtag_Ele_Wprime_mass", "DetReco_1Lbtag_Ele_Wprime_mass;1Lbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_2btag': ROOT.TH1F("DetReco_2Lbtag_Ele_Wprime_mass", "DetReco_2Lbtag_Ele_Wprime_mass;2Lbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_0btag': ROOT.TH1F("DetReco_0Lbtag_Mu_Wprime_mass", "DetReco_0Lbtag_Mu_Wprime_mass;0Lbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_1btag': ROOT.TH1F("DetReco_1Lbtag_Mu_Wprime_mass", "DetReco_1Lbtag_Mu_Wprime_mass;1Lbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_2btag': ROOT.TH1F("DetReco_2Lbtag_Mu_Wprime_mass", "DetReco_2Lbtag_Mu_Wprime_mass;2Lbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_0btag': ROOT.TH1F("DetReco_0Lbtag_Lep_Wprime_mass", "DetReco_0Lbtag_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Lbtag_Lep_Wprime_mass", "DetReco_1Lbtag_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Lbtag_Lep_Wprime_mass", "DetReco_2Lbtag_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_0btag': ROOT.TH1F("DetReco_0Lbtag_Ele_Wprime_mass", "DetReco_0Lbtag_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_1btag': ROOT.TH1F("DetReco_1Lbtag_Ele_Wprime_mass", "DetReco_1Lbtag_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_2btag': ROOT.TH1F("DetReco_2Lbtag_Ele_Wprime_mass", "DetReco_2Lbtag_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_0btag': ROOT.TH1F("DetReco_0Lbtag_Mu_Wprime_mass", "DetReco_0Lbtag_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_1btag': ROOT.TH1F("DetReco_1Lbtag_Mu_Wprime_mass", "DetReco_1Lbtag_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_2btag': ROOT.TH1F("DetReco_2Lbtag_Mu_Wprime_mass", "DetReco_2Lbtag_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
             }
             h_Wprime_mass_sublead_M = {
-                         'all_0btag': ROOT.TH1F("DetReco_0Mbtag_Lep_Wprime_mass", "DetReco_0Mbtag_Lep_Wprime_mass;0Mbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_1btag': ROOT.TH1F("DetReco_1Mbtag_Lep_Wprime_mass", "DetReco_1Mbtag_Lep_Wprime_mass;1Mbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_2btag': ROOT.TH1F("DetReco_2Mbtag_Lep_Wprime_mass", "DetReco_2Mbtag_Lep_Wprime_mass;2Mbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_0btag': ROOT.TH1F("DetReco_0Mbtag_Ele_Wprime_mass", "DetReco_0Mbtag_Ele_Wprime_mass;0Mbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_1btag': ROOT.TH1F("DetReco_1Mbtag_Ele_Wprime_mass", "DetReco_1Mbtag_Ele_Wprime_mass;1Mbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_2btag': ROOT.TH1F("DetReco_2Mbtag_Ele_Wprime_mass", "DetReco_2Mbtag_Ele_Wprime_mass;2Mbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_0btag': ROOT.TH1F("DetReco_0Mbtag_Mu_Wprime_mass", "DetReco_0Mbtag_Mu_Wprime_mass;0Mbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_1btag': ROOT.TH1F("DetReco_1Mbtag_Mu_Wprime_mass", "DetReco_1Mbtag_Mu_Wprime_mass;1Mbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_2btag': ROOT.TH1F("DetReco_2Mbtag_Mu_Wprime_mass", "DetReco_2Mbtag_Mu_Wprime_mass;2Mbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_0btag': ROOT.TH1F("DetReco_0Mbtag_Lep_Wprime_mass", "DetReco_0Mbtag_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Mbtag_Lep_Wprime_mass", "DetReco_1Mbtag_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Mbtag_Lep_Wprime_mass", "DetReco_2Mbtag_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_0btag': ROOT.TH1F("DetReco_0Mbtag_Ele_Wprime_mass", "DetReco_0Mbtag_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_1btag': ROOT.TH1F("DetReco_1Mbtag_Ele_Wprime_mass", "DetReco_1Mbtag_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_2btag': ROOT.TH1F("DetReco_2Mbtag_Ele_Wprime_mass", "DetReco_2Mbtag_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_0btag': ROOT.TH1F("DetReco_0Mbtag_Mu_Wprime_mass", "DetReco_0Mbtag_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_1btag': ROOT.TH1F("DetReco_1Mbtag_Mu_Wprime_mass", "DetReco_1Mbtag_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_2btag': ROOT.TH1F("DetReco_2Mbtag_Mu_Wprime_mass", "DetReco_2Mbtag_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
             }
             h_Wprime_mass_sublead_T = {
-                         'all_0btag': ROOT.TH1F("DetReco_0Tbtag_Lep_Wprime_mass", "DetReco_0Tbtag_Lep_Wprime_mass;0Tbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_1btag': ROOT.TH1F("DetReco_1Tbtag_Lep_Wprime_mass", "DetReco_1Tbtag_Lep_Wprime_mass;1Tbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_2btag': ROOT.TH1F("DetReco_2Tbtag_Lep_Wprime_mass", "DetReco_2Tbtag_Lep_Wprime_mass;2Tbtagged Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_0btag': ROOT.TH1F("DetReco_0Tbtag_Ele_Wprime_mass", "DetReco_0Tbtag_Ele_Wprime_mass;0Tbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_1btag': ROOT.TH1F("DetReco_1Tbtag_Ele_Wprime_mass", "DetReco_1Tbtag_Ele_Wprime_mass;1Tbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_2btag': ROOT.TH1F("DetReco_2Tbtag_Ele_Wprime_mass", "DetReco_2Tbtag_Ele_Wprime_mass;2Tbtagged Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_0btag': ROOT.TH1F("DetReco_0Tbtag_Mu_Wprime_mass", "DetReco_0Tbtag_Mu_Wprime_mass;0Tbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_1btag': ROOT.TH1F("DetReco_1Tbtag_Mu_Wprime_mass", "DetReco_1Tbtag_Mu_Wprime_mass;1Tbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_2btag': ROOT.TH1F("DetReco_2Tbtag_Mu_Wprime_mass", "DetReco_2Tbtag_Mu_Wprime_mass;2Tbtagged Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_0btag': ROOT.TH1F("DetReco_0Tbtag_Lep_Wprime_mass", "DetReco_0Tbtag_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Tbtag_Lep_Wprime_mass", "DetReco_1Tbtag_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Tbtag_Lep_Wprime_mass", "DetReco_2Tbtag_Lep_Wprime_mass;Lep W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_0btag': ROOT.TH1F("DetReco_0Tbtag_Ele_Wprime_mass", "DetReco_0Tbtag_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_1btag': ROOT.TH1F("DetReco_1Tbtag_Ele_Wprime_mass", "DetReco_1Tbtag_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_2btag': ROOT.TH1F("DetReco_2Tbtag_Ele_Wprime_mass", "DetReco_2Tbtag_Ele_Wprime_mass;Ele W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_0btag': ROOT.TH1F("DetReco_0Tbtag_Mu_Wprime_mass", "DetReco_0Tbtag_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_1btag': ROOT.TH1F("DetReco_1Tbtag_Mu_Wprime_mass", "DetReco_1Tbtag_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_2btag': ROOT.TH1F("DetReco_2Tbtag_Mu_Wprime_mass", "DetReco_2Tbtag_Mu_Wprime_mass;Mu W' mass [GeV];Countings", wnbins, wnmin, wnmax),
             }
 
             h_Wprime_mass_closest_L = copy.deepcopy(h_Wprime_mass_sublead_L)
@@ -1333,8 +1357,8 @@ for i in range(len(inpfiles)):
 
         
         h_Wprime_tmass_sublead = {'all': ROOT.TH1F("DetReco_Lep_Wprime_transverse_mass", "DetReco_Lep_Wprime_transverse_mass;DetReco Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                          'ele_all': ROOT.TH1F("DetReco_Ele_Wprime_transverse_mass", "DetReco_Ele_Wprime_transverse_mass;DetReco Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                          'mu_all': ROOT.TH1F("DetReco_Mu_Wprime_transverse_mass", "DetReco_Mu_Wprime_transverse_mass;DetReco Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax)
+                          'ele': ROOT.TH1F("DetReco_Ele_Wprime_transverse_mass", "DetReco_Ele_Wprime_transverse_mass;DetReco Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                          'mu': ROOT.TH1F("DetReco_Mu_Wprime_transverse_mass", "DetReco_Mu_Wprime_transverse_mass;DetReco Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax)
         }
         h_Wprime_tmass_closest = copy.deepcopy(h_Wprime_tmass_sublead)
         for value in h_Wprime_tmass_closest.values():
@@ -1370,37 +1394,37 @@ for i in range(len(inpfiles)):
         
         if BTagging:
             h_Wprime_tmass_sublead_L = {
-                         'all_0btag': ROOT.TH1F("DetReco_0Lbtag_Lep_Wprime_transverse_mass", "DetReco_0Lbtag_Lep_Wprime_transverse_mass;0Lbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_1btag': ROOT.TH1F("DetReco_1Lbtag_Lep_Wprime_transverse_mass", "DetReco_1Lbtag_Lep_Wprime_transverse_mass;1Lbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_2btag': ROOT.TH1F("DetReco_2Lbtag_Lep_Wprime_transverse_mass", "DetReco_2Lbtag_Lep_Wprime_transverse_mass;2Lbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_0btag': ROOT.TH1F("DetReco_0Lbtag_Ele_Wprime_transverse_mass", "DetReco_0Lbtag_Ele_Wprime_transverse_mass;0Lbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_1btag': ROOT.TH1F("DetReco_1Lbtag_Ele_Wprime_transverse_mass", "DetReco_1Lbtag_Ele_Wprime_transverse_mass;1Lbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_2btag': ROOT.TH1F("DetReco_2Lbtag_Ele_Wprime_transverse_mass", "DetReco_2Lbtag_Ele_Wprime_transverse_mass;2Lbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_0btag': ROOT.TH1F("DetReco_0Lbtag_Mu_Wprime_transverse_mass", "DetReco_0Lbtag_Mu_Wprime_transverse_mass;0Lbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_1btag': ROOT.TH1F("DetReco_1Lbtag_Mu_Wprime_transverse_mass", "DetReco_1Lbtag_Mu_Wprime_transverse_mass;1Lbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_2btag': ROOT.TH1F("DetReco_2Lbtag_Mu_Wprime_transverse_mass", "DetReco_2Lbtag_Mu_Wprime_transverse_mass;2Lbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_0btag': ROOT.TH1F("DetReco_0Lbtag_Lep_Wprime_transverse_mass", "DetReco_0Lbtag_Lep_Wprime_transverse_mass;Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Lbtag_Lep_Wprime_transverse_mass", "DetReco_1Lbtag_Lep_Wprime_transverse_mass;Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Lbtag_Lep_Wprime_transverse_mass", "DetReco_2Lbtag_Lep_Wprime_transverse_mass;Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_0btag': ROOT.TH1F("DetReco_0Lbtag_Ele_Wprime_transverse_mass", "DetReco_0Lbtag_Ele_Wprime_transverse_mass;Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_1btag': ROOT.TH1F("DetReco_1Lbtag_Ele_Wprime_transverse_mass", "DetReco_1Lbtag_Ele_Wprime_transverse_mass;Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_2btag': ROOT.TH1F("DetReco_2Lbtag_Ele_Wprime_transverse_mass", "DetReco_2Lbtag_Ele_Wprime_transverse_mass;Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_0btag': ROOT.TH1F("DetReco_0Lbtag_Mu_Wprime_transverse_mass", "DetReco_0Lbtag_Mu_Wprime_transverse_mass;Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_1btag': ROOT.TH1F("DetReco_1Lbtag_Mu_Wprime_transverse_mass", "DetReco_1Lbtag_Mu_Wprime_transverse_mass;Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_2btag': ROOT.TH1F("DetReco_2Lbtag_Mu_Wprime_transverse_mass", "DetReco_2Lbtag_Mu_Wprime_transverse_mass;Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
             }
             h_Wprime_tmass_sublead_M = {
-                         'all_0btag': ROOT.TH1F("DetReco_0Mbtag_Lep_Wprime_transverse_mass", "DetReco_0Mbtag_Lep_Wprime_transverse_mass;0Mbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_1btag': ROOT.TH1F("DetReco_1Mbtag_Lep_Wprime_transverse_mass", "DetReco_1Mbtag_Lep_Wprime_transverse_mass;1Mbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_2btag': ROOT.TH1F("DetReco_2Mbtag_Lep_Wprime_transverse_mass", "DetReco_2Mbtag_Lep_Wprime_transverse_mass;2Mbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_0btag': ROOT.TH1F("DetReco_0Mbtag_Ele_Wprime_transverse_mass", "DetReco_0Mbtag_Ele_Wprime_transverse_mass;0Mbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_1btag': ROOT.TH1F("DetReco_1Mbtag_Ele_Wprime_transverse_mass", "DetReco_1Mbtag_Ele_Wprime_transverse_mass;1Mbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_2btag': ROOT.TH1F("DetReco_2Mbtag_Ele_Wprime_transverse_mass", "DetReco_2Mbtag_Ele_Wprime_transverse_mass;2Mbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_0btag': ROOT.TH1F("DetReco_0Mbtag_Mu_Wprime_transverse_mass", "DetReco_0Mbtag_Mu_Wprime_transverse_mass;0Mbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_1btag': ROOT.TH1F("DetReco_1Mbtag_Mu_Wprime_transverse_mass", "DetReco_1Mbtag_Mu_Wprime_transverse_mass;1Mbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_2btag': ROOT.TH1F("DetReco_2Mbtag_Mu_Wprime_transverse_mass", "DetReco_2Mbtag_Mu_Wprime_transverse_mass;2Mbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_0btag': ROOT.TH1F("DetReco_0Mbtag_Lep_Wprime_transverse_mass", "DetReco_0Mbtag_Lep_Wprime_transverse_mass;Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Mbtag_Lep_Wprime_transverse_mass", "DetReco_1Mbtag_Lep_Wprime_transverse_mass;Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Mbtag_Lep_Wprime_transverse_mass", "DetReco_2Mbtag_Lep_Wprime_transverse_mass;Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_0btag': ROOT.TH1F("DetReco_0Mbtag_Ele_Wprime_transverse_mass", "DetReco_0Mbtag_Ele_Wprime_transverse_mass;Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_1btag': ROOT.TH1F("DetReco_1Mbtag_Ele_Wprime_transverse_mass", "DetReco_1Mbtag_Ele_Wprime_transverse_mass;Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_2btag': ROOT.TH1F("DetReco_2Mbtag_Ele_Wprime_transverse_mass", "DetReco_2Mbtag_Ele_Wprime_transverse_mass;Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_0btag': ROOT.TH1F("DetReco_0Mbtag_Mu_Wprime_transverse_mass", "DetReco_0Mbtag_Mu_Wprime_transverse_mass;Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_1btag': ROOT.TH1F("DetReco_1Mbtag_Mu_Wprime_transverse_mass", "DetReco_1Mbtag_Mu_Wprime_transverse_mass;Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_2btag': ROOT.TH1F("DetReco_2Mbtag_Mu_Wprime_transverse_mass", "DetReco_2Mbtag_Mu_Wprime_transverse_mass;Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
             }
             h_Wprime_tmass_sublead_T = {
-                         'all_0btag': ROOT.TH1F("DetReco_0Tbtag_Lep_Wprime_transverse_mass", "DetReco_0Tbtag_Lep_Wprime_transverse_mass;0Tbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_1btag': ROOT.TH1F("DetReco_1Tbtag_Lep_Wprime_transverse_mass", "DetReco_1Tbtag_Lep_Wprime_transverse_mass;1Tbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'all_2btag': ROOT.TH1F("DetReco_2Tbtag_Lep_Wprime_transverse_mass", "DetReco_2Tbtag_Lep_Wprime_transverse_mass;2Tbtagged Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_0btag': ROOT.TH1F("DetReco_0Tbtag_Ele_Wprime_transverse_mass", "DetReco_0Tbtag_Ele_Wprime_transverse_mass;0Tbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_1btag': ROOT.TH1F("DetReco_1Tbtag_Ele_Wprime_transverse_mass", "DetReco_1Tbtag_Ele_Wprime_transverse_mass;1Tbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'ele_all_2btag': ROOT.TH1F("DetReco_2Tbtag_Ele_Wprime_transverse_mass", "DetReco_2Tbtag_Ele_Wprime_transverse_mass;2Tbtagged Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_0btag': ROOT.TH1F("DetReco_0Tbtag_Mu_Wprime_transverse_mass", "DetReco_0Tbtag_Mu_Wprime_transverse_mass;0Tbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_1btag': ROOT.TH1F("DetReco_1Tbtag_Mu_Wprime_transverse_mass", "DetReco_1Tbtag_Mu_Wprime_transverse_mass;1Tbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
-                         'mu_all_2btag': ROOT.TH1F("DetReco_2Tbtag_Mu_Wprime_transverse_mass", "DetReco_2Tbtag_Mu_Wprime_transverse_mass;2Tbtagged Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_0btag': ROOT.TH1F("DetReco_0Tbtag_Lep_Wprime_transverse_mass", "DetReco_0Tbtag_Lep_Wprime_transverse_mass;Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_1btag': ROOT.TH1F("DetReco_1Tbtag_Lep_Wprime_transverse_mass", "DetReco_1Tbtag_Lep_Wprime_transverse_mass;Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'all_2btag': ROOT.TH1F("DetReco_2Tbtag_Lep_Wprime_transverse_mass", "DetReco_2Tbtag_Lep_Wprime_transverse_mass;Lep W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_0btag': ROOT.TH1F("DetReco_0Tbtag_Ele_Wprime_transverse_mass", "DetReco_0Tbtag_Ele_Wprime_transverse_mass;Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_1btag': ROOT.TH1F("DetReco_1Tbtag_Ele_Wprime_transverse_mass", "DetReco_1Tbtag_Ele_Wprime_transverse_mass;Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'ele_2btag': ROOT.TH1F("DetReco_2Tbtag_Ele_Wprime_transverse_mass", "DetReco_2Tbtag_Ele_Wprime_transverse_mass;Ele W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_0btag': ROOT.TH1F("DetReco_0Tbtag_Mu_Wprime_transverse_mass", "DetReco_0Tbtag_Mu_Wprime_transverse_mass;Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_1btag': ROOT.TH1F("DetReco_1Tbtag_Mu_Wprime_transverse_mass", "DetReco_1Tbtag_Mu_Wprime_transverse_mass;Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
+                         'mu_2btag': ROOT.TH1F("DetReco_2Tbtag_Mu_Wprime_transverse_mass", "DetReco_2Tbtag_Mu_Wprime_transverse_mass;Mu W' transverse mass [GeV];Countings", wnbins, wnmin, wnmax),
             }
 
             h_Wprime_tmass_closest_L = copy.deepcopy(h_Wprime_tmass_sublead_L)
@@ -1670,7 +1694,24 @@ for i in range(len(inpfiles)):
             h_eff_benchmark.GetXaxis().SetBinLabel(t, str(naeff[k]))
             h_countings.GetXaxis().SetBinLabel(t, str(naeff[k]))
 
+        if BTagging:
+            h_btag_countings = {'sublead': ROOT.TH1F("DetReco_btagging_countings_sublead", "DetReco_btagging_countings_sublead", 9, 0, 9),
+                                'closest': ROOT.TH1F("DetReco_btagging_countings_closest", "DetReco_btagging_countings_closest", 9, 0, 9),
+                                'chi': ROOT.TH1F("DetReco_btagging_countings_chi", "DetReco_btagging_countings_chi", 9, 0, 9),
+                                'best': ROOT.TH1F("DetReco_btagging_countings_best", "DetReco_btagging_countings_best", 9, 0, 9)
+            }
+            h_btag_eff_benchmark = ROOT.TH1F("DetReco_btag_bmeff", "DetReco_btag_bmeff", 9, 0, 9)
+
+            for k in range(9):
+                t = k + 1
+                h_btag_eff_benchmark.GetXaxis().SetBinLabel(t, str(bnaeff[k]))
+            for value in h_btag_countings.values():
+                for k in range(9):
+                    t = k + 1
+                    value.GetXaxis().SetBinLabel(t, str(bnaeff[k]))
+
     #preselection
+ 
     badflag = 0
     badevt = 0
     PreSelEvt = 0
@@ -1686,6 +1727,52 @@ for i in range(len(inpfiles)):
     best_ev = 0
     nentries = tree.GetEntries()
     
+    Lbtagged0Ev = {'sublead': 0,
+                   'closest': 0,
+                   'chi': 0,
+                   'best': 0
+    }
+    Lbtagged1Ev = {'sublead': 0,
+                   'closest': 0,
+                   'chi': 0,
+                   'best': 0
+    }
+    Lbtagged2Ev = {'sublead': 0,
+                   'closest': 0,
+                   'chi': 0,
+                   'best': 0
+    }
+    Mbtagged0Ev = {'sublead': 0,
+                   'closest': 0,
+                   'chi': 0,
+                   'best': 0
+    }
+    Mbtagged1Ev = {'sublead': 0,
+                   'closest': 0,
+                   'chi': 0,
+                   'best': 0
+    }
+    Mbtagged2Ev = {'sublead': 0,
+                   'closest': 0,
+                   'chi': 0,
+                   'best': 0
+    }
+    Tbtagged0Ev = {'sublead': 0,
+                   'closest': 0,
+                   'chi': 0,
+                   'best': 0
+    }
+    Tbtagged1Ev = {'sublead': 0,
+                   'closest': 0,
+                   'chi': 0,
+                   'best': 0
+    }
+    Tbtagged2Ev = {'sublead': 0,
+                   'closest': 0,
+                   'chi': 0,
+                   'best': 0
+    }
+
     if Debug:
         nentries = 10000
 
@@ -1770,15 +1857,30 @@ for i in range(len(inpfiles)):
         PreSelEvt += 1
 
         goodleptons = None
+        MuHLT = None
+        EleHLT = None
+        JetHLT = None
+        WJets17 = False
+
+
+        if 'WJets_2017' in inpfile:
+            WJets17 = True
 
         #HLTriggering + mclepton finding
         if isMu:        
+            if WJets17:
+                MuHLT = HLT.Mu50
+                JetHLT = HLT.PFHT780 or HLT.PFHT890
+            elif not WJets17:
+                MuHLT = HLT.Mu50 or HLT.TkMu50
+                JetHLT = HLT.PFHT800 or HLT.PFHT900
+
             goodleptons = get_Mu(muons)
-            if HLTrig and (HLT.Mu50 or HLT.TkMu50 or HLT.PFHT800 or HLT.PFHT900):
+            if HLTrig and (MuHLT or JetHLT):
                 isHLT = True
-                if (HLT.Mu50 or HLT.TkMu50):
+                if MuHLT:
                     isLepHLT = True
-                if (HLT.PFHT800 or HLT.PFHT900):
+                if JetHLT:
                     isHadHLT = True
             if MCReco:
                 mctfound = False
@@ -1791,12 +1893,13 @@ for i in range(len(inpfiles)):
                             continue
     
         if isEle:
+            EleHLT = HLT.Ele115_CaloIdVT_GsfTrkIdT
             goodleptons = get_Ele(electrons)
-            if HLTrig and (HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.PFHT800 or HLT.PFHT900):
+            if HLTrig and (EleHLT or JetHLT):
                 isHLT = True
-                if (HLT.Ele115_CaloIdVT_GsfTrkIdT):
+                if EleHLT:
                     isLepHLT = True
-                if (HLT.PFHT800 or HLT.PFHT900):
+                if JetHLT:
                     isHadHLT = True
             if MCReco:
                 mctfound = False
@@ -1970,12 +2073,12 @@ for i in range(len(inpfiles)):
                     h_mcWprime_mass_unHLT['all'].Fill(MCWprime_p4.M())
                     h_mcWprime_tmass_unHLT['all'].Fill(MCWprime_p4t.M())
                     if isEle:
-                        h_mcWprime_mass_unHLT['ele_all'].Fill(MCWprime_p4.M())
-                        h_mcWprime_tmass_unHLT['ele_all'].Fill(MCWprime_p4t.M())
+                        h_mcWprime_mass_unHLT['ele'].Fill(MCWprime_p4.M())
+                        h_mcWprime_tmass_unHLT['ele'].Fill(MCWprime_p4t.M())
                         h_mclepton_pt_unHLT['electron'].Fill(mclepton.pt)
                     elif isMu:
-                        h_mcWprime_mass_unHLT['mu_all'].Fill(MCWprime_p4.M())
-                        h_mcWprime_tmass_unHLT['mu_all'].Fill(MCWprime_p4t.M())
+                        h_mcWprime_mass_unHLT['mu'].Fill(MCWprime_p4.M())
+                        h_mcWprime_tmass_unHLT['mu'].Fill(MCWprime_p4t.M())
                         h_mclepton_pt_unHLT['muon'].Fill(mclepton.pt)
 
                     if isHLT:
@@ -1984,12 +2087,12 @@ for i in range(len(inpfiles)):
                             h_mcWprime_mass['all'].Fill(MCWprime_p4.M())
                             h_mcWprime_tmass['all'].Fill(MCWprime_p4t.M())
                             if isEle:
-                                h_mcWprime_mass['ele_all'].Fill(MCWprime_p4.M())
-                                h_mcWprime_tmass['ele_all'].Fill(MCWprime_p4t.M())
+                                h_mcWprime_mass['ele'].Fill(MCWprime_p4.M())
+                                h_mcWprime_tmass['ele'].Fill(MCWprime_p4t.M())
                                 h_mclepton_pt['electron'].Fill(mclepton.pt)
                             elif isMu:
-                                h_mcWprime_mass['mu_all'].Fill(MCWprime_p4.M())
-                                h_mcWprime_tmass['mu_all'].Fill(MCWprime_p4t.M())
+                                h_mcWprime_mass['mu'].Fill(MCWprime_p4.M())
+                                h_mcWprime_tmass['mu'].Fill(MCWprime_p4t.M())
                                 h_mclepton_pt['muon'].Fill(mclepton.pt)
                         
                         if IsmcNeg:
@@ -1997,33 +2100,33 @@ for i in range(len(inpfiles)):
                             h_mcWprime_mass_IsNeg['all'].Fill(MCWprime_p4.M())
                             h_mcWprime_tmass_IsNeg['all'].Fill(MCWprime_p4t.M())
                             if isEle:
-                                h_mcWprime_mass_IsNeg['ele_all'].Fill(MCWprime_p4.M())
-                                h_mcWprime_mass_IsNeg['ele_all'].Fill(MCWprime_p4t.M())
+                                h_mcWprime_mass_IsNeg['ele'].Fill(MCWprime_p4.M())
+                                h_mcWprime_mass_IsNeg['ele'].Fill(MCWprime_p4t.M())
                             elif isMu:
-                                h_mcWprime_mass_IsNeg['mu_all'].Fill(MCWprime_p4.M())
-                                h_mcWprime_mass_IsNeg['mu_all'].Fill(MCWprime_p4t.M())
+                                h_mcWprime_mass_IsNeg['mu'].Fill(MCWprime_p4.M())
+                                h_mcWprime_mass_IsNeg['mu'].Fill(MCWprime_p4t.M())
                         
                     if isLepHLT and LepHLTrig:
                         h_mcWprime_mass_lepHLT['all'].Fill(MCWprime_p4.M())
                         h_mcWprime_tmass_lepHLT['all'].Fill(MCWprime_p4t.M())
                         if isEle:
-                            h_mcWprime_mass_lepHLT['ele_all'].Fill(MCWprime_p4.M())
-                            h_mcWprime_tmass_lepHLT['ele_all'].Fill(MCWprime_p4t.M())
+                            h_mcWprime_mass_lepHLT['ele'].Fill(MCWprime_p4.M())
+                            h_mcWprime_tmass_lepHLT['ele'].Fill(MCWprime_p4t.M())
                             h_mclepton_pt_lepHLT['electron'].Fill(mclepton.pt)
                         elif isMu:
-                            h_mcWprime_mass_lepHLT['mu_all'].Fill(MCWprime_p4.M())
-                            h_mcWprime_tmass_lepHLT['mu_all'].Fill(MCWprime_p4t.M())
+                            h_mcWprime_mass_lepHLT['mu'].Fill(MCWprime_p4.M())
+                            h_mcWprime_tmass_lepHLT['mu'].Fill(MCWprime_p4t.M())
                             h_mclepton_pt_lepHLT['muon'].Fill(mclepton.pt)
                     if isHadHLT and HadHLTrig:
                         h_mcWprime_mass_hadHLT['all'].Fill(MCWprime_p4.M())
                         h_mcWprime_tmass_hadHLT['all'].Fill(MCWprime_p4t.M())
                         if isEle:
-                            h_mcWprime_mass_hadHLT['ele_all'].Fill(MCWprime_p4.M())
-                            h_mcWprime_tmass_hadHLT['ele_all'].Fill(MCWprime_p4t.M())
+                            h_mcWprime_mass_hadHLT['ele'].Fill(MCWprime_p4.M())
+                            h_mcWprime_tmass_hadHLT['ele'].Fill(MCWprime_p4t.M())
                             h_mclepton_pt_hadHLT['electron'].Fill(mclepton.pt)
                         elif isMu:
-                            h_mcWprime_mass_hadHLT['mu_all'].Fill(MCWprime_p4.M())
-                            h_mcWprime_tmass_hadHLT['mu_all'].Fill(MCWprime_p4t.M())
+                            h_mcWprime_mass_hadHLT['mu'].Fill(MCWprime_p4.M())
+                            h_mcWprime_tmass_hadHLT['mu'].Fill(MCWprime_p4t.M())
                             h_mclepton_pt_hadHLT['muon'].Fill(mclepton.pt)
                     
             #AK8 RECO
@@ -2088,12 +2191,12 @@ for i in range(len(inpfiles)):
                         h_mcfatWprime_mass['all'].Fill(MCfatWprime_p4.M())
                         h_mcfatWprime_tmass['all'].Fill(MCfatWprime_p4t.M())
                         if isEle:
-                            h_mcfatWprime_mass['ele_all'].Fill(MCfatWprime_p4.M())
-                            h_mcfatWprime_tmass['ele_all'].Fill(MCfatWprime_p4t.M())
+                            h_mcfatWprime_mass['ele'].Fill(MCfatWprime_p4.M())
+                            h_mcfatWprime_tmass['ele'].Fill(MCfatWprime_p4t.M())
                             h_mcfatlepton_pt['electron'].Fill(mclepton.pt)
                         elif isMu:
-                            h_mcfatWprime_mass['mu_all'].Fill(MCfatWprime_p4.M())
-                            h_mcfatWprime_tmass['mu_all'].Fill(MCfatWprime_p4t.M())
+                            h_mcfatWprime_mass['mu'].Fill(MCfatWprime_p4.M())
+                            h_mcfatWprime_tmass['mu'].Fill(MCfatWprime_p4t.M())
                             h_mcfatlepton_pt['muon'].Fill(mclepton.pt)
                     
         if not DetReco:
@@ -2161,22 +2264,23 @@ for i in range(len(inpfiles)):
         subleadTrig = False
         bestTrig = False
 
-        btag_countings_sublead = {'Loose': 0,
-                          'Medium': 1,
-                          'Tight': 2
-        }
-        btag_countings_closest = {'Loose': 0,
-                          'Medium': 1,
-                          'Tight': 2
-        }
-        btag_countings_chi = {'Loose': 0,
-                          'Medium': 1,
-                          'Tight': 2
-        }
-        btag_countings_best = {'Loose': 0,
-                          'Medium': 1,
-                          'Tight': 2
-        }
+        if BTagging:
+            btag_countings_sublead = {'Loose': 0,
+                                      'Medium': 1,
+                                      'Tight': 2
+            }
+            btag_countings_closest = {'Loose': 0,
+                                      'Medium': 1,
+                                      'Tight': 2
+            }
+            btag_countings_chi = {'Loose': 0,
+                                  'Medium': 1,
+                                  'Tight': 2
+            }
+            btag_countings_best = {'Loose': 0,
+                                   'Medium': 1,
+                                   'Tight': 2
+            }
 
         for k in range(len(goodjets)):
             '''
@@ -2215,8 +2319,9 @@ for i in range(len(inpfiles)):
         closest_recotop_p4, IsNeg_closest = recotop.top4Momentum(sellepton.p4(), closest_jet_p4, MET['metPx'], MET['metPy'])
         IsNeg_closest = IsNeg_closest * DeltaFilter            
 
-        for key, value in btag_countings_closest.items():
-            btag_countings_closest[key] = 10*(btagger(algo, closest_jet.btagDeepFlavB*DeepFlv + closest_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, closest_promptjet.btagDeepFlavB*DeepFlv + closest_promptjet.btagDeepB*DeepCSV) > value)
+        if BTagging:
+            for key, value in btag_countings_closest.items():
+                btag_countings_closest[key] = 10*(btagger(algo, closest_jet.btagDeepFlavB*DeepFlv + closest_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, closest_promptjet.btagDeepFlavB*DeepFlv + closest_promptjet.btagDeepB*DeepCSV) > value)
 
         closest_jet_p4t = copy.deepcopy(closest_jet_p4)
         closest_jet_p4t.SetPz(0.)
@@ -2241,8 +2346,9 @@ for i in range(len(inpfiles)):
         chi_recotop_p4, IsNeg_chi = recotop.top4Momentum(sellepton.p4(), chi_jet_p4, MET['metPx'], MET['metPy'])
         IsNeg_chi = IsNeg_chi * DeltaFilter
 
-        for key, value in btag_countings_chi.items():
-            btag_countings_chi[key] = 10*(btagger(algo, chi_jet.btagDeepFlavB*DeepFlv + chi_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, chi_promptjet.btagDeepFlavB*DeepFlv + chi_promptjet.btagDeepB*DeepCSV) > value)
+        if BTagging:
+            for key, value in btag_countings_chi.items():
+                btag_countings_chi[key] = 10*(btagger(algo, chi_jet.btagDeepFlavB*DeepFlv + chi_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, chi_promptjet.btagDeepFlavB*DeepFlv + chi_promptjet.btagDeepB*DeepCSV) > value)
 
         chi_jet_p4t = copy.deepcopy(chi_jet_p4)
         chi_jet_p4t.SetPz(0.)
@@ -2264,8 +2370,9 @@ for i in range(len(inpfiles)):
         sublead_recotop_p4, IsNeg_sublead = recotop.top4Momentum(sellepton.p4(), sublead_jet_p4, MET['metPx'], MET['metPy'])
         IsNeg_sublead = IsNeg_sublead * DeltaFilter
 
-        for key, value in btag_countings_sublead.items():
-            btag_countings_sublead[key] = copy.deepcopy(10*(btagger(algo, sublead_jet.btagDeepFlavB*DeepFlv + sublead_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, sublead_promptjet.btagDeepFlavB*DeepFlv + sublead_promptjet.btagDeepB*DeepCSV) > value))
+        if BTagging:
+            for key, value in btag_countings_sublead.items():
+                btag_countings_sublead[key] = copy.deepcopy(10*(btagger(algo, sublead_jet.btagDeepFlavB*DeepFlv + sublead_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, sublead_promptjet.btagDeepFlavB*DeepFlv + sublead_promptjet.btagDeepB*DeepCSV) > value))
 
         sublead_jet_p4t = copy.deepcopy(sublead_jet_p4)
         sublead_jet_p4t.SetPz(0.)
@@ -2334,8 +2441,9 @@ for i in range(len(inpfiles)):
             best_promptjet_p4t = copy.deepcopy(best_promptjet.p4())
             best_promptjet_p4t.SetPz(0.)
 
-            for key, value in btag_countings_best.items():
-                btag_countings_best[key] = 10*(btagger(algo, best_jet.btagDeepFlavB*DeepFlv + best_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, best_promptjet.btagDeepFlavB*DeepFlv + best_promptjet.btagDeepB*DeepCSV) > value)
+            if BTagging:
+                for key, value in btag_countings_best.items():
+                    btag_countings_best[key] = 10*(btagger(algo, best_jet.btagDeepFlavB*DeepFlv + best_jet.btagDeepB*DeepCSV) > value) + 1*(btagger(algo, best_promptjet.btagDeepFlavB*DeepFlv + best_promptjet.btagDeepB*DeepCSV) > value)
 
         if not (best_recotop_p4 is None):
             if mass_cut_inf < best_recotop_p4.M() < mass_cut:#_Wprime_p4.M() > mass_cut:
@@ -2413,11 +2521,11 @@ for i in range(len(inpfiles)):
                 h_Wprime_mass_sublead['all'].Fill(sublead_Wprime_p4.M())
                 h_Wprime_tmass_sublead['all'].Fill(sublead_Wprime_p4t.M())
                 if isEle:
-                    h_Wprime_mass_sublead['ele_all'].Fill(sublead_Wprime_p4.M())
-                    h_Wprime_tmass_sublead['ele_all'].Fill(sublead_Wprime_p4t.M())
+                    h_Wprime_mass_sublead['ele'].Fill(sublead_Wprime_p4.M())
+                    h_Wprime_tmass_sublead['ele'].Fill(sublead_Wprime_p4t.M())
                 if isMu:
-                    h_Wprime_mass_sublead['mu_all'].Fill(sublead_Wprime_p4.M())
-                    h_Wprime_tmass_sublead['mu_all'].Fill(sublead_Wprime_p4t.M())
+                    h_Wprime_mass_sublead['mu'].Fill(sublead_Wprime_p4.M())
+                    h_Wprime_tmass_sublead['mu'].Fill(sublead_Wprime_p4t.M())
             
             if IsNeg_sublead:
                 h_recotop_vs_Wprime_mass_sublead_IsNeg['nobtag'].Fill(sublead_recotop_p4.M()/sublead_Wprime_p4.M())
@@ -2425,11 +2533,11 @@ for i in range(len(inpfiles)):
                 h_Wprime_mass_sublead_IsNeg['all'].Fill(sublead_Wprime_p4.M())
                 h_Wprime_tmass_sublead_IsNeg['all'].Fill(sublead_Wprime_p4t.M())
                 if isEle:
-                    h_Wprime_mass_sublead_IsNeg['ele_all'].Fill(sublead_Wprime_p4.M())
-                    h_Wprime_tmass_sublead_IsNeg['ele_all'].Fill(sublead_Wprime_p4t.M())
+                    h_Wprime_mass_sublead_IsNeg['ele'].Fill(sublead_Wprime_p4.M())
+                    h_Wprime_tmass_sublead_IsNeg['ele'].Fill(sublead_Wprime_p4t.M())
                 if isMu:
-                    h_Wprime_mass_sublead_IsNeg['mu_all'].Fill(sublead_Wprime_p4.M())
-                    h_Wprime_tmass_sublead_IsNeg['mu_all'].Fill(sublead_Wprime_p4t.M())
+                    h_Wprime_mass_sublead_IsNeg['mu'].Fill(sublead_Wprime_p4.M())
+                    h_Wprime_tmass_sublead_IsNeg['mu'].Fill(sublead_Wprime_p4t.M())
             
         if closestTrig:
             if not IsNeg_closest:
@@ -2442,11 +2550,11 @@ for i in range(len(inpfiles)):
                 h_Wprime_mass_closest['all'].Fill(closest_Wprime_p4.M())
                 h_Wprime_tmass_closest['all'].Fill(closest_Wprime_p4t.M())
                 if isEle:
-                    h_Wprime_mass_closest['ele_all'].Fill(closest_Wprime_p4.M())
-                    h_Wprime_tmass_closest['ele_all'].Fill(closest_Wprime_p4t.M())
+                    h_Wprime_mass_closest['ele'].Fill(closest_Wprime_p4.M())
+                    h_Wprime_tmass_closest['ele'].Fill(closest_Wprime_p4t.M())
                 if isMu:
-                    h_Wprime_mass_closest['mu_all'].Fill(closest_Wprime_p4.M())
-                    h_Wprime_tmass_closest['mu_all'].Fill(closest_Wprime_p4t.M())
+                    h_Wprime_mass_closest['mu'].Fill(closest_Wprime_p4.M())
+                    h_Wprime_tmass_closest['mu'].Fill(closest_Wprime_p4t.M())
             
             if IsNeg_closest:
                 h_recotop_vs_Wprime_mass_closest_IsNeg['nobtag'].Fill(closest_recotop_p4.M()/closest_Wprime_p4.M())
@@ -2454,11 +2562,11 @@ for i in range(len(inpfiles)):
                 h_Wprime_mass_closest_IsNeg['all'].Fill(closest_Wprime_p4.M())
                 h_Wprime_tmass_closest_IsNeg['all'].Fill(closest_Wprime_p4t.M())
                 if isEle:
-                    h_Wprime_mass_closest_IsNeg['ele_all'].Fill(closest_Wprime_p4.M())
-                    h_Wprime_tmass_closest_IsNeg['ele_all'].Fill(closest_Wprime_p4t.M())
+                    h_Wprime_mass_closest_IsNeg['ele'].Fill(closest_Wprime_p4.M())
+                    h_Wprime_tmass_closest_IsNeg['ele'].Fill(closest_Wprime_p4t.M())
                 if isMu:
-                    h_Wprime_mass_closest_IsNeg['mu_all'].Fill(closest_Wprime_p4.M())
-                    h_Wprime_tmass_closest_IsNeg['mu_all'].Fill(closest_Wprime_p4t.M())
+                    h_Wprime_mass_closest_IsNeg['mu'].Fill(closest_Wprime_p4.M())
+                    h_Wprime_tmass_closest_IsNeg['mu'].Fill(closest_Wprime_p4t.M())
             
         if chiTrig:
             if not IsNeg_chi:
@@ -2471,11 +2579,11 @@ for i in range(len(inpfiles)):
                 h_Wprime_mass_chi['all'].Fill(chi_Wprime_p4.M())
                 h_Wprime_tmass_chi['all'].Fill(chi_Wprime_p4t.M())
                 if isEle:
-                    h_Wprime_mass_chi['ele_all'].Fill(chi_Wprime_p4.M())
-                    h_Wprime_tmass_chi['ele_all'].Fill(chi_Wprime_p4t.M())
+                    h_Wprime_mass_chi['ele'].Fill(chi_Wprime_p4.M())
+                    h_Wprime_tmass_chi['ele'].Fill(chi_Wprime_p4t.M())
                 if isMu:
-                    h_Wprime_mass_chi['mu_all'].Fill(chi_Wprime_p4.M())
-                    h_Wprime_tmass_chi['mu_all'].Fill(chi_Wprime_p4t.M())
+                    h_Wprime_mass_chi['mu'].Fill(chi_Wprime_p4.M())
+                    h_Wprime_tmass_chi['mu'].Fill(chi_Wprime_p4t.M())
             
             if IsNeg_chi:
                 h_recotop_vs_Wprime_mass_chi_IsNeg['nobtag'].Fill(chi_recotop_p4.M()/chi_Wprime_p4.M())
@@ -2483,11 +2591,11 @@ for i in range(len(inpfiles)):
                 h_Wprime_mass_chi_IsNeg['all'].Fill(chi_Wprime_p4.M())
                 h_Wprime_tmass_chi_IsNeg['all'].Fill(chi_Wprime_p4t.M())
                 if isEle:
-                    h_Wprime_mass_chi_IsNeg['ele_all'].Fill(chi_Wprime_p4.M())
-                    h_Wprime_tmass_chi_IsNeg['ele_all'].Fill(chi_Wprime_p4t.M())
+                    h_Wprime_mass_chi_IsNeg['ele'].Fill(chi_Wprime_p4.M())
+                    h_Wprime_tmass_chi_IsNeg['ele'].Fill(chi_Wprime_p4t.M())
                 if isMu:
-                    h_Wprime_mass_chi_IsNeg['mu_all'].Fill(chi_Wprime_p4.M())
-                    h_Wprime_tmass_chi_IsNeg['mu_all'].Fill(chi_Wprime_p4t.M())
+                    h_Wprime_mass_chi_IsNeg['mu'].Fill(chi_Wprime_p4.M())
+                    h_Wprime_tmass_chi_IsNeg['mu'].Fill(chi_Wprime_p4t.M())
             
         if bestTrig:
             if not IsNeg_best:
@@ -2500,11 +2608,11 @@ for i in range(len(inpfiles)):
                 h_Wprime_mass_best['all'].Fill(best_Wprime_p4.M())
                 h_Wprime_tmass_best['all'].Fill(best_Wprime_p4t.M())
                 if isEle:
-                    h_Wprime_mass_best['ele_all'].Fill(best_Wprime_p4.M())
-                    h_Wprime_tmass_best['ele_all'].Fill(best_Wprime_p4t.M())
+                    h_Wprime_mass_best['ele'].Fill(best_Wprime_p4.M())
+                    h_Wprime_tmass_best['ele'].Fill(best_Wprime_p4t.M())
                 if isMu:
-                    h_Wprime_mass_best['mu_all'].Fill(best_Wprime_p4.M())
-                    h_Wprime_tmass_best['mu_all'].Fill(best_Wprime_p4t.M())
+                    h_Wprime_mass_best['mu'].Fill(best_Wprime_p4.M())
+                    h_Wprime_tmass_best['mu'].Fill(best_Wprime_p4t.M())
             
             if IsNeg_best:
                 h_recotop_vs_Wprime_mass_best_IsNeg['nobtag'].Fill(best_recotop_p4.M()/best_Wprime_p4.M())
@@ -2512,11 +2620,11 @@ for i in range(len(inpfiles)):
                 h_Wprime_mass_best_IsNeg['all'].Fill(best_Wprime_p4.M())
                 h_Wprime_tmass_best_IsNeg['all'].Fill(best_Wprime_p4t.M())
                 if isEle:
-                    h_Wprime_mass_best_IsNeg['ele_all'].Fill(best_Wprime_p4.M())
-                    h_Wprime_tmass_best_IsNeg['ele_all'].Fill(best_Wprime_p4t.M())
+                    h_Wprime_mass_best_IsNeg['ele'].Fill(best_Wprime_p4.M())
+                    h_Wprime_tmass_best_IsNeg['ele'].Fill(best_Wprime_p4t.M())
                 if isMu:
-                    h_Wprime_mass_best_IsNeg['mu_all'].Fill(best_Wprime_p4.M())
-                    h_Wprime_tmass_best_IsNeg['mu_all'].Fill(best_Wprime_p4t.M())
+                    h_Wprime_mass_best_IsNeg['mu'].Fill(best_Wprime_p4.M())
+                    h_Wprime_tmass_best_IsNeg['mu'].Fill(best_Wprime_p4t.M())
             
         '''
         if subleadTrig or closestTrig or chiTrig:
@@ -2572,86 +2680,95 @@ for i in range(len(inpfiles)):
                     if btag_countings_sublead['Loose'] == 0:
                         h_Wprime_mass_sublead_L['all_0btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_L['all_0btag'].Fill(sublead_Wprime_p4t.M())
+                        Lbtagged0Ev['sublead'] += 1
                         if isEle:
-                            h_Wprime_mass_sublead_L['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_L['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_L['ele_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['ele_0btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_L['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_L['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_L['mu_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['mu_0btag'].Fill(sublead_Wprime_p4t.M())
                     elif bool(btag_countings_sublead['Loose'] == 10) != bool(btag_countings_sublead['Loose'] == 1):
+                        Lbtagged1Ev['sublead'] += 1
                         h_Wprime_mass_sublead_L['all_1btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_L['all_1btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_L['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_L['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_L['ele_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['ele_1btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_L['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_L['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_L['mu_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['mu_1btag'].Fill(sublead_Wprime_p4t.M())
                     elif btag_countings_sublead['Loose'] == 11:
+                        Lbtagged2Ev['sublead'] += 1
                         h_Wprime_mass_sublead_L['all_2btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_L['all_2btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_L['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_L['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_L['ele_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['ele_2btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_L['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_L['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_L['mu_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_L['mu_2btag'].Fill(sublead_Wprime_p4t.M())
 
                     if btag_countings_sublead['Medium'] == 0:
+                        Mbtagged0Ev['sublead'] += 1
                         h_Wprime_mass_sublead_M['all_0btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_M['all_0btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_M['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_M['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_M['ele_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['ele_0btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_M['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_M['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_M['mu_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['mu_0btag'].Fill(sublead_Wprime_p4t.M())
                     elif bool(btag_countings_sublead['Medium'] == 10) != bool(btag_countings_sublead['Medium'] == 1):
+                        Mbtagged1Ev['sublead'] += 1
                         h_Wprime_mass_sublead_M['all_1btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_M['all_1btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_M['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_M['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_M['ele_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['ele_1btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_M['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_M['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_M['mu_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['mu_1btag'].Fill(sublead_Wprime_p4t.M())
                     elif btag_countings_sublead['Medium'] == 11:
+                        Mbtagged2Ev['sublead'] += 1
                         h_Wprime_mass_sublead_M['all_2btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_M['all_2btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_M['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_M['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_M['ele_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['ele_2btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_M['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_M['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_M['mu_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_M['mu_2btag'].Fill(sublead_Wprime_p4t.M())
 
                     if btag_countings_sublead['Tight'] == 0:
+                        Tbtagged0Ev['sublead'] += 1
                         h_Wprime_mass_sublead_T['all_0btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_T['all_0btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_T['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_T['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_T['ele_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['ele_0btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_T['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_T['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_T['mu_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['mu_0btag'].Fill(sublead_Wprime_p4t.M())
                     elif bool(btag_countings_sublead['Tight'] == 10) != bool(btag_countings_sublead['Tight'] == 1):
+                        Tbtagged1Ev['sublead'] += 1
                         h_Wprime_mass_sublead_T['all_1btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_T['all_1btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_T['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_T['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_T['ele_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['ele_1btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_T['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_T['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_T['mu_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['mu_1btag'].Fill(sublead_Wprime_p4t.M())
                     elif btag_countings_sublead['Tight'] == 11:
+                        Tbtagged2Ev['sublead'] += 1
                         h_Wprime_mass_sublead_T['all_2btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_T['all_2btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_T['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_T['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_T['ele_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['ele_2btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_T['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_T['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_T['mu_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_T['mu_2btag'].Fill(sublead_Wprime_p4t.M())
 
             
                 if IsNeg_sublead:
@@ -2672,85 +2789,85 @@ for i in range(len(inpfiles)):
                         h_Wprime_mass_sublead_IsNeg_L['all_0btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_IsNeg_L['all_0btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_IsNeg_L['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_L['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_L['ele_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['ele_0btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_IsNeg_L['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_L['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_L['mu_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['mu_0btag'].Fill(sublead_Wprime_p4t.M())
                     elif bool(btag_countings_sublead['Loose'] == 10) != bool(btag_countings_sublead['Loose'] == 1):
                         h_Wprime_mass_sublead_IsNeg_L['all_1btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_IsNeg_L['all_1btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_IsNeg_L['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_L['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_L['ele_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['ele_1btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_IsNeg_L['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_L['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_L['mu_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['mu_1btag'].Fill(sublead_Wprime_p4t.M())
                     elif btag_countings_sublead['Loose'] == 11:
                         h_Wprime_mass_sublead_IsNeg_L['all_2btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_IsNeg_L['all_2btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_IsNeg_L['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_L['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_L['ele_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['ele_2btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_IsNeg_L['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_L['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_L['mu_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_L['mu_2btag'].Fill(sublead_Wprime_p4t.M())
 
                     if btag_countings_sublead['Medium'] == 0:
                         h_Wprime_mass_sublead_IsNeg_M['all_0btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_IsNeg_M['all_0btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_IsNeg_M['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_M['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_M['ele_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['ele_0btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_IsNeg_M['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_M['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_M['mu_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['mu_0btag'].Fill(sublead_Wprime_p4t.M())
                     elif bool(btag_countings_sublead['Medium'] == 10) != bool(btag_countings_sublead['Medium'] == 1):
                         h_Wprime_mass_sublead_IsNeg_M['all_1btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_IsNeg_M['all_1btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_IsNeg_M['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_M['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_M['ele_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['ele_1btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_IsNeg_M['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_M['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_M['mu_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['mu_1btag'].Fill(sublead_Wprime_p4t.M())
                     elif btag_countings_sublead['Medium'] == 11:
                         h_Wprime_mass_sublead_IsNeg_M['all_2btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_IsNeg_M['all_2btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_IsNeg_M['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_M['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_M['ele_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['ele_2btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_IsNeg_M['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_M['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_M['mu_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_M['mu_2btag'].Fill(sublead_Wprime_p4t.M())
 
                     if btag_countings_sublead['Tight'] == 0:
                         h_Wprime_mass_sublead_IsNeg_T['all_0btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_IsNeg_T['all_0btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_IsNeg_T['ele_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_T['ele_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_T['ele_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['ele_0btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_IsNeg_T['mu_all_0btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_T['mu_all_0btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_T['mu_0btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['mu_0btag'].Fill(sublead_Wprime_p4t.M())
                     elif bool(btag_countings_sublead['Tight'] == 10) != bool(btag_countings_sublead['Tight'] == 1):
                         h_Wprime_mass_sublead_IsNeg_T['all_1btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_IsNeg_T['all_1btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_IsNeg_T['ele_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_T['ele_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_T['ele_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['ele_1btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_IsNeg_T['mu_all_1btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_T['mu_all_1btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_T['mu_1btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['mu_1btag'].Fill(sublead_Wprime_p4t.M())
                     elif btag_countings_sublead['Tight'] == 11:
                         h_Wprime_mass_sublead_IsNeg_T['all_2btag'].Fill(sublead_Wprime_p4.M())
                         h_Wprime_tmass_sublead_IsNeg_T['all_2btag'].Fill(sublead_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_sublead_IsNeg_T['ele_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_T['ele_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_T['ele_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['ele_2btag'].Fill(sublead_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_sublead_IsNeg_T['mu_all_2btag'].Fill(sublead_Wprime_p4.M())
-                            h_Wprime_tmass_sublead_IsNeg_T['mu_all_2btag'].Fill(sublead_Wprime_p4t.M())
+                            h_Wprime_mass_sublead_IsNeg_T['mu_2btag'].Fill(sublead_Wprime_p4.M())
+                            h_Wprime_tmass_sublead_IsNeg_T['mu_2btag'].Fill(sublead_Wprime_p4t.M())
             
             if closestTrig:
                 if not IsNeg_closest:
@@ -2787,88 +2904,97 @@ for i in range(len(inpfiles)):
                         h_jet_pt_closest_T['Wbjet_nobtag'].Fill(closest_promptjet.pt)
 
                     if btag_countings_closest['Loose'] == 0:
+                        Lbtagged0Ev['closest'] += 1                        
                         h_Wprime_mass_closest_L['all_0btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_L['all_0btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_L['ele_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_L['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_L['ele_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['ele_0btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_L['mu_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_L['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_L['mu_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['mu_0btag'].Fill(closest_Wprime_p4t.M())
                     elif bool(btag_countings_closest['Loose'] == 10) != bool(btag_countings_closest['Loose'] == 1):
+                        Lbtagged1Ev['closest'] += 1                        
                         h_Wprime_mass_closest_L['all_1btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_L['all_1btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_L['ele_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_L['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_L['ele_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['ele_1btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_L['mu_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_L['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_L['mu_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['mu_1btag'].Fill(closest_Wprime_p4t.M())
                     elif btag_countings_closest['Loose'] == 11:
+                        Lbtagged2Ev['closest'] += 1
                         h_Wprime_mass_closest_L['all_2btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_L['all_2btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_L['ele_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_L['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_L['ele_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['ele_2btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_L['mu_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_L['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_L['mu_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_L['mu_2btag'].Fill(closest_Wprime_p4t.M())
 
                     if btag_countings_closest['Medium'] == 0:
+                        Mbtagged0Ev['closest'] += 1
                         h_Wprime_mass_closest_M['all_0btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_M['all_0btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_M['ele_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_M['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_M['ele_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['ele_0btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_M['mu_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_M['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_M['mu_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['mu_0btag'].Fill(closest_Wprime_p4t.M())
                     elif bool(btag_countings_closest['Medium'] == 10) != bool(btag_countings_closest['Medium'] == 1):
+                        Mbtagged1Ev['closest'] += 1
                         h_Wprime_mass_closest_M['all_1btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_M['all_1btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_M['ele_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_M['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_M['ele_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['ele_1btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_M['mu_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_M['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_M['mu_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['mu_1btag'].Fill(closest_Wprime_p4t.M())
                     elif btag_countings_closest['Medium'] == 11:
+                        Mbtagged2Ev['closest'] += 1
                         h_Wprime_mass_closest_M['all_2btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_M['all_2btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_M['ele_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_M['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_M['ele_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['ele_2btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_M['mu_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_M['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_M['mu_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_M['mu_2btag'].Fill(closest_Wprime_p4t.M())
 
                     if btag_countings_closest['Tight'] == 0:
+                        Tbtagged0Ev['closest'] += 1
                         h_Wprime_mass_closest_T['all_0btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_T['all_0btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_T['ele_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_T['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_T['ele_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['ele_0btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_T['mu_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_T['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_T['mu_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['mu_0btag'].Fill(closest_Wprime_p4t.M())
                     elif bool(btag_countings_closest['Tight'] == 10) != bool(btag_countings_closest['Tight'] == 1):
+                        Tbtagged1Ev['closest'] += 1
                         h_Wprime_mass_closest_T['all_1btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_T['all_1btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_T['ele_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_T['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_T['ele_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['ele_1btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_T['mu_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_T['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_T['mu_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['mu_1btag'].Fill(closest_Wprime_p4t.M())
                     elif btag_countings_closest['Tight'] == 11:
+                        Tbtagged2Ev['closest'] += 1
                         h_Wprime_mass_closest_T['all_2btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_T['all_2btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_T['ele_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_T['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_T['ele_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['ele_2btag'].Fill(closest_Wprime_p4t.M())
                         if isMu:
-                            h_Wprime_mass_closest_T['mu_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_T['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_T['mu_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_T['mu_2btag'].Fill(closest_Wprime_p4t.M())
             
                 if IsNeg_closest:
                     if btag_countings_closest['Loose']/10 == 1:
@@ -2888,85 +3014,85 @@ for i in range(len(inpfiles)):
                         h_Wprime_mass_closest_IsNeg_L['all_0btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_IsNeg_L['all_0btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_IsNeg_L['ele_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_L['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_L['ele_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['ele_0btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_IsNeg_L['mu_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_L['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_L['mu_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['mu_0btag'].Fill(closest_Wprime_p4t.M())
                     elif bool(btag_countings_closest['Loose'] == 10) != bool(btag_countings_closest['Loose'] == 1):
                         h_Wprime_mass_closest_IsNeg_L['all_1btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_IsNeg_L['all_1btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_IsNeg_L['ele_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_L['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_L['ele_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['ele_1btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_IsNeg_L['mu_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_L['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_L['mu_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['mu_1btag'].Fill(closest_Wprime_p4t.M())
                     elif btag_countings_closest['Loose'] == 11:
                         h_Wprime_mass_closest_IsNeg_L['all_2btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_IsNeg_L['all_2btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_IsNeg_L['ele_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_L['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_L['ele_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['ele_2btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_IsNeg_L['mu_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_L['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_L['mu_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_L['mu_2btag'].Fill(closest_Wprime_p4t.M())
 
                     if btag_countings_closest['Medium'] == 0:
                         h_Wprime_mass_closest_IsNeg_M['all_0btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_IsNeg_M['all_0btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_IsNeg_M['ele_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_M['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_M['ele_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['ele_0btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_IsNeg_M['mu_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_M['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_M['mu_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['mu_0btag'].Fill(closest_Wprime_p4t.M())
                     elif bool(btag_countings_closest['Medium'] == 10) != bool(btag_countings_closest['Medium'] == 1):
                         h_Wprime_mass_closest_IsNeg_M['all_1btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_IsNeg_M['all_1btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_IsNeg_M['ele_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_M['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_M['ele_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['ele_1btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_IsNeg_M['mu_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_M['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_M['mu_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['mu_1btag'].Fill(closest_Wprime_p4t.M())
                     elif btag_countings_closest['Medium'] == 11:
                         h_Wprime_mass_closest_IsNeg_M['all_2btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_IsNeg_M['all_2btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_IsNeg_M['ele_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_M['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_M['ele_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['ele_2btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_IsNeg_M['mu_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_M['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_M['mu_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_M['mu_2btag'].Fill(closest_Wprime_p4t.M())
 
                     if btag_countings_closest['Tight'] == 0:
                         h_Wprime_mass_closest_IsNeg_T['all_0btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_IsNeg_T['all_0btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_IsNeg_T['ele_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_T['ele_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_T['ele_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['ele_0btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_IsNeg_T['mu_all_0btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_T['mu_all_0btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_T['mu_0btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['mu_0btag'].Fill(closest_Wprime_p4t.M())
                     elif bool(btag_countings_closest['Tight'] == 10) != bool(btag_countings_closest['Tight'] == 1):
                         h_Wprime_mass_closest_IsNeg_T['all_1btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_IsNeg_T['all_1btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_IsNeg_T['ele_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_T['ele_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_T['ele_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['ele_1btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_IsNeg_T['mu_all_1btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_T['mu_all_1btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_T['mu_1btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['mu_1btag'].Fill(closest_Wprime_p4t.M())
                     elif btag_countings_closest['Tight'] == 11:
                         h_Wprime_mass_closest_IsNeg_T['all_2btag'].Fill(closest_Wprime_p4.M())
                         h_Wprime_tmass_closest_IsNeg_T['all_2btag'].Fill(closest_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_closest_IsNeg_T['ele_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_T['ele_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_T['ele_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['ele_2btag'].Fill(closest_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_closest_IsNeg_T['mu_all_2btag'].Fill(closest_Wprime_p4.M())
-                            h_Wprime_tmass_closest_IsNeg_T['mu_all_2btag'].Fill(closest_Wprime_p4t.M())
+                            h_Wprime_mass_closest_IsNeg_T['mu_2btag'].Fill(closest_Wprime_p4.M())
+                            h_Wprime_tmass_closest_IsNeg_T['mu_2btag'].Fill(closest_Wprime_p4t.M())
             
             if chiTrig:
                 if not IsNeg_chi:
@@ -3003,88 +3129,97 @@ for i in range(len(inpfiles)):
                         h_jet_pt_chi_T['Wbjet_nobtag'].Fill(chi_promptjet.pt)
 
                     if btag_countings_chi['Loose'] == 0:
+                        Lbtagged0Ev['chi'] += 1
                         h_Wprime_mass_chi_L['all_0btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_L['all_0btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_L['ele_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_L['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_L['ele_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['ele_0btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_L['mu_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_L['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_L['mu_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['mu_0btag'].Fill(chi_Wprime_p4t.M())
                     elif bool(btag_countings_chi['Loose'] == 10) != bool(btag_countings_chi['Loose'] == 1):
+                        Lbtagged1Ev['chi'] += 1
                         h_Wprime_mass_chi_L['all_1btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_L['all_1btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_L['ele_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_L['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_L['ele_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['ele_1btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_L['mu_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_L['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_L['mu_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['mu_1btag'].Fill(chi_Wprime_p4t.M())
                     elif btag_countings_chi['Loose'] == 11:
+                        Lbtagged2Ev['chi'] += 1
                         h_Wprime_mass_chi_L['all_2btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_L['all_2btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_L['ele_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_L['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_L['ele_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['ele_2btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_L['mu_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_L['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_L['mu_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_L['mu_2btag'].Fill(chi_Wprime_p4t.M())
 
                     if btag_countings_chi['Medium'] == 0:
+                        Mbtagged0Ev['chi'] += 1
                         h_Wprime_mass_chi_M['all_0btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_M['all_0btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_M['ele_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_M['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_M['ele_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['ele_0btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_M['mu_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_M['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_M['mu_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['mu_0btag'].Fill(chi_Wprime_p4t.M())
                     elif bool(btag_countings_chi['Medium'] == 10) != bool(btag_countings_chi['Medium'] == 1):
+                        Mbtagged1Ev['chi'] += 1
                         h_Wprime_mass_chi_M['all_1btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_M['all_1btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_M['ele_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_M['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_M['ele_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['ele_1btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_M['mu_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_M['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_M['mu_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['mu_1btag'].Fill(chi_Wprime_p4t.M())
                     elif btag_countings_chi['Medium'] == 11:
+                        Mbtagged2Ev['chi'] += 1
                         h_Wprime_mass_chi_M['all_2btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_M['all_2btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_M['ele_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_M['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_M['ele_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['ele_2btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_M['mu_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_M['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_M['mu_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_M['mu_2btag'].Fill(chi_Wprime_p4t.M())
 
                     if btag_countings_chi['Tight'] == 0:
+                        Tbtagged0Ev['chi'] += 1
                         h_Wprime_mass_chi_T['all_0btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_T['all_0btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_T['ele_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_T['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_T['ele_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['ele_0btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_T['mu_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_T['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_T['mu_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['mu_0btag'].Fill(chi_Wprime_p4t.M())
                     elif bool(btag_countings_chi['Tight'] == 10) != bool(btag_countings_chi['Tight'] == 1):
+                        Tbtagged1Ev['chi'] += 1
                         h_Wprime_mass_chi_T['all_1btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_T['all_1btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_T['ele_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_T['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_T['ele_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['ele_1btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_T['mu_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_T['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_T['mu_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['mu_1btag'].Fill(chi_Wprime_p4t.M())
                     elif btag_countings_chi['Tight'] == 11:
+                        Tbtagged2Ev['chi'] += 1
                         h_Wprime_mass_chi_T['all_2btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_T['all_2btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_T['ele_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_T['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_T['ele_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['ele_2btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_T['mu_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_T['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_T['mu_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_T['mu_2btag'].Fill(chi_Wprime_p4t.M())
             
                 if IsNeg_chi:
                     if btag_countings_chi['Loose']/10 == 1:
@@ -3104,85 +3239,85 @@ for i in range(len(inpfiles)):
                         h_Wprime_mass_chi_IsNeg_L['all_0btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_IsNeg_L['all_0btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_IsNeg_L['ele_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_L['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_L['ele_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['ele_0btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_IsNeg_L['mu_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_L['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_L['mu_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['mu_0btag'].Fill(chi_Wprime_p4t.M())
                     elif bool(btag_countings_chi['Loose'] == 10) != bool(btag_countings_chi['Loose'] == 1):
                         h_Wprime_mass_chi_IsNeg_L['all_1btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_IsNeg_L['all_1btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_IsNeg_L['ele_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_L['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_L['ele_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['ele_1btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_IsNeg_L['mu_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_L['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_L['mu_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['mu_1btag'].Fill(chi_Wprime_p4t.M())
                     elif btag_countings_chi['Loose'] == 11:
                         h_Wprime_mass_chi_IsNeg_L['all_2btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_IsNeg_L['all_2btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_IsNeg_L['ele_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_L['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_L['ele_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['ele_2btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_IsNeg_L['mu_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_L['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_L['mu_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_L['mu_2btag'].Fill(chi_Wprime_p4t.M())
 
                     if btag_countings_chi['Medium'] == 0:
                         h_Wprime_mass_chi_IsNeg_M['all_0btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_IsNeg_M['all_0btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_IsNeg_M['ele_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_M['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_M['ele_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['ele_0btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_IsNeg_M['mu_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_M['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_M['mu_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['mu_0btag'].Fill(chi_Wprime_p4t.M())
                     elif bool(btag_countings_chi['Medium'] == 10) != bool(btag_countings_chi['Medium'] == 1):
                         h_Wprime_mass_chi_IsNeg_M['all_1btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_IsNeg_M['all_1btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_IsNeg_M['ele_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_M['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_M['ele_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['ele_1btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_IsNeg_M['mu_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_M['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_M['mu_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['mu_1btag'].Fill(chi_Wprime_p4t.M())
                     elif btag_countings_chi['Medium'] == 11:
                         h_Wprime_mass_chi_IsNeg_M['all_2btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_IsNeg_M['all_2btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_IsNeg_M['ele_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_M['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_M['ele_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['ele_2btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_IsNeg_M['mu_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_M['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_M['mu_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_M['mu_2btag'].Fill(chi_Wprime_p4t.M())
 
                     if btag_countings_chi['Tight'] == 0:
                         h_Wprime_mass_chi_IsNeg_T['all_0btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_IsNeg_T['all_0btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_IsNeg_T['ele_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_T['ele_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_T['ele_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['ele_0btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_IsNeg_T['mu_all_0btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_T['mu_all_0btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_T['mu_0btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['mu_0btag'].Fill(chi_Wprime_p4t.M())
                     elif bool(btag_countings_chi['Tight'] == 10) != bool(btag_countings_chi['Tight'] == 1):
                         h_Wprime_mass_chi_IsNeg_T['all_1btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_IsNeg_T['all_1btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_IsNeg_T['ele_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_T['ele_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_T['ele_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['ele_1btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_IsNeg_T['mu_all_1btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_T['mu_all_1btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_T['mu_1btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['mu_1btag'].Fill(chi_Wprime_p4t.M())
                     elif btag_countings_chi['Tight'] == 11:
                         h_Wprime_mass_chi_IsNeg_T['all_2btag'].Fill(chi_Wprime_p4.M())
                         h_Wprime_tmass_chi_IsNeg_T['all_2btag'].Fill(chi_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_chi_IsNeg_T['ele_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_T['ele_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_T['ele_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['ele_2btag'].Fill(chi_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_chi_IsNeg_T['mu_all_2btag'].Fill(chi_Wprime_p4.M())
-                            h_Wprime_tmass_chi_IsNeg_T['mu_all_2btag'].Fill(chi_Wprime_p4t.M())
+                            h_Wprime_mass_chi_IsNeg_T['mu_2btag'].Fill(chi_Wprime_p4.M())
+                            h_Wprime_tmass_chi_IsNeg_T['mu_2btag'].Fill(chi_Wprime_p4t.M())
             
             if bestTrig:
                 if not IsNeg_best:
@@ -3219,88 +3354,97 @@ for i in range(len(inpfiles)):
                         h_jet_pt_best_T['Wbjet_nobtag'].Fill(best_promptjet.pt)
 
                     if btag_countings_best['Loose'] == 0:
+                        Lbtagged0Ev['best'] += 1
                         h_Wprime_mass_best_L['all_0btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_L['all_0btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_L['ele_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_L['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_L['ele_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['ele_0btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_L['mu_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_L['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_L['mu_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['mu_0btag'].Fill(best_Wprime_p4t.M())
                     elif bool(btag_countings_best['Loose'] == 10) != bool(btag_countings_best['Loose'] == 1):
+                        Lbtagged1Ev['best'] += 1
                         h_Wprime_mass_best_L['all_1btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_L['all_1btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_L['ele_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_L['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_L['ele_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['ele_1btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_L['mu_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_L['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_L['mu_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['mu_1btag'].Fill(best_Wprime_p4t.M())
                     elif btag_countings_best['Loose'] == 11:
+                        Lbtagged2Ev['best'] += 1
                         h_Wprime_mass_best_L['all_2btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_L['all_2btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_L['ele_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_L['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_L['ele_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['ele_2btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_L['mu_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_L['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_L['mu_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_L['mu_2btag'].Fill(best_Wprime_p4t.M())
 
                     if btag_countings_best['Medium'] == 0:
+                        Mbtagged0Ev['best'] += 1
                         h_Wprime_mass_best_M['all_0btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_M['all_0btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_M['ele_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_M['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_M['ele_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['ele_0btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_M['mu_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_M['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_M['mu_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['mu_0btag'].Fill(best_Wprime_p4t.M())
                     elif bool(btag_countings_best['Medium'] == 10) != bool(btag_countings_best['Medium'] == 1):
+                        Mbtagged1Ev['best'] += 1
                         h_Wprime_mass_best_M['all_1btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_M['all_1btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_M['ele_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_M['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_M['ele_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['ele_1btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_M['mu_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_M['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_M['mu_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['mu_1btag'].Fill(best_Wprime_p4t.M())
                     elif btag_countings_best['Medium'] == 11:
+                        Mbtagged2Ev['best'] += 1
                         h_Wprime_mass_best_M['all_2btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_M['all_2btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_M['ele_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_M['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_M['ele_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['ele_2btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_M['mu_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_M['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_M['mu_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_M['mu_2btag'].Fill(best_Wprime_p4t.M())
 
                     if btag_countings_best['Tight'] == 0:
+                        Tbtagged0Ev['best'] += 1
                         h_Wprime_mass_best_T['all_0btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_T['all_0btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_T['ele_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_T['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_T['ele_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['ele_0btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_T['mu_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_T['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_T['mu_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['mu_0btag'].Fill(best_Wprime_p4t.M())
                     elif bool(btag_countings_best['Tight'] == 10) != bool(btag_countings_best['Tight'] == 1):
+                        Tbtagged1Ev['best'] += 1
                         h_Wprime_mass_best_T['all_1btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_T['all_1btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_T['ele_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_T['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_T['ele_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['ele_1btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_T['mu_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_T['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_T['mu_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['mu_1btag'].Fill(best_Wprime_p4t.M())
                     elif btag_countings_best['Tight'] == 11:
+                        Tbtagged2Ev['best'] += 1
                         h_Wprime_mass_best_T['all_2btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_T['all_2btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_T['ele_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_T['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_T['ele_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['ele_2btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_T['mu_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_T['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_T['mu_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_T['mu_2btag'].Fill(best_Wprime_p4t.M())
             
                 if IsNeg_best:
                     if btag_countings_best['Loose']/10 == 1:
@@ -3320,90 +3464,91 @@ for i in range(len(inpfiles)):
                         h_Wprime_mass_best_IsNeg_L['all_0btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_IsNeg_L['all_0btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_IsNeg_L['ele_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_L['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_L['ele_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['ele_0btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_IsNeg_L['mu_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_L['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_L['mu_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['mu_0btag'].Fill(best_Wprime_p4t.M())
                     elif bool(btag_countings_best['Loose'] == 10) != bool(btag_countings_best['Loose'] == 1):
                         h_Wprime_mass_best_IsNeg_L['all_1btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_IsNeg_L['all_1btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_IsNeg_L['ele_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_L['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_L['ele_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['ele_1btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_IsNeg_L['mu_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_L['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_L['mu_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['mu_1btag'].Fill(best_Wprime_p4t.M())
                     elif btag_countings_best['Loose'] == 11:
                         h_Wprime_mass_best_IsNeg_L['all_2btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_IsNeg_L['all_2btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_IsNeg_L['ele_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_L['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_L['ele_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['ele_2btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_IsNeg_L['mu_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_L['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_L['mu_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_L['mu_2btag'].Fill(best_Wprime_p4t.M())
 
                     if btag_countings_best['Medium'] == 0:
                         h_Wprime_mass_best_IsNeg_M['all_0btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_IsNeg_M['all_0btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_IsNeg_M['ele_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_M['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_M['ele_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['ele_0btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_IsNeg_M['mu_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_M['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_M['mu_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['mu_0btag'].Fill(best_Wprime_p4t.M())
                     elif bool(btag_countings_best['Medium'] == 10) != bool(btag_countings_best['Medium'] == 1):
                         h_Wprime_mass_best_IsNeg_M['all_1btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_IsNeg_M['all_1btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_IsNeg_M['ele_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_M['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_M['ele_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['ele_1btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_IsNeg_M['mu_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_M['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_M['mu_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['mu_1btag'].Fill(best_Wprime_p4t.M())
                     elif btag_countings_best['Medium'] == 11:
                         h_Wprime_mass_best_IsNeg_M['all_2btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_IsNeg_M['all_2btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_IsNeg_M['ele_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_M['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_M['ele_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['ele_2btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_IsNeg_M['mu_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_M['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_M['mu_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_M['mu_2btag'].Fill(best_Wprime_p4t.M())
 
                     if btag_countings_best['Tight'] == 0:
                         h_Wprime_mass_best_IsNeg_T['all_0btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_IsNeg_T['all_0btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_IsNeg_T['ele_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_T['ele_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_T['ele_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['ele_0btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_IsNeg_T['mu_all_0btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_T['mu_all_0btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_T['mu_0btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['mu_0btag'].Fill(best_Wprime_p4t.M())
                     elif bool(btag_countings_best['Tight'] == 10) != bool(btag_countings_best['Tight'] == 1):
                         h_Wprime_mass_best_IsNeg_T['all_1btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_IsNeg_T['all_1btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_IsNeg_T['ele_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_T['ele_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_T['ele_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['ele_1btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_IsNeg_T['mu_all_1btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_T['mu_all_1btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_T['mu_1btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['mu_1btag'].Fill(best_Wprime_p4t.M())
                     elif btag_countings_best['Tight'] == 11:
                         h_Wprime_mass_best_IsNeg_T['all_2btag'].Fill(best_Wprime_p4.M())
                         h_Wprime_tmass_best_IsNeg_T['all_2btag'].Fill(best_Wprime_p4t.M())
                         if isEle:
-                            h_Wprime_mass_best_IsNeg_T['ele_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_T['ele_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_T['ele_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['ele_2btag'].Fill(best_Wprime_p4t.M())
                         elif isMu:
-                            h_Wprime_mass_best_IsNeg_T['mu_all_2btag'].Fill(best_Wprime_p4.M())
-                            h_Wprime_tmass_best_IsNeg_T['mu_all_2btag'].Fill(best_Wprime_p4t.M())
+                            h_Wprime_mass_best_IsNeg_T['mu_2btag'].Fill(best_Wprime_p4.M())
+                            h_Wprime_tmass_best_IsNeg_T['mu_2btag'].Fill(best_Wprime_p4t.M())
            
 
         #cut_and_count efficiences
         if (i%100) == 0:
             print i
+
     #efficiencies histos
     if HLTrig and MCReco:
         heff_mclepton_pt = {'electron': ROOT.TEfficiency(h_mclepton_pt['electron'], h_mclepton_pt_unHLT['electron']),
@@ -3471,17 +3616,17 @@ for i in range(len(inpfiles)):
         
         heff_mcWprime_mass = {'gen': ROOT.TEfficiency(h_mcWprime_mass['gen'], h_mcWprime_mass_unHLT['gen']),
                               'all': ROOT.TEfficiency(h_mcWprime_mass['all'], h_mcWprime_mass_unHLT['all']),
-                              'ele_all': ROOT.TEfficiency(h_mcWprime_mass['ele_all'], h_mcWprime_mass_unHLT['ele_all']),
-                              'mu_all': ROOT.TEfficiency(h_mcWprime_mass['mu_all'], h_mcWprime_mass_unHLT['mu_all']),
+                              'ele': ROOT.TEfficiency(h_mcWprime_mass['ele'], h_mcWprime_mass_unHLT['ele']),
+                              'mu': ROOT.TEfficiency(h_mcWprime_mass['mu'], h_mcWprime_mass_unHLT['mu']),
                           }
         heff_mcWprime_mass['gen'].SetTitle("HLTEff_MC_GenPart_Wprime_mass;GenPart W' mass [GeV];#varepsilon")
         heff_mcWprime_mass['gen'].SetName("HLTEff_MC_GenPart_Wprime_mass")
         heff_mcWprime_mass['all'].SetTitle("HLTEff_MC_Lep_Wprime_mass;Lep MCReco W' mass [GeV];#varepsilon")
         heff_mcWprime_mass['all'].SetName("HLTEff_MC_Lep_Wprime_mass")
-        heff_mcWprime_mass['ele_all'].SetTitle("HLTEff_MC_Ele_Wprime_mass;Ele MCReco W' mass [GeV];#varepsilon")
-        heff_mcWprime_mass['ele_all'].SetName("HLTEff_MC_Ele_Wprime_mass")
-        heff_mcWprime_mass['mu_all'].SetTitle("HLTEff_MC_Mu_Wprime_mass;Mu MCReco  W' mass [GeV];#varepsilon")
-        heff_mcWprime_mass['mu_all'].SetName("HLTEff_MC_Mu_Wprime_mass")
+        heff_mcWprime_mass['ele'].SetTitle("HLTEff_MC_Ele_Wprime_mass;Ele MCReco W' mass [GeV];#varepsilon")
+        heff_mcWprime_mass['ele'].SetName("HLTEff_MC_Ele_Wprime_mass")
+        heff_mcWprime_mass['mu'].SetTitle("HLTEff_MC_Mu_Wprime_mass;Mu MCReco  W' mass [GeV];#varepsilon")
+        heff_mcWprime_mass['mu'].SetName("HLTEff_MC_Mu_Wprime_mass")
         for value in heff_mcWprime_mass.values():
             value.SetLineColor(ROOT.kBlue)
         if LepHLTrig:
@@ -3506,15 +3651,15 @@ for i in range(len(inpfiles)):
                 value.SetName(new_name)
         
         heff_mcWprime_tmass = {'all': ROOT.TEfficiency(h_mcWprime_tmass['all'], h_mcWprime_tmass_unHLT['all']),
-                               'ele_all': ROOT.TEfficiency(h_mcWprime_tmass['ele_all'], h_mcWprime_tmass_unHLT['ele_all']),
-                               'mu_all': ROOT.TEfficiency(h_mcWprime_tmass['mu_all'], h_mcWprime_tmass_unHLT['mu_all']),
+                               'ele': ROOT.TEfficiency(h_mcWprime_tmass['ele'], h_mcWprime_tmass_unHLT['ele']),
+                               'mu': ROOT.TEfficiency(h_mcWprime_tmass['mu'], h_mcWprime_tmass_unHLT['mu']),
                            }
         heff_mcWprime_tmass['all'].SetTitle("HLTEff_MC_Lep_Wprime_transverse_mass;Lep MCReco W' transverse mass [GeV];#varepsilon")
         heff_mcWprime_tmass['all'].SetName("HLTEff_MC_Lep_Wprime_transverse_mass")
-        heff_mcWprime_tmass['ele_all'].SetTitle("HLTEff_MC_Ele_Wprime_transverse_mass;Ele MCReco W' transverse mass [GeV];#varepsilon")
-        heff_mcWprime_tmass['ele_all'].SetName("HLTEff_MC_Ele_Wprime_transverse_mass")
-        heff_mcWprime_tmass['mu_all'].SetTitle("HLTEff_MC_Mu_Wprime_transverse_mass;Mu MCReco W' transverse mass [GeV];#varepsilon")
-        heff_mcWprime_tmass['mu_all'].SetName("HLTEff_MC_Mu_Wprime_transverse_mass")
+        heff_mcWprime_tmass['ele'].SetTitle("HLTEff_MC_Ele_Wprime_transverse_mass;Ele MCReco W' transverse mass [GeV];#varepsilon")
+        heff_mcWprime_tmass['ele'].SetName("HLTEff_MC_Ele_Wprime_transverse_mass")
+        heff_mcWprime_tmass['mu'].SetTitle("HLTEff_MC_Mu_Wprime_transverse_mass;Mu MCReco W' transverse mass [GeV];#varepsilon")
+        heff_mcWprime_tmass['mu'].SetName("HLTEff_MC_Mu_Wprime_transverse_mass")
         for value in heff_mcWprime_tmass.values():
             value.SetLineColor(ROOT.kBlue)
         if LepHLTrig:
@@ -3542,7 +3687,6 @@ for i in range(len(inpfiles)):
         h_countings.SetBinContent(1, nentries)
         h_countings.SetBinContent(2, PreSelEvt)
         h_countings.SetBinContent(3, HLTriggered)
-        #h_countings.SetBinContent(4, LepTriggered)
         h_countings.SetBinContent(4, JetTriggered)
         h_countings.SetBinContent(5, sublead_ev)
         h_countings.SetBinContent(6, chimass_ev)
@@ -3550,31 +3694,875 @@ for i in range(len(inpfiles)):
         h_countings.SetBinContent(8, best_ev)
 
         for k in range(8):
-            k = k + 1
-            h_eff_benchmark.SetBinContent(k, nentries)
-
+            u = k + 1
+            h_eff_benchmark.SetBinContent(u, nentries)
+        if BTagging:
+            for k in range(9):
+                u = k + 1
+                h_btag_eff_benchmark.SetBinContent(u, nentries)
+            '''
+            for k in range(9):
+                print h_btag_eff_benchmark.GetBinContent(k+1, nentries)
+            '''
+        
         h_efficiencies = ROOT.TEfficiency(h_countings, h_eff_benchmark)
         h_efficiencies.SetName("DetReco_efficiencies")
         h_efficiencies.SetTitle("DetReco_efficiencies;;#varepsilon")
         h_efficiencies.SetLineColor(ROOT.kBlue)
         h_efficiencies_gae = GetTGAEfromTE(h_efficiencies, naeff)
         
-        '''
-        hmceff_Wprime_mass_sublead = {}
-        for key, value in h_Wprime_mass_sublead.items():
-            eff_dict = None
-            eff_dict = {key: GetTGAEfromTE(ROOT.TEfficiency(value, h_mcWprime_mass_unHLT[key]))}
-            old_title = value.GetTitle()
-            old_name = value.GetName()
-            new_title = insert_char_into_string(len('DetReco_'), 'unHLT-MCEff_', old_title)
-            new_name = insert_char_into_string(len('DetReco_'), 'unHLT-MCEff_', old_name)
-            new_title_x = value.GetXaxis().GetTitle()
-            new_title_y = "#varepsilon"
-            new_title = new_title + ";" + new_title_x + ";" + new_title_y
-            eff_dict[key].SetTitle(new_title)
-            eff_dict[key].SetName(new_name)
-            hmceff_Wprime_mass_sublead.update(eff_dict)
-        '''
+        if BTagging:
+            for key, value in h_btag_countings.items():
+                value.SetBinContent(1, Lbtagged0Ev[key])
+                value.SetBinContent(2, Mbtagged0Ev[key])
+                value.SetBinContent(3, Tbtagged0Ev[key])
+                value.SetBinContent(4, Lbtagged1Ev[key])
+                value.SetBinContent(5, Mbtagged1Ev[key])
+                value.SetBinContent(6, Tbtagged1Ev[key])
+                value.SetBinContent(7, Lbtagged2Ev[key])
+                value.SetBinContent(8, Mbtagged2Ev[key])
+                value.SetBinContent(9, Tbtagged2Ev[key])
+            
+            h_btag_efficiencies = {key: ROOT.TEfficiency(value, h_btag_eff_benchmark) for key, value in h_btag_countings.items()}
+            for key, value in h_btag_efficiencies.items():
+                name = "DetReco_btag_efficiencies_" + str(key)
+                title = "DetReco_btag_efficiencies_" + str(key)+ ";;#varepsilon"
+                value.SetName(name)
+                value.SetTitle(title)
+                value.SetLineColor(ROOT.kBlue)
+                h_btag_efficiencies_gae = {key: GetTGAEfromTE(value, bnaeff) for key, value in h_btag_efficiencies.items()}
+            
+            heff_btagging_Wprime_mass_sublead_L = {}
+            for key, value in h_Wprime_mass_sublead.items():
+                for subkey, subvalue in h_Wprime_mass_sublead_L.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_sublead_L[subkey].GetTitle()
+                    old_name = h_Wprime_mass_sublead_L[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_sublead_L.update(eff_dict)
+            heff_btagging_Wprime_mass_closest_L = {}
+            for key, value in h_Wprime_mass_closest.items():
+                for subkey, subvalue in h_Wprime_mass_closest_L.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_closest_L[subkey].GetTitle()
+                    old_name = h_Wprime_mass_closest_L[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_closest_L.update(eff_dict)
+            heff_btagging_Wprime_mass_chi_L = {}
+            for key, value in h_Wprime_mass_chi.items():
+                for subkey, subvalue in h_Wprime_mass_chi_L.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_chi_L[subkey].GetTitle()
+                    old_name = h_Wprime_mass_chi_L[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_chi_L.update(eff_dict)
+            heff_btagging_Wprime_mass_best_L = {}
+            for key, value in h_Wprime_mass_best.items():
+                for subkey, subvalue in h_Wprime_mass_best_L.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_best_L[subkey].GetTitle()
+                    old_name = h_Wprime_mass_best_L[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_best_L.update(eff_dict)
+            
+            heff_btagging_Wprime_mass_sublead_M = {}
+            for key, value in h_Wprime_mass_sublead.items():
+                for subkey, subvalue in h_Wprime_mass_sublead_M.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_sublead_M[subkey].GetTitle()
+                    old_name = h_Wprime_mass_sublead_M[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_sublead_M.update(eff_dict)
+            heff_btagging_Wprime_mass_closest_M = {}
+            for key, value in h_Wprime_mass_closest.items():
+                for subkey, subvalue in h_Wprime_mass_closest_M.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_closest_M[subkey].GetTitle()
+                    old_name = h_Wprime_mass_closest_M[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_closest_M.update(eff_dict)
+            heff_btagging_Wprime_mass_chi_M = {}
+            for key, value in h_Wprime_mass_chi.items():
+                for subkey, subvalue in h_Wprime_mass_chi_M.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_chi_M[subkey].GetTitle()
+                    old_name = h_Wprime_mass_chi_M[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_chi_M.update(eff_dict)
+            heff_btagging_Wprime_mass_best_M = {}
+            for key, value in h_Wprime_mass_best.items():
+                for subkey, subvalue in h_Wprime_mass_best_M.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_best_M[subkey].GetTitle()
+                    old_name = h_Wprime_mass_best_M[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_best_M.update(eff_dict)
+            
+            heff_btagging_Wprime_mass_sublead_T = {}
+            for key, value in h_Wprime_mass_sublead.items():
+                for subkey, subvalue in h_Wprime_mass_sublead_T.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_sublead_T[subkey].GetTitle()
+                    old_name = h_Wprime_mass_sublead_T[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_sublead_T.update(eff_dict)
+            heff_btagging_Wprime_mass_closest_T = {}
+            for key, value in h_Wprime_mass_closest.items():
+                for subkey, subvalue in h_Wprime_mass_closest_T.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_closest_T[subkey].GetTitle()
+                    old_name = h_Wprime_mass_closest_T[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_closest_T.update(eff_dict)
+            heff_btagging_Wprime_mass_chi_T = {}
+            for key, value in h_Wprime_mass_chi.items():
+                for subkey, subvalue in h_Wprime_mass_chi_T.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_chi_T[subkey].GetTitle()
+                    old_name = h_Wprime_mass_chi_T[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_chi_T.update(eff_dict)
+            heff_btagging_Wprime_mass_best_T = {}
+            for key, value in h_Wprime_mass_best.items():
+                for subkey, subvalue in h_Wprime_mass_best_T.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_mass_best_T[subkey].GetTitle()
+                    old_name = h_Wprime_mass_best_T[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_mass_best_T.update(eff_dict)
+            
+            if DeltaFilter:
+            	heff_btagging_Wprime_mass_sublead_IsNeg_L = {}
+            	for key, value in h_Wprime_mass_sublead_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_sublead_IsNeg_L.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_sublead_IsNeg_L[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_sublead_IsNeg_L[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_sublead_IsNeg_L.update(eff_dict)
+            	heff_btagging_Wprime_mass_closest_IsNeg_L = {}
+            	for key, value in h_Wprime_mass_closest_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_closest_IsNeg_L.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_closest_IsNeg_L[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_closest_IsNeg_L[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_closest_IsNeg_L.update(eff_dict)
+            	heff_btagging_Wprime_mass_chi_IsNeg_L = {}
+            	for key, value in h_Wprime_mass_chi_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_chi_IsNeg_L.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_chi_IsNeg_L[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_chi_IsNeg_L[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_chi_IsNeg_L.update(eff_dict)
+            	heff_btagging_Wprime_mass_best_IsNeg_L = {}
+            	for key, value in h_Wprime_mass_best_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_best_IsNeg_L.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_best_IsNeg_L[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_best_IsNeg_L[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_best_IsNeg_L.update(eff_dict)
+
+            	heff_btagging_Wprime_mass_sublead_IsNeg_M = {}
+            	for key, value in h_Wprime_mass_sublead_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_sublead_IsNeg_M.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_sublead_IsNeg_M[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_sublead_IsNeg_M[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_sublead_IsNeg_M.update(eff_dict)
+            	heff_btagging_Wprime_mass_closest_IsNeg_M = {}
+            	for key, value in h_Wprime_mass_closest_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_closest_IsNeg_M.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_closest_IsNeg_M[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_closest_IsNeg_M[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_closest_IsNeg_M.update(eff_dict)
+            	heff_btagging_Wprime_mass_chi_IsNeg_M = {}
+            	for key, value in h_Wprime_mass_chi_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_chi_IsNeg_M.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_chi_IsNeg_M[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_chi_IsNeg_M[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_chi_IsNeg_M.update(eff_dict)
+            	heff_btagging_Wprime_mass_best_IsNeg_M = {}
+            	for key, value in h_Wprime_mass_best_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_best_IsNeg_M.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_best_IsNeg_M[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_best_IsNeg_M[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_best_IsNeg_M.update(eff_dict)
+
+            	heff_btagging_Wprime_mass_sublead_IsNeg_T = {}
+            	for key, value in h_Wprime_mass_sublead_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_sublead_IsNeg_T.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_sublead_IsNeg_T[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_sublead_IsNeg_T[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_sublead_IsNeg_T.update(eff_dict)
+            	heff_btagging_Wprime_mass_closest_IsNeg_T = {}
+            	for key, value in h_Wprime_mass_closest_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_closest_IsNeg_T.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_closest_IsNeg_T[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_closest_IsNeg_T[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_closest_IsNeg_T.update(eff_dict)
+            	heff_btagging_Wprime_mass_chi_IsNeg_T = {}
+            	for key, value in h_Wprime_mass_chi_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_chi_IsNeg_T.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_chi_IsNeg_T[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_chi_IsNeg_T[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_chi_IsNeg_T.update(eff_dict)
+            	heff_btagging_Wprime_mass_best_IsNeg_T = {}
+            	for key, value in h_Wprime_mass_best_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_mass_best_IsNeg_T.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_mass_best_IsNeg_T[subkey].GetTitle()
+            	        old_name = h_Wprime_mass_best_IsNeg_T[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_mass_best_IsNeg_T.update(eff_dict)
+
+
+            heff_btagging_Wprime_tmass_sublead_L = {}
+            for key, value in h_Wprime_tmass_sublead.items():
+                for subkey, subvalue in h_Wprime_tmass_sublead_L.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_sublead_L[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_sublead_L[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_sublead_L.update(eff_dict)
+            heff_btagging_Wprime_tmass_closest_L = {}
+            for key, value in h_Wprime_tmass_closest.items():
+                for subkey, subvalue in h_Wprime_tmass_closest_L.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_closest_L[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_closest_L[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_closest_L.update(eff_dict)
+            heff_btagging_Wprime_tmass_chi_L = {}
+            for key, value in h_Wprime_tmass_chi.items():
+                for subkey, subvalue in h_Wprime_tmass_chi_L.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_chi_L[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_chi_L[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_chi_L.update(eff_dict)
+            heff_btagging_Wprime_tmass_best_L = {}
+            for key, value in h_Wprime_tmass_best.items():
+                for subkey, subvalue in h_Wprime_tmass_best_L.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_best_L[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_best_L[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_best_L.update(eff_dict)
+
+            heff_btagging_Wprime_tmass_sublead_M = {}
+            for key, value in h_Wprime_tmass_sublead.items():
+                for subkey, subvalue in h_Wprime_tmass_sublead_M.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_sublead_M[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_sublead_M[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_sublead_M.update(eff_dict)
+            heff_btagging_Wprime_tmass_closest_M = {}
+            for key, value in h_Wprime_tmass_closest.items():
+                for subkey, subvalue in h_Wprime_tmass_closest_M.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_closest_M[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_closest_M[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_closest_M.update(eff_dict)
+            heff_btagging_Wprime_tmass_chi_M = {}
+            for key, value in h_Wprime_tmass_chi.items():
+                for subkey, subvalue in h_Wprime_tmass_chi_M.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_chi_M[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_chi_M[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_chi_M.update(eff_dict)
+            heff_btagging_Wprime_tmass_best_M = {}
+            for key, value in h_Wprime_tmass_best.items():
+                for subkey, subvalue in h_Wprime_tmass_best_M.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_best_M[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_best_M[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_best_M.update(eff_dict)
+
+            heff_btagging_Wprime_tmass_sublead_T = {}
+            for key, value in h_Wprime_tmass_sublead.items():
+                for subkey, subvalue in h_Wprime_tmass_sublead_T.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_sublead_T[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_sublead_T[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_sublead_T.update(eff_dict)
+            heff_btagging_Wprime_tmass_closest_T = {}
+            for key, value in h_Wprime_tmass_closest.items():
+                for subkey, subvalue in h_Wprime_tmass_closest_T.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_closest_T[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_closest_T[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_closest_T.update(eff_dict)
+            heff_btagging_Wprime_tmass_chi_T = {}
+            for key, value in h_Wprime_tmass_chi.items():
+                for subkey, subvalue in h_Wprime_tmass_chi_T.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_chi_T[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_chi_T[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_chi_T.update(eff_dict)
+            heff_btagging_Wprime_tmass_best_T = {}
+            for key, value in h_Wprime_tmass_best.items():
+                for subkey, subvalue in h_Wprime_tmass_best_T.items():
+                    if key not in subkey:
+                        continue
+                    eff_dict = None
+                    eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+                    old_title = h_Wprime_tmass_best_T[subkey].GetTitle()
+                    old_name = h_Wprime_tmass_best_T[subkey].GetName()
+                    new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+                    new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+                    new_title_x = value.GetXaxis().GetTitle()
+                    new_title_y = "#varepsilon"
+                    new_title = new_title + ";" + new_title_x + ";" + new_title_y
+                    eff_dict[subkey].SetTitle(new_title)
+                    eff_dict[subkey].SetName(new_name)
+                    heff_btagging_Wprime_tmass_best_T.update(eff_dict)
+
+            if DeltaFilter:
+            	heff_btagging_Wprime_tmass_sublead_IsNeg_L = {}
+            	for key, value in h_Wprime_tmass_sublead_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_sublead_IsNeg_L.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_sublead_IsNeg_L[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_sublead_IsNeg_L[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_sublead_IsNeg_L.update(eff_dict)
+            	heff_btagging_Wprime_tmass_closest_IsNeg_L = {}
+            	for key, value in h_Wprime_tmass_closest_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_closest_IsNeg_L.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_closest_IsNeg_L[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_closest_IsNeg_L[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_closest_IsNeg_L.update(eff_dict)
+            	heff_btagging_Wprime_tmass_chi_IsNeg_L = {}
+            	for key, value in h_Wprime_tmass_chi_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_chi_IsNeg_L.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_chi_IsNeg_L[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_chi_IsNeg_L[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_chi_IsNeg_L.update(eff_dict)
+            	heff_btagging_Wprime_tmass_best_IsNeg_L = {}
+            	for key, value in h_Wprime_tmass_best_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_best_IsNeg_L.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_best_IsNeg_L[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_best_IsNeg_L[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_best_IsNeg_L.update(eff_dict)
+
+            	heff_btagging_Wprime_tmass_sublead_IsNeg_M = {}
+            	for key, value in h_Wprime_tmass_sublead_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_sublead_IsNeg_M.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_sublead_IsNeg_M[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_sublead_IsNeg_M[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_sublead_IsNeg_M.update(eff_dict)
+            	heff_btagging_Wprime_tmass_closest_IsNeg_M = {}
+            	for key, value in h_Wprime_tmass_closest_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_closest_IsNeg_M.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_closest_IsNeg_M[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_closest_IsNeg_M[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_closest_IsNeg_M.update(eff_dict)
+            	heff_btagging_Wprime_tmass_chi_IsNeg_M = {}
+            	for key, value in h_Wprime_tmass_chi_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_chi_IsNeg_M.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_chi_IsNeg_M[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_chi_IsNeg_M[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_chi_IsNeg_M.update(eff_dict)
+            	heff_btagging_Wprime_tmass_best_IsNeg_M = {}
+            	for key, value in h_Wprime_tmass_best_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_best_IsNeg_M.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_best_IsNeg_M[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_best_IsNeg_M[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_best_IsNeg_M.update(eff_dict)
+
+            	heff_btagging_Wprime_tmass_sublead_IsNeg_T = {}
+            	for key, value in h_Wprime_tmass_sublead_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_sublead_IsNeg_T.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_sublead_IsNeg_T[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_sublead_IsNeg_T[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_sublead_IsNeg_T.update(eff_dict)
+            	heff_btagging_Wprime_tmass_closest_IsNeg_T = {}
+            	for key, value in h_Wprime_tmass_closest_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_closest_IsNeg_T.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_closest_IsNeg_T[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_closest_IsNeg_T[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_closest_IsNeg_T.update(eff_dict)
+            	heff_btagging_Wprime_tmass_chi_IsNeg_T = {}
+            	for key, value in h_Wprime_tmass_chi_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_chi_IsNeg_T.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_chi_IsNeg_T[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_chi_IsNeg_T[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_chi_IsNeg_T.update(eff_dict)
+            	heff_btagging_Wprime_tmass_best_IsNeg_T = {}
+            	for key, value in h_Wprime_tmass_best_IsNeg.items():
+            	    for subkey, subvalue in h_Wprime_tmass_best_IsNeg_T.items():
+            	        if key not in subkey:
+            	            continue
+            	        eff_dict = None
+            	        eff_dict = {subkey: ROOT.TEfficiency(subvalue, value)}
+            	        old_title = h_Wprime_tmass_best_IsNeg_T[subkey].GetTitle()
+            	        old_name = h_Wprime_tmass_best_IsNeg_T[subkey].GetName()
+            	        new_title = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_title)
+            	        new_name = insert_char_into_string(len('DetReco_'), 'BTagEff_', old_name)
+            	        new_title_x = value.GetXaxis().GetTitle()
+            	        new_title_y = "#varepsilon"
+            	        new_title = new_title + ";" + new_title_x + ";" + new_title_y
+            	        eff_dict[subkey].SetTitle(new_title)
+            	        eff_dict[subkey].SetName(new_name)
+            	        heff_btagging_Wprime_tmass_best_IsNeg_T.update(eff_dict)
+            
     #effhistos printing and saving
     if HLTrig and MCReco:
         for value in heff_mclepton_pt.values():
@@ -4048,7 +5036,172 @@ for i in range(len(inpfiles)):
                 print_hist(inpfile, subfold, value)
                 save_hist(inpfile, subfold, value)
 
+            for value in heff_btagging_Wprime_mass_sublead_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_mass_closest_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_mass_chi_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_mass_best_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+
+            for value in heff_btagging_Wprime_mass_sublead_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_mass_closest_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_mass_chi_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_mass_best_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+
+            for value in heff_btagging_Wprime_mass_sublead_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_mass_closest_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_mass_chi_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_mass_best_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+
+            
+            for value in heff_btagging_Wprime_tmass_sublead_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_tmass_closest_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_tmass_chi_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_tmass_best_L.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+
+            for value in heff_btagging_Wprime_tmass_sublead_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_tmass_closest_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_tmass_chi_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_tmass_best_M.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+
+            for value in heff_btagging_Wprime_tmass_sublead_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_tmass_closest_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_tmass_chi_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+            for value in heff_btagging_Wprime_tmass_best_T.values():
+                print_hist(inpfile, subfold, value)
+                save_hist(inpfile, subfold, value)
+
+            for value in h_btag_countings.values():
+                print_hist(inpfile, subfold, value, "HIST0")
+                save_hist(inpfile, subfold, value, "HIST0")
+            for value in h_btag_efficiencies_gae.values():
+                print_hist(inpfile, subfold, value, "AP")
+                save_hist(inpfile, subfold, value, "AP")
+
             if DeltaFilter:
+                for value in heff_btagging_Wprime_mass_sublead_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_mass_closest_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_mass_chi_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_mass_best_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+
+                for value in heff_btagging_Wprime_mass_sublead_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_mass_closest_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_mass_chi_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_mass_best_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+
+                for value in heff_btagging_Wprime_mass_sublead_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_mass_closest_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_mass_chi_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_mass_best_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+
+
+                for value in heff_btagging_Wprime_tmass_sublead_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_tmass_closest_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_tmass_chi_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_tmass_best_IsNeg_L.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+
+                for value in heff_btagging_Wprime_tmass_sublead_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_tmass_closest_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_tmass_chi_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_tmass_best_IsNeg_M.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+
+                for value in heff_btagging_Wprime_tmass_sublead_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_tmass_closest_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_tmass_chi_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+                for value in heff_btagging_Wprime_tmass_best_IsNeg_T.values():
+                    print_hist(inpfile, subfold, value)
+                    save_hist(inpfile, subfold, value)
+
                 for value in h_Wprime_mass_sublead_IsNeg_L.values():
                     print_hist(inpfile, subfold, value)
                     save_hist(inpfile, subfold, value)
@@ -4160,6 +5313,6 @@ for i in range(len(inpfiles)):
                     print_hist(inpfile, subfold, value)
                     save_hist(inpfile, subfold, value)
 
-    print 'Total events: %d   ||   Bad MET flag events %d   ||   Bad events %d   ||   LepPreSel %d    ||   MC Events %d    ||    HLTriggered %d   ||   JetTriggered %d   ||' %(tree.GetEntries(), badflag, badevt, PreSelEvt, MCEvents, HLTriggered, JetTriggered)
+    print 'Total events: %d   ||   Bad MET flag events %d   ||   Bad events %d   ||   LepPreSe%d    ||   MC Events %d    ||    HLTriggered %d   ||   JetTriggered %d   ||' %(tree.GetEntries(), badflag, badevt, PreSelEvt, MCEvents, HLTriggered, JetTriggered)
 
 
