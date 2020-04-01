@@ -125,11 +125,7 @@ for sample in samples:
         infile.Close()
         
 
-'''    
-    inpfile = inpfiles[i]
-    subfold = subfolds[i]
-    filetoopen = inputpath + inpfile
-
-    
-
+'''
+usage:
+python stackroot.py samples.txt plots.txt
 '''
