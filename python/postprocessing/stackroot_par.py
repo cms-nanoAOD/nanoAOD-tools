@@ -85,13 +85,13 @@ def projectperevent(sample, plot):
     rootfiles = os.listdir(sampledir)
     print "Sample: " + sampledir
     print rootfiles
-    sobj = "losamples."+sample[0]
-    x = "scard"
-    exec("%s = %s" % (x, sobj))
+    scard = None
+    if 'Data' not in sample[0]:
+        sobj = "losamples."+sample[0]
+        x = "scard"
+        exec("%s = %s" % (x, sobj))
 
     for k, rootfile in enumerate(rootfiles):
-        if k > 0:
-            break
         print "\trootfile #%i" % (k)
         infile = ROOT.TFile.Open(sampledir + rootfile)        
         tree = InputTree(infile.Events)
@@ -132,7 +132,7 @@ def projectperevent(sample, plot):
         print h[1].GetEntries()
         scalefac = 1. / h[1].GetEntries()
         for k, v in lumi.items():
-            if k in rootfile:
+            if k in sample[0]:
                 scalefac = scalefac*v
                 break
         scalefac = scalefac * scard.sigma * 1000.
