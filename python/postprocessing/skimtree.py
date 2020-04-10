@@ -149,7 +149,7 @@ class systWeights(object):
             self.weightedNames.append("")
 
         if addTTSplit:
-            self.nCategories=4;
+            self.nCategories=4
             categoriesNames.append("TT0lep")
             categoriesNames.append("TT1lep")
             categoriesNames.append("TT2lep")
@@ -250,20 +250,40 @@ class systWeights(object):
 
     def setPDFWeights(self, wpdfs, xsections, numPDFs, wzero=1.0, mult=True):
         zerofact = 1.0
+        rms, mean = 0., 0.
         if mult:
             zerofact = self.weightedSysts[0]
         for i in range(numPDFs+1):
             if wzero != 0 and xsections[i] != 0:
+                try:
+                    pvalue = wpdfs[i] / (wzero*xsections[i])
+                except math.isnan(pvalue):
+                    pvalue = 1.
                 self.setPDFValue(i, zerofact*wpdfs[i]/(wzero*xsections[i]) )
+                mean += pvalue
             else:
-                self.setPDFValue(i, 0)
+                self.setPDFValue(i, wzero)
+        mean = mean / numPDFs
 
-        self.setSystValue("pdf_asUp", self.getPDFValue(self.nPDF-2)/wzero)
-        self.setSystValue("pdf_asDown", zerofact)
-        self.setSystValue("pdf_zmUp", self.getPDFValue(self.nPDF-1)/wzero)
-        self.setSystValue("pdf_zmDown", zerofact)
-        self.setSystValue("pdf_totalUp", zerofact)
-        self.setSystValue("pdf_totalDown", zerofact)
+        for i in range(numPDFs):
+            if wzero != 0 and xsections[i] != 0:
+                try:
+                    pvalue = wpdfs[i] / (wzero*xsections[i])
+                except math.isnan(pvalue):
+                    pvalue = 1.
+                rms += (mean-pvalue) * (mean-pvalue)
+            else:
+                rms += 0.
+
+        if self.shortPDFFiles:
+            self.setSystValue("pdf_asUp", self.getPDFValue(self.nPDF-2.)/wzero)
+            self.setSystValue("pdf_asDown", zerofact)
+            self.setSystValue("pdf_zmUp", self.getPDFValue(self.nPDF-1.)/wzero)
+            self.setSystValue("pdf_zmDown", zerofact)
+            if math.isnan(rms):
+                rms += 0.
+            self.setSystValue("pdf_totalUp", zerofact*(1.+rms))
+            self.setSystValue("pdf_totalDown", zerofact*(1.-rms))
 
     def setTWeight(self, tweight, wtotsample=1.0, mult=True):
         zerofact = 1.0
@@ -379,7 +399,7 @@ class systWeights(object):
                     ws = systWeights[sy]*wcats[c]
                 else:
                     if nFirstSysts != 0:
-                        wcats[c] = 1.0;
+                        wcats[c] = 1.0
                     ws = self.weightedSysts[sy]*wcats[c]
 
                 histo[sy+(MAX+1)*(c)].Fill(v, w * ws)
@@ -411,8 +431,7 @@ class systWeights(object):
 
             if self.addPDF:
                 if not useOnlyNominal:
-                   allFiles[MAX+((MAX+1)*c)]= ROOT.TFile.Open((basename+"_pdf"+cname+".ro\
-ot"), opt)
+                   allFiles[MAX+((MAX+1)*c)]= ROOT.TFile.Open((basename+"_pdf"+cname+".root"), opt)
 
     def writeHistogramsSysts(self, histo, filesout):
         MAX = self.maxSystsNonPDF
@@ -527,13 +546,13 @@ systZero.prepareDefault(True, addQ2, addPDF, addTopPt, addVHF, addTTSplit)
 print "max systs are ", systZero.maxSysts
 '''
   if(addTopTagging) {
-    systZero.addTopTagSF("topTag");
+    systZero.addTopTagSF("topTag")
   }
   if(addWTagging){
-    systZero.addWTagSF("wTag");
+    systZero.addWTagSF("wTag")
   }
   if(addTrigSF){
-    systZero.addTrigSF("trigSF");
+    systZero.addTrigSF("trigSF")
   }
-  maxSysts= systZero.maxSysts;
+  maxSysts= systZero.maxSysts
 '''
