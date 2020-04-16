@@ -1,1 +1,14 @@
-Muon_pt Muon_pt>=20. 200 0. 2000.
+Muon_pt (Muon_effSF)*(Muon_pt>=20.)&&(Muon_eta>-2.4&&Muon_eta<2.4)&&(Muon_miniPFRelIso_all<0.1) 100. 0. 1000.
+Electron_pt (Electron_effSF)*(Electron_pt>20.)&&((Electron_eta>-2.5&&Electron_eta<-1.566)||(Electron_eta>-1.4442&&Electron_eta<1.4442)||(Electron_eta>1.566&&Electron_eta<2.5))&&(Electron_miniPFRelIso_all<0.1) 100. 0. 1000.
+Jet_pt (Jet_pt>=35.)&&(Jet_jetId>=2)&&(Jet_eta>-2.4&&Jet_eta<2.4) 250. 0. 2500.
+Jet_pt[0] (Jet_pt[0]>=35.)&&(Jet_jetId[0]>=2)&&(Jet_eta[0]>-2.4&&Jet_eta[0]<2.4) 250. 0. 2500.
+MET_pt nocut 150. 0. 1500.
+nJet nocut 25. 0. 25.
+Muon_eta (Muon_effSF)*(Muon_pt>=20.)&&(Muon_eta>-2.4&&Muon_eta<2.4)&&(Muon_miniPFRelIso_all<0.1) 60. -6. 6.
+Electron_eta (Electron_effSF)*(Electron_pt>20.)&&((Electron_eta>-2.5&&Electron_eta<-1.566)||(Electron_eta>-1.4442&&Electron_eta<1.4442)||(Electron_eta>1.566&&Electron_eta<2.5))&&(Electron_miniPFRelIso_all<0.1) 60. -6. 6.
+Jet_eta (Jet_pt>=35.)&&(Jet_jetId>=2)&&(Jet_eta>-2.4&&Jet_eta<2.4) 60. -6. 6.
+MET_phi nocut 80. -4. 4.
+Muon_phi (Muon_effSF)*(Muon_pt>=20.)&&(Muon_eta>-2.4&&Muon_eta<2.4)&&(Muon_miniPFRelIso_all<0.1) 80. -4. 4.
+Electron_phi (Electron_effSF)*(Electron_pt>20.)&&((Electron_eta>-2.5&&Electron_eta<-1.566)||(Electron_eta>-1.4442&&Electron_eta<1.4442)||(Electron_eta>1.566&&Electron_eta<2.5))&&(Electron_miniPFRelIso_all<0.1) 80. -4. 4.
+Jet_phi (Jet_pt>=35.)&&(Jet_jetId>=2)&&(Jet_eta>-2.4&&Jet_eta<2.4) 80. -4. 4.
+MET_sumEt nocut 800. 0. 8000.

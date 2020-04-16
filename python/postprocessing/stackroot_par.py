@@ -34,7 +34,7 @@ class variabile(object):
         return  '\"'+str(self._name)+'\",\"'+str(self._title)+'\",'+str(self._nbins)+','+str(self._xmin)+','+str(self._xmax)
 
 def cutToTag(cut):
-    newstring = cut.replace(">=","_GE_").replace(">","_G_").replace(" ","").replace("&&","_AND_").replace("||","_OR_").replace("<=","_LE_").replace("<","_L_").replace(".","p").replace("((", "_").replace("))", "_").replace("(","").replace(")","").replace("==","_EQ_").replace("=","_EQ_").replace("*","_AND_").replace("+","_OR_").replace("-", "neg")
+    newstring = cut.replace("(Electron_effSF)*", "").replace("(Muon_effSF)*", "").replace(">=","_GE_").replace(">","_G_").replace(" ","").replace("&&","_AND_").replace("||","_OR_").replace("<=","_LE_").replace("<","_L_").replace(".","p").replace("((", "_").replace("))", "_").replace("(","").replace(")","").replace("==","_EQ_").replace("=","_EQ_").replace("*","_AND_").replace("+","_OR_").replace("-", "neg")
     return newstring
 
 def collect_result(result):
@@ -76,33 +76,53 @@ def createhlist(plot):
     hlist.append(copy.deepcopy(var))
     hlist.append(ROOT.TH1F(name, title, nbins, nmin, nmax))
     return hlist
-        
+
+def getfilelist(sampledir):
+    files = [fil for fil in os.listdir(sampledir) if os.path.isfile(os.path.join(sampledir, fil))]
+    return files
+
 def projectperevent(sample, plot):
+    #print sample
     h = None
     h = createhlist(plot) 
+    nscale = 0.
+    sampledir = inputpath + sample[0]
+    rootfiles = getfilelist(sampledir)
+    if len(rootfiles) == 0:
+        return []
+    #rootfiles = os.listdir(sampledir)
 
-    sampledir = inputpath + sample[0] + "/"
-    rootfiles = os.listdir(sampledir)
     print "Sample: " + sampledir
-    print rootfiles
+    #for f in rootfiles:
+        #print f
+    #print rootfiles
+    
     scard = None
     if 'Data' not in sample[0]:
         sobj = "losamples."+sample[0]
         x = "scard"
         exec("%s = %s" % (x, sobj))
 
+    for j, rootfile in enumerate(rootfiles):
+        if sample[0] in rootfile:
+            rootfiles.pop(j)
+
     for k, rootfile in enumerate(rootfiles):
+        if k != 1 and 'Data' not in sample[0]:
+            continue
+        #if sample[0] in rootfile:
+            #continue
         print "\trootfile #%i" % (k)
-        infile = ROOT.TFile.Open(sampledir + rootfile)        
+        infile = ROOT.TFile.Open(sampledir + "/" + rootfile) 
         tree = InputTree(infile.Events)
         nentries = tree.GetEntries()
-        
+    
         for i in xrange(0, nentries):
-            if (i % int(nentries/20)) == 0:
+            if (i % int(nentries/1000)) == 0:
                perc = float(i)/float(nentries) * 100.
                sys.stdout.write("\r\t\tPercentage wrt total: {0}%".format(math.ceil(perc)))
                sys.stdout.flush()
-               
+           
             event = Event(tree,i)
             electrons = Collection(event, "Electron")
             muons = Collection(event, "Muon")
@@ -116,7 +136,7 @@ def projectperevent(sample, plot):
             elif sample[1] == 'ele' or sample[1] == 'electron':
                 if not isEle:
                     continue
-                
+
             htemp = None
             newname = "htemp_" + h[0]._title
             htemp = h[1].Clone(newname)
@@ -125,37 +145,56 @@ def projectperevent(sample, plot):
             h[1].Add(htemp)
             htemp = None
 
+        print "\nFirst Integral: ", h[1].Integral()
+        if 'Data' not in sample[0]:
+            nscale = nscale + infile.Get("plots/h_genweight").GetBinContent(1)
+            print "nscale #", k, ": ", nscale
         infile.Close()
         print "\trootfile closed"
 
     if 'Data' not in sample[0]:
-        print h[1].GetEntries()
-        scalefac = 1. / h[1].GetEntries()
+        print "nscale tot: ", nscale
+        scalefac = 1. / nscale
+        print "scalefac: ", scalefac
         for k, v in lumi.items():
             if k in sample[0]:
+                print "lumi: ", v, " year: ", k
                 scalefac = scalefac*v
+                print "scalefac * lumi: ", scalefac
                 break
         scalefac = scalefac * scard.sigma * 1000.
+        print "sigma: ", scard.sigma, " scalefac tot: ", scalefac
         h[1].Scale(scalefac)
-        print scalefac, h[1].GetEntries()
+        print "New integral: ", h[1].Integral()
+        #print scalefac, h[1].Integral()
         
     outname = sample[0]+'_'+sample[1]
-    return [h[1], outname]
+    return [copy.deepcopy(h[1]), copy.deepcopy(outname)]
 
 pool = mp.Pool(mp.cpu_count())
 
 samples = getsampleslist(sys.argv[1])
 plots = getplotslist(sys.argv[2])    
+
 for sample in samples:
     for plot in plots:
+        #results.append(projectperevent(sample, plot))
         pool.apply_async(projectperevent, args=(sample, plot), callback=collect_result)
 
 pool.close()
 pool.join()
 
-for result in results:
-    print result[0], result[1]
+print results
+
+print "\nSaving..."
+for i, result in enumerate(results):
+    sys.stdout.write("\r\t\tPlots wrt total: {0}/{1}".format(i+1, len(results)))
+    sys.stdout.flush()
+    if result == []:
+        continue
     save_hist(result[1], "Plots_par", result[0])
+
+print "\n"
 
 '''
 pool = mp.Pool(mp.cpu_count())
