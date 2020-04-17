@@ -94,8 +94,7 @@ for i in xrange(0,tree.GetEntries()):
     #++++++++++++++++++++++++++++++++++
     #++      defining variables      ++
     #++++++++++++++++++++++++++++++++++
-    tightMu = ROOT.TLorentzVector()
-    tightEle = ROOT.TLorentzVector()
+    tightlep_p4 = ROOT.TLorentzVector()
 
     #++++++++++++++++++++++++++++++++++
     #++    starting the analysis     ++
