@@ -130,12 +130,15 @@ def PSet_writer(sample):
     f.close()
 
 #dataset = MuB_2017
-#dataset = WJets_2017
+dataset = WJets_2017
 #dataset = DataMu_2017
 #dataset = DataEle_2017
-dataset = TT_Mtt_2017
+#dataset = TT_Mtt_2017
 #sample = TT_Mtt1000toInf_2017
 #sample = TT_Mtt700to1000_2017
+#dataset = WJetsHT1200to2500_2017
+#dataset = WJetsHT600to800_2017
+
 samples = []
 
 if hasattr(dataset, 'components'): # How to check whether this exists or not
@@ -228,4 +231,7 @@ for sample in samples:
     elif getout:
         if not os.path.exists("/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label):
             os.makedirs("/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label)
+        print "crab getoutput -d crab_" + sample.label + " --outputpath=/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label + "/"
         os.system("crab getoutput -d crab_" + sample.label + " --outputpath=/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label + "/")
+        #for i in xrange(1, 969):
+        #os.system("crab getoutput -d crab_" + sample.label + " --outputpath=/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label + "/ --jobids="+str(i))
