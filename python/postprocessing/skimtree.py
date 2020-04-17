@@ -409,12 +409,12 @@ class systWeights(object):
             MAX = self.maxSystsNonPDF
             MAXTOT = self.maxSystsNonPDF
             useOnlyNominal = self.onlyNominal
-            cname = ROOT.TString(str(self.categoriesNames[c]))
+            cname = str(self.categoriesNames[c])
 
             if c != 0:
                 cname = "_" + cname
             for sy in range(MAX):
-                ns = ROOT.TString(str(self.weightedNames[sy]))
+                ns = str(self.weightedNames[sy])
                 print " creating file for syst ", ns
 
                 if c != 0:
@@ -422,11 +422,11 @@ class systWeights(object):
                     print "onlynominal is ", useOnlyNominal
                 
                 if sy == 0:
-                    allFiles[sy+(MAX+1)*c]= ROOT.TFile.Open((basename+ns+cname+".root"), opt)
+                    allFiles[sy+(MAX+1)*c] = ROOT.TFile.Open((basename+ns+cname+".root"), opt)
                 else:
                     if not useOnlyNominal:
                         print " filename is ", basename, ns, cname, ".root"
-                        allFiles[sy+(MAX+1)*c]= ROOT.TFile.Open((basename+"_"+ns+cname+".root"), opt)
+                        allFiles[sy+(MAX+1)*c] = ROOT.TFile.Open((basename+"_"+ns+cname+".root"), opt)
                         print "ESCO dal create Sys "
 
             if self.addPDF:
