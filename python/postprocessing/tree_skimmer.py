@@ -26,9 +26,9 @@ def bjet_filter(jets, tagger, WP): #returns collections of b jets and no b jets
 
 fcName = sys.argv[2]
 fc = ROOT.TFileCollection(fcName,fcName,fcName)
-chain = ROOT.TChain('Events');
-chain.AddFileInfoList(fc.GetList());
-nEventsTot = chainNEvents.GetEntries();
+chain = ROOT.TChain('Events')
+chain.AddFileInfoList(fc.GetList())
+nEventsTot = chainNEvents.GetEntries()
 
 tree = InputTree(chain.GetTree())
 isMC = True
