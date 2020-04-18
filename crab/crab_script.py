@@ -12,6 +12,6 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer impor
 from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import *
 metCorrector = createJMECorrector(isMC=True, dataYear=2017, jesUncert='All', redojec=True)
 fatJetCorrector = createJMECorrector(isMC=True, dataYear=2017, jesUncert='All', redojec=True, jetType = 'AK8PFchs')
-p=PostProcessor('.', inputFiles(), '', modules=[MCweight_writer(),  MET_HLT_Filter_2017(), lepSF_2017(), btagSF2017(), PrefCorr(), metCorrector(), fatJetCorrector(), preselection()], provenance=True, fwkJobReport=True, histFileName='hist.root', histDirName='plots', outputbranchsel='keep_and_drop.txt')
+p=PostProcessor('.', inputFiles(), '', modules=[MCweight_writer(),  MET_HLT_Filter_2017(), preselection(), lepSF_2017(), btagSF2017(), PrefCorr(), metCorrector(), fatJetCorrector()], provenance=True, fwkJobReport=True, histFileName='hist.root', histDirName='plots', outputbranchsel='keep_and_drop.txt')
 p.run()
 print 'DONE'

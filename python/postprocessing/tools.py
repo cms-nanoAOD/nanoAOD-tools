@@ -105,19 +105,31 @@ def get_HT(jets):
         HT += jet.pt
     return HT
 
-def trig_map(HLT):
+def trig_map(HLT, year):
     passMu = False
     passEle = False
     passHT = False
     noTrigger = False
-    if(HLT.Mu50 or HLT.TkMu50):
-        passMu = True
-    elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
-        passEle = True  
-    elif(HLT.PFHT800 or HLT.PFHT900):
-        passHT = True
+    if(year == 2016):
+        if(HLT.Mu50 or HLT.TkMu50):
+            passMu = True
+        elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
+            passEle = True  
+        elif(HLT.PFHT800 or HLT.PFHT900):
+            passHT = True
+        else:
+            noTrigger = True
+    elif(year == 2017 or year == 2018):
+        if(HLT.Mu50):
+            passMu = True
+        elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
+            passEle = True  
+        elif(HLT.PFHT780 or HLT.PFHT890):
+            passHT = True
+        else:
+            noTrigger = True
     else:
-        noTrigger = True
+        print('Wrong year! Please enter 2016, 2017, or 2018')
     return passMu, passEle, passHT, noTrigger
 
 def get_ptrel(lepton, jet):
