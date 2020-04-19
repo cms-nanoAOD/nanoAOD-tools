@@ -84,12 +84,12 @@ class systWeights(object):
             tree.Branch(cname, self.wCats[c], tystring)
 
     def addSelection(self, selection):
-        self.selectionsNames.append(str(selection))
+        self.selectionsNames[self.nSelections] = (str(selection))
         initSelection = self.nSelections
         self.nSelections += 1
         for sc in range(self.nEventBasedSysts):
-            self.selectionsNames.append(str(selection) + "_" + str(self.eventBasedNames[sc]))
-            self.baseSelections.append(initSelection)
+            self.selectionsNames[self.nSelections] = (str(selection) + "_" + str(self.eventBasedNames[sc]))
+            self.baseSelections[self.nSelections][0] = initSelection
             self.nSelections += 1
 
     def setSelectionsNames(self, selections):
@@ -97,7 +97,7 @@ class systWeights(object):
             if s < (len(self.selectionNames) - 1):
                 self.selectionsNames[s] = copy.deepcopy(selections[s])
             else:
-                self.selectionsNames[s].append(copy.deepcopy(selections[s]))
+                self.selectionsNames[s] = copy.deepcopy(selections[s])
 
     def branchTreesSysts(self, trees, selection, name, tfile, f):
         tfile.cd()
@@ -105,18 +105,20 @@ class systWeights(object):
         for s in range(self.nSelections):
             print " selection # ", str(s), " name ", str(self.selectionsNames[s]), " name ", str(tname)
             print " tree is ", str(trees[s])
+            tystring = str(name + pytocpptypes(f))
             if selection == self.selectionsNames[s]:
-                trees[s].Branch(tname, f)
+
+                trees[s].Branch(tname, f, tystring)
             if self.isEventBasedSelection(s):
-                if selection == self.selectionNames[self.baseSelections[s]] :
-                    trees[s].Branch(tname, f)
+                if selection == self.selectionNames[self.baseSelections[s][0]] :
+                    trees[s].Branch(tname, f, tystring)
 
     def fillTreesSysts(self, trees, selection):
         for s in range(self.nSelections):
             if selection == self.selectionsNames[s] and not self.isEventBasedSelection(s) and self.eventBasedScenario == "nominal" :
                 trees[s].Fill()
             if self.isEventBasedSelection(s):
-                if self.eventBasedScenario in self.selectionsNames[s] and selection == self.selectionsNames[self.baseSelections[s]]:
+                if self.eventBasedScenario in self.selectionsNames[s] and selection == self.selectionsNames[self.baseSelections[s][0]]:
                     trees[s].Fill()
 
     def writeTreesSysts(self, trees, tfile):
@@ -132,82 +134,82 @@ class systWeights(object):
         self.addTTSplit = copy.deepcopy(addTTSplit)
         self.nPDF = copy.deepcopy(numPDF)
         self.nCategories = 1
-        self.categoriesNames.append("")
+        self.categoriesNames[0] = ""
         self.wCats[0] = array.array('f', [1.0])
         self.nSelections = 0 
         self.eventBasedScenario = "nominal"
 
         if addDefault:
-            self.weightedNames.append("")
-            self.weightedNames.append("btagUp")
-            self.weightedNames.append("btagDown")
-            self.weightedNames.append("mistagUp")
-            self.weightedNames.append("mistagDown")
-            self.weightedNames.append("puUp")
-            self.weightedNames.append("puDown")
-            #self.weightedNames.append("lepUp")
-            #self.weightedNames.append("lepDown")
-            #self.weightedNames.append("isoUp")
-            #self.weightedNames.append("isoDown")
-            #self.weightedNames.append("trigUp")
-            #self.weightedNames.append("trigDown")
+            self.weightedNames[0] = ""
+            self.weightedNames[1] = "btagUp"
+            self.weightedNames[2] = "btagDown"
+            self.weightedNames[3] = "mistagUp"
+            self.weightedNames[4] = "mistagDown"
+            self.weightedNames[5] = "puUp"
+            self.weightedNames[6] = "puDown"
+            #self.weightedNames[7] = "lepUp"
+            #self.weightedNames[8] = "lepDown"
+            #self.weightedNames[9] = "isoUp"
+            #self.weightedNames[10] = "isoDown"
+            #self.weightedNames[11] = "trigUp"
+            #self.weightedNames[12] = "trigDown"
             self.setMax(7)
             self.setMaxNonPDF(7)
-            self.weightedNames.append("")
+            self.weightedNames[self.maxSysts] = ""
 
         if addQ2: 
             self.weightedNames[self.maxSysts] = "q2Up"
-            self.weightedNames.append("q2Down")
+            self.weightedNames[self.maxSysts+1] = "q2Down"
             self.setMax(self.maxSysts+2)
             self.setMaxNonPDF(self.maxSystsNonPDF+2) 
-            self.weightedNames.append("")
+            self.weightedNames[self.maxSysts] = ""
 
         if addTopPt:
             self.weightedNames[self.maxSysts] = "topPtWeightUp"
-            self.weightedNames.append("topPtWeightDown")
+            self.weightedNames[self.maxSysts+1] = "topPtWeightDown"
             self.setMax(self.maxSysts+2)
             self.setMaxNonPDF(self.maxSystsNonPDF+2)
-            self.weightedNames.append("")
+            self.weightedNames[self.maxSysts] = ""
 
         if addVHF:
             self.weightedNames[self.maxSysts]="VHFWeightUp"
-            self.weightedNames.append("VHFWeightDown")
+            self.weightedNames[self.maxSysts+1] = "VHFWeightDown"
             self.setMax(self.maxSysts+2)
             self.setMaxNonPDF(self.maxSystsNonPDF+2)
-            self.weightedNames.append("")
+            self.weightedNames[self.maxSysts] = ""
 
         if addTTSplit:
-            self.nCategories=4
-            categoriesNames.append("TT0lep")
-            categoriesNames.append("TT1lep")
-            categoriesNames.append("TT2lep")
-            self.wCats.append(array.array('f', [1.0]))
-            self.wCats.append(array.array('f', [1.0]))
-            self.wCats.append(array.array('f', [1.0]))
+            self.nCategories = 4
+            categoriesNames[1] = "TT0lep"
+            categoriesNames[2] = "TT1lep"
+            categoriesNames[3] = "TT2lep"
+            self.wCats[1] = array.array('f', [1.0])
+            self.wCats[2] = array.array('f', [1.0])
+            self.wCats[3] = array.array('f', [1.0])
 
         if addPDF:
             self.weightedNames[self.maxSysts] = "pdf_totalUp"
-            self.weightedNames.append("pdf_totalDown")
-            self.weightedNames.append("pdf_asUp")
-            self.weightedNames.append("pdf_asDown")
-            self.weightedNames.append("pdf_zmUp")
-            self.weightedNames.append("pdf_zmDown")
+            self.weightedNames[self.maxSysts+1] = "pdf_totalDown"
+            self.weightedNames[self.maxSysts+2] = "pdf_asUp"
+            self.weightedNames[self.maxSysts+3] = "pdf_asDown"
+            self.weightedNames[self.maxSysts+4] = "pdf_zmUp"
+            self.weightedNames[self.maxSysts+5] = "pdf_zmDown"
             self.setMax(self.maxSysts+6)
             self.setMaxNonPDF(self.maxSystsNonPDF+6)
             nPDF = self.nPDF
             for i in range(nPDF):
                 ss = str(i+1)
-                self.weightedNames.append("pdf" + str(ss))
+                self.weightedNames[i+self.maxSysts] = "pdf" + str(ss)
 
             self.setMax(maxSysts+nPDF)
-            self.weightedNames.append("")
+            self.weightedNames[self.maxSysts] = ""
 
     def addSyst(self, name):
         self.weightedNames[self.maxSysts] = copy.deepcopy(name)
         self.setMax(maxSysts+1)
         if "pdf" in name:
             self.setMaxNonPDF(maxSysts+1)
-            self.weightedNames.append("")
+        self.weightedNames[self.maxSysts] = ""
 
     def addSystNonPDF(self, name):
         self.weightedNames[self.maxSystsNonPDF] = copy.deepcopy(name)
@@ -215,9 +217,9 @@ class systWeights(object):
         nPDF = self.nPDF
         for i in range(nPDF):
             ss = str(i+1)
-            self.weightedNames.append("pdf"+str(ss))
+            self.weightedNames[i+self.maxSystsNonPDF] = "pdf" + str(ss)
         self.setMax(maxSystsNonPDF+nPDF)
-        self.weightedNames.append("")
+        self.weightedNames[self.maxSysts] = ""
 
     def addTopTagSF(self, name):
         up = name + "Up"
@@ -406,11 +408,8 @@ class systWeights(object):
   
     def setWCats(self, wcats):
         for i in range(self.nCategories):
-            if i < (len(self.wCats) - 1):
-                arwcats = array.array('f', [wcats[i]])
-                self.wCats[i] = copy.deepcopy(arwcats)
-            else:
-                self.wCats.append(copy.deepcopy(arwcats))
+            arwcats = array.array('f', [wcats[i]])
+            self.wCats[i] = copy.deepcopy(arwcats)
                 
     def fillHistogramsSysts(self, histo, v, w, systWeights=[], wcats=None):
         nFirstSysts = len(systWeights)
