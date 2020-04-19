@@ -3,9 +3,18 @@ import ROOT.TMath as TMath
 import math
 import copy as copy
 from os import path
-from array import array
+import array
 from PhysicsTools.NanoAODTools.postprocessing.framework.preskimming import preSkim
 print "PhysicsTools implemented"
+
+def pytocpptypes(typ):
+    if type(typ) == int:
+        return "/I"
+    elif type(typ) == float:
+        return "/F"
+    elif type(typ) == array.array:
+        single = pytocpptypes(typ[0])
+        return "[" + str(len(typ)) + "]" + single
 
 class systWeights(object):
 
@@ -24,23 +33,40 @@ class systWeights(object):
         self.nCategories = 0
         self.nSelections = 0
         self.nEventBasedSysts = 0
-        self.weightedSysts = array('f', [0.])
+        self.weightedSysts = []
+        for i in range(150):
+            self.weightedSysts.append(array.array('f', [0.]))
         self.eventBasedScenario = ""
-        self.wCats = array('d', [0.])
+        self.wCats = []
+        for i in range(10):
+            self.wCats.append(array.array('f', [0.]))
         self.eventBasedNames = []
-        self.baseSelections = array('i', [0])
+        for i in range(10):
+            self.eventBasedNames.append("")
+        self.baseSelections = []
+        for i in range(20):
+            self.baseSelections.append(array.array('i', [0]))
         self.weightedNames = []
+        for i in range(150):
+            self.weightedNames.append("")
         self.selectionsNames = []
+        for i in range(20):
+            self.selectionsNames.append("")
         self.categoriesNames = []
+        for i in range(10):
+            self.categoriesNames.append("")
 
     def initTreesSysts(self, trees, tfile):
         tfile.cd()
-        for s in range(self.nSelections):
-            temptree = ROOT.TTree(str("events_"+self.selectionsNames[s]), "")
-            isEventBasedSelection = self.isEventBasedSelection(s)
-            self.__initTreesSysts2S(temptree, isEventBasedSelection)
 
-    def __initTreesSysts2S(tree, isEventBasedSyst=False):
+        for s in range(self.nSelections):
+            trees[s] = ROOT.TTree(str("events_"+self.selectionsNames[s]), "")
+            isEventBasedSelection = self.isEventBasedSelection(s)
+            #print trees[s], isEventBasedSelection
+            self.initTreesSysts2S(trees[s], isEventBasedSelection)
+            
+    def initTreesSysts2S(self, tree, isEventBasedSyst):
+        isEventBasedSyst = False
         Max = self.maxSysts
         if self.shortPDFFiles:
             Max = self.maxSystsNonPDF
@@ -50,16 +76,18 @@ class systWeights(object):
             ns = str(self.weightedNames[sy])
             if sy == 0:
                 ns = "w_nominal"
-            tree.Branch(str(ns), (self.weightedSysts[int(sy)]))
+            tystring = str(ns + pytocpptypes(self.weightedSysts[int(sy)]))
+            tree.Branch(ns, self.weightedSysts[int(sy)], tystring)
         for c in range(self.nCategories):
             cname = str(self.categoriesNames[c])
-            tree.Branch(cname, self.wCats[c])
+            tystring = str(cname + pytocpptypes(self.wCats[c]))
+            tree.Branch(cname, self.wCats[c], tystring)
 
     def addSelection(self, selection):
         self.selectionsNames.append(str(selection))
         initSelection = self.nSelections
         self.nSelections += 1
-        for sc in range(self.nEventsBasedSysts):
+        for sc in range(self.nEventBasedSysts):
             self.selectionsNames.append(str(selection) + "_" + str(self.eventBasedNames[sc]))
             self.baseSelections.append(initSelection)
             self.nSelections += 1
@@ -105,7 +133,7 @@ class systWeights(object):
         self.nPDF = copy.deepcopy(numPDF)
         self.nCategories = 1
         self.categoriesNames.append("")
-        self.wCats[0] = 1.0
+        self.wCats[0] = array.array('f', [1.0])
         self.nSelections = 0 
         self.eventBasedScenario = "nominal"
 
@@ -153,9 +181,9 @@ class systWeights(object):
             categoriesNames.append("TT0lep")
             categoriesNames.append("TT1lep")
             categoriesNames.append("TT2lep")
-            self.wCats.append(1.0)
-            self.wCats.append(1.0)
-            self.wCats.append(1.0)
+            self.wCats.append(array.array('f', [1.0]))
+            self.wCats.append(array.array('f', [1.0]))
+            self.wCats.append(array.array('f', [1.0]))
 
         if addPDF:
             self.weightedNames[self.maxSysts] = "pdf_totalUp"
@@ -210,7 +238,7 @@ class systWeights(object):
         self.addSystNonPDF(down)
 
     def setTopTagSF(self, name, SF_nom, SF_up, SF_down, mult=True):
-        zerofact = 1.0
+        zerofact = array.array('f', [1.0])
         if mult:
             zerofact = self.weightedSysts[0]
         up = name + "Up"
@@ -218,11 +246,11 @@ class systWeights(object):
         valueup = SF_up/SF_nom
         valuedown = SF_down/SF_nom
         
-        self.setSystValue(up, valueup*zerofact)
-        self.setSystValue(down, valuedown*zerofact)
+        self.setSystValue(up, valueup*zerofact[0])
+        self.setSystValue(down, valuedown*zerofact[0])
 
     def setWTagSF(self, name, SF_nom, SF_up, SF_down, mult=True):
-        zerofact = 1.0
+        zerofact = array.array('f', [1.0])
         if mult:
            zerofact = self.weightedSysts[0]
         up = name+"Up"
@@ -230,11 +258,11 @@ class systWeights(object):
         valueup = SF_up/SF_nom
         valuedown = SF_down/SF_nom
 
-        self.setSystValue(up, valueup*zerofact)
-        self.setSystValue(down, valuedown*zerofact)
+        self.setSystValue(up, valueup*zerofact[0])
+        self.setSystValue(down, valuedown*zerofact[0])
 
     def setTrigSF(self, name, SF_nom, SF_up, SF_down, mult=True):
-        zerofact = 1.0
+        zerofact = array.array('f', [1.0])
         if mult:
             zerofact = self.weightedSysts[0]
         up = name+"Up"
@@ -245,11 +273,11 @@ class systWeights(object):
             valueup = 0
             valuedown = 0
 
-        self.setSystValue(up, valueup*zerofact)
-        self.setSystValue(down, valuedown*zerofact)
+        self.setSystValue(up, valueup*zerofact[0])
+        self.setSystValue(down, valuedown*zerofact[0])
 
     def setPDFWeights(self, wpdfs, xsections, numPDFs, wzero=1.0, mult=True):
-        zerofact = 1.0
+        zerofact = array.array('f', [1.0])
         rms, mean = 0., 0.
         if mult:
             zerofact = self.weightedSysts[0]
@@ -259,7 +287,7 @@ class systWeights(object):
                     pvalue = wpdfs[i] / (wzero*xsections[i])
                 except math.isnan(pvalue):
                     pvalue = 1.
-                self.setPDFValue(i, zerofact*wpdfs[i]/(wzero*xsections[i]) )
+                self.setPDFValue(i, zerofact[0]*wpdfs[i]/(wzero*xsections[i]) )
                 mean += pvalue
             else:
                 self.setPDFValue(i, wzero)
@@ -277,53 +305,53 @@ class systWeights(object):
 
         if self.shortPDFFiles:
             self.setSystValue("pdf_asUp", self.getPDFValue(self.nPDF-2.)/wzero)
-            self.setSystValue("pdf_asDown", zerofact)
+            self.setSystValue("pdf_asDown", zerofact[0])
             self.setSystValue("pdf_zmUp", self.getPDFValue(self.nPDF-1.)/wzero)
-            self.setSystValue("pdf_zmDown", zerofact)
+            self.setSystValue("pdf_zmDown", zerofact[0])
             if math.isnan(rms):
                 rms += 0.
-            self.setSystValue("pdf_totalUp", zerofact*(1.+rms))
-            self.setSystValue("pdf_totalDown", zerofact*(1.-rms))
+            self.setSystValue("pdf_totalUp", zerofact[0]*(1.+rms))
+            self.setSystValue("pdf_totalDown", zerofact[0]*(1.-rms))
 
     def setTWeight(self, tweight, wtotsample=1.0, mult=True):
-        zerofact = 1.0
+        zerofact = array.array('f', [1.0])
         if mult:
             zerofact = self.weightedSysts[0]
-        self.setSystValue("topPtWeightUp", zerofact*tweight/wtotsample)
-        self.setSystValue("topPtWeightDown", zerofact/tweight*wtotsample)
+        self.setSystValue("topPtWeightUp", zerofact[0]*tweight/wtotsample)
+        self.setSystValue("topPtWeightDown", zerofact[0]/tweight*wtotsample)
 
     def setVHFWeight(self, vhf, mult=True, shiftval=0.65):
-        zerofact = 1.0
+        zerofact = array.array('f', [1.0])
         w_shift = 0.0
         if vhf > 1:
             w_shift = shiftval
         if mult: 
-            zerofact = self.weightedSysts[0]
+            zerofact[0] = self.weightedSysts[0]
         
-        self.setSystValue("VHFWeightUp", zerofact*(1+w_shift))
-        self.setSystValue("VHFWeightDown", zerofact*(1-w_shift))
+        self.setSystValue("VHFWeightUp", zerofact[0]*(1+w_shift))
+        self.setSystValue("VHFWeightDown", zerofact[0]*(1-w_shift))
 
     def setQ2Weights(self, q2up, q2down, wzero=1.0, mult=True):
-        zerofact = 1.0
+        zerofact = array.array('f', [1.0])
         if mult:
-            zerofact = self.weightedSysts[0]
+            zerofact[0] = self.weightedSysts[0]
   
-        self.setSystValue("q2Up", zerofact*q2up/wzero)
-        self.setSystValue("q2Down", zerofact*q2down/wzero)
+        self.setSystValue("q2Up", zerofact[0]*q2up/wzero)
+        self.setSystValue("q2Down", zerofact[0]*q2down/wzero)
 
     def getPDFValue(self, numPDF):
         if not self.addPDF:
             print "error! No PDF used, this will do nothing."
             return 0.
         MIN = self.maxSystsNonPDF
-        return float(self.weightedSysts[numPDF+MIN])
+        return float(self.weightedSysts[numPDF+MIN][0])
 
     def setPDFValue(self, numPDF, w):
         if not self.addPDF:
             print "error! No PDF used, this will do nothing."
             return
         MIN = self.maxSystsNonPDF
-        self.weightedSysts[numPDF+MIN] = w
+        self.weightedSysts[numPDF+MIN][0] = w
 
     
     def calcPDFHisto(self, histo, singleHisto, scalefactor=1.0, c=0):
@@ -379,9 +407,10 @@ class systWeights(object):
     def setWCats(self, wcats):
         for i in range(self.nCategories):
             if i < (len(self.wCats) - 1):
-                self.wCats[i] = copy.deepcopy(wcats[i])
+                arwcats = array.array('f', [wcats[i]])
+                self.wCats[i] = copy.deepcopy(arwcats)
             else:
-                self.append(copy.deepcopy(wcats[i]))
+                self.wCats.append(copy.deepcopy(arwcats))
                 
     def fillHistogramsSysts(self, histo, v, w, systWeights=[], wcats=None):
         nFirstSysts = len(systWeights)
@@ -395,12 +424,12 @@ class systWeights(object):
                     continue
                 ws = 1.0
                 if sy < nFirstSysts:
-                    wcats[c] = 1.0
-                    ws = systWeights[sy]*wcats[c]
+                    wcats[c] = array.array('f', 1.0)
+                    ws = systWeights[sy]*wcats[c][0]
                 else:
                     if nFirstSysts != 0:
-                        wcats[c] = 1.0
-                    ws = self.weightedSysts[sy]*wcats[c]
+                        wcats[c] = array.array('f', 1.0)
+                    ws = self.weightedSysts[sy][0]*wcats[c][0]
 
                 histo[sy+(MAX+1)*(c)].Fill(v, w * ws)
                             
@@ -484,19 +513,19 @@ class systWeights(object):
         self.maxSystsNonPDF = copy.deepcopy(Max)
 
     def setSystValueName(self, name, value, mult=False):
-        zerofact = 1.0
+        zerofact = array.array('f', [1.0])
         if mult:
             zerofact = self.weightedSysts[0]
         MAX = self.maxSysts
         for sy in range(MAX):
             if self.weightedNames[sy] == name:
-                self.weightedSysts[sy] = value*zerofact
+                self.weightedSysts[sy][0] = value*zerofact[0]
 
     def setSystValuePlace(self, systPlace, value, mult=False):
-        zerofact=1.0
+        zerofact = array.array('f', [1.0])
         if mult:
             zerofact = self.weightedSysts[0]
-        self.weightedSysts[place] = value*zerofact
+        self.weightedSysts[place][0] = value*zerofact[0]
 
     def setWeightName(self, name, value, mult=False):
         self.setSystValueName(name, value, mult)
@@ -521,7 +550,7 @@ class systWeights(object):
             if addPDF:
                 if not useOnlyNominal:
                     filesout[MAX+(MAX+1)*(c)].Close()
-
+'''
 systZero = systWeights()                        
 maxSysts = 0
 addPDF = False
@@ -544,7 +573,7 @@ nPDF = 102
 
 systZero.prepareDefault(True, addQ2, addPDF, addTopPt, addVHF, addTTSplit)
 print "max systs are ", systZero.maxSysts
-'''
+
   if(addTopTagging) {
     systZero.addTopTagSF("topTag")
   }
