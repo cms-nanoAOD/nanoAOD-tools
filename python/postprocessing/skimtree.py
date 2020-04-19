@@ -102,29 +102,33 @@ class systWeights(object):
     def branchTreesSysts(self, trees, selection, name, tfile, f):
         tfile.cd()
         tname = ROOT.TString(name)
+        print f
         for s in range(self.nSelections):
             print " selection # ", str(s), " name ", str(self.selectionsNames[s]), " name ", str(tname)
             print " tree is ", str(trees[s])
             tystring = str(name + pytocpptypes(f))
+            print tystring
             if selection == self.selectionsNames[s]:
-
-                trees[s].Branch(tname, f, tystring)
+                trees[s].Branch(name, f, tystring)
             if self.isEventBasedSelection(s):
                 if selection == self.selectionNames[self.baseSelections[s][0]] :
-                    trees[s].Branch(tname, f, tystring)
+                    trees[s].Branch(name, f, tystring)
 
     def fillTreesSysts(self, trees, selection):
         for s in range(self.nSelections):
             if selection == self.selectionsNames[s] and not self.isEventBasedSelection(s) and self.eventBasedScenario == "nominal" :
-                trees[s].Fill()
+                if isinstance(trees[s], ROOT.TTree):
+                    trees[s].Fill()
             if self.isEventBasedSelection(s):
                 if self.eventBasedScenario in self.selectionsNames[s] and selection == self.selectionsNames[self.baseSelections[s][0]]:
-                    trees[s].Fill()
+                    if isinstance(trees[s], ROOT.TTree):
+                        trees[s].Fill()
 
     def writeTreesSysts(self, trees, tfile):
         tfile.cd()
         for s in range(self.nSelections):
-            trees[s].Write()
+            if isinstance(trees[s], ROOT.TTree):
+                trees[s].Write()
 
     def prepareDefault(self, addDefault, addPDF, addQ2, addTopPt, addVHF, addTTSplit, numPDF=102):
         self.addPDF = copy.deepcopy(addPDF)
