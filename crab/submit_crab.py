@@ -5,7 +5,7 @@ import sys
 
 usage = 'python submit_crab.py'
 parser = optparse.OptionParser(usage)
-#parser.add_option('-d', '--dat', dest='dat', type=sample, default = '', help='Please enter a dataset name')
+parser.add_option('-d', '--dat', dest='dat', type=str, default = '', help='Please enter a dataset name')
 parser.add_option('--status', dest = 'status', default = False, action = 'store_true', help = 'Default do not check the status')
 parser.add_option('-s', '--sub', dest = 'sub', default = False, action = 'store_true', help = 'Default do not submit')
 parser.add_option('-k', '--kill', dest = 'kill', default = False, action = 'store_true', help = 'Default do not kill')
@@ -42,7 +42,7 @@ def cfg_writer(sample, isMC, year, outdir):
         f.write("config.Data.unitsPerJob = 50\n")
     else:
         f.write("config.Data.splitting = 'FileBased'\n")
-        f.write("config.Data.unitsPerJob = 2\n")
+        f.write("config.Data.unitsPerJob = 1\n")
     #config.Data.runRange = ''
     #f.write("config.Data.splitting = 'EventAwareLumiBased'")
     #f.write("config.Data.totalUnits = 10\n")
@@ -130,7 +130,7 @@ def PSet_writer(sample):
     f.close()
 
 #dataset = MuB_2017
-dataset = WJets_2017
+dataset = sample_dict[opt.dat]
 #dataset = DataMu_2017
 #dataset = DataEle_2017
 #dataset = TT_Mtt_2017
