@@ -38,6 +38,7 @@ def sameflav_filter(jets, flav): #returns a collection of only b-gen jets (to us
     return list(filter(lambda x : x.partonFlavour == flav, jets))
 
 Debug = True
+MCReco = True
 
 DeltaFilter = True
 leadingjet_ptcut = 150.
@@ -59,6 +60,9 @@ isMC = True
 if ('Data' in fcName):
     isMC = False
 '''
+
+MCReco = MCReco * isMC
+
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
@@ -109,11 +113,12 @@ systTree.setWeightName("lepDown",1.)
 #++++++++++++++++++++++++++++++++++
 
 #Reconstructed Wprime
-MC_Wprime_pt = array.array('f', [0.])
-MC_Wprime_eta = array.array('f', [0.])
-MC_Wprime_phi = array.array('f', [0.])
-MC_Wprime_m = array.array('f', [0.])
-MC_Wprime_mt = array.array('f', [0.])
+if MCReco:
+    MC_Wprime_pt = array.array('f', [0.])
+    MC_Wprime_eta = array.array('f', [0.])
+    MC_Wprime_phi = array.array('f', [0.])
+    MC_Wprime_m = array.array('f', [0.])
+    MC_Wprime_mt = array.array('f', [0.])
 closest_Wprime_pt = array.array('f', [0.])
 closest_Wprime_eta = array.array('f', [0.])
 closest_Wprime_phi = array.array('f', [0.])
@@ -136,13 +141,14 @@ best_Wprime_m = array.array('f', [0.])
 best_Wprime_mt = array.array('f', [0.])
 
 #Reconstructed Top
-MC_RecoTop_pt = array.array('f', [0.])
-MC_RecoTop_eta = array.array('f', [0.])
-MC_RecoTop_phi = array.array('f', [0.])
-MC_RecoTop_m = array.array('f', [0.])
-MC_RecoTop_mt = array.array('f', [0.])
-MC_RecoTop_isNeg = array.array('i', [0])
-MC_RecoTop_chi2 = array.array('i', [0])
+if MCReco:
+    MC_RecoTop_pt = array.array('f', [0.])
+    MC_RecoTop_eta = array.array('f', [0.])
+    MC_RecoTop_phi = array.array('f', [0.])
+    MC_RecoTop_m = array.array('f', [0.])
+    MC_RecoTop_mt = array.array('f', [0.])
+    MC_RecoTop_isNeg = array.array('i', [0])
+    MC_RecoTop_chi2 = array.array('i', [0])
 closest_RecoTop_pt = array.array('f', [0.])
 closest_RecoTop_eta = array.array('f', [0.])
 closest_RecoTop_phi = array.array('f', [0.])
@@ -174,10 +180,11 @@ best_RecoTop_chi2 = array.array('i', [0])
 
 nJet = array.array('i', [0])
 #Jet produced after top semilep decay
-MC_TopJet_pt = array.array('f', [0.])
-MC_TopJet_eta = array.array('f', [0.])
-MC_TopJet_phi = array.array('f', [0.])
-MC_TopJet_m = array.array('f', [0.])
+if MCReco:
+    MC_TopJet_pt = array.array('f', [0.])
+    MC_TopJet_eta = array.array('f', [0.])
+    MC_TopJet_phi = array.array('f', [0.])
+    MC_TopJet_m = array.array('f', [0.])
 closest_TopJet_pt = array.array('f', [0.])
 closest_TopJet_eta = array.array('f', [0.])
 closest_TopJet_phi = array.array('f', [0.])
@@ -226,10 +233,11 @@ best_TopJet_isDCT = array.array('i', [0])
 '''
 
 #Prompt jet from Wprime decay
-MC_WpJet_pt = array.array('f', [0.])
-MC_WpJet_eta = array.array('f', [0.])
-MC_WpJet_phi = array.array('f', [0.])
-MC_WpJet_m = array.array('f', [0.])
+if MCReco:
+    MC_WpJet_pt = array.array('f', [0.])
+    MC_WpJet_eta = array.array('f', [0.])
+    MC_WpJet_phi = array.array('f', [0.])
+    MC_WpJet_m = array.array('f', [0.])
 closest_WpJet_pt = array.array('f', [0.])
 closest_WpJet_eta = array.array('f', [0.])
 closest_WpJet_phi = array.array('f', [0.])
@@ -278,11 +286,12 @@ best_WpJet_isDCT = array.array('i', [0])
 '''
 
 #Lepton
-MC_Lepton_pt = array.array('f', [0.])
-MC_Lepton_eta = array.array('f', [0.])
-MC_Lepton_phi = array.array('f', [0.])
-MC_Lepton_m = array.array('f', [0.])
-MC_Lepton_SF = array.array('f', [0.])
+if MCReco:
+    MC_Lepton_pt = array.array('f', [0.])
+    MC_Lepton_eta = array.array('f', [0.])
+    MC_Lepton_phi = array.array('f', [0.])
+    MC_Lepton_m = array.array('f', [0.])
+    MC_Lepton_SF = array.array('f', [0.])
 DetReco_Lepton_pt = array.array('f', [0.])
 DetReco_Lepton_eta = array.array('f', [0.])
 DetReco_Lepton_phi = array.array('f', [0.])
@@ -301,7 +310,7 @@ MET_m = array.array('f', [0.])
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
 # appena capito come si fa
-if isMC:
+if MCReco:
     systTree.branchTreesSysts(trees, "signal", "MC_Wprime_pt", outTreeFile, MC_Wprime_pt)
     systTree.branchTreesSysts(trees, "signal", "MC_Wprime_eta", outTreeFile, MC_Wprime_eta)
     systTree.branchTreesSysts(trees, "signal", "MC_Wprime_phi", outTreeFile, MC_Wprime_phi)
@@ -329,7 +338,7 @@ systTree.branchTreesSysts(trees, "signal", "best_Wprime_m", outTreeFile, best_Wp
 systTree.branchTreesSysts(trees, "signal", "best_Wprime_mt", outTreeFile, best_Wprime_mt)
 
 systTree.branchTreesSysts(trees, "signal", "nJet", outTreeFile, nJet)
-if isMC:
+if MCReco:
     systTree.branchTreesSysts(trees, "signal", "MC_RecoTop_pt", outTreeFile, MC_RecoTop_pt)
     systTree.branchTreesSysts(trees, "signal", "MC_RecoTop_eta", outTreeFile, MC_RecoTop_eta)
     systTree.branchTreesSysts(trees, "signal", "MC_RecoTop_phi", outTreeFile, MC_RecoTop_phi)
@@ -361,7 +370,7 @@ systTree.branchTreesSysts(trees, "signal", "best_RecoTop_m", outTreeFile, best_R
 systTree.branchTreesSysts(trees, "signal", "best_RecoTop_mt", outTreeFile, best_RecoTop_mt)
 systTree.branchTreesSysts(trees, "signal", "best_RecoTop_isNeg", outTreeFile, best_RecoTop_isNeg)
 
-if isMC:
+if MCReco:
     systTree.branchTreesSysts(trees, "signal", "MC_TopJet_pt", outTreeFile, MC_TopJet_pt)
     systTree.branchTreesSysts(trees, "signal", "MC_TopJet_eta", outTreeFile, MC_TopJet_eta)
     systTree.branchTreesSysts(trees, "signal", "MC_TopJet_phi", outTreeFile, MC_TopJet_phi)
@@ -387,7 +396,7 @@ systTree.branchTreesSysts(trees, "signal", "best_TopJet_phi", outTreeFile, best_
 systTree.branchTreesSysts(trees, "signal", "best_TopJet_m", outTreeFile, best_TopJet_m)
 systTree.branchTreesSysts(trees, "signal", "best_TopJet_isBTagged", outTreeFile, best_TopJet_isBTagged)
 
-if isMC:
+if MCReco:
     systTree.branchTreesSysts(trees, "signal", "MC_WpJet_pt", outTreeFile, MC_WpJet_pt)
     systTree.branchTreesSysts(trees, "signal", "MC_WpJet_eta", outTreeFile, MC_WpJet_eta)
     systTree.branchTreesSysts(trees, "signal", "MC_WpJet_phi", outTreeFile, MC_WpJet_phi)
@@ -413,7 +422,7 @@ systTree.branchTreesSysts(trees, "signal", "best_WpJet_phi", outTreeFile, best_W
 systTree.branchTreesSysts(trees, "signal", "best_WpJet_m", outTreeFile, best_WpJet_m)
 systTree.branchTreesSysts(trees, "signal", "best_WpJet_isBTagged", outTreeFile, best_WpJet_isBTagged)
 
-if isMC:
+if MCReco:
     systTree.branchTreesSysts(trees, "signal", "MC_Lepton_pt", outTreeFile, MC_Lepton_pt)
     systTree.branchTreesSysts(trees, "signal", "MC_Lepton_eta", outTreeFile, MC_Lepton_eta)
     systTree.branchTreesSysts(trees, "signal", "MC_Lepton_phi", outTreeFile, MC_Lepton_phi)
@@ -536,7 +545,7 @@ for i in xrange(0,tree.GetEntries()):
     recotop = TopUtilities()
 
     #MCtruth event reconstruction                                                      
-    if isMC:
+    if MCReco:
         mcbjets = mcbjet_filter(jets)
 
         mctfound = False
