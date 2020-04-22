@@ -12,6 +12,8 @@ def pytocpptypes(typ):
         return "/I"
     elif type(typ) == float:
         return "/F"
+    elif type(typ) == str:
+        return "/C"
     elif type(typ) == array.array:
         single = pytocpptypes(typ[0])
         return "[" + str(len(typ)) + "]" + single
@@ -102,12 +104,10 @@ class systWeights(object):
     def branchTreesSysts(self, trees, selection, name, tfile, f):
         tfile.cd()
         tname = ROOT.TString(name)
-        print f
         for s in range(self.nSelections):
             print " selection # ", str(s), " name ", str(self.selectionsNames[s]), " name ", str(tname)
             print " tree is ", str(trees[s])
             tystring = str(name + pytocpptypes(f))
-            print tystring
             if selection == self.selectionsNames[s]:
                 trees[s].Branch(name, f, tystring)
             if self.isEventBasedSelection(s):
@@ -524,7 +524,7 @@ class systWeights(object):
             if self.weightedNames[sy] == name:
                 self.weightedSysts[sy][0] = value*zerofact[0]
 
-    def setSystValuePlace(self, systPlace, value, mult=False):
+    def setSystValuePlace(self, place, value, mult=False):
         zerofact = array.array('f', [1.0])
         if mult:
             zerofact = self.weightedSysts[0]
