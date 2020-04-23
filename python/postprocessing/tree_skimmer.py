@@ -9,15 +9,13 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import InputTree
 from PhysicsTools.NanoAODTools.postprocessing.topreco import *
 from PhysicsTools.NanoAODTools.postprocessing.skimtree import *
+import datetime
 
 def Chi_TopMass(mT):
     sigma = 28.8273
     mST = 174.729
     chi = ( ROOT.TMath.Power((mST-mT), 2.) ) / ( ROOT.TMath.Power(sigma, 2.))
     return chi
-
-#os.environ["X509_USER_PROXY"] = sys.argv[1]
-#print(os.environ["X509_USER_PROXY"]) 
 
 def bjet_filter(jets, tagger, WP): #returns collections of b jets and no b jets (discriminated with btaggers)
     # b-tag working points: mistagging efficiency tight = 0.1%, medium 1% and loose = 10% 
@@ -37,29 +35,32 @@ def mcbjet_filter(jets): #returns a collection of only b-gen jets (to use only f
 def sameflav_filter(jets, flav): #returns a collection of only b-gen jets (to use only forMC samples)                       
     return list(filter(lambda x : x.partonFlavour == flav, jets))
 
+os.environ["X509_USER_PROXY"] = sys.argv[1]
+print(os.environ["X509_USER_PROXY"]) 
+dataset = sample_dict[sys.argv[2]]
+part_idx = sys.argv[3]
+file_list = sys.argv[4]
+
+startTime = datetime.now()
+print("Starting running at " + str(startTime))
 Debug = True
 MCReco = True
 
 DeltaFilter = True
 leadingjet_ptcut = 150.
 
-'''
-fcName = sys.argv[2]
-fc = ROOT.TFileCollection(fcName,fcName,fcName)
 chain = ROOT.TChain('Events')
-chain.AddFileInfoList(fc.GetList())
-nEventsTot = chainNEvents.GetEntries()
-'''
+for infile in file_list: 
+    chain.AddFile(fc.GetList())
+tree = InputTree(chain.GetTree())
 
-#tree = InputTree(chain.GetTree())
-path = "/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root"
-inp = ROOT.TFile.Open("/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root")
-tree = InputTree(inp.Events)
+#path = "/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root"
+#inp = ROOT.TFile.Open("/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root")
+#tree = InputTree(inp.Events)
+
 isMC = True
-'''
-if ('Data' in fcName):
+if ('Data' in dataset.label):
     isMC = False
-'''
 
 MCReco = MCReco * isMC
 
@@ -67,7 +68,7 @@ MCReco = MCReco * isMC
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
 #outTreeFile = ROOT.TFile(outdir+"/trees_"+sample+"_"+channel+".root", "RECREATE") #some name of the output file
-outTreeFile = ROOT.TFile("./trees/prova.root", "RECREATE") #some name of the output file
+outTreeFile = ROOT.TFile(dataset.label+"_part"+str(part_idx), "RECREATE") #some name of the output file
 trees = []
 for i in range(10):
     trees.append(None)
@@ -1044,3 +1045,6 @@ if 'Data' not in path:
     h_genweight.Write("h_genweight")
             
 inp.Close()
+
+endTime = datetime.now()
+print("Ending running at " + str(endTime))

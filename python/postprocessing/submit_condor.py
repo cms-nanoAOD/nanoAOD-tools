@@ -3,37 +3,33 @@ import os
 import optparse
 import sys
 
-usage = 'python submit_crab.py'
+usage = 'python submit_condor.py - d dataset_name'
 parser = optparse.OptionParser(usage)
 parser.add_option('-d', '--dat', dest='dat', type=str, default = '', help='Please enter a dataset name')
-parser.add_option('--status', dest = 'status', default = False, action = 'store_true', help = 'Default do not check the status')
-parser.add_option('-s', '--sub', dest = 'sub', default = False, action = 'store_true', help = 'Default do not submit')
-parser.add_option('-k', '--kill', dest = 'kill', default = False, action = 'store_true', help = 'Default do not kill')
-parser.add_option('-r', '--resub', dest = 'resub', default = False, action = 'store_true', help = 'Default do not resubmit')
-parser.add_option('-g', '--gout', dest = 'gout', default = False, action = 'store_true', help = 'Default do not do getoutput')
 (opt, args) = parser.parse_args()
 
-def sub_writer(sample):
+def sub_writer(sample, n, files):
     f = open("condor.sub", "w")
-    f.write("Proxy_filename          = x509up\n")
-    f.write("Proxy_path              = /afs/cern.ch/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/private/$(Proxy_filename)\n")
-    f.write("arguments               = $(Proxy_path) dataset\n")
+    f.write("Proxy_filename          = x509up_103214\n")
+    f.write("Proxy_path              = "+str(os.environ.get('HOME'))+"/$(Proxy_filename)\n")
 
     f.write("should_transfer_files   = YES\n")
     f.write("when_to_transfer_output = ON_EXIT\n")
-    #f.write("transfer_output_files   = ""\n") #This command only transfer back files to the submitting directory. Alll the output files will anyway be present in the 'output' directory
-    f.write("transfer_input_files    = $(Proxy_path),input2.txt,input3.txt\n")
-    
-    f.write("executable              = python skim_tree.py\n")
-    f.write("input                   = input.txt\n")
-    f.write("output                  = /eos/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label +"/out.$(ClusterId).$(ProcId)\n")
-    f.write("error                   = /eos/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label +"/err.$(ClusterId).$(ProcId)\n")
-    f.write("log                     = /eos/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label +"/log.$(ClusterId).$(ProcId)\n")
-    f.write("queue 100\n")
+    f.write("transfer_input_files    = $(Proxy_path)\n")
+    f.write("transfer_output_remaps  = "+ sample.label + "_part" + str(n) + "=/eos/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label +"/"+ sample.label + "_part" + str(n) + "\n")
 
+    f.write("executable              = python tree_skimmer.py\n")
+    f.write("arguments               = $(Proxy_path) dataset " + str(n) + " " + str(files) + "\n")
+    #f.write("input                   = input.txt\n")
 
+    f.write("output                  = condor/output/"+ sample.label + "_part" + str(n) + "\n")
+    f.write("error                   = condor/error/"+ sample.label + "_part" + str(n) + "\n")
+    f.write("log                     = condor/log/"+ sample.label + "_part" + str(n) + "\n")
 
+    f.write("queue\n")
 
+if not(opt.dat in sample_dict.keys()):
+    print sample_dict.keys()
 dataset = sample_dict[opt.dat]
 samples = []
 
@@ -43,9 +39,33 @@ else:
     print "You are launching a single sample and not an entire bunch of samples"
     samples.append(dataset)
 
+if not os.path.exists("condor/output"):
+    os.makedirs("condor/output")
+if not os.path.exists("condor/error"):
+    os.makedirs("condor/error")
+if not os.path.exists("condor/log"):
+    os.makedirs("condor/log")
+
+split = 50
 #Writing the configuration file                                                                                                                                                                                                     
 for sample in samples:
+    isMC = True
+    if('Data' in sample.label):
+        isMC = False
     if not os.path.exists("/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label):
         os.makedirs("/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label)
-    sub_writer(sample)
-    os.system('condor_submit condor.sub')
+    f = open("../../crab/macros/files/" + sample.label + ".txt", "r")
+    files_list = f.read().splitlines()
+    print(str(len(files_list)))
+    if(isMC):
+        for i, files in enumerate(files_list):
+            sub_writer(sample, i, files)
+            #os.popen('condor_submit condor.sub')
+    else:
+        for i in range(len(files_list)/split+1):
+            sub_writer(sample, i, files_list[split*i:split*(i+1)])
+            #os.popen('condor_submit condor.sub')
+            print("***************************************************")
+            print(i, str( files_list[split*i:split*(i+1)]))
+            print(str(len( files_list[split*i:split*(i+1)]))) 
+            print("***************************************************\n")
