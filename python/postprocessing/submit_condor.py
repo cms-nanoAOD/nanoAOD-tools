@@ -61,10 +61,12 @@ for sample in samples:
         for i, files in enumerate(files_list):
             sub_writer(sample, i, files)
             #os.popen('condor_submit condor.sub')
+            os.popen("python tree_skimmer.py " + str(os.environ.get('HOME')) + "x509up_103214 " + str(sample) + " " + str(i) + " " + str(files) + "/")
     else:
         for i in range(len(files_list)/split+1):
             sub_writer(sample, i, files_list[split*i:split*(i+1)])
             #os.popen('condor_submit condor.sub')
+            os.popen("python tree_skimmer.py " + str(os.environ.get('HOME')) + "x509up_103214 " + str(sample) + " " + str(i) + " " + str(files) + "/")
             print("***************************************************")
             print(i, str( files_list[split*i:split*(i+1)]))
             print(str(len( files_list[split*i:split*(i+1)]))) 
