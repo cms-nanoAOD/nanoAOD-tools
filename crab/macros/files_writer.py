@@ -8,6 +8,8 @@ parser = optparse.OptionParser(usage)
 parser.add_option('-d', '--dat', dest='dat', type=str, default = '', help='Please enter a dataset name')
 (opt, args) = parser.parse_args()
 
+if not(opt.dat in sample_dict.keys()):
+    print sample_dict.keys()
 dataset = sample_dict[opt.dat]
 samples = []
 

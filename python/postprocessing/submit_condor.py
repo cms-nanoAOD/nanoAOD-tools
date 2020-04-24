@@ -11,20 +11,20 @@ parser.add_option('-d', '--dat', dest='dat', type=str, default = '', help='Pleas
 def sub_writer(sample, n, files):
     f = open("condor.sub", "w")
     f.write("Proxy_filename          = x509up_103214\n")
-    f.write("Proxy_path              = "+str(os.environ.get('HOME'))+"/$(Proxy_filename)\n")
+    f.write("Proxy_path              = /tmp/$(Proxy_filename)\n")
 
     f.write("should_transfer_files   = YES\n")
     f.write("when_to_transfer_output = ON_EXIT\n")
     f.write("transfer_input_files    = $(Proxy_path)\n")
-    f.write("transfer_output_remaps  = "+ sample.label + "_part" + str(n) + "=/eos/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label +"/"+ sample.label + "_part" + str(n) + "\n")
+    f.write("transfer_output_remaps  = "+ sample.label + "_part" + str(n) + ".root=/eos/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label +"/"+ sample.label + "_part" + str(n) + ".root\n")
 
     f.write("executable              = python tree_skimmer.py\n")
     f.write("arguments               = $(Proxy_path) dataset " + str(n) + " " + str(files) + "\n")
     #f.write("input                   = input.txt\n")
 
-    f.write("output                  = condor/output/"+ sample.label + "_part" + str(n) + "\n")
-    f.write("error                   = condor/error/"+ sample.label + "_part" + str(n) + "\n")
-    f.write("log                     = condor/log/"+ sample.label + "_part" + str(n) + "\n")
+    f.write("output                  = condor/output/"+ sample.label + "_part" + str(n) + ".out\n")
+    f.write("error                   = condor/error/"+ sample.label + "_part" + str(n) + ".err\n")
+    f.write("log                     = condor/log/"+ sample.label + "_part" + str(n) + ".log\n")
 
     f.write("queue\n")
 
@@ -61,12 +61,13 @@ for sample in samples:
         for i, files in enumerate(files_list):
             sub_writer(sample, i, files)
             #os.popen('condor_submit condor.sub')
-            os.popen("python tree_skimmer.py " + str(os.environ.get('HOME')) + "x509up_103214 " + str(sample) + " " + str(i) + " " + str(files) + "/")
+            #os.popen("python tree_skimmer.py  /tmp/x509up_103214 " + str(sample) + " " + str(i) + " " + str(files) + "/")
+            print("python tree_skimmer.py  /tmp/x509up_103214 " + str(sample.label) + " " + str(i) + " " + str(files))
     else:
         for i in range(len(files_list)/split+1):
             sub_writer(sample, i, files_list[split*i:split*(i+1)])
             #os.popen('condor_submit condor.sub')
-            os.popen("python tree_skimmer.py " + str(os.environ.get('HOME')) + "x509up_103214 " + str(sample) + " " + str(i) + " " + str(files) + "/")
+            os.popen("python tree_skimmer.py /tmp/x509up_103214 " + str(sample.label) + " " + str(i) + " " + str(files))
             print("***************************************************")
             print(i, str( files_list[split*i:split*(i+1)]))
             print(str(len( files_list[split*i:split*(i+1)]))) 

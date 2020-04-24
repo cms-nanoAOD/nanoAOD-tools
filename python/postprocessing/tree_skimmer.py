@@ -3,13 +3,13 @@ import os
 import sys
 import ROOT
 import math
+import datetime
 from array import array
 from PhysicsTools.NanoAODTools.postprocessing.tools import *
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object, Event
 from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import InputTree
 from PhysicsTools.NanoAODTools.postprocessing.topreco import *
 from PhysicsTools.NanoAODTools.postprocessing.skimtree import *
-import datetime
 from PhysicsTools.NanoAODTools.postprocessing.samples.samples import *
 
 def Chi_TopMass(mT):
@@ -40,9 +40,17 @@ os.environ["X509_USER_PROXY"] = sys.argv[1]
 print(os.environ["X509_USER_PROXY"]) 
 dataset = sample_dict[sys.argv[2]]
 part_idx = sys.argv[3]
-file_list = sys.argv[4]
+file_list = []
 
-startTime = datetime.now()
+if(type(sys.argv[4]) == str):
+    file_list.append(str(sys.argv[4]))
+elif(type(sys.argv[4]) == list):
+    for file_ in sys.argv[4]:
+        file_list.append(str(file_))
+else:
+    print("Something went wrong")
+
+startTime = datetime.datetime.now()
 print("Starting running at " + str(startTime))
 Debug = True
 MCReco = True
@@ -50,11 +58,18 @@ MCReco = True
 DeltaFilter = True
 leadingjet_ptcut = 150.
 
-chain = ROOT.TChain('Events')
-for infile in file_list: 
-    chain.AddFile(infile)
-tree = InputTree(chain.GetTree())
+print(file_list)
 
+chain = ROOT.TChain('Events')
+print(chain)
+#for infile in file_list: 
+#print(infile)
+chain.Add(sys.argv[4])
+#chain.Add("/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root")
+print(chain)
+tree = InputTree(chain)
+print(tree.GetEntries())
+print(tree.GetName(), tree)
 #path = "/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root"
 #inp = ROOT.TFile.Open("/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root")
 #tree = InputTree(inp.Events)
@@ -311,7 +326,6 @@ MET_m = array.array('f', [0.])
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
-# appena capito come si fa
 if MCReco:
     systTree.branchTreesSysts(trees, "signal", "MC_Wprime_pt", outTreeFile, MC_Wprime_pt)
     systTree.branchTreesSysts(trees, "signal", "MC_Wprime_eta", outTreeFile, MC_Wprime_eta)
@@ -1047,5 +1061,5 @@ if 'Data' not in path:
             
 inp.Close()
 
-endTime = datetime.now()
+endTime = datetime.datetime.now()
 print("Ending running at " + str(endTime))
