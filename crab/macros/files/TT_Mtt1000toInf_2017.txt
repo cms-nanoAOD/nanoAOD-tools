@@ -1,0 +1,16 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_7.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_6.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_11.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_8.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_16.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_9.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_14.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_4.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_15.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_10.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_17.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_13.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_5.root
