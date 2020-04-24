@@ -10,6 +10,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools imp
 from PhysicsTools.NanoAODTools.postprocessing.topreco import *
 from PhysicsTools.NanoAODTools.postprocessing.skimtree import *
 import datetime
+from PhysicsTools.NanoAODTools.postprocessing.samples.samples import *
 
 def Chi_TopMass(mT):
     sigma = 28.8273
@@ -51,7 +52,7 @@ leadingjet_ptcut = 150.
 
 chain = ROOT.TChain('Events')
 for infile in file_list: 
-    chain.AddFile(fc.GetList())
+    chain.AddFile(infile)
 tree = InputTree(chain.GetTree())
 
 #path = "/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root"
