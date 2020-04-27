@@ -60,14 +60,14 @@ print("Starting running at " + str(startTime))
 
 ROOT.gROOT.SetBatch()
 
-Debug = True
+Debug = False
 MCReco = True
 
 DeltaFilter = True
 leadingjet_ptcut = 150.
 
 chain = ROOT.TChain('Events')
-#chain_plots = ROOT.TChain('plots')
+chain_plots = ROOT.TChain('plots')
 print(chain)
 for infile in file_list: 
     print(infile)
