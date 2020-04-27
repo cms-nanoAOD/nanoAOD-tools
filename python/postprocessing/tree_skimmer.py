@@ -36,64 +36,73 @@ def mcbjet_filter(jets): #returns a collection of only b-gen jets (to use only f
 def sameflav_filter(jets, flav): #returns a collection of only b-gen jets (to use only forMC samples)                       
     return list(filter(lambda x : x.partonFlavour == flav, jets))
 
-#os.environ["X509_USER_PROXY"] = sys.argv[1]
-#print(os.environ["X509_USER_PROXY"])
+localrun = True
+if not(localrun):
+    os.environ["X509_USER_PROXY"] = sys.argv[1]
+    print(os.environ["X509_USER_PROXY"])
 #os.environ["XRD_NETWORKSTACK"] = "IPv4"
 dataset = sample_dict[sys.argv[2]]
 part_idx = sys.argv[3]
 file_list = []
 
-print(type(sys.argv[4]))
-if(type(sys.argv[4]) == str):
-    print(type(sys.argv[4]))
-    file_list.append(str(sys.argv[4]))
-elif(type(sys.argv[4]) == list):
-    print(type(sys.argv[4]))
-    for file_ in sys.argv[4]:
-        file_list.append(str(file_))
-else:
-    print("Something went wrong")
+file_list = map(str, sys.argv[4].strip('[]').split(','))
+#if(type(sys.argv[4]) == str):
+#    print(type(sys.argv[4]))
+#    file_list.append(str(sys.argv[4]))
+#elif(type(sys.argv[4]) == list):
+#    print(type(sys.argv[4]))
+#    for file_ in sys.argv[4]:
+#        file_list.append(str(file_))
+#else:
+#    print("Something went wrong")
 print(file_list)
+
+
+Debug = True
+MCReco = True
+DeltaFilter = True
 
 startTime = datetime.datetime.now()
 print("Starting running at " + str(startTime))
 
 ROOT.gROOT.SetBatch()
 
-Debug = False
-MCReco = True
-
-DeltaFilter = True
 leadingjet_ptcut = 150.
 
 chain = ROOT.TChain('Events')
-chain_plots = ROOT.TChain('plots')
 print(chain)
 for infile in file_list: 
-    print(infile)
+    print("Adding %s to the chain" %(infile))
     chain.Add(infile)
-#chain.Add("/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root")
-#chain.AddFile("root://xrootd-cms.infn.it//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_7.root")
-#chain.AddFile("root://xrootd-redic.pi.infn.it:1094//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_7.root")
-print(chain)
+
 tree = InputTree(chain)
 print(tree.GetEntries())
-print(tree.GetName(), tree)
-#path = "/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root"
-#inp = ROOT.TFile.Open("/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root")
-#tree = InputTree(inp.Events)
 
-print(chain_plots.Print())
 isMC = True
 if ('Data' in dataset.label):
     isMC = False
 
+if(isMC):
+    h_genweight = ROOT.TH1F('h_genweight_add', 'h_genweight_add', 10, 0, 10)
+    h_PDFweight = ROOT.TH1F()
+    h_PDFweight.SetNameTitle("h_PDFweight_add","h_PDFweight_add")
+    for infile in file_list: 
+        print("Getting the histos from %s" %(infile))
+        newfile  = ROOT.TFile.Open(infile)
+        h_genw_tmp = ROOT.TH1F(newfile.Get("plots/h_genweight"))
+        h_pdfw_tmp = ROOT.TH1F(newfile.Get("plots/h_PDFweight"))
+        print(ROOT.TH1F(h_PDFweight).Integral())
+        if(ROOT.TH1F(h_PDFweight).Integral() < 1.):
+            h_PDFweight.SetBins(h_pdfw_tmp.GetXaxis().GetNbins(), h_pdfw_tmp.GetXaxis().GetXmin(), h_pdfw_tmp.GetXaxis().GetXmax())
+        print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(newfile.Get("plots/h_genweight")).GetBinContent(1), ROOT.TH1F(newfile.Get("plots/h_PDFweight")).GetNbinsX()))
+        h_genweight.Add(h_genw_tmp)
+        h_PDFweight.Add(h_pdfw_tmp)
+    print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
 MCReco = MCReco * isMC
 
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
-#outTreeFile = ROOT.TFile(outdir+"/trees_"+sample+"_"+channel+".root", "RECREATE") #some name of the output file
 outTreeFile = ROOT.TFile(dataset.label+"_part"+str(part_idx)+".root", "RECREATE") #some name of the output file
 trees = []
 for i in range(10):
