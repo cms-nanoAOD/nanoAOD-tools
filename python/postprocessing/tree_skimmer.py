@@ -36,36 +36,45 @@ def mcbjet_filter(jets): #returns a collection of only b-gen jets (to use only f
 def sameflav_filter(jets, flav): #returns a collection of only b-gen jets (to use only forMC samples)                       
     return list(filter(lambda x : x.partonFlavour == flav, jets))
 
-os.environ["X509_USER_PROXY"] = sys.argv[1]
-print(os.environ["X509_USER_PROXY"]) 
+#os.environ["X509_USER_PROXY"] = sys.argv[1]
+#print(os.environ["X509_USER_PROXY"])
+#os.environ["XRD_NETWORKSTACK"] = "IPv4"
 dataset = sample_dict[sys.argv[2]]
 part_idx = sys.argv[3]
 file_list = []
 
+print(type(sys.argv[4]))
 if(type(sys.argv[4]) == str):
+    print(type(sys.argv[4]))
     file_list.append(str(sys.argv[4]))
 elif(type(sys.argv[4]) == list):
+    print(type(sys.argv[4]))
     for file_ in sys.argv[4]:
         file_list.append(str(file_))
 else:
     print("Something went wrong")
+print(file_list)
 
 startTime = datetime.datetime.now()
 print("Starting running at " + str(startTime))
+
+ROOT.gROOT.SetBatch()
+
 Debug = True
 MCReco = True
 
 DeltaFilter = True
 leadingjet_ptcut = 150.
 
-print(file_list)
-
 chain = ROOT.TChain('Events')
+#chain_plots = ROOT.TChain('plots')
 print(chain)
-#for infile in file_list: 
-#print(infile)
-chain.Add(sys.argv[4])
+for infile in file_list: 
+    print(infile)
+    chain.Add(infile)
 #chain.Add("/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root")
+#chain.AddFile("root://xrootd-cms.infn.it//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_7.root")
+#chain.AddFile("root://xrootd-redic.pi.infn.it:1094//store/user/adeiorio/OutDir/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/TT_Mtt1000toInf_2017/200328_192805/0000/tree_hadd_7.root")
 print(chain)
 tree = InputTree(chain)
 print(tree.GetEntries())
@@ -74,6 +83,7 @@ print(tree.GetName(), tree)
 #inp = ROOT.TFile.Open("/eos/home-a/adeiorio/Wprime/nosynch/WJetsHT200to400_2017/WJetsHT200to400_2017.root")
 #tree = InputTree(inp.Events)
 
+print(chain_plots.Print())
 isMC = True
 if ('Data' in dataset.label):
     isMC = False
@@ -84,7 +94,7 @@ MCReco = MCReco * isMC
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
 #outTreeFile = ROOT.TFile(outdir+"/trees_"+sample+"_"+channel+".root", "RECREATE") #some name of the output file
-outTreeFile = ROOT.TFile(dataset.label+"_part"+str(part_idx), "RECREATE") #some name of the output file
+outTreeFile = ROOT.TFile(dataset.label+"_part"+str(part_idx)+".root", "RECREATE") #some name of the output file
 trees = []
 for i in range(10):
     trees.append(None)
@@ -1056,10 +1066,10 @@ systTree.writeTreesSysts(trees, outTreeFile)
 
 if 'Data' not in path:
     outTreeFile.cd()
-    h_genweight = inp.Get("plots/h_genweight")
-    h_genweight.Write("h_genweight")
+    #h_genweight = inp.Get("plots/h_genweight")
+    #h_genweight.Write("h_genweight")
             
-inp.Close()
+#inp.Close()
 
 endTime = datetime.datetime.now()
 print("Ending running at " + str(endTime))
