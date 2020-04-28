@@ -231,6 +231,9 @@ best_TopJet_eta = array.array('f', [0.])
 best_TopJet_phi = array.array('f', [0.])
 best_TopJet_m = array.array('f', [0.])
 best_TopJet_isBTagged = array.array('i', [0])
+
+Event_HT = array.array('f', [0.])
+
 '''
 closest_TopJet_isDFL = array.array('i', [0])
 closest_TopJet_isDFM = array.array('i', [0])
@@ -325,6 +328,8 @@ MET_pt = array.array('f', [0.])
 MET_phi = array.array('f', [0.])
 MET_eta = array.array('f', [0.])
 MET_m = array.array('f', [0.])
+
+w_nominal = array.array('f', [0.])
 
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
@@ -441,6 +446,8 @@ systTree.branchTreesSysts(trees, "signal", "best_WpJet_phi", outTreeFile, best_W
 systTree.branchTreesSysts(trees, "signal", "best_WpJet_m", outTreeFile, best_WpJet_m)
 systTree.branchTreesSysts(trees, "signal", "best_WpJet_isBTagged", outTreeFile, best_WpJet_isBTagged)
 
+systTree.branchTreesSysts(trees, "signal", "Event_HT", outTreeFile, Event_HT)
+
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_pt", outTreeFile, DetReco_Lepton_pt)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_eta", outTreeFile, DetReco_Lepton_eta)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_phi", outTreeFile, DetReco_Lepton_phi)
@@ -454,6 +461,8 @@ systTree.branchTreesSysts(trees, "signal", "MET_pt", outTreeFile, MET_pt)
 systTree.branchTreesSysts(trees, "signal", "MET_eta", outTreeFile, MET_eta)
 systTree.branchTreesSysts(trees, "signal", "MET_phi", outTreeFile, MET_phi)
 systTree.branchTreesSysts(trees, "signal", "MET_m", outTreeFile, MET_m)
+
+systTree.branchTreesSysts(trees, "signal", "w_nominal", outTreeFile, w_nominal)
 
 #++++++++++++++++++++++++++++++++++
 #++   looping over the events    ++
@@ -472,6 +481,7 @@ for i in xrange(0,tree.GetEntries()):
     jets = Collection(event, "Jet")
     njets = len(jets)
     fatjets = Collection(event, "FatJet")
+    HT = Object(event, "EventHT")
     PV = Object(event, "PV")
     HLT = Object(event, "HLT")
     Flag = Object(event, 'Flag')
@@ -542,6 +552,7 @@ for i in xrange(0,tree.GetEntries()):
         MET_eta[0] = 0.
         MET_phi[0] = met.phi
         MET_m[0] = 0.
+        Event_HT[0] = HT
     else:
         nJet[0] = -1
         DetReco_Lepton_pt[0] = -1.
@@ -554,6 +565,7 @@ for i in xrange(0,tree.GetEntries()):
         MET_eta = -1.
         MET_phi = -1.
         MET_m = -1.
+        Event_HT[0] = -1.
 
     goodJets = get_Jet(jets, 25)
     bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
