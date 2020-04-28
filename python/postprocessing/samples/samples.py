@@ -158,95 +158,95 @@ WJets_2018.components = [WJetsHT200to400_2018, WJetsHT400to600_2018, WJetsHT600t
 #Data datasets
 tag_data = 'Nano25Oct2019'
 
-MuC_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunC2016")
-MuC_2016.dataset = '/SingleMuon/Run2016C-'+tag_data + '-v1/NANOAOD'
-MuD_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunD2016")
-MuD_2016.dataset = '/SingleMuon/Run2016D-'+tag_data + '-v1/NANOAOD'
-MuE_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunE2016")
-MuE_2016.dataset = '/SingleMuon/Run2016E-'+tag_data + '-v1/NANOAOD'
-MuF_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunF2016")
-MuF_2016.dataset = '/SingleMuon/Run2016F-'+tag_data + '-v1/NANOAOD'
-MuG_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunG2016")
-MuG_2016.dataset = '/SingleMuon/Run2016G-'+tag_data + '-v1/NANOAOD'
-MuH_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunH2016")
-MuH_2016.dataset = '/SingleMuon/Run2016H-'+tag_data + '-v1/NANOAOD'
+DataMuC_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuC_2016")
+DataMuC_2016.dataset = '/SingleMuon/Run2016C-'+tag_data + '-v1/NANOAOD'
+DataMuD_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuD_2016")
+DataMuD_2016.dataset = '/SingleMuon/Run2016D-'+tag_data + '-v1/NANOAOD'
+DataMuE_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuE_2016")
+DataMuE_2016.dataset = '/SingleMuon/Run2016E-'+tag_data + '-v1/NANOAOD'
+DataMuF_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuF_2016")
+DataMuF_2016.dataset = '/SingleMuon/Run2016F-'+tag_data + '-v1/NANOAOD'
+DataMuG_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuG_2016")
+DataMuG_2016.dataset = '/SingleMuon/Run2016G-'+tag_data + '-v1/NANOAOD'
+DataMuH_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuH_2016")
+DataMuH_2016.dataset = '/SingleMuon/Run2016H-'+tag_data + '-v1/NANOAOD'
 DataMu_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_2016")
-DataMu_2016.components = [MuC_2016, MuD_2016, MuE_2016, MuF_2016, MuG_2016, MuH_2016]
+DataMu_2016.components = [DataMuC_2016, DataMuD_2016, DataMuE_2016, DataMuF_2016, DataMuG_2016, DataMuH_2016]
 
-EleC_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunC2016")
-EleC_2016.dataset = '/SingleElectron/Run2016C-'+tag_data + '-v1/NANOAOD'
-EleD_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunD2016")
-EleD_2016.dataset = '/SingleElectron/Run2016D-'+tag_data + '-v1/NANOAOD'
-EleE_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunE2016")
-EleE_2016.dataset = '/SingleElectron/Run2016E-'+tag_data + '-v1/NANOAOD'
-EleF_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunF2016")
-EleF_2016.dataset = '/SingleElectron/Run2016F-'+tag_data + '-v1/NANOAOD'
-EleG_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunG2016")
-EleG_2016.dataset = '/SingleElectron/Run2016G-'+tag_data + '-v1/NANOAOD'
-EleH_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunH2016")
-EleH_2016.dataset = '/SingleElectron/Run2016H-'+tag_data + '-v1/NANOAOD'
+DataEleC_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleC_2016")
+DataEleC_2016.dataset = '/SingleElectron/Run2016C-'+tag_data + '-v1/NANOAOD'
+DataEleD_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleD_2016")
+DataEleD_2016.dataset = '/SingleElectron/Run2016D-'+tag_data + '-v1/NANOAOD'
+DataEleE_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleE_2016")
+DataEleE_2016.dataset = '/SingleElectron/Run2016E-'+tag_data + '-v1/NANOAOD'
+DataEleF_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleF_2016")
+DataEleF_2016.dataset = '/SingleElectron/Run2016F-'+tag_data + '-v1/NANOAOD'
+DataEleG_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleG_2016")
+DataEleG_2016.dataset = '/SingleElectron/Run2016G-'+tag_data + '-v1/NANOAOD'
+DataEleH_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleH_2016")
+DataEleH_2016.dataset = '/SingleElectron/Run2016H-'+tag_data + '-v1/NANOAOD'
 DataEle_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_2016")
-DataEle_2016.components = [EleC_2016, EleD_2016, EleE_2016, EleF_2016, EleG_2016, EleH_2016]
+DataEle_2016.components = [DataEleC_2016, DataEleD_2016, DataEleE_2016, DataEleF_2016, DataEleG_2016, DataEleH_2016]
 
-MuB_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunB2017")
-MuB_2017.dataset = '/SingleMuon/Run2017B-'+tag_data + '-v1/NANOAOD'
-MuC_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunC2017")
-MuC_2017.dataset = '/SingleMuon/Run2017C-'+tag_data + '-v1/NANOAOD'
-MuD_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunD2017")
-MuD_2017.dataset = '/SingleMuon/Run2017D-'+tag_data + '-v1/NANOAOD'
-MuE_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunE2017")
-MuE_2017.dataset = '/SingleMuon/Run2017E-'+tag_data + '-v1/NANOAOD'
-MuF_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunF2017")
-MuF_2017.dataset = '/SingleMuon/Run2017F-'+tag_data + '-v1/NANOAOD'
+DataMuB_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuB_2017")
+DataMuB_2017.dataset = '/SingleMuon/Run2017B-'+tag_data + '-v1/NANOAOD'
+DataMuC_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuC_2017")
+DataMuC_2017.dataset = '/SingleMuon/Run2017C-'+tag_data + '-v1/NANOAOD'
+DataMuD_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuD_2017")
+DataMuD_2017.dataset = '/SingleMuon/Run2017D-'+tag_data + '-v1/NANOAOD'
+DataMuE_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuE_2017")
+DataMuE_2017.dataset = '/SingleMuon/Run2017E-'+tag_data + '-v1/NANOAOD'
+DataMuF_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuF_2017")
+DataMuF_2017.dataset = '/SingleMuon/Run2017F-'+tag_data + '-v1/NANOAOD'
 DataMu_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_2017")
-DataMu_2017.components = [MuB_2017, MuC_2017, MuD_2017, MuE_2017, MuF_2017]
+DataMu_2017.components = [DataMuB_2017, DataMuC_2017, DataMuD_2017, DataMuE_2017, DataMuF_2017]
 
-EleB_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunB2017")
-EleB_2017.dataset = '/SingleElectron/Run2017B-'+tag_data + '-v1/NANOAOD'
-EleC_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunC2017")
-EleC_2017.dataset = '/SingleElectron/Run2017C-'+tag_data + '-v1/NANOAOD'
-EleD_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunD2017")
-EleD_2017.dataset = '/SingleElectron/Run2017D-'+tag_data + '-v1/NANOAOD'
-EleE_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunE2017")
-EleE_2017.dataset = '/SingleElectron/Run2017E-'+tag_data + '-v1/NANOAOD'
-EleF_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunF2017")
-EleF_2017.dataset = '/SingleElectron/Run2017F-'+tag_data + '-v1/NANOAOD'
+DataEleB_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleB_2017")
+DataEleB_2017.dataset = '/SingleElectron/Run2017B-'+tag_data + '-v1/NANOAOD'
+DataEleC_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleC_2017")
+DataEleC_2017.dataset = '/SingleElectron/Run2017C-'+tag_data + '-v1/NANOAOD'
+DataEleD_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleD_2017")
+DataEleD_2017.dataset = '/SingleElectron/Run2017D-'+tag_data + '-v1/NANOAOD'
+DataEleE_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleE_2017")
+DataEleE_2017.dataset = '/SingleElectron/Run2017E-'+tag_data + '-v1/NANOAOD'
+DataEleF_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleF_2017")
+DataEleF_2017.dataset = '/SingleElectron/Run2017F-'+tag_data + '-v1/NANOAOD'
 DataEle_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_2017")
-DataEle_2017.components = [EleB_2017, EleC_2017, EleD_2017, EleE_2017, EleF_2017]
+DataEle_2017.components = [DataEleB_2017, DataEleC_2017, DataEleD_2017, DataEleE_2017, DataEleF_2017]
 
-MuA_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunA2018")
-MuA_2018.dataset = '/SingleMuon/Run2018A-'+tag_data + '-v1/NANOAOD'
-MuB_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunB2018")
-MuB_2018.dataset = '/SingleMuon/Run2018C-'+tag_data + '-v1/NANOAOD'
-MuC_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunC2018")
-MuC_2018.dataset = '/SingleMuon/Run2018C-'+tag_data + '-v1/NANOAOD'
-MuD_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_RunD2018")
-MuD_2018.dataset = '/SingleMuon/Run2018D-'+tag_data + '-v1/NANOAOD'
-DataMu_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_2018")
-DataMu_2018.components = [MuA_2018, MuB_2018, MuC_2018, MuD_2018]
+DataMuA_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuA_2018")
+DataMuA_2018.dataset = '/SingleMuon/Run2018A-'+tag_data + '-v1/NANOAOD'
+DataMuB_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuB_2018")
+DataMuB_2018.dataset = '/SingleMuon/Run2018C-'+tag_data + '-v1/NANOAOD'
+DataMuC_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuC_2018")
+DataMuC_2018.dataset = '/SingleMuon/Run2018C-'+tag_data + '-v1/NANOAOD'
+DataMuD_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuD_2018")
+DataMuD_2018.dataset = '/SingleMuon/Run2018D-'+tag_data + '-v1/NANOAOD'
+DataMu_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataDataMu_2018")
+DataMu_2018.components = [DataMuA_2018, DataMuB_2018, DataMuC_2018, DataMuD_2018]
 
-EleA_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunA2018")
-EleA_2018.dataset = '/SingleElectron/Run2018A-'+tag_data + '-v1/NANOAOD'
-EleB_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunB2018")
-EleB_2018.dataset = '/SingleElectron/Run2018C-'+tag_data + '-v1/NANOAOD'
-EleC_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunC2018")
-EleC_2018.dataset = '/SingleElectron/Run2018C-'+tag_data + '-v1/NANOAOD'
-EleD_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_RunD2018")
-EleD_2018.dataset = '/SingleElectron/Run2018D-'+tag_data + '-v1/NANOAOD'
+DataEleA_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleA_2018")
+DataEleA_2018.dataset = '/SingleElectron/Run2018A-'+tag_data + '-v1/NANOAOD'
+DataEleB_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleB_2018")
+DataEleB_2018.dataset = '/SingleElectron/Run2018C-'+tag_data + '-v1/NANOAOD'
+DataEleC_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleC_2018")
+DataEleC_2018.dataset = '/SingleElectron/Run2018C-'+tag_data + '-v1/NANOAOD'
+DataEleD_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleD_2018")
+DataEleD_2018.dataset = '/SingleElectron/Run2018D-'+tag_data + '-v1/NANOAOD'
 DataEle_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEle_2018")
-DataEle_2018.components = [EleA_2018, EleB_2018, EleC_2018, EleD_2018]
+DataEle_2018.components = [DataEleA_2018, DataEleB_2018, DataEleC_2018, DataEleD_2018]
 
 sample_dict = {
     'TT_Mtt_2016':TT_Mtt_2016, 'TT_Mtt700to1000_2016':TT_Mtt700to1000_2016, 'TT_Mtt1000toInf_2016':TT_Mtt1000toInf_2016,
     'WJets_2016':WJets_2016, 'WJetsHT200to400_2016':WJetsHT200to400_2016, 'WJetsHT400to600_2016':WJetsHT400to600_2016, 'WJetsHT600to800_2016':WJetsHT600to800_2016, 'WJetsHT800to1200_2016':WJetsHT800to1200_2016, 'WJetsHT1200to2500_2016':WJetsHT1200to2500_2016, 'WJetsHT2500toInf_2016':WJetsHT2500toInf_2016,
-    'DataMu_2016':DataMu_2016, 'MuC_2016':MuC_2016, 'MuD_2016':MuD_2016, 'MuE_2016':MuE_2016, 'MuF_2016':MuF_2016, 'MuG_2016':MuG_2016, 'MuH_2016':MuH_2016,
-    'DataEle_2016':DataEle_2016, 'EleC_2016':EleC_2016, 'EleD_2016':EleD_2016, 'EleE_2016':EleE_2016, 'EleF_2016':EleF_2016, 'EleG_2016':EleG_2016, 'EleH_2016':EleH_2016,
+    'DataMu_2016':DataMu_2016, 'DataMuC_2016':DataMuC_2016, 'DataMuD_2016':DataMuD_2016, 'DataMuE_2016':DataMuE_2016, 'DataMuF_2016':DataMuF_2016, 'DataMuG_2016':DataMuG_2016, 'DataMuH_2016':DataMuH_2016,
+    'DataEle_2016':DataEle_2016, 'DataEleC_2016':DataEleC_2016, 'DataEleD_2016':DataEleD_2016, 'DataEleE_2016':DataEleE_2016, 'DataEleF_2016':DataEleF_2016, 'DataEleG_2016':DataEleG_2016, 'DataEleH_2016':DataEleH_2016,
     'TT_Mtt_2017':TT_Mtt_2017, 'TT_Mtt700to1000_2017':TT_Mtt700to1000_2017, 'TT_Mtt1000toInf_2017':TT_Mtt1000toInf_2017,
     'WJets_2017':WJets_2017, 'WJetsHT200to400_2017':WJetsHT200to400_2017, 'WJetsHT400to600_2017':WJetsHT400to600_2017, 'WJetsHT600to800_2017':WJetsHT600to800_2017, 'WJetsHT800to1200_2017':WJetsHT800to1200_2017, 'WJetsHT1200to2500_2017':WJetsHT1200to2500_2017, 'WJetsHT2500toInf_2017':WJetsHT2500toInf_2017,
-    'DataMu_2017':DataMu_2017, 'MuB_2017':MuB_2017, 'MuC_2017':MuC_2017, 'MuD_2017':MuD_2017, 'MuE_2017':MuE_2017, 'MuF_2017':MuF_2017,
-    'DataEle_2017':DataEle_2017, 'EleB_2017':EleB_2017, 'EleC_2017':EleC_2017, 'EleD_2017':EleD_2017, 'EleE_2017':EleE_2017, 'EleF_2017':EleF_2017,
+    'DataMu_2017':DataMu_2017, 'DataMuB_2017':DataMuB_2017, 'DataMuC_2017':DataMuC_2017, 'DataMuD_2017':DataMuD_2017, 'DataMuE_2017':DataMuE_2017, 'DataMuF_2017':DataMuF_2017,
+    'DataEle_2017':DataEle_2017, 'DataEleB_2017':DataEleB_2017, 'DataEleC_2017':DataEleC_2017, 'DataEleD_2017':DataEleD_2017, 'DataEleE_2017':DataEleE_2017, 'DataEleF_2017':DataEleF_2017,
     'TT_Mtt_2018':TT_Mtt_2018, 'TT_Mtt700to1000_2018':TT_Mtt700to1000_2018, 'TT_Mtt1000toInf_2018':TT_Mtt1000toInf_2018,
     'WJets_2018':WJets_2018, 'WJetsHT200to400_2018':WJetsHT200to400_2018, 'WJetsHT400to600_2018':WJetsHT400to600_2018, 'WJetsHT600to800_2018':WJetsHT600to800_2018, 'WJetsHT800to1200_2018':WJetsHT800to1200_2018, 'WJetsHT1200to2500_2018':WJetsHT1200to2500_2018, 'WJetsHT2500toInf_2018':WJetsHT2500toInf_2018,
-    'DataMu_2018':DataMu_2018, 'MuA_2018':MuA_2018, 'MuB_2018':MuB_2018, 'MuC_2018':MuC_2018, 'MuD_2018':MuD_2018,
-    'DataEle_2018':DataEle_2018, 'EleA_2018':EleA_2018, 'EleB_2018':EleB_2018, 'EleC_2018':EleC_2018, 'EleD_2018':EleD_2018
+    'DataMu_2018':DataMu_2018, 'DataMuA_2018':DataMuA_2018, 'DataMuB_2018':DataMuB_2018, 'DataMuC_2018':DataMuC_2018, 'DataMuD_2018':DataMuD_2018,
+    'DataEle_2018':DataEle_2018, 'DataEleA_2018':DataEleA_2018, 'DataEleB_2018':DataEleB_2018, 'DataEleC_2018':DataEleC_2018, 'DataEleD_2018':DataEleD_2018
 }

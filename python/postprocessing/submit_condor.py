@@ -19,7 +19,7 @@ def sub_writer(sample, n, files):
     f.write("transfer_output_remaps  = "+ sample.label + "_part" + str(n) + ".root=/eos/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label +"/"+ sample.label + "_part" + str(n) + ".root\n")
 
     f.write("executable              = python tree_skimmer.py\n")
-    f.write("arguments               = $(Proxy_path) dataset " + str(n) + " " + str(files) + "\n")
+    f.write("arguments               = $(Proxy_path) " + sample.label + " " + str(n) + " " + str(files) + "\n")
     #f.write("input                   = input.txt\n")
 
     f.write("output                  = condor/output/"+ sample.label + "_part" + str(n) + ".out\n")
@@ -61,14 +61,16 @@ for sample in samples:
         for i, files in enumerate(files_list):
             sub_writer(sample, i, files)
             #os.popen('condor_submit condor.sub')
+            print('condor_submit condor.sub')
             #os.popen("python tree_skimmer.py  /tmp/x509up_103214 " + str(sample) + " " + str(i) + " " + str(files) + "/")
-            print("python tree_skimmer.py  /tmp/x509up_103214 " + str(sample.label) + " " + str(i) + " " + str(files))
+            print("python tree_skimmer.py  /tmp/x509up_103214 " + sample.label + " " + str(i) + " " + str(files))
     else:
         for i in range(len(files_list)/split+1):
             sub_writer(sample, i, files_list[split*i:split*(i+1)])
             #os.popen('condor_submit condor.sub')
-            os.popen("python tree_skimmer.py /tmp/x509up_103214 " + str(sample.label) + " " + str(i) + " " + str(files))
-            print("***************************************************")
-            print(i, str( files_list[split*i:split*(i+1)]))
-            print(str(len( files_list[split*i:split*(i+1)]))) 
-            print("***************************************************\n")
+            #os.popen("python tree_skimmer.py /tmp/x509up_103214 " + str(sample) + " " + str(i) + " " + str(files_list[split*i:split*(i+1)]))
+            print("python tree_skimmer.py /tmp/x509up_103214 " + sample.label + " " + str(i) + " " + ",".join( e for e in files_list[split*i:split*(i+1)]))
+            #print("***************************************************")
+            #print(i, str( files_list[split*i:split*(i+1)]))
+            #print(str(len( files_list[split*i:split*(i+1)]))) 
+            #print("***************************************************\n")

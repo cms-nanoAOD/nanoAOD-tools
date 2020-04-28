@@ -43,20 +43,8 @@ if not(localrun):
 #os.environ["XRD_NETWORKSTACK"] = "IPv4"
 dataset = sample_dict[sys.argv[2]]
 part_idx = sys.argv[3]
-file_list = []
-
 file_list = map(str, sys.argv[4].strip('[]').split(','))
-#if(type(sys.argv[4]) == str):
-#    print(type(sys.argv[4]))
-#    file_list.append(str(sys.argv[4]))
-#elif(type(sys.argv[4]) == list):
-#    print(type(sys.argv[4]))
-#    for file_ in sys.argv[4]:
-#        file_list.append(str(file_))
-#else:
-#    print("Something went wrong")
 print(file_list)
-
 
 Debug = True
 MCReco = True
@@ -98,6 +86,8 @@ if(isMC):
         h_genweight.Add(h_genw_tmp)
         h_PDFweight.Add(h_pdfw_tmp)
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
+
+
 MCReco = MCReco * isMC
 
 #++++++++++++++++++++++++++++++++++
@@ -322,12 +312,6 @@ best_WpJet_isDCT = array.array('i', [0])
 '''
 
 #Lepton
-if MCReco:
-    MC_Lepton_pt = array.array('f', [0.])
-    MC_Lepton_eta = array.array('f', [0.])
-    MC_Lepton_phi = array.array('f', [0.])
-    MC_Lepton_m = array.array('f', [0.])
-    MC_Lepton_SF = array.array('f', [0.])
 DetReco_Lepton_pt = array.array('f', [0.])
 DetReco_Lepton_eta = array.array('f', [0.])
 DetReco_Lepton_phi = array.array('f', [0.])
@@ -457,17 +441,12 @@ systTree.branchTreesSysts(trees, "signal", "best_WpJet_phi", outTreeFile, best_W
 systTree.branchTreesSysts(trees, "signal", "best_WpJet_m", outTreeFile, best_WpJet_m)
 systTree.branchTreesSysts(trees, "signal", "best_WpJet_isBTagged", outTreeFile, best_WpJet_isBTagged)
 
-if MCReco:
-    systTree.branchTreesSysts(trees, "signal", "MC_Lepton_pt", outTreeFile, MC_Lepton_pt)
-    systTree.branchTreesSysts(trees, "signal", "MC_Lepton_eta", outTreeFile, MC_Lepton_eta)
-    systTree.branchTreesSysts(trees, "signal", "MC_Lepton_phi", outTreeFile, MC_Lepton_phi)
-    systTree.branchTreesSysts(trees, "signal", "MC_Lepton_m", outTreeFile, MC_Lepton_m)
-    systTree.branchTreesSysts(trees, "signal", "MC_Lepton_SF", outTreeFile, MC_Lepton_SF)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_pt", outTreeFile, DetReco_Lepton_pt)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_eta", outTreeFile, DetReco_Lepton_eta)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_phi", outTreeFile, DetReco_Lepton_phi)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_m", outTreeFile, DetReco_Lepton_m)
-systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_SF", outTreeFile, DetReco_Lepton_SF)
+if(isMC):
+    systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_SF", outTreeFile, DetReco_Lepton_SF)
 systTree.branchTreesSysts(trees, "signal", "isEle", outTreeFile, isEle)
 systTree.branchTreesSysts(trees, "signal", "isMu", outTreeFile, isMu)
 
@@ -532,7 +511,8 @@ for i in xrange(0,tree.GetEntries()):
         tightlep_p4.SetPtEtaPhiM(goodMu[0].pt,goodMu[0].eta,goodMu[0].phi,goodMu[0].mass)
         tightlep_p4t = copy.deepcopy(tightlep_p4)
         tightlep_p4t.SetPz(0.)
-        tightlep_SF = goodMu[0].effSF
+        if(isMC):
+            tightlep_SF = goodMu[0].effSF
     elif(isElectron):
         isEle[0] = 1
         isMu[0] = 0
@@ -541,7 +521,8 @@ for i in xrange(0,tree.GetEntries()):
         tightlep_p4.SetPtEtaPhiM(goodEle[0].pt,goodEle[0].eta,goodEle[0].phi,goodEle[0].mass)
         tightlep_p4t = copy.deepcopy(tightlep_p4)
         tightlep_p4t.SetPz(0.)
-        tightlep_SF = goodEle[0].effSF
+        if(isMC):
+            tightlep_SF = goodEle[0].effSF
     else:
         print('Not a good event')
         continue
@@ -555,7 +536,8 @@ for i in xrange(0,tree.GetEntries()):
         DetReco_Lepton_eta[0] = tightlep_p4.Eta()
         DetReco_Lepton_phi[0] = tightlep_p4.Phi()
         DetReco_Lepton_m[0] = tightlep_p4.M()
-        DetReco_Lepton_SF[0] = tightlep_SF
+        if(isMC):
+            DetReco_Lepton_SF[0] = tightlep_SF
         MET_pt[0] = met.pt
         MET_eta[0] = 0.
         MET_phi[0] = met.phi
@@ -566,7 +548,8 @@ for i in xrange(0,tree.GetEntries()):
         DetReco_Lepton_eta[0] = -1.
         DetReco_Lepton_phi[0] = -1.
         DetReco_Lepton_m[0] = -1.
-        DetReco_Lepton_SF[0] = -1.
+        if(isMC):
+            DetReco_Lepton_SF[0] = -1.
         MET_pt = -1.
         MET_eta = -1.
         MET_phi = -1.
@@ -1072,13 +1055,6 @@ for i in xrange(0,tree.GetEntries()):
 
 trees[0].Print()
 systTree.writeTreesSysts(trees, outTreeFile)
-
-if 'Data' not in path:
-    outTreeFile.cd()
-    #h_genweight = inp.Get("plots/h_genweight")
-    #h_genweight.Write("h_genweight")
-            
-#inp.Close()
 
 endTime = datetime.datetime.now()
 print("Ending running at " + str(endTime))
