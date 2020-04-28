@@ -36,7 +36,7 @@ def mcbjet_filter(jets): #returns a collection of only b-gen jets (to use only f
 def sameflav_filter(jets, flav): #returns a collection of only b-gen jets (to use only forMC samples)                       
     return list(filter(lambda x : x.partonFlavour == flav, jets))
 
-localrun = True
+localrun = False # True
 if not(localrun):
     os.environ["X509_USER_PROXY"] = sys.argv[1]
     print(os.environ["X509_USER_PROXY"])
@@ -46,7 +46,7 @@ part_idx = sys.argv[3]
 file_list = map(str, sys.argv[4].strip('[]').split(','))
 print(file_list)
 
-Debug = True
+Debug = False # True
 MCReco = True
 DeltaFilter = True
 
