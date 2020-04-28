@@ -41,7 +41,7 @@ if not(localrun):
     os.environ["X509_USER_PROXY"] = sys.argv[1]
     print(os.environ["X509_USER_PROXY"])
 #os.environ["XRD_NETWORKSTACK"] = "IPv4"
-dataset = sample_dict[sys.argv[2]]
+sample = sample_dict[sys.argv[2]]
 part_idx = sys.argv[3]
 file_list = map(str, sys.argv[4].strip('[]').split(','))
 print(file_list)
@@ -67,33 +67,15 @@ tree = InputTree(chain)
 print(tree.GetEntries())
 
 isMC = True
-if ('Data' in dataset.label):
+if ('Data' in sample.label):
     isMC = False
-
-if(isMC):
-    h_genweight = ROOT.TH1F('h_genweight_add', 'h_genweight_add', 10, 0, 10)
-    h_PDFweight = ROOT.TH1F()
-    h_PDFweight.SetNameTitle("h_PDFweight_add","h_PDFweight_add")
-    for infile in file_list: 
-        print("Getting the histos from %s" %(infile))
-        newfile  = ROOT.TFile.Open(infile)
-        h_genw_tmp = ROOT.TH1F(newfile.Get("plots/h_genweight"))
-        h_pdfw_tmp = ROOT.TH1F(newfile.Get("plots/h_PDFweight"))
-        print(ROOT.TH1F(h_PDFweight).Integral())
-        if(ROOT.TH1F(h_PDFweight).Integral() < 1.):
-            h_PDFweight.SetBins(h_pdfw_tmp.GetXaxis().GetNbins(), h_pdfw_tmp.GetXaxis().GetXmin(), h_pdfw_tmp.GetXaxis().GetXmax())
-        print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(newfile.Get("plots/h_genweight")).GetBinContent(1), ROOT.TH1F(newfile.Get("plots/h_PDFweight")).GetNbinsX()))
-        h_genweight.Add(h_genw_tmp)
-        h_PDFweight.Add(h_pdfw_tmp)
-    print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
-
 
 MCReco = MCReco * isMC
 
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
-outTreeFile = ROOT.TFile(dataset.label+"_part"+str(part_idx)+".root", "RECREATE") #some name of the output file
+outTreeFile = ROOT.TFile(sample.label+"_part"+str(part_idx)+".root", "RECREATE") #some name of the output file
 trees = []
 for i in range(10):
     trees.append(None)
@@ -330,6 +312,7 @@ MET_eta = array.array('f', [0.])
 MET_m = array.array('f', [0.])
 
 w_nominal = array.array('f', [0.])
+w_PDF = array.array('f', [0.])
 
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
@@ -446,8 +429,6 @@ systTree.branchTreesSysts(trees, "signal", "best_WpJet_phi", outTreeFile, best_W
 systTree.branchTreesSysts(trees, "signal", "best_WpJet_m", outTreeFile, best_WpJet_m)
 systTree.branchTreesSysts(trees, "signal", "best_WpJet_isBTagged", outTreeFile, best_WpJet_isBTagged)
 
-systTree.branchTreesSysts(trees, "signal", "Event_HT", outTreeFile, Event_HT)
-
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_pt", outTreeFile, DetReco_Lepton_pt)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_eta", outTreeFile, DetReco_Lepton_eta)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_phi", outTreeFile, DetReco_Lepton_phi)
@@ -456,19 +437,43 @@ if(isMC):
     systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_SF", outTreeFile, DetReco_Lepton_SF)
 systTree.branchTreesSysts(trees, "signal", "isEle", outTreeFile, isEle)
 systTree.branchTreesSysts(trees, "signal", "isMu", outTreeFile, isMu)
-
+systTree.branchTreesSysts(trees, "signal", "Event_HT", outTreeFile, Event_HT)
 systTree.branchTreesSysts(trees, "signal", "MET_pt", outTreeFile, MET_pt)
 systTree.branchTreesSysts(trees, "signal", "MET_eta", outTreeFile, MET_eta)
 systTree.branchTreesSysts(trees, "signal", "MET_phi", outTreeFile, MET_phi)
 systTree.branchTreesSysts(trees, "signal", "MET_m", outTreeFile, MET_m)
-
 systTree.branchTreesSysts(trees, "signal", "w_nominal", outTreeFile, w_nominal)
+if(isMC and addPDF):
+    systTree.branchTreesSysts(trees, "signal", "w_PDF", outTreeFile, w_PDF)
+w_nominal[0] = 1 
+
+#++++++++++++++++++++++++++++++++++
+#++      taking MC weights       ++
+#++++++++++++++++++++++++++++++++++
+if(isMC):
+    h_genweight = ROOT.TH1F('h_genweight_add', 'h_genweight_add', 10, 0, 10)
+    h_PDFweight = ROOT.TH1F()
+    h_PDFweight.SetNameTitle("h_PDFweight_add","h_PDFweight_add")
+    for infile in file_list: 
+        print("Getting the histos from %s" %(infile))
+        newfile  = ROOT.TFile.Open(infile)
+        h_genw_tmp = ROOT.TH1F(newfile.Get("plots/h_genweight"))
+        h_pdfw_tmp = ROOT.TH1F(newfile.Get("plots/h_PDFweight"))
+        print(ROOT.TH1F(h_PDFweight).Integral())
+        if(ROOT.TH1F(h_PDFweight).Integral() < 1.):
+            h_PDFweight.SetBins(h_pdfw_tmp.GetXaxis().GetNbins(), h_pdfw_tmp.GetXaxis().GetXmin(), h_pdfw_tmp.GetXaxis().GetXmax())
+        print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(newfile.Get("plots/h_genweight")).GetBinContent(1), ROOT.TH1F(newfile.Get("plots/h_PDFweight")).GetNbinsX()))
+        h_genweight.Add(h_genw_tmp)
+        h_PDFweight.Add(h_pdfw_tmp)
+    w_nominal[0] = 1/h_genweight.GetBinContent(1) 
+    for i in xrange(1, h_PDFweight.GetXaxis().GetNbins()):
+        w_PDF[i] = h_PDFweight.GetBinContent(i)/h_genweight.GetBinContent(1) 
+    print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
 
 #++++++++++++++++++++++++++++++++++
 #++   looping over the events    ++
 #++++++++++++++++++++++++++++++++++
 for i in xrange(0,tree.GetEntries()):
-    #for i in xrange(0,20):
     #++++++++++++++++++++++++++++++++++
     #++        taking objects        ++
     #++++++++++++++++++++++++++++++++++
@@ -507,7 +512,7 @@ for i in xrange(0,tree.GetEntries()):
     goodMu = get_Mu(muons)
     VetoEle = get_LooseEle(electrons)
     goodEle = get_Ele(electrons)
-    year = 2017
+    year = sample.year
 
     passMu, passEle, passHT, noTrigger = trig_map(HLT, year)
 
@@ -534,7 +539,7 @@ for i in xrange(0,tree.GetEntries()):
         if(isMC):
             tightlep_SF = goodEle[0].effSF
     else:
-        print('Not a good event')
+        print('Event %i not a good' %(event))
         continue
 
     recomet_p4t = ROOT.TLorentzVector()
