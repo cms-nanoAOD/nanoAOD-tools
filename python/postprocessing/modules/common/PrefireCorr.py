@@ -4,12 +4,29 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 import re
 import os
 
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
+from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class PrefCorr(Module):
-    def __init__(self, jetroot="L1prefiring_jetpt_2017BtoF.root", jetmapname="L1prefiring_jetpt_2017BtoF",
-                 photonroot="L1prefiring_photonpt_2017BtoF.root", photonmapname="L1prefiring_photonpt_2017BtoF"):
+    def __init__(self,
+                 jetroot="L1prefiring_jetpt_2017BtoF.root",
+                 jetmapname="L1prefiring_jetpt_2017BtoF",
+                 photonroot="L1prefiring_photonpt_2017BtoF.root",
+                 photonmapname="L1prefiring_photonpt_2017BtoF",
+                 branchnames=["PrefireWeight","PrefireWeight_Up", "PrefireWeight_Down"]):
+        """Module to compute prefiring weights
+
+        :param jetroot: Root file containing prefiring map for jets, defaults to "L1prefiring_jetpt_2017BtoF.root"
+        :type jetroot: str, optional
+        :param jetmapname: Name of jet prefiring map in ROOT file, defaults to "L1prefiring_jetpt_2017BtoF"
+        :type jetmapname: str, optional
+        :param photonroot: ROOT file containing prefiring map for photons, defaults to "L1prefiring_photonpt_2017BtoF.root"
+        :type photonroot: str, optional
+        :param photonmapname: Name of photon prefiring map in ROOT file, defaults to "L1prefiring_photonpt_2017BtoF"
+        :type photonmapname: str, optional
+        :param branchnames: Output branch names for nominal, up, down variations, defaults to ["PrefireWeight","PrefireWeight_Up", "PrefireWeight_Down"]
+        :type branchnames: list, optional
+        """
 
         cmssw_base = os.getenv('CMSSW_BASE')
 
@@ -20,7 +37,7 @@ class PrefCorr(Module):
         self.jet_map = self.get_root_obj(self.jet_file, jetmapname)
 
         self.UseEMpT = ("jetempt" in jetroot)
-
+        self.branchnames = branchnames
     def open_root(self, path):
         r_file = ROOT.TFile.Open(path)
         if not r_file.__nonzero__() or not r_file.IsOpen(): raise NameError('File ' + path + ' not open')
@@ -39,7 +56,6 @@ class PrefCorr(Module):
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.branchnames = ["PrefireWeight", "PrefireWeight_Up", "PrefireWeight_Down"]
         for bname in self.branchnames:
           self.out.branch(bname, "F")
 
@@ -115,7 +131,7 @@ class PrefCorr(Module):
       stat = Map.GetBinError(bin) # bin statistical uncertainty
       syst = 0.2*pref_prob # 20% of prefire rate
 
-      if self.variation == 1: 
+      if self.variation == 1:
         pref_prob = min(pref_prob + math.sqrt(stat*stat + syst*syst), 1.0)
       if self.variation == -1:
         pref_prob = max(pref_prob - math.sqrt(stat*stat + syst*syst), 0.0)
