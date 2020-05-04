@@ -8,22 +8,23 @@ parser = optparse.OptionParser(usage)
 parser.add_option('-d', '--dat', dest='dat', type=str, default = '', help='Please enter a dataset name')
 (opt, args) = parser.parse_args()
 #Insert here your uid... you can see it typing echo $uid
-uid = 103214
+uid = 0
 
 def sub_writer(sample, n, files):
     f = open("condor.sub", "w")
-    #f.write("Proxy_filename          = x509up\n")
-    f.write("Proxy_path              = /afs/cern.ch/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/private/x509up\n")
-
+    f.write("Proxy_filename          = x509up\n")
+    f.write("Proxy_path              = /afs/cern.ch/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/private/$(Proxy_filename)\n")
+    f.write("universe                = vanilla\n")
+    f.write("x509userproxy           = $(Proxy_path)\n"))
+    f.write("use_x509userproxy       = true\n")
     f.write("should_transfer_files   = YES\n")
     f.write("when_to_transfer_output = ON_EXIT\n")
-    f.write("transfer_input_files    = $(Proxy_path)\n")
+    f.write("transfer_input_files    = $(Proxy_path), samples/samples.py, skimtree_utils.py, __init__.py\n")
     f.write("transfer_output_remaps  = \""+ sample.label + "_part" + str(n) + ".root=/eos/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label +"/"+ sample.label + "_part" + str(n) + ".root\"\n")
-
+    f.write("+JobFlavour             = \"workday\"\n") # options are espresso = 20 minutes, microcentury = 1 hour, longlunch = 2 hours, workday = 8 hours, tomorrow = 1 day, testmatch = 3 days, nextweek     = 1 week
     f.write("executable              = tree_skimmer.py\n")
-    f.write("arguments               = $(Proxy_path) " + sample.label + " " + str(n) + " " + str(files) + "\n")
+    f.write("arguments               = " + sample.label + " " + str(n) + " " + str(files) + "\n")
     #f.write("input                   = input.txt\n")
-
     f.write("output                  = condor/output/"+ sample.label + "_part" + str(n) + ".out\n")
     f.write("error                   = condor/error/"+ sample.label + "_part" + str(n) + ".err\n")
     f.write("log                     = condor/log/"+ sample.label + "_part" + str(n) + ".log\n")
@@ -52,7 +53,7 @@ if(uid == 0):
     print("Please insert your uid")
     exit()
 if not os.path.exists("/tmp/x509up_u" + str(uid)):
-    os.system('voms-proxy-init -voms cms -rfc')
+    os.system('voms-proxy-init --rfc --voms cms -valid 192:00')
 os.popen("cp /tmp/x509up_u" + str(uid) + " /afs/cern.ch/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/private/x509up")
 
 split = 50
