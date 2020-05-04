@@ -5,48 +5,19 @@ import ROOT
 import math
 import datetime
 from array import array
-from PhysicsTools.NanoAODTools.postprocessing.tools import *
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object, Event
-from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import InputTree
-from PhysicsTools.NanoAODTools.postprocessing.topreco import *
-from PhysicsTools.NanoAODTools.postprocessing.skimtree import *
-from PhysicsTools.NanoAODTools.postprocessing.samples.samples import *
+from skimtree_utils import *
 
-def Chi_TopMass(mT):
-    sigma = 28.8273
-    mST = 174.729
-    chi = ( ROOT.TMath.Power((mST-mT), 2.) ) / ( ROOT.TMath.Power(sigma, 2.))
-    return chi
-
-def bjet_filter(jets, tagger, WP): #returns collections of b jets and no b jets (discriminated with btaggers)
-    # b-tag working points: mistagging efficiency tight = 0.1%, medium 1% and loose = 10% 
-    WPbtagger = {'DeepFlv_T': 0.7264, 'DeepFlv_M': 0.2770, 'DeepFlv_L': 0.0494, 'DeepCSV_T': 0.7527, 'DeepCSV_M': 0.4184, 'DeepCSV_L': 0.1241}
-    if(tagger == 'DeepFlv'):
-        threshold = WPbtagger[str(tagger) + '_' + str(WP)]
-        return list(filter(lambda x : x.btagDeepFlavB >= threshold, jets)), list(filter(lambda x : x.btagDeepFlavB < threshold, jets))
-    elif(tagger == 'DeepCSV'):
-        threshold = WPbtagger[str(tagger) + '_' + str(WP)]
-        return list(filter(lambda x : x.btagDeepB >= threshold, jets)), list(filter(lambda x : x.btagDeepB < threshold, jets))
-    else:
-        print('Only DeepFlv and DeepCSV accepted! Pleae implement other taggers if you want them.')
-
-def mcbjet_filter(jets): #returns a collection of only b-gen jets (to use only for MC samples)
-    return list(filter(lambda x : x.partonFlavour == -5 or x.partonFlavour == 5, jets))
-
-def sameflav_filter(jets, flav): #returns a collection of only b-gen jets (to use only forMC samples)                       
-    return list(filter(lambda x : x.partonFlavour == flav, jets))
-
-localrun = False # True
+localrun = False # True #
 if not(localrun):
-    os.environ["X509_USER_PROXY"] = sys.argv[1]
-    print(os.environ["X509_USER_PROXY"])
-#os.environ["XRD_NETWORKSTACK"] = "IPv4"
-sample = sample_dict[sys.argv[2]]
-part_idx = sys.argv[3]
-file_list = map(str, sys.argv[4].strip('[]').split(','))
+    from samples import *
+else:
+    from samples.samples import *
+sample = sample_dict[sys.argv[1]]
+part_idx = sys.argv[2]
+file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = False # True
+Debug = False # True #
 MCReco = True
 DeltaFilter = True
 
@@ -312,7 +283,7 @@ MET_eta = array.array('f', [0.])
 MET_m = array.array('f', [0.])
 
 w_nominal = array.array('f', [0.])
-w_PDF = array.array('f', [0.])
+w_PDF = array.array('f', [0.]*110)
 
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
@@ -465,8 +436,8 @@ if(isMC):
         print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(newfile.Get("plots/h_genweight")).GetBinContent(1), ROOT.TH1F(newfile.Get("plots/h_PDFweight")).GetNbinsX()))
         h_genweight.Add(h_genw_tmp)
         h_PDFweight.Add(h_pdfw_tmp)
-    w_nominal[0] = 1/h_genweight.GetBinContent(1) 
-    for i in xrange(1, h_PDFweight.GetXaxis().GetNbins()):
+    w_nominal[0] = sample.sigma/h_genweight.GetBinContent(1) 
+    for i in xrange(1, h_PDFweight.GetXaxis().GetNbins()+1):
         w_PDF[i] = h_PDFweight.GetBinContent(i)/h_genweight.GetBinContent(1) 
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
 
@@ -486,7 +457,7 @@ for i in xrange(0,tree.GetEntries()):
     jets = Collection(event, "Jet")
     njets = len(jets)
     fatjets = Collection(event, "FatJet")
-    HT = Object(event, "EventHT")
+    #HT = Object(event, "HT")
     PV = Object(event, "PV")
     HLT = Object(event, "HLT")
     Flag = Object(event, 'Flag')
@@ -539,7 +510,7 @@ for i in xrange(0,tree.GetEntries()):
         if(isMC):
             tightlep_SF = goodEle[0].effSF
     else:
-        print('Event %i not a good' %(event))
+        print('Event %i not a good' %(i))
         continue
 
     recomet_p4t = ROOT.TLorentzVector()
@@ -557,7 +528,7 @@ for i in xrange(0,tree.GetEntries()):
         MET_eta[0] = 0.
         MET_phi[0] = met.phi
         MET_m[0] = 0.
-        Event_HT[0] = HT
+        #Event_HT[0] = HT.eventHT
     else:
         nJet[0] = -1
         DetReco_Lepton_pt[0] = -1.
