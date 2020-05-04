@@ -907,14 +907,14 @@ class systWeights(object):
             self.weightedNames[4] = "mistagDown"
             self.weightedNames[5] = "puUp"
             self.weightedNames[6] = "puDown"
-            #self.weightedNames[7] = "lepUp"
-            #self.weightedNames[8] = "lepDown"
+            self.weightedNames[7] = "lepUp"
+            self.weightedNames[8] = "lepDown"
             #self.weightedNames[9] = "isoUp"
             #self.weightedNames[10] = "isoDown"
             #self.weightedNames[11] = "trigUp"
             #self.weightedNames[12] = "trigDown"
-            self.setMax(7)
-            self.setMaxNonPDF(7)
+            self.setMax(9)
+            self.setMaxNonPDF(9)
             self.weightedNames[self.maxSysts] = ""
 
         if addQ2: 
