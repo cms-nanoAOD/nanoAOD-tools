@@ -72,11 +72,11 @@ for sample in samples:
             sub_writer(sample, i, files)
             #os.popen('condor_submit condor.sub')
             print('condor_submit condor.sub')
-            #os.popen("python tree_skimmer.py  /tmp/x509up_u" + str(uid) + " " + sample.label + " " + str(i) + " " + str(files))
-            print("python tree_skimmer.py  /tmp/x509up_u" + str(uid) + " " + sample.label + " " + str(i) + " " + str(files))
+            #os.popen("python tree_skimmer.py " + str(uid) + " " + sample.label + " " + str(i) + " " + str(files))
+            print("python tree_skimmer.py " + str(uid) + " " + sample.label + " " + str(i) + " " + str(files))
     else:
         for i in range(len(files_list)/split+1):
             sub_writer(sample, i,  ",".join( e for e in files_list[split*i:split*(i+1)]))
             #os.popen('condor_submit condor.sub')
-            #os.popen("python tree_skimmer.py /tmp/x509up_u" + str(uid) + " " + sample.label + " " + str(i) + " " + ",".join( e for e in files_list[split*i:split*(i+1)]))
-            print("python tree_skimmer.py /tmp/x509up_u" + str(uid) + " " + sample.label + " " + str(i) + " " + ",".join( e for e in files_list[split*i:split*(i+1)]))
+            #os.popen("python tree_skimmer.py " + str(uid) + " " + sample.label + " " + str(i) + " " + ",".join( e for e in files_list[split*i:split*(i+1)]))
+            print("python tree_skimmer.py " + str(uid) + " " + sample.label + " " + str(i) + " " + ",".join( e for e in files_list[split*i:split*(i+1)]))
