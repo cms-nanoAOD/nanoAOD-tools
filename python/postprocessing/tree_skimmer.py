@@ -7,6 +7,13 @@ import datetime
 from array import array
 from skimtree_utils import *
 
+lumi = {
+    "2016": 35.9,
+    "2017": 41.53,
+    "2018": 57.3,
+}
+
+
 localrun = False # True #
 if not(localrun):
     from samples import *
@@ -17,7 +24,7 @@ part_idx = sys.argv[2]
 file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = False # True #
+Debug = False # True # 
 MCReco = True
 DeltaFilter = True
 
@@ -53,7 +60,8 @@ for i in range(10):
 #systZero = systWeights()
 # defining the operations to be done with the systWeights class
 maxSysts = 0
-addPDF = False
+addPDFsyst = False
+addPDF = True
 addQ2 = False
 addTopPt = False
 addVHF = False
@@ -61,17 +69,10 @@ addTTSplit = False
 addTopTagging = False
 addWTagging = False
 addTrigSF = False
-addPDF = False
-addQ2 = False
-addTopTagging = False
-addWTagging = False
-addTopPt = False
-addVHF = False
-addTrigSF = False
 nPDF = 0
 
 systTree = systWeights()
-systTree.prepareDefault(True, addQ2, addPDF, addTopPt, addVHF, addTTSplit)
+systTree.prepareDefault(True, addQ2, addPDFsyst, addTopPt, addVHF, addTTSplit)
 systTree.addSelection("signal")
 systTree.initTreesSysts(trees, outTreeFile)
 
@@ -83,9 +84,10 @@ systTree.setWeightName("mistagUp",1.)
 systTree.setWeightName("mistagDown",1.)
 systTree.setWeightName("puUp",1.)
 systTree.setWeightName("puDown",1.)
+'''
 systTree.setWeightName("lepUp",1.)
 systTree.setWeightName("lepDown",1.)
-'''
+
 
 #++++++++++++++++++++++++++++++++++
 #++     variables to branch      ++
@@ -272,15 +274,15 @@ DetReco_Lepton_pt = array.array('f', [0.])
 DetReco_Lepton_eta = array.array('f', [0.])
 DetReco_Lepton_phi = array.array('f', [0.])
 DetReco_Lepton_m = array.array('f', [0.])
-DetReco_Lepton_SF = array.array('f', [0.])
+#DetReco_Lepton_SF = array.array('f', [0.])
 isEle = array.array('i', [0])
 isMu = array.array('i', [0])
 
 #MET (phi = 0, m = 0 for every event)
 MET_pt = array.array('f', [0.])
 MET_phi = array.array('f', [0.])
-MET_eta = array.array('f', [0.])
-MET_m = array.array('f', [0.])
+#MET_eta = array.array('f', [0.])
+#MET_m = array.array('f', [0.])
 
 w_nominal = array.array('f', [0.])
 w_PDF = array.array('f', [0.]*110)
@@ -404,19 +406,21 @@ systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_pt", outTreeFile, Det
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_eta", outTreeFile, DetReco_Lepton_eta)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_phi", outTreeFile, DetReco_Lepton_phi)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_m", outTreeFile, DetReco_Lepton_m)
-if(isMC):
-    systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_SF", outTreeFile, DetReco_Lepton_SF)
+#if(isMC):
+    #systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_SF", outTreeFile, DetReco_Lepton_SF)
 systTree.branchTreesSysts(trees, "signal", "isEle", outTreeFile, isEle)
 systTree.branchTreesSysts(trees, "signal", "isMu", outTreeFile, isMu)
 systTree.branchTreesSysts(trees, "signal", "Event_HT", outTreeFile, Event_HT)
 systTree.branchTreesSysts(trees, "signal", "MET_pt", outTreeFile, MET_pt)
-systTree.branchTreesSysts(trees, "signal", "MET_eta", outTreeFile, MET_eta)
+#systTree.branchTreesSysts(trees, "signal", "MET_eta", outTreeFile, MET_eta)
 systTree.branchTreesSysts(trees, "signal", "MET_phi", outTreeFile, MET_phi)
-systTree.branchTreesSysts(trees, "signal", "MET_m", outTreeFile, MET_m)
-systTree.branchTreesSysts(trees, "signal", "w_nominal", outTreeFile, w_nominal)
+#systTree.branchTreesSysts(trees, "signal", "MET_m", outTreeFile, MET_m)
+#systTree.branchTreesSysts(trees, "signal", "w_nominal", outTreeFile, w_nominal)
+print isMC, addPDF
 if(isMC and addPDF):
     systTree.branchTreesSysts(trees, "signal", "w_PDF", outTreeFile, w_PDF)
-w_nominal[0] = 1 
+    print "ciao"
+w_nominal[0] = 1.
 
 #++++++++++++++++++++++++++++++++++
 #++      taking MC weights       ++
@@ -436,10 +440,11 @@ if(isMC):
         print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(newfile.Get("plots/h_genweight")).GetBinContent(1), ROOT.TH1F(newfile.Get("plots/h_PDFweight")).GetNbinsX()))
         h_genweight.Add(h_genw_tmp)
         h_PDFweight.Add(h_pdfw_tmp)
-    w_nominal[0] = sample.sigma/h_genweight.GetBinContent(1) 
+    w_nominal[0] = sample.sigma/h_genweight.GetBinContent(1) * lumi[str(sample.year)] * 1000.
     for i in xrange(1, h_PDFweight.GetXaxis().GetNbins()+1):
         w_PDF[i] = h_PDFweight.GetBinContent(i)/h_genweight.GetBinContent(1) 
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
+    systTree.setWeightPlace(0,copy.deepcopy(w_nominal[0]))
 
 #++++++++++++++++++++++++++++++++++
 #++   looping over the events    ++
@@ -499,6 +504,8 @@ for i in xrange(0,tree.GetEntries()):
         tightlep_p4t.SetPz(0.)
         if(isMC):
             tightlep_SF = goodMu[0].effSF
+            systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SF))
+            systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SF))
     elif(isElectron):
         isEle[0] = 1
         isMu[0] = 0
@@ -509,8 +516,10 @@ for i in xrange(0,tree.GetEntries()):
         tightlep_p4t.SetPz(0.)
         if(isMC):
             tightlep_SF = goodEle[0].effSF
+            systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SF))
+            systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SF))
     else:
-        print('Event %i not a good' %(i))
+        #print('Event %i not a good' %(i))
         continue
 
     recomet_p4t = ROOT.TLorentzVector()
@@ -522,26 +531,30 @@ for i in xrange(0,tree.GetEntries()):
         DetReco_Lepton_eta[0] = tightlep_p4.Eta()
         DetReco_Lepton_phi[0] = tightlep_p4.Phi()
         DetReco_Lepton_m[0] = tightlep_p4.M()
+        '''
         if(isMC):
             DetReco_Lepton_SF[0] = tightlep_SF
+        '''
         MET_pt[0] = met.pt
-        MET_eta[0] = 0.
+        #MET_eta[0] = 0.
         MET_phi[0] = met.phi
-        MET_m[0] = 0.
+        #MET_m[0] = 0.
         #Event_HT[0] = HT.eventHT
     else:
         nJet[0] = -1
-        DetReco_Lepton_pt[0] = -1.
-        DetReco_Lepton_eta[0] = -1.
-        DetReco_Lepton_phi[0] = -1.
-        DetReco_Lepton_m[0] = -1.
+        DetReco_Lepton_pt[0] = -100.
+        DetReco_Lepton_eta[0] = -100.
+        DetReco_Lepton_phi[0] = -100.
+        DetReco_Lepton_m[0] = -100.
+        '''
         if(isMC):
-            DetReco_Lepton_SF[0] = -1.
-        MET_pt = -1.
-        MET_eta = -1.
-        MET_phi = -1.
-        MET_m = -1.
-        Event_HT[0] = -1.
+            DetReco_Lepton_SF[0] = -100.
+        '''
+        MET_pt[0] = -100.
+        #MET_eta[0] = -100.
+        MET_phi[0] = -100.
+        #MET_m[0] = -100.
+        Event_HT[0] = -100.
 
     goodJets = get_Jet(jets, 25)
     bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
@@ -667,25 +680,25 @@ for i in xrange(0,tree.GetEntries()):
             MC_WpJet_eta[0] = mcpromptbjet_p4.Eta()
             MC_WpJet_phi[0] = mcpromptbjet_p4.Phi()
         else:
-            MC_Wprime_m[0] = -1.
-            MC_Wprime_mt[0] = -1.
-            MC_Wprime_pt[0] = -1.
-            MC_Wprime_eta[0] = -1.
-            MC_Wprime_phi[0] = -1.
-            MC_RecoTop_m[0] = -1.
-            MC_RecoTop_mt[0] = -1.
-            MC_RecoTop_pt[0] = -1.
-            MC_RecoTop_eta[0] = -1.
-            MC_RecoTop_phi[0] = -1.
+            MC_Wprime_m[0] = -100.
+            MC_Wprime_mt[0] = -100.
+            MC_Wprime_pt[0] = -100.
+            MC_Wprime_eta[0] = -100.
+            MC_Wprime_phi[0] = -100.
+            MC_RecoTop_m[0] = -100.
+            MC_RecoTop_mt[0] = -100.
+            MC_RecoTop_pt[0] = -100.
+            MC_RecoTop_eta[0] = -100.
+            MC_RecoTop_phi[0] = -100.
             MC_RecoTop_isNeg[0] = -1
-            MC_TopJet_m[0] = -1.
-            MC_TopJet_pt[0] = -1.
-            MC_TopJet_eta[0] = -1.
-            MC_TopJet_phi[0] = -1.
-            MC_WpJet_m[0] = -1.
-            MC_WpJet_pt[0] = -1.
-            MC_WpJet_eta[0] = -1.
-            MC_WpJet_phi[0] = -1.
+            MC_TopJet_m[0] = -100.
+            MC_TopJet_pt[0] = -100.
+            MC_TopJet_eta[0] = -100.
+            MC_TopJet_phi[0] = -100.
+            MC_WpJet_m[0] = -100.
+            MC_WpJet_pt[0] = -100.
+            MC_WpJet_eta[0] = -100.
+            MC_WpJet_phi[0] = -100.
 
     #DetReco(nstruction)
     if len(goodJets) < 2:
@@ -876,26 +889,26 @@ for i in xrange(0,tree.GetEntries()):
         closest_WpJet_phi[0] = closest_promptjet.p4().Phi()
         closest_WpJet_isBTagged[0] = int(len(bjet_filter([closest_promptjet], 'DeepFlv', 'M')))
     else:
-        closest_Wprime_m[0] = -1.
-        closest_Wprime_mt[0] = -1.
-        closest_Wprime_pt[0] = -1.
-        closest_Wprime_eta[0] = -1.
-        closest_Wprime_phi[0] = -1.
-        closest_RecoTop_m[0] = -1.
-        closest_RecoTop_mt[0] = -1.
-        closest_RecoTop_pt[0] = -1.
-        closest_RecoTop_eta[0] = -1.
-        closest_RecoTop_phi[0] = -1.
+        closest_Wprime_m[0] = -100.
+        closest_Wprime_mt[0] = -100.
+        closest_Wprime_pt[0] = -100.
+        closest_Wprime_eta[0] = -100.
+        closest_Wprime_phi[0] = -100.
+        closest_RecoTop_m[0] = -100.
+        closest_RecoTop_mt[0] = -100.
+        closest_RecoTop_pt[0] = -100.
+        closest_RecoTop_eta[0] = -100.
+        closest_RecoTop_phi[0] = -100.
         closest_RecoTop_isNeg[0] = -1
-        closest_TopJet_m[0] = -1.
-        closest_TopJet_pt[0] = -1.
-        closest_TopJet_eta[0] = -1.
-        closest_TopJet_phi[0] = -1.
+        closest_TopJet_m[0] = -100.
+        closest_TopJet_pt[0] = -100.
+        closest_TopJet_eta[0] = -100.
+        closest_TopJet_phi[0] = -100.
         closest_TopJet_isBTagged[0] = -1
-        closest_WpJet_m[0] = -1.
-        closest_WpJet_pt[0] = -1.
-        closest_WpJet_eta[0] = -1.
-        closest_WpJet_phi[0] = -1.
+        closest_WpJet_m[0] = -100.
+        closest_WpJet_pt[0] = -100.
+        closest_WpJet_eta[0] = -100.
+        closest_WpJet_phi[0] = -100.
         closest_WpJet_isBTagged[0] = -1
 
     if chi_recotop_p4 != None :
@@ -923,26 +936,26 @@ for i in xrange(0,tree.GetEntries()):
         chi_WpJet_phi[0] = chi_promptjet.p4().Phi()
         chi_WpJet_isBTagged[0] = int(len(bjet_filter([chi_promptjet], 'DeepFlv', 'M')))
     else:
-        chi_Wprime_m[0] = -1.
-        chi_Wprime_mt[0] = -1.
-        chi_Wprime_pt[0] = -1.
-        chi_Wprime_eta[0] = -1.
-        chi_Wprime_phi[0] = -1.
-        chi_RecoTop_m[0] = -1.
-        chi_RecoTop_mt[0] = -1.
-        chi_RecoTop_pt[0] = -1.
-        chi_RecoTop_eta[0] = -1.
-        chi_RecoTop_phi[0] = -1.
+        chi_Wprime_m[0] = -100.
+        chi_Wprime_mt[0] = -100.
+        chi_Wprime_pt[0] = -100.
+        chi_Wprime_eta[0] = -100.
+        chi_Wprime_phi[0] = -100.
+        chi_RecoTop_m[0] = -100.
+        chi_RecoTop_mt[0] = -100.
+        chi_RecoTop_pt[0] = -100.
+        chi_RecoTop_eta[0] = -100.
+        chi_RecoTop_phi[0] = -100.
         chi_RecoTop_isNeg[0] = -1
-        chi_TopJet_m[0] = -1.
-        chi_TopJet_pt[0] = -1.
-        chi_TopJet_eta[0] = -1.
-        chi_TopJet_phi[0] = -1.
+        chi_TopJet_m[0] = -100.
+        chi_TopJet_pt[0] = -100.
+        chi_TopJet_eta[0] = -100.
+        chi_TopJet_phi[0] = -100.
         chi_TopJet_isBTagged[0] = -1
-        chi_WpJet_m[0] = -1.
-        chi_WpJet_pt[0] = -1.
-        chi_WpJet_eta[0] = -1.
-        chi_WpJet_phi[0] = -1.
+        chi_WpJet_m[0] = -100.
+        chi_WpJet_pt[0] = -100.
+        chi_WpJet_eta[0] = -100.
+        chi_WpJet_phi[0] = -100.
         chi_WpJet_isBTagged[0] = -1
 
     if sublead_recotop_p4 != None :
@@ -970,26 +983,26 @@ for i in xrange(0,tree.GetEntries()):
         sublead_WpJet_phi[0] = sublead_promptjet.p4().Phi()
         sublead_WpJet_isBTagged[0] = int(len(bjet_filter([sublead_promptjet], 'DeepFlv', 'M')))
     else:
-        sublead_Wprime_m[0] = -1.
-        sublead_Wprime_mt[0] = -1.
-        sublead_Wprime_pt[0] = -1.
-        sublead_Wprime_eta[0] = -1.
-        sublead_Wprime_phi[0] = -1.
-        sublead_RecoTop_m[0] = -1.
-        sublead_RecoTop_mt[0] = -1.
-        sublead_RecoTop_pt[0] = -1.
-        sublead_RecoTop_eta[0] = -1.
-        sublead_RecoTop_phi[0] = -1.
+        sublead_Wprime_m[0] = -100.
+        sublead_Wprime_mt[0] = -100.
+        sublead_Wprime_pt[0] = -100.
+        sublead_Wprime_eta[0] = -100.
+        sublead_Wprime_phi[0] = -100.
+        sublead_RecoTop_m[0] = -100.
+        sublead_RecoTop_mt[0] = -100.
+        sublead_RecoTop_pt[0] = -100.
+        sublead_RecoTop_eta[0] = -100.
+        sublead_RecoTop_phi[0] = -100.
         sublead_RecoTop_isNeg[0] = -1
-        sublead_TopJet_m[0] = -1.
-        sublead_TopJet_pt[0] = -1.
-        sublead_TopJet_eta[0] = -1.
-        sublead_TopJet_phi[0] = -1.
+        sublead_TopJet_m[0] = -100.
+        sublead_TopJet_pt[0] = -100.
+        sublead_TopJet_eta[0] = -100.
+        sublead_TopJet_phi[0] = -100.
         sublead_TopJet_isBTagged[0] = -1
-        sublead_WpJet_m[0] = -1.
-        sublead_WpJet_pt[0] = -1.
-        sublead_WpJet_eta[0] = -1.
-        sublead_WpJet_phi[0] = -1.
+        sublead_WpJet_m[0] = -100.
+        sublead_WpJet_pt[0] = -100.
+        sublead_WpJet_eta[0] = -100.
+        sublead_WpJet_phi[0] = -100.
         sublead_WpJet_isBTagged[0] = -1
 
     if best_recotop_p4 != None :
@@ -1017,26 +1030,26 @@ for i in xrange(0,tree.GetEntries()):
         best_WpJet_phi[0] = best_promptjet.p4().Phi()
         best_WpJet_isBTagged[0] = int(len(bjet_filter([best_promptjet], 'DeepFlv', 'M')))
     else:
-        best_Wprime_m[0] = -1.
-        best_Wprime_mt[0] = -1.
-        best_Wprime_pt[0] = -1.
-        best_Wprime_eta[0] = -1.
-        best_Wprime_phi[0] = -1.
-        best_RecoTop_m[0] = -1.
-        best_RecoTop_mt[0] = -1.
-        best_RecoTop_pt[0] = -1.
-        best_RecoTop_eta[0] = -1.
-        best_RecoTop_phi[0] = -1.
+        best_Wprime_m[0] = -100.
+        best_Wprime_mt[0] = -100.
+        best_Wprime_pt[0] = -100.
+        best_Wprime_eta[0] = -100.
+        best_Wprime_phi[0] = -100.
+        best_RecoTop_m[0] = -100.
+        best_RecoTop_mt[0] = -100.
+        best_RecoTop_pt[0] = -100.
+        best_RecoTop_eta[0] = -100.
+        best_RecoTop_phi[0] = -100.
         best_RecoTop_isNeg[0] = -1
-        best_TopJet_m[0] = -1.
-        best_TopJet_pt[0] = -1.
-        best_TopJet_eta[0] = -1.
-        best_TopJet_phi[0] = -1.
+        best_TopJet_m[0] = -100.
+        best_TopJet_pt[0] = -100.
+        best_TopJet_eta[0] = -100.
+        best_TopJet_phi[0] = -100.
         best_TopJet_isBTagged[0] = -1
-        best_WpJet_m[0] = -1.
-        best_WpJet_pt[0] = -1.
-        best_WpJet_eta[0] = -1.
-        best_WpJet_phi[0] = -1.
+        best_WpJet_m[0] = -100.
+        best_WpJet_pt[0] = -100.
+        best_WpJet_eta[0] = -100.
+        best_WpJet_phi[0] = -100.                    
         best_WpJet_isBTagged[0] = -1
         
     systTree.fillTreesSysts(trees, "signal")
