@@ -25,5 +25,6 @@ class MCweight_writer(Module):
             for pdfw, i in zip(LHEPdfWeight, xrange(1, len(LHEPdfWeight)+1)):
                 self.h_PDFweight.GetXaxis().SetBinLabel(i, 'pdf['+str(i)+']')
                 self.h_PDFweight.AddBinContent(i, pdfw.__getattr__(""))
+        self.h_genweight.Fill("SumEvents", 1)
         self.h_genweight.Fill("GenWeights", Generator.weight)
         return True
