@@ -94,7 +94,7 @@ def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total
     # no MET variations calculated
     else:
       if isMC:
-          jmeCorrections = lambda : fatJetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, jetType = jetType, jerTag=jerTag_, jmrVals = jmrValues_, jmsVals = jmsValues_, applySmearing = applySmearing)
+          jmeCorrections = lambda : fatJetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, jetType = jetType, jerTag=jerTag_, jmrVals = jmrValues_, jmsVals = jmsValues_, applySmearing = applySmearing, applyHEMfix=applyHEMfix, splitJER=splitJER)
       else:
           jmeCorrections = lambda : fatJetUncertaintiesProducer(era=dataYear, archive=archiveTag_, globalTag=jecTag_, jesUncertainties=jmeUncert_, jetType = jetType, jerTag=jerTag_, jmrVals = jmrValues_, jmsVals = jmsValues_, isData=True)
 

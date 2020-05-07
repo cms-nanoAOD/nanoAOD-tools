@@ -111,7 +111,6 @@ class jetmetUncertaintiesProducer(Module):
                 print("Load Library '%s'" % library.replace("lib", ""))
                 ROOT.gSystem.Load(library)
 
-
     def getJERsplitID(self, pt, eta):
         if not self.splitJER:
             return ""
@@ -405,11 +404,11 @@ class jetmetUncertaintiesProducer(Module):
               jet_pt_jerDown = { jerID: jet_pt_nom for jerID in self.splitJERIDs }
               jet_mass_jerUp = { jerID: jet_mass_nom for jerID in self.splitJERIDs }
               jet_mass_jerDown = { jerID: jet_mass_nom for jerID in self.splitJERIDs }
-              jerID = self.getJERsplitID(jet_pt_nom, jet.eta)
-              jet_pt_jerUp[jerID] = jet_pt_jerUpVal * jet_pt
-              jet_pt_jerDown[jerID] = jet_pt_jerDownVal * jet_pt
-              jet_mass_jerUp[jerID] = jet_pt_jerUpVal * jet_mass
-              jet_mass_jerDown[jerID] = jet_pt_jerDownVal * jet_mass
+              thisJERID = self.getJERsplitID(jet_pt_nom, jet.eta)
+              jet_pt_jerUp[thisJERID] = jet_pt_jerUpVal * jet_pt
+              jet_pt_jerDown[thisJERID] = jet_pt_jerDownVal * jet_pt
+              jet_mass_jerUp[thisJERID] = jet_pt_jerUpVal * jet_mass
+              jet_mass_jerDown[thisJERID] = jet_pt_jerDownVal * jet_mass
 
               # evaluate JES uncertainties
               jet_pt_jesUp     = {}
@@ -427,7 +426,7 @@ class jetmetUncertaintiesProducer(Module):
                       jets_pt_jerDown[jerID].append(jet_pt_jerDown[jerID])
                       jets_mass_jerUp[jerID].append(jet_mass_jerUp[jerID])
                       jets_mass_jerDown[jerID].append(jet_mass_jerDown[jerID])
-              
+
               for jesUncertainty in self.jesUncertainties:
                   # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties )
 
@@ -436,9 +435,9 @@ class jetmetUncertaintiesProducer(Module):
                       delta = 1.
                       if iJet < nJet and jet_pt_nom > 15 and jet.jetId & 2 and jet.phi > -1.57 and jet.phi < -0.87:
                           if jet.eta > -2.5 and jet.eta < -1.3:
-                            delta = 0.8
+                              delta = 0.8
                           elif jet.eta <= -2.5 and jet.eta > -3:
-                            delta = 0.65
+                              delta = 0.65
                       jet_pt_jesUp[jesUncertainty] = jet_pt_nom
                       jet_pt_jesDown[jesUncertainty] = delta * jet_pt_nom
                       jet_mass_jesUp[jesUncertainty] = jet_mass_nom
