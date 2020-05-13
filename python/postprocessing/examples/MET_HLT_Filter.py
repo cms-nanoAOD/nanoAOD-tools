@@ -21,8 +21,8 @@ class MET_HLT_Filter(Module):
             good_HLT = HLT.PFHT800 or HLT.PFHT900 or HLT.Mu50 or HLT.TkMu50 or HLT.Ele115_CaloIdVT_GsfTrkIdT
         elif(self.year == 2017):
             good_HLT = HLT.PFHT780 or HLT.PFHT890 or HLT.Mu50 or HLT.Ele115_CaloIdVT_GsfTrkIdT
-        elif(self.year == 2017):
-            good_HLT = HLT.PFHT780 or HLT.PFHT890 or HLT.Mu50 or HLT.TkMu50 or HLT.Ele115_CaloIdVT_GsfTrkIdT
+        elif(self.year == 2018):
+            good_HLT = HLT.PFHT780 or HLT.PFHT890 or HLT.Mu50 or HLT.Ele115_CaloIdVT_GsfTrkIdT
         else:
             print "Please specify the year: possible choices are 2016, 2017 or 2018"
         return good_MET and good_HLT
