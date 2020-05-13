@@ -131,12 +131,12 @@ def get_HT(jets):
         HT += jet.pt
     return HT
 
-def trig_map(HLT, year):
+def trig_map(HLT, year, runPeriod):
     passMu = False
     passEle = False
     passHT = False
     noTrigger = False
-    if(year == 2016):
+    if(year == 2016 and runPeriod != 'H'):
         if(HLT.Mu50 or HLT.TkMu50):
             passMu = True
         elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
@@ -145,11 +145,27 @@ def trig_map(HLT, year):
             passHT = True
         else:
             noTrigger = True
-    elif(year == 2017 or year == 2018):
+    elif(year == 2016 and runPeriod == 'H'):
+        if(HLT.Mu50 or HLT.TkMu50):
+            passMu = True
+        elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
+            passEle = True  
+        elif(HLT.PFHT900):
+            passHT = True
+        else:
+            noTrigger = True
+    elif(year == 2017 and runPeriod != 'B' or year == 2018):
         if(HLT.Mu50):
             passMu = True
         elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
             passEle = True  
+        elif(HLT.PFHT780 or HLT.PFHT890):
+            passHT = True
+        else:
+            noTrigger = True
+    elif(year == 2017 and runPeriod == 'B'):
+        if(HLT.Mu50):
+            passMu = True
         elif(HLT.PFHT780 or HLT.PFHT890):
             passHT = True
         else:

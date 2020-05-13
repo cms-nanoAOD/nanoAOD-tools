@@ -8,14 +8,14 @@ parser = optparse.OptionParser(usage)
 parser.add_option('-d', '--dat', dest='dat', type=str, default = '', help='Please enter a dataset name')
 (opt, args) = parser.parse_args()
 #Insert here your uid... you can see it typing echo $uid
-uid = 0
+uid = 103214
 
 def sub_writer(sample, n, files):
     f = open("condor.sub", "w")
     f.write("Proxy_filename          = x509up\n")
     f.write("Proxy_path              = /afs/cern.ch/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/private/$(Proxy_filename)\n")
     f.write("universe                = vanilla\n")
-    f.write("x509userproxy           = $(Proxy_path)\n"))
+    f.write("x509userproxy           = $(Proxy_path)\n")
     f.write("use_x509userproxy       = true\n")
     f.write("should_transfer_files   = YES\n")
     f.write("when_to_transfer_output = ON_EXIT\n")
@@ -70,13 +70,14 @@ for sample in samples:
     if(isMC):
         for i, files in enumerate(files_list):
             sub_writer(sample, i, files)
-            #os.popen('condor_submit condor.sub')
+            os.popen('condor_submit condor.sub')
             print('condor_submit condor.sub')
-            #os.popen("python tree_skimmer.py " + str(uid) + " " + sample.label + " " + str(i) + " " + str(files))
-            print("python tree_skimmer.py " + str(uid) + " " + sample.label + " " + str(i) + " " + str(files))
+            #os.popen("python tree_skimmer.py " " + sample.label + " " + str(i) + " " + str(files))
+            print("python tree_skimmer.py " + sample.label + " " + str(i) + " " + str(files))
     else:
         for i in range(len(files_list)/split+1):
             sub_writer(sample, i,  ",".join( e for e in files_list[split*i:split*(i+1)]))
-            #os.popen('condor_submit condor.sub')
-            #os.popen("python tree_skimmer.py " + str(uid) + " " + sample.label + " " + str(i) + " " + ",".join( e for e in files_list[split*i:split*(i+1)]))
-            print("python tree_skimmer.py " + str(uid) + " " + sample.label + " " + str(i) + " " + ",".join( e for e in files_list[split*i:split*(i+1)]))
+            print('condor_submit condor.sub')
+            os.popen('condor_submit condor.sub')
+            #os.popen("python tree_skimmer.py " + sample.label + " " + str(i) + " " + ",".join( e for e in files_list[split*i:split*(i+1)]))
+            #print("python tree_skimmer.py " + sample.label + " " + str(i) + " " + ",".join( e for e in files_list[split*i:split*(i+1)]))

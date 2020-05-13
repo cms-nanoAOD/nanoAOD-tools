@@ -1,0 +1,3 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT2500toInf_2017/200323_145044/0000/tree_hadd_18.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT2500toInf_2017/200323_145044/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT2500toInf_2017/200323_145044/0000/tree_hadd_5.root

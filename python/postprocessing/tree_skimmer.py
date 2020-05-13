@@ -7,13 +7,6 @@ import datetime
 from array import array
 from skimtree_utils import *
 
-lumi = {
-    "2016": 35.9,
-    "2017": 41.53,
-    "2018": 57.3,
-}
-
-
 localrun = False # True #
 if not(localrun):
     from samples import *
@@ -24,7 +17,7 @@ part_idx = sys.argv[2]
 file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = False # True # 
+Debug = False # True #
 MCReco = True
 DeltaFilter = True
 
@@ -42,7 +35,7 @@ for infile in file_list:
     chain.Add(infile)
 
 tree = InputTree(chain)
-print(tree.GetEntries())
+print("Number of entries: " +str(tree.GetEntries()))
 
 isMC = True
 if ('Data' in sample.label):
@@ -286,6 +279,9 @@ MET_phi = array.array('f', [0.])
 
 w_nominal = array.array('f', [0.])
 w_PDF = array.array('f', [0.]*110)
+passed_mu = array.array('f', [0.])
+passed_ele = array.array('f', [0.])
+passed_ht = array.array('f', [0.])
 
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
@@ -406,20 +402,19 @@ systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_pt", outTreeFile, Det
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_eta", outTreeFile, DetReco_Lepton_eta)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_phi", outTreeFile, DetReco_Lepton_phi)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_m", outTreeFile, DetReco_Lepton_m)
+systTree.branchTreesSysts(trees, "signal", "passed_mu", outTreeFile, passed_mu)
+systTree.branchTreesSysts(trees, "signal", "passed_ele", outTreeFile, passed_ele)
+systTree.branchTreesSysts(trees, "signal", "passed_ht", outTreeFile, passed_ht)
 #if(isMC):
     #systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_SF", outTreeFile, DetReco_Lepton_SF)
 systTree.branchTreesSysts(trees, "signal", "isEle", outTreeFile, isEle)
 systTree.branchTreesSysts(trees, "signal", "isMu", outTreeFile, isMu)
 systTree.branchTreesSysts(trees, "signal", "Event_HT", outTreeFile, Event_HT)
 systTree.branchTreesSysts(trees, "signal", "MET_pt", outTreeFile, MET_pt)
-#systTree.branchTreesSysts(trees, "signal", "MET_eta", outTreeFile, MET_eta)
 systTree.branchTreesSysts(trees, "signal", "MET_phi", outTreeFile, MET_phi)
-#systTree.branchTreesSysts(trees, "signal", "MET_m", outTreeFile, MET_m)
-#systTree.branchTreesSysts(trees, "signal", "w_nominal", outTreeFile, w_nominal)
-print isMC, addPDF
+print "Is MC: " + str(isMC) + "      option addPDF: " + str(addPDF)
 if(isMC and addPDF):
     systTree.branchTreesSysts(trees, "signal", "w_PDF", outTreeFile, w_PDF)
-    print "ciao"
 w_nominal[0] = 1.
 
 #++++++++++++++++++++++++++++++++++
@@ -440,11 +435,7 @@ if(isMC):
         print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(newfile.Get("plots/h_genweight")).GetBinContent(1), ROOT.TH1F(newfile.Get("plots/h_PDFweight")).GetNbinsX()))
         h_genweight.Add(h_genw_tmp)
         h_PDFweight.Add(h_pdfw_tmp)
-    w_nominal[0] = sample.sigma/h_genweight.GetBinContent(1) * lumi[str(sample.year)] * 1000.
-    for i in xrange(1, h_PDFweight.GetXaxis().GetNbins()+1):
-        w_PDF[i] = h_PDFweight.GetBinContent(i)/h_genweight.GetBinContent(1) 
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
-    systTree.setWeightPlace(0,copy.deepcopy(w_nominal[0]))
 
 #++++++++++++++++++++++++++++++++++
 #++   looping over the events    ++
@@ -462,7 +453,7 @@ for i in xrange(0,tree.GetEntries()):
     jets = Collection(event, "Jet")
     njets = len(jets)
     fatjets = Collection(event, "FatJet")
-    #HT = Object(event, "HT")
+    HT = Object(event, "HT")
     PV = Object(event, "PV")
     HLT = Object(event, "HLT")
     Flag = Object(event, 'Flag')
@@ -489,8 +480,15 @@ for i in xrange(0,tree.GetEntries()):
     VetoEle = get_LooseEle(electrons)
     goodEle = get_Ele(electrons)
     year = sample.year
+    if(isMC):
+        runPeriod = None
+    else:
+        runPeriod = sample.runP
+    passMu, passEle, passHT, noTrigger = trig_map(HLT, year, runPeriod)
 
-    passMu, passEle, passHT, noTrigger = trig_map(HLT, year)
+    passed_mu[0] = int(passMu)
+    passed_ele[0] = int(passEle)
+    passed_ht[0] = int(passHT)
 
     isMuon = (len(goodMu) == 1) and (len(goodEle) == 0) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT)
     isElectron = (len(goodMu) == 0) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passEle or passHT)
@@ -539,7 +537,7 @@ for i in xrange(0,tree.GetEntries()):
         #MET_eta[0] = 0.
         MET_phi[0] = met.phi
         #MET_m[0] = 0.
-        #Event_HT[0] = HT.eventHT
+        Event_HT[0] = HT.eventHT
     else:
         nJet[0] = -1
         DetReco_Lepton_pt[0] = -100.
@@ -1052,9 +1050,15 @@ for i in xrange(0,tree.GetEntries()):
         best_WpJet_phi[0] = -100.                    
         best_WpJet_isBTagged[0] = -1
         
+    systTree.setWeightPlace(0,copy.deepcopy(w_nominal[0]))
     systTree.fillTreesSysts(trees, "signal")
 
 trees[0].Print()
+outTreeFile.cd()
+if(isMC):
+    print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
+    h_genweight.Write()
+    h_PDFweight.Write()
 systTree.writeTreesSysts(trees, outTreeFile)
 
 endTime = datetime.datetime.now()

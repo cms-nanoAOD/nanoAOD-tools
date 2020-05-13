@@ -27,7 +27,9 @@ for sample in samples:
     f=open("./files/"+str(sample.label)+".txt", "w")
 
     url = os.popen('crab getoutput --xrootd --jobids=1 -d ' + path + '/crab_' + str(sample.label) + '/').readlines()[0]
+    print(url)
     s1=url.split(str(os.environ.get('USER')))
+    print(s1[1])
     s2=s1[1].split('0000')
     #newurl = 'root://t3dcachedb03.psi.ch:1094//pnfs/psi.ch/cms/trivcat/store/user/' + str(os.environ.get('USER')) + s2[0]
     path_xrd = 'root://cms-xrd-global.cern.ch//store/user/' + str(os.environ.get('USER')) + s2[0]

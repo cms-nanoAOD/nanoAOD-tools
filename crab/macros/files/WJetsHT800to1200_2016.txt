@@ -1,0 +1,2 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2016/200506_111757/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2016/200506_111757/0000/tree_hadd_3.root

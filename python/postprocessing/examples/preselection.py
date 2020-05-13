@@ -15,7 +15,7 @@ class preselection(Module):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.out.branch("EventHT",  "F") 
+        self.out.branch("HT_eventHT",  "F") 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
     def analyze(self, event):
@@ -43,7 +43,7 @@ class preselection(Module):
         for j in goodJet:
             eventSum += j.p4()
 
-        self.out.fillBranch("EventHT", eventSum.Pt())
+        self.out.fillBranch("HT_eventHT", eventSum.Pt())
 
         isGoodEvent = ((((len(goodMu) >= 1) and (len(goodEle) == 0)) or ((len(goodMu) == 0) and (len(goodEle) >= 1))) and len(goodJet)>=1)
         goodEvent = isGoodPV and isGoodEvent

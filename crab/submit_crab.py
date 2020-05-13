@@ -13,13 +13,14 @@ parser.add_option('-r', '--resub', dest = 'resub', default = False, action = 'st
 parser.add_option('-g', '--gout', dest = 'gout', default = False, action = 'store_true', help = 'Default do not do getoutput')
 (opt, args) = parser.parse_args()
 
-def cfg_writer(sample, isMC, year, outdir):
+def cfg_writer(sample, isMC, outdir):
     f = open("crab_cfg.py", "w")
     f.write("from WMCore.Configuration import Configuration\n")
     #f.write("from CRABClient.UserUtilities import config, getUsernameFromSiteDB\n")
     f.write("\nconfig = Configuration()\n")
     f.write("config.section_('General')\n")
     f.write("config.General.requestName = '"+sample.label+"'\n")
+    f.write("config.General.instance = 'preprod'\n") #needed to solve a bug with Oracle server... 
     f.write("config.General.transferLogs=True\n")
     f.write("config.section_('JobType')\n")
     f.write("config.JobType.pluginName = 'Analysis'\n")
@@ -29,15 +30,16 @@ def cfg_writer(sample, isMC, year, outdir):
     f.write("config.JobType.sendPythonFolder = True\n")
     f.write("config.section_('Data')\n")
     f.write("config.Data.inputDataset = '"+sample.dataset+"'\n")
+    f.write("config.Data.allowNonValidInputDataset = True\n")
     #f.write("config.Data.inputDBS = 'phys03'")
     f.write("config.Data.inputDBS = 'global'\n")
     if not isMC:
         f.write("config.Data.splitting = 'LumiBased'\n")
-        if year == '2016':
+        if sample.year == '2016':
             f.write("config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt'\n")
-        elif year == '2017':
+        elif sample.year == '2017':
             f.write("config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'\n")
-        elif year == '2018':
+        elif sample.year == '2018':
             f.write("config.Data.lumiMask = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt'\n")
         f.write("config.Data.unitsPerJob = 50\n")
     else:
@@ -56,7 +58,7 @@ def cfg_writer(sample, isMC, year, outdir):
     #f.write("config.User.voGroup = 'dcms'
     f.close()
 
-def crab_script_writer(sample, outpath, isMC, year, modules, presel):
+def crab_script_writer(sample, outpath, isMC, modules, presel):
     f = open("crab_script.py", "w")
     f.write("#!/usr/bin/env python\n")
     f.write("import os\n")
@@ -71,14 +73,16 @@ def crab_script_writer(sample, outpath, isMC, year, modules, presel):
     f.write("from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import *\n")
 
-    f.write("metCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+year+", jesUncert='All', redojec=True)\n")
-    f.write("fatJetCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+year+", jesUncert='All', redojec=True, jetType = 'AK8PFchs')\n")
     #f.write("infile = "+str(sample.files)+"\n")
     #f.write("outpath = '"+ outpath+"'\n")
     #Deafult PostProcessor(outputDir,inputFiles,cut=None,branchsel=None,modules=[],compression='LZMA:9',friend=False,postfix=None, jsonInput=None,noOut=False,justcount=False,provenance=False,haddFileName=None,fwkJobReport=False,histFileName=None,histDirName=None, outputbranchsel=None,maxEntries=None,firstEntry=0, prefetch=False,longTermCache=False)\n")
     if isMC:
+        f.write("metCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", jesUncert='All', redojec=True)\n")
+        f.write("fatJetCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", jesUncert='All', redojec=True, jetType = 'AK8PFchs')\n")
         f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, fwkJobReport=True, histFileName='hist.root', histDirName='plots', outputbranchsel='keep_and_drop.txt')\n")# haddFileName='"+sample.label+".root'
     else: 
+        f.write("metCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", runPeriod='"+str(sample.runP)+"', jesUncert='All', redojec=True)\n")
+        f.write("fatJetCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", runPeriod='"+str(sample.runP)+"', jesUncert='All', redojec=True, jetType = 'AK8PFchs')\n")
         f.write("p=PostProcessor('.', inputFiles(), '"+presel+"', modules=["+modules+"], provenance=True, fwkJobReport=True, jsonInput=runsAndLumis(), haddFileName='tree_hadd.root', outputbranchsel='keep_and_drop.txt')\n")#
     f.write("p.run()\n")
     f.write("print 'DONE'\n")
@@ -129,15 +133,9 @@ def PSet_writer(sample):
     f.write("process.out = cms.EndPath(process.output)\n")
     f.close()
 
-#dataset = MuB_2017
+if not(opt.dat in sample_dict.keys()):
+    print sample_dict.keys()
 dataset = sample_dict[opt.dat]
-#dataset = DataMu_2017
-#dataset = DataEle_2017
-#dataset = TT_Mtt_2017
-#sample = TT_Mtt1000toInf_2017
-#sample = TT_Mtt700to1000_2017
-#dataset = WJetsHT1200to2500_2017
-#dataset = WJetsHT600to800_2017
 
 samples = []
 
@@ -157,41 +155,23 @@ for sample in samples:
     print 'Launching sample ' + sample.label
     if submit:
         #Writing the script file 
-        if '2016' in sample.label:
-            year = '2016'
-            lep_mod = 'lepSF_2016()'
-            btag_mod = 'btagSF2016()'
-            met_hlt_mod = 'MET_HLT_Filter_2016()'
-        elif '2017' in sample.label:
-            year = '2017'
-            lep_mod = 'lepSF_2017()'
-            btag_mod = 'btagSF2017()'
-            met_hlt_mod = 'MET_HLT_Filter_2017()'
-        elif '2018' in sample.label:
-            year = '2018'
-            lep_mod = 'lepSF_2018()'
-            btag_mod = 'btagSF2018()'
-            met_hlt_mod = 'MET_HLT_Filter_2018()'
-        else:
-            print 'Please enter the name of a valid dataset'
-            
+        year = str(sample.year)
+        lep_mod = 'lepSF_'+year+'()'
+        btag_mod = 'btagSF'+year+'()'
+        met_hlt_mod = 'MET_HLT_Filter_'+year+'()'
         if ('Data' in sample.label):
             isMC = False
             presel = "Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter "
-            if 'Mu' in sample.label:
-                if year == '2016':
-                    presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50)"
-                elif year == '2017':
-                    presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50)"
-                elif year == '2018':
-                    presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50)"
-            elif 'Ele' in sample.label:
-                if year == '2016':
-                    presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
-                elif year == '2017':
-                    presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
-                elif year == '2018':
-                    presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
+            if year == '2016' and sample.runP != 'H':
+                presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
+            elif year == '2016' and sample.runP == 'H':
+                presel += " && (HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
+            elif year == '2017' and sample.runP != 'B':
+                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
+            elif year == '2017' and sample.runP == 'B':
+                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50)"
+            elif year == '2018':
+                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
         else:
             isMC = True
             presel = ""
@@ -199,7 +179,7 @@ for sample in samples:
         print 'The flag isMC is: ' + str(isMC)
 
         print "Producing crab configuration file"
-        cfg_writer(sample, isMC, year, "OutDir")
+        cfg_writer(sample, isMC, "OutDir")
         
         
         if isMC:
@@ -208,7 +188,7 @@ for sample in samples:
             modules = "preselection(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
             
         print "Producing crab script"
-        crab_script_writer(sample,'/eos/user/'+str(os.environ.get('USER')[0]) + '/'+str(os.environ.get('USER'))+'/Wprime/nosynch/', isMC, year, modules, presel)
+        crab_script_writer(sample,'/eos/user/'+str(os.environ.get('USER')[0]) + '/'+str(os.environ.get('USER'))+'/Wprime/nosynch/', isMC, modules, presel)
         os.system("chmod +x crab_script.sh")
         
         #Launching crab
@@ -229,9 +209,7 @@ for sample in samples:
         os.system("crab status -d crab_" + sample.label)
         
     elif getout:
-        if not os.path.exists("/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label):
-            os.makedirs("/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label)
-        print "crab getoutput -d crab_" + sample.label + " --outputpath=/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label + "/"
-        os.system("crab getoutput -d crab_" + sample.label + " --outputpath=/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label + "/")
+        print "crab getoutput -d crab_" + sample.label + " --xrootd > ./macros/files/" + sample.label + ".txt"
+        os.system("crab getoutput -d crab_" + sample.label + " --xrootd > ./macros/files/" + sample.label + ".txt")
         #for i in xrange(1, 969):
         #os.system("crab getoutput -d crab_" + sample.label + " --outputpath=/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label + "/ --jobids="+str(i))
