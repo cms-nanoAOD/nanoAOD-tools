@@ -53,7 +53,6 @@ for i in range(10):
 #systZero = systWeights()
 # defining the operations to be done with the systWeights class
 maxSysts = 0
-addPDFsyst = False
 addPDF = True
 addQ2 = False
 addTopPt = False
@@ -65,7 +64,7 @@ addTrigSF = False
 nPDF = 0
 
 systTree = systWeights()
-systTree.prepareDefault(True, addQ2, addPDFsyst, addTopPt, addVHF, addTTSplit)
+systTree.prepareDefault(True, addQ2, addPDF, addTopPt, addVHF, addTTSplit)
 systTree.addSelection("signal")
 systTree.initTreesSysts(trees, outTreeFile)
 
@@ -428,13 +427,16 @@ if(isMC):
         print("Getting the histos from %s" %(infile))
         newfile  = ROOT.TFile.Open(infile)
         h_genw_tmp = ROOT.TH1F(newfile.Get("plots/h_genweight"))
-        h_pdfw_tmp = ROOT.TH1F(newfile.Get("plots/h_PDFweight"))
-        print(ROOT.TH1F(h_PDFweight).Integral())
-        if(ROOT.TH1F(h_PDFweight).Integral() < 1.):
-            h_PDFweight.SetBins(h_pdfw_tmp.GetXaxis().GetNbins(), h_pdfw_tmp.GetXaxis().GetXmin(), h_pdfw_tmp.GetXaxis().GetXmax())
-        print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(newfile.Get("plots/h_genweight")).GetBinContent(1), ROOT.TH1F(newfile.Get("plots/h_PDFweight")).GetNbinsX()))
+        if(newfile.GetListOfKeys().Contains("plots/h_PDFweight")):
+            h_pdfw_tmp = ROOT.TH1F(newfile.Get("plots/h_PDFweight"))
+            print(ROOT.TH1F(h_PDFweight).Integral())
+            if(ROOT.TH1F(h_PDFweight).Integral() < 1.):
+                h_PDFweight.SetBins(h_pdfw_tmp.GetXaxis().GetNbins(), h_pdfw_tmp.GetXaxis().GetXmin(), h_pdfw_tmp.GetXaxis().GetXmax())
+                print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(newfile.Get("plots/h_genweight")).GetBinContent(1), ROOT.TH1F(newfile.Get("plots/h_PDFweight")).GetNbinsX()))
+            h_PDFweight.Add(h_pdfw_tmp)
+        else:
+            addPDF = False
         h_genweight.Add(h_genw_tmp)
-        h_PDFweight.Add(h_pdfw_tmp)
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
 
 #++++++++++++++++++++++++++++++++++

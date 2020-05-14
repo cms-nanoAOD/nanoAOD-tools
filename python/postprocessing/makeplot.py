@@ -110,11 +110,11 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
           if not 'Data' in sample.label:
                cut += '*passed_mu'
      elif 'electron' in lep:
-          cut  = variable._taglio + '*isEle*passed_ele'
+          cut  = variable._taglio + '*isEle'
           if not 'Data' in sample.label:
-               cut += '*passed_mu'
+               cut += '*passed_ele'
      print str(cut)
-     foutput = "plot/"+lep+"/"+ sample.label +"_"+lep+".root"
+     foutput = filerepo + "plot/"+lep+"/"+ sample.label +"_"+lep+".root"
      '''
      else:
           if(syst==""):
@@ -172,11 +172,11 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_):
      print samples_
      for s in samples_:
           if(syst_==""):
-               outfile="stack_"+str(lep_).strip('[]')+".root"
-               infile.append(ROOT.TFile.Open("plot/"+lep+"/"+ s.label +"_"+lep+".root"))
+               outfile = filerepo + "stack_"+str(lep_).strip('[]')+".root"
+               infile.append(ROOT.TFile.Open(filerepo + "plot/"+lep+"/"+ s.label +"_"+lep+".root"))
           else:
-               outfile="stack_"+syst_+"_"+str(lep_).strip('[]')+".root"
-               infile.append(ROOT.TFile.Open("plot/"+lep+"/"+ s.label +"_"+lep+"_"+syst_+".root"))
+               outfile = filerepo + "stack_"+syst_+"_"+str(lep_).strip('[]')+".root"
+               infile.append(ROOT.TFile.Open(filerepo + "plot/"+lep+"/"+ s.label +"_"+lep+"_"+syst_+".root"))
      i=0
      for s in samples_:
           infile[i].cd()
@@ -361,7 +361,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_):
      pad2.RedrawAxis()
      c1.Update()
      #c1.Print("stack/"+canvasname+".pdf")
-     c1.Print("stack/"+canvasname+".png")
+     c1.Print(filerepo + "stack/"+canvasname+".png")
      i=0
      for s in samples_:
           infile[i].Close()
@@ -404,7 +404,7 @@ if opt.cut == "DetReco_Lepton_m>0":
 else:
      cut_tag = cutToTag(opt.cut)
 
-lumi = {'2016': 35.89, "2017": 41.53, "2018": 57.3}
+lumi = {'2016': 35.89, "2017": 41.53, "2018": 59.7}
 
 variables = []
 wzero = 'w_nominal'

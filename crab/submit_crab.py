@@ -20,7 +20,8 @@ def cfg_writer(sample, isMC, outdir):
     f.write("\nconfig = Configuration()\n")
     f.write("config.section_('General')\n")
     f.write("config.General.requestName = '"+sample.label+"'\n")
-    f.write("config.General.instance = 'preprod'\n") #needed to solve a bug with Oracle server... 
+    if not isMC:
+        f.write("config.General.instance = 'preprod'\n") #needed to solve a bug with Oracle server... 
     f.write("config.General.transferLogs=True\n")
     f.write("config.section_('JobType')\n")
     f.write("config.JobType.pluginName = 'Analysis'\n")
