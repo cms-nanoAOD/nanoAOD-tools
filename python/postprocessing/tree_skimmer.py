@@ -68,7 +68,7 @@ systTree.prepareDefault(True, addQ2, addPDF, addTopPt, addVHF, addTTSplit)
 systTree.addSelection("signal")
 systTree.initTreesSysts(trees, outTreeFile)
 
-systTree.setWeightPlace(0,1.)
+systTree.setWeightName("w_nominal",1.)
 '''
 systTree.setWeightName("btagUp",1.)
 systTree.setWeightName("btagDown",1.)
@@ -77,8 +77,12 @@ systTree.setWeightName("mistagDown",1.)
 systTree.setWeightName("puUp",1.)
 systTree.setWeightName("puDown",1.)
 '''
+systTree.setWeightName("lepSF",1.)
 systTree.setWeightName("lepUp",1.)
 systTree.setWeightName("lepDown",1.)
+systTree.setWeightName("PFSF",1.)
+systTree.setWeightName("PFUp",1.)
+systTree.setWeightName("PFDown",1.)
 
 
 #++++++++++++++++++++++++++++++++++
@@ -266,15 +270,16 @@ DetReco_Lepton_pt = array.array('f', [0.])
 DetReco_Lepton_eta = array.array('f', [0.])
 DetReco_Lepton_phi = array.array('f', [0.])
 DetReco_Lepton_m = array.array('f', [0.])
-#DetReco_Lepton_SF = array.array('f', [0.])
+lepton_miniIso = array.array('f', [0.])
 isEle = array.array('i', [0])
 isMu = array.array('i', [0])
 
-#MET (phi = 0, m = 0 for every event)
 MET_pt = array.array('f', [0.])
 MET_phi = array.array('f', [0.])
-#MET_eta = array.array('f', [0.])
-#MET_m = array.array('f', [0.])
+
+nPU = array.array('f', [0.])
+nPV = array.array('f', [0.])
+mtw = array.array('f', [0.])
 
 w_nominal = array.array('f', [0.])
 w_PDF = array.array('f', [0.]*110)
@@ -401,16 +406,20 @@ systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_pt", outTreeFile, Det
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_eta", outTreeFile, DetReco_Lepton_eta)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_phi", outTreeFile, DetReco_Lepton_phi)
 systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_m", outTreeFile, DetReco_Lepton_m)
+systTree.branchTreesSysts(trees, "signal", "lepton_miniIso", outTreeFile, lepton_miniIso)
 systTree.branchTreesSysts(trees, "signal", "passed_mu", outTreeFile, passed_mu)
 systTree.branchTreesSysts(trees, "signal", "passed_ele", outTreeFile, passed_ele)
 systTree.branchTreesSysts(trees, "signal", "passed_ht", outTreeFile, passed_ht)
 #if(isMC):
     #systTree.branchTreesSysts(trees, "signal", "DetReco_Lepton_SF", outTreeFile, DetReco_Lepton_SF)
+systTree.branchTreesSysts(trees, "signal", "nPU", outTreeFile, nPU)
+systTree.branchTreesSysts(trees, "signal", "nPV", outTreeFile, nPV)
 systTree.branchTreesSysts(trees, "signal", "isEle", outTreeFile, isEle)
 systTree.branchTreesSysts(trees, "signal", "isMu", outTreeFile, isMu)
 systTree.branchTreesSysts(trees, "signal", "Event_HT", outTreeFile, Event_HT)
 systTree.branchTreesSysts(trees, "signal", "MET_pt", outTreeFile, MET_pt)
 systTree.branchTreesSysts(trees, "signal", "MET_phi", outTreeFile, MET_phi)
+systTree.branchTreesSysts(trees, "signal", "mtw", outTreeFile, mtw)
 print "Is MC: " + str(isMC) + "      option addPDF: " + str(addPDF)
 if(isMC and addPDF):
     systTree.branchTreesSysts(trees, "signal", "w_PDF", outTreeFile, w_PDF)
@@ -461,10 +470,12 @@ for i in xrange(0,tree.GetEntries()):
     Flag = Object(event, 'Flag')
     met = Object(event, "MET")
     MET = {'metPx': met.pt*ROOT.TMath.Cos(met.phi), 'metPy': met.pt*ROOT.TMath.Sin(met.phi)}
+    PU = Object(event, "Pileup")
     genpart = None
+
     if isMC:
         genpart = Collection(event, "GenPart")
-
+        chain.GetEntry(i)
     #++++++++++++++++++++++++++++++++++
     #++      defining variables      ++
     #++++++++++++++++++++++++++++++++++
@@ -472,8 +483,15 @@ for i in xrange(0,tree.GetEntries()):
     tightlep_p4 = None
     tightlep_p4t = None
     tightlep_SF = None
+    tightlep_SFUp = None
+    tightlep_SFDown = None
     recomet_p4t = None
-
+    PF_SF = None
+    PF_SFUp = None
+    PF_SFDown = None
+    PU_SF = None
+    PU_SFUp = None
+    PU_SFDown = None
     #++++++++++++++++++++++++++++++++++
     #++    starting the analysis     ++
     #++++++++++++++++++++++++++++++++++
@@ -504,8 +522,11 @@ for i in xrange(0,tree.GetEntries()):
         tightlep_p4t.SetPz(0.)
         if(isMC):
             tightlep_SF = goodMu[0].effSF
-            systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SF))
-            systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SF))
+            tightlep_SFUp = goodMu[0].effSF_errUp
+            tightlep_SFDown = goodMu[0].effSF_errDown
+            systTree.setWeightName("lepSF", copy.deepcopy(tightlep_SF))
+            systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SFUp))
+            systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SFDown))
     elif(isElectron):
         isEle[0] = 1
         isMu[0] = 0
@@ -516,29 +537,45 @@ for i in xrange(0,tree.GetEntries()):
         tightlep_p4t.SetPz(0.)
         if(isMC):
             tightlep_SF = goodEle[0].effSF
-            systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SF))
-            systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SF))
+            tightlep_SFUp = goodEle[0].effSF_errUp
+            tightlep_SFDown = goodEle[0].effSF_errDown
+            systTree.setWeightName("lepSF", copy.deepcopy(tightlep_SF))
+            systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SFUp))
+            systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SFDown))
     else:
         #print('Event %i not a good' %(i))
         continue
 
+    if(isMC):
+        PF_SF = chain.PrefireWeight
+        PF_SFUp = chain.PrefireWeight_Up
+        PF_SFDown = chain.PrefireWeight_Down
+        systTree.setWeightName("PFSF", copy.deepcopy(PF_SF))
+        systTree.setWeightName("PFUp", copy.deepcopy(PF_SFUp))
+        systTree.setWeightName("PFDown", copy.deepcopy(PF_SFDown))
+        '''
+        PU_SF = chain.PrefireWeight
+        PU_SFUp = chain.PrefireWeight_Up
+        PU_SFDown = chain.PrefireWeight_Down
+        systTree.setWeightName("PUSF", copy.deepcopy(PU_SF))
+        systTree.setWeightName("puUp", copy.deepcopy(PU_SFUp))
+        systTree.setWeightName("puDown", copy.deepcopy(PU_SFDown))
+        '''
     recomet_p4t = ROOT.TLorentzVector()
     recomet_p4t.SetPtEtaPhiM(met.pt, 0., met.phi, 0)
 
+    nPU[0] = PU.nPU
+    nPV[0] = chain.nOtherPV
+ 
     if tightlep != None:
         nJet[0] = njets
         DetReco_Lepton_pt[0] = tightlep_p4.Pt()
         DetReco_Lepton_eta[0] = tightlep_p4.Eta()
         DetReco_Lepton_phi[0] = tightlep_p4.Phi()
         DetReco_Lepton_m[0] = tightlep_p4.M()
-        '''
-        if(isMC):
-            DetReco_Lepton_SF[0] = tightlep_SF
-        '''
+        lepton_miniIso[0] = tightlep.miniPFRelIso_all
         MET_pt[0] = met.pt
-        #MET_eta[0] = 0.
         MET_phi[0] = met.phi
-        #MET_m[0] = 0.
         Event_HT[0] = HT.eventHT
     else:
         nJet[0] = -1
@@ -546,20 +583,15 @@ for i in xrange(0,tree.GetEntries()):
         DetReco_Lepton_eta[0] = -100.
         DetReco_Lepton_phi[0] = -100.
         DetReco_Lepton_m[0] = -100.
-        '''
-        if(isMC):
-            DetReco_Lepton_SF[0] = -100.
-        '''
         MET_pt[0] = -100.
-        #MET_eta[0] = -100.
         MET_phi[0] = -100.
-        #MET_m[0] = -100.
         Event_HT[0] = -100.
 
     goodJets = get_Jet(jets, 25)
     bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
     mcbjets = None
     mclepton = None
+    mtw[0] = math.sqrt(2*tightlep_p4.Pt() * met.pt *(1-math.cos(abs(deltaPhi(tightlep_p4.Phi(), met.phi)))))
 
     recotop = TopUtilities()
 
@@ -1052,7 +1084,7 @@ for i in xrange(0,tree.GetEntries()):
         best_WpJet_phi[0] = -100.                    
         best_WpJet_isBTagged[0] = -1
         
-    systTree.setWeightPlace(0,copy.deepcopy(w_nominal[0]))
+    systTree.setWeightName("w_nominal",copy.deepcopy(w_nominal[0]))
     systTree.fillTreesSysts(trees, "signal")
 
 trees[0].Print()

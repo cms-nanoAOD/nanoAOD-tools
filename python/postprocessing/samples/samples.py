@@ -1,6 +1,6 @@
 import ROOT
-#import json_reader as jr
 import os 
+#import json_reader as jr
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -140,7 +140,7 @@ WP_M2000W20_RH_2016.sigma = 1
 WP_M2000W20_RH_2016.year = 2016
 WP_M2000W20_RH_2016.dataset = "/Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8/"+tag_2016+"-v1/NANOAODSIM"
 
-WP_M3000W30_RH_2016 = sample(ROOT.kBlue, 1, 1001, "W' 3TeV(1%) RH", "WP_M3000W30_RH_2016")
+WP_M3000W30_RH_2016 = sample(ROOT.kAzure, 1, 1001, "W' 3TeV(1%) RH", "WP_M3000W30_RH_2016")
 WP_M3000W30_RH_2016.sigma = 1
 WP_M3000W30_RH_2016.year = 2016
 WP_M3000W30_RH_2016.dataset = "/Wprimetotb_M3000W30_RH_TuneCP5_13TeV-madgraph-pythia8/"+tag_2016+"-v1/NANOAODSIM"
@@ -156,12 +156,12 @@ WP_M3000W600_RH_2016.sigma =
 WP_M3000W600_RH_2016.year = 2016
 WP_M3000W600_RH_2016.dataset = "/Wprimetotb_M3000W600_RH_TuneCP5_13TeV-madgraph-pythia8/"+tag_2016+"-v1/NANOAODSIM"
 '''
-WP_M4000W40_RH_2016 = sample(ROOT.kBlue, 1, 1001, "W' 4TeV(1%) RH", "WP_M4000W40_RH_2016")
+WP_M4000W40_RH_2016 = sample(ROOT.kGreen+2, 1, 1001, "W' 4TeV(1%) RH", "WP_M4000W40_RH_2016")
 WP_M4000W40_RH_2016.sigma = 1
 WP_M4000W40_RH_2016.year = 2016
 WP_M4000W40_RH_2016.dataset = "/Wprimetotb_M4000W40_RH_TuneCP5_13TeV-madgraph-pythia8/"+tag_2016+"-v1/NANOAODSIM"
 
-WP_M4000W400_RH_2016 = sample(ROOT.kBlue, 1, 1001, "W' 4TeV(10%) RH", "WP_M4000W400_RH_2016")
+WP_M4000W400_RH_2016 = sample(ROOT.kMagenta+2, 1, 1001, "W' 4TeV(10%) RH", "WP_M4000W400_RH_2016")
 WP_M4000W400_RH_2016.sigma = 1
 WP_M4000W400_RH_2016.year = 2016
 WP_M4000W400_RH_2016.dataset = "/Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8/"+tag_2016+"-v1/NANOAODSIM"

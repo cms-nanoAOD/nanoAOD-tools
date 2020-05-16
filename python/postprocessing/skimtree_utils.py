@@ -877,8 +877,8 @@ class systWeights(object):
         tfile.cd()
         tname = ROOT.TString(name)
         for s in range(self.nSelections):
-            print " selection # ", str(s), " name ", str(self.selectionsNames[s]), " name ", str(tname)
-            print " tree is ", str(trees[s])
+            #print " selection # ", str(s), " name ", str(self.selectionsNames[s]), " name ", str(tname)
+            #print " tree is ", str(trees[s])
             tystring = str(name + pytocpptypes(f))
             if selection == self.selectionsNames[s]:
                 trees[s].Branch(name, f, tystring)
@@ -916,20 +916,24 @@ class systWeights(object):
         self.eventBasedScenario = "nominal"
 
         if addDefault:
-            self.weightedNames[0] = ""
-            self.weightedNames[1] = "btagUp"
-            self.weightedNames[2] = "btagDown"
-            self.weightedNames[3] = "mistagUp"
-            self.weightedNames[4] = "mistagDown"
+            self.weightedNames[0] = "w_nominal"
+            self.weightedNames[1] = "lepSF"
+            self.weightedNames[2] = "lepUp"
+            self.weightedNames[3] = "lepDown"
+            self.weightedNames[4] = "puSF"
             self.weightedNames[5] = "puUp"
             self.weightedNames[6] = "puDown"
-            self.weightedNames[7] = "lepUp"
-            self.weightedNames[8] = "lepDown"
-            #self.weightedNames[9] = "isoUp"
+            self.weightedNames[7] = "PFSF"
+            self.weightedNames[8] = "PFUp"
+            self.weightedNames[9] = "PFDown"
+            #self.weightedNames[1] = "btagUp"
+            #self.weightedNames[2] = "btagDown"
+            #self.weightedNames[3] = "mistagUp"
+            #self.weightedNames[4] = "mistagDown"
             #self.weightedNames[10] = "isoDown"
             #self.weightedNames[11] = "trigUp"
             #self.weightedNames[12] = "trigDown"
-            self.setMax(9)
+            self.setMax(10)
             self.setMaxNonPDF(9)
             self.weightedNames[self.maxSysts] = ""
 

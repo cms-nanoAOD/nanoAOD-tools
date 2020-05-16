@@ -143,21 +143,19 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      fout.Close()
      f1.Close()
 
-def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_):
+def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      histo = []
      tmp = ROOT.TH1F()
      h = ROOT.TH1F()
-     hsig = ROOT.TH1F()
+     h_sig = []
      h_err = ROOT.TH1F()
      h_bkg_err = ROOT.TH1F()
-     err_up = []
-     err_down =  []
      print "Variabile:", variabile_._name
      ROOT.gROOT.SetStyle('Plain')
      ROOT.gStyle.SetPalette(1)
      ROOT.gStyle.SetOptStat(0)
      ROOT.TH1.SetDefaultSumw2()
-     if cut_tag_=="":
+     if cut_tag_ == "":
           histoname = "h_"+reg_+"_"+variabile_._name
           stackname = "stack_"+reg_+"_"+variabile_._name
           canvasname = "stack_"+reg_+"_"+variabile_._name+"_"+lep_
@@ -168,20 +166,21 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_):
      stack = ROOT.THStack(stackname, variabile_._name)
      leg_stack = ROOT.TLegend(0.45,0.66,0.94,0.88)
      signal = False
-     infile = []
+     infile = {}
      print samples_
      for s in samples_:
+          if('WP' in s.label):
+               signal = True
           if(syst_==""):
                outfile = filerepo + "stack_"+str(lep_).strip('[]')+".root"
-               infile.append(ROOT.TFile.Open(filerepo + "plot/"+lep+"/"+ s.label +"_"+lep+".root"))
+               infile[s.label] = ROOT.TFile.Open(filerepo + "plot/"+lep+"/"+ s.label +"_"+lep+".root")
           else:
                outfile = filerepo + "stack_"+syst_+"_"+str(lep_).strip('[]')+".root"
-               infile.append(ROOT.TFile.Open(filerepo + "plot/"+lep+"/"+ s.label +"_"+lep+"_"+syst_+".root"))
-     i=0
+               infile[s.label] = ROOT.TFile.Open(filerepo + "plot/"+lep+"/"+ s.label +"_"+lep+"_"+syst_+".root")
      for s in samples_:
-          infile[i].cd()
-          print "opening file: ", infile[i].GetName()
-          tmp = (ROOT.TH1F)(infile[i].Get(histoname))
+          infile[s.label].cd()
+          print "opening file: ", infile[s.label].GetName()
+          tmp = (ROOT.TH1F)(infile[s.label].Get(histoname))
           tmp.SetLineColor(ROOT.kBlack)
           tmp.SetName(s.leglabel)
           if('Data' in s.label):
@@ -189,14 +188,19 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_):
                hdata.SetMarkerStyle(20)
                hdata.SetMarkerSize(0.9)
                leg_stack.AddEntry(hdata, "Data", "lp")
+          elif('WP' in s.label):
+               tmp.SetLineStyle(9)
+               tmp.SetLineColor(s.color)
+               tmp.SetLineWidth(3)
+               tmp.SetMarkerSize(0.)
+               tmp.SetMarkerColor(s.color)
+               h_sig.append(ROOT.TH1F(tmp.Clone("")))
           else:
                tmp.SetOption("HIST SAME")
                tmp.SetTitle("")
                tmp.SetFillColor(s.color)
                histo.append(tmp.Clone(""))
                stack.Add(tmp.Clone(""))
-               #hratio.Add(tmp)
-          i+=1
           tmp.Reset("ICES")
      for hist in reversed(histo):
           if not ('Data' in hist.GetName()):
@@ -250,7 +254,10 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_):
           else:
                ytitle = "Events/%.2f GeV" %step
      else:
-          ytitle = "Events/%.2f units" %step
+          if step.is_integer():
+               ytitle = "Events/%.0f units" %step
+          else:
+               ytitle = "Events/%.2f units" %step
      stack.GetYaxis().SetTitle(ytitle)
      stack.GetYaxis().SetTitleFont(42)
      stack.GetXaxis().SetLabelOffset(1.8)
@@ -260,14 +267,10 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_):
      stack.GetYaxis().SetTitleSize(0.07)
      stack.SetTitle("")
      if(signal):
-          hsig.SetLineStyle(9)
-          hsig.SetLineColor(ROOT.kBlue)
-          hsig.SetLineWidth(3)
-          
-          hsig.SetMarkerSize(0.)
-          hsig.SetMarkerColor(ROOT.kBlue)
-          hsig.Scale(1000)
-          hsig.Draw("same L")
+          for hsig in h_sig:
+               #hsig.Scale(1000)
+               hsig.Draw("same L")
+               leg_stack.AddEntry(hsig, hsig.GetName(), "l")
      h_err = stack.GetStack().Last().Clone("h_err")
      h_err.SetLineWidth(100)
      h_err.SetFillStyle(3154)
@@ -286,7 +289,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_):
      elif str(lep_).strip('[]') == "electron":
           lep_tag = "e+"
           
-     lumi_sqrtS = "35.9 fb^{-1}  (13 TeV)"
+     lumi_sqrtS = "%s fb^{-1}  (13 TeV)"%(lumi)
      
      iPeriod = 0
      iPos = 11
@@ -362,19 +365,21 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_):
      c1.Update()
      #c1.Print("stack/"+canvasname+".pdf")
      c1.Print(filerepo + "stack/"+canvasname+".png")
-     i=0
-     for s in samples_:
-          infile[i].Close()
-          i+=1
      del histo
-     del tmp
-     del h
-     del hsig
-     del hratio
-     del c1
-     del stack
-     del pad1
-     del pad2
+     tmp.Delete()
+     h.Delete()
+     del h_sig
+     h_err.Delete()
+     h_bkg_err.Delete()
+     hratio.Delete()
+     pad1.Delete()
+     pad2.Delete()
+     c1.Destructor()
+     stack.Delete()
+     for s in samples_:
+          infile[s.label].Close()
+          infile[s.label].Delete()
+
 
 dataset_dict = {'2016':[],'2017':[],'2018':[]}
 if(opt.dat!= 'all'):
@@ -386,7 +391,10 @@ if(opt.dat!= 'all'):
      [samples.append(sample_dict[dataset_name]) for dataset_name in dataset_names]
      [dataset_dict[str(sample.year)].append(sample) for sample in samples]
 else:
-     dataset_dict = {'2016':[DataMu_2016, DataEle_2016, TT_Mtt_2016, WJets_2016],'2017':[DataMu_2017, DataEle_2017, TT_Mtt_2017, WJets_2017],'2018':[DataMu_2018, DataEle_2018, TT_Mtt_2018, WJets_2018]}
+     dataset_dict = {
+          '2016':[DataMu_2016, DataEle_2016, ST_2016, QCD_2016, TT_Mtt_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
+          '2017':[DataMu_2017, DataEle_2017, TT_Mtt_2017, WJets_2017],
+          '2018':[DataMu_2018, DataEle_2018, TT_Mtt_2018, WJets_2018]}
 print(dataset_dict)
 
 years = []
@@ -411,11 +419,18 @@ wzero = 'w_nominal'
 #variables.append(variabile('DetReco_Lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 1200))
 variables.append(variabile('DetReco_Lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
 variables.append(variabile('DetReco_Lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
-variables.append(variabile('DetReco_Lepton_phi', 'lepton #phi',  wzero+'*('+cut+')',20,-3.2,3.2))
+variables.append(variabile('DetReco_Lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20,-3.2,3.2))
 #variables.append(variabile('DetReco_Lepton_m', 'lepton mass [GeV]', wzero+'*('+cut+')', 75, 0.101, 0.110))
 variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', 100, 0, 1000))
 variables.append(variabile('Event_HT', 'event HT', wzero+'*('+cut+')', 70, 0, 1400))
 variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')',20,-3.2,3.2))
+variables.append(variabile('sublead_TopJet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 1200))
+variables.append(variabile('sublead_TopJet_eta', 'sub leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
+variables.append(variabile('sublead_WpJet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
+variables.append(variabile('sublead_WpJet_eta', 'leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
+variables.append(variabile('sublead_WpJet_isBTagged', 'leading jet b tagged',  wzero+'*('+cut+')', 2, -0.5, 1.5))
+variables.append(variabile('nJet', 'no. of jets',  wzero+'*('+cut+')', 8, 1.5, 9.5))
+
 
 for year in years:
      for sample in dataset_dict[year]:
@@ -439,7 +454,7 @@ for year in years:
                          plot(lep, 'SR', var, sample, cut_tag, "")
           if(opt.stack):
                for var in variables:
-                    makestack(lep, 'SR', var, dataset_new, cut_tag, "")
+                    makestack(lep, 'SR', var, dataset_new, cut_tag, "", lumi[str(year)])
 #if hasattr(dataset_dict[str(year)], 'components'): # How to check whether this exists or not
 #     samples = [sample for sample in dataset.components]# Method exists and was used.
 #else:
