@@ -498,27 +498,35 @@ class TopUtilities():
         self.reco_topqv = None
         self.neutrino = None
         return None'''
-
+        dR_lepjet = None
+        dR_lepjet = deltaR(jet.Eta(), jet.Phi(), lepton.Eta(), lepton.Phi())
         neutrino, IsNeg  = self.NuMomentum(lepton.Px(), lepton.Py(), lepton.Pz(), lepton.Pt(), lepton.Energy(), metPx, metPy)
         besttop = None
         #recochi = []
         chi2 = 100000000.
 
+        rtop = ROOT.TLorentzVector()
         if isinstance(neutrino, list):
           for i in range(len(neutrino)):
-            rtop = lepton + jet + neutrino[i]
+            if dR_lepjet > 0.4:
+              rtop = lepton + jet + neutrino[i]
+            else:
+              rtop = jet + neutrino[i]
             rchi = Chi_TopMass(rtop.M())
             if rchi < chi2:
               besttop = copy.deepcopy(rtop)
         elif isinstance(neutrino, ROOT.TLorentzVector):
-          rtop = lepton + jet + neutrino
+          if dR_lepjet > 0.4:
+            rtop = lepton + jet + neutrino
+          else:
+            rtop = jet + neutrino
           rchi = Chi_TopMass(rtop.M())
           besttop = copy.deepcopy(rtop)
         elif neutrino is None:
           besttop = None
         
         #top = lepton + jet + neutrino
-        return besttop, IsNeg
+        return besttop, IsNeg, dR_lepjet
 
     def topMtw(self, lepton, jet, metPx, metPy):
         lb = lepton + jet
@@ -850,12 +858,14 @@ class systWeights(object):
             ns = str(self.weightedNames[sy])
             if sy == 0:
                 ns = "w_nominal"
+            print "Branch: ", ns
             tystring = str(ns + pytocpptypes(self.weightedSysts[int(sy)]))
             tree.Branch(ns, self.weightedSysts[int(sy)], tystring)
-        for c in range(self.nCategories):
+        for c in range(self.nCategories):         
             cname = str(self.categoriesNames[c])
             tystring = str(cname + pytocpptypes(self.wCats[c]))
-            tree.Branch(cname, self.wCats[c], tystring)
+            print "Branch: ", ns
+            if c > 1: tree.Branch(cname, self.wCats[c], tystring)
 
     def addSelection(self, selection):
         self.selectionsNames[self.nSelections] = (str(selection))
