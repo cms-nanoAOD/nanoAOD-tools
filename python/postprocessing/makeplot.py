@@ -164,7 +164,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           stackname = "stack_"+reg_+"_"+variabile_._name+"_"+cut_tag_
           canvasname = "stack_"+reg_+"_"+variabile_._name+"_"+cut_tag_+"_"+lep_
      stack = ROOT.THStack(stackname, variabile_._name)
-     leg_stack = ROOT.TLegend(0.45,0.66,0.94,0.88)
+     leg_stack = ROOT.TLegend(0.33,0.62,0.91,0.87)
      signal = False
      infile = {}
      print samples_
@@ -189,9 +189,9 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
                hdata.SetMarkerSize(0.9)
                leg_stack.AddEntry(hdata, "Data", "lp")
           elif('WP' in s.label):
-               tmp.SetLineStyle(9)
+               #tmp.SetLineStyle(9)
                tmp.SetLineColor(s.color)
-               tmp.SetLineWidth(3)
+               #tmp.SetLineWidth(3)
                tmp.SetMarkerSize(0.)
                tmp.SetMarkerColor(s.color)
                h_sig.append(ROOT.TH1F(tmp.Clone("")))
@@ -210,9 +210,8 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      leg_stack.SetFillColor(0)
      leg_stack.SetFillStyle(0)
      leg_stack.SetTextFont(42)
-     leg_stack.SetTextSize(20)
      leg_stack.SetBorderSize(0)
-     leg_stack.SetTextSize(0.055)
+     leg_stack.SetTextSize(0.05)
      c1 = ROOT.TCanvas(canvasname,"c1",50,50,700,600)
      c1.SetFillColor(0)
      c1.SetBorderMode(0)
@@ -372,10 +371,10 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      h_err.Delete()
      h_bkg_err.Delete()
      hratio.Delete()
+     stack.Delete()
      pad1.Delete()
      pad2.Delete()
-     c1.Destructor()
-     stack.Delete()
+     c1.Delete()
      for s in samples_:
           infile[s.label].Close()
           infile[s.label].Delete()

@@ -1,0 +1,6 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/QCDHT_1500to2000_2016/200514_093427/0000/tree_hadd_4.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/QCDHT_1500to2000_2016/200514_093427/0000/tree_hadd_5.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/QCDHT_1500to2000_2016/200514_093427/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/QCDHT_1500to2000_2016/200514_093427/0000/tree_hadd_6.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/QCDHT_1500to2000_2016/200514_093427/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/QCDHT_1500to2000_2016/200514_093427/0000/tree_hadd_1.root
