@@ -14,3 +14,9 @@ build
 *.json
 *.xml
 crab/crab_*
+crab/crab_cfg.py
+crab/crab_script.py
+crab/crab_script_local.py
+python/postprocessing/condor
+python/postprocessing/plots
+python/postprocessing/copyplot.csh
