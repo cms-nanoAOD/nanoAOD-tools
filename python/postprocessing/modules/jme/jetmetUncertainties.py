@@ -510,8 +510,6 @@ class jetmetUncertaintiesProducer(Module):
           self.out.fillBranch("%s_pt_unclustEnDown" % self.metBranchName, math.sqrt(met_px_unclEnDown**2 + met_py_unclEnDown**2))
           self.out.fillBranch("%s_phi_unclustEnDown" % self.metBranchName, math.atan2(met_py_unclEnDown, met_px_unclEnDown))
 
-        print 'nano', event.MET_pt, 'raw', event.RawMET_pt, 'corr', math.sqrt(met_px_nom**2 + met_py_nom**2)
-
         return True
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
