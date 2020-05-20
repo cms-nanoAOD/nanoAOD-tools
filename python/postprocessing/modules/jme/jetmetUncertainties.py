@@ -304,9 +304,9 @@ class jetmetUncertaintiesProducer(Module):
             # set the jet pt to the muon subtracted raw pt
             jet.pt = newjet.Pt()
             jet.rawFactor = 0
-            # get the proper jet pts for type-1 MET. only correct the non-mu fraction of the jet. if the corrected pt>15, use the corrected jet, otherwise use raw
-            jet_pt_noMuL1L2L3 = jet.pt*jec    if jet.pt*jec > self.unclEnThreshold else jet.pt
-            jet_pt_noMuL1     = jet.pt*jecL1  if jet.pt*jec > self.unclEnThreshold else jet.pt
+            # get the proper jet pts for type-1 MET
+            jet_pt_noMuL1L2L3 = jet.pt*jec   
+            jet_pt_noMuL1     = jet.pt*jecL1 
 
             # this step is only needed for v2 MET in 2017 when different JECs are applied compared to the nanoAOD production
             if self.jetReCalibratorProd:
@@ -408,13 +408,13 @@ class jetmetUncertaintiesProducer(Module):
                   jet_pt_jesDownT1[jesUncertainty] = jet_pt_L1L2L3*(1. - delta)
 
 
-            # progate JER and JES corrections and uncertainties to MET
-            if jet_pt_L1L2L3 > self.unclEnThreshold and (jet.neEmEF+jet.chEmEF) < 0.9:
+            # progate JER and JES corrections and uncertainties to MET. Only propagate JECs to MET if the corrected pt without the muon is above the threshold
+            if jet_pt_noMuL1L2L3 > self.unclEnThreshold and (jet.neEmEF+jet.chEmEF) < 0.9:
                 if not ( self.metBranchName == 'METFixEE2017' and 2.65<abs(jet.eta)<3.14 and jet.pt*(1-jet.rawFactor)<50 ): # do not re-correct for jets that aren't included in METv2 recipe
                     jet_cosPhi = math.cos(jet.phi)
                     jet_sinPhi = math.sin(jet.phi)
                     met_px_nom     = met_px_nom     - (jet_pt_L1L2L3  - jet_pt_L1)*jet_cosPhi 
-                    met_py_nom     = met_py_nom     - (jet_pt_L1L2L3  - jet_pt_L1)*jet_sinPhi 
+                    met_py_nom     = met_py_nom     - (jet_pt_L1L2L3  - jet_pt_L1)*jet_sinPhi
                     if not self.isData:
                       met_px_jer     = met_px_jer     - (jet_pt_L1L2L3*jet_pt_jerNomVal   - jet_pt_L1)*jet_cosPhi 
                       met_py_jer     = met_py_jer     - (jet_pt_L1L2L3*jet_pt_jerNomVal   - jet_pt_L1)*jet_sinPhi 
@@ -509,6 +509,8 @@ class jetmetUncertaintiesProducer(Module):
           self.out.fillBranch("%s_phi_unclustEnUp" % self.metBranchName, math.atan2(met_py_unclEnUp, met_px_unclEnUp))
           self.out.fillBranch("%s_pt_unclustEnDown" % self.metBranchName, math.sqrt(met_px_unclEnDown**2 + met_py_unclEnDown**2))
           self.out.fillBranch("%s_phi_unclustEnDown" % self.metBranchName, math.atan2(met_py_unclEnDown, met_px_unclEnDown))
+
+        print 'nano', event.MET_pt, 'raw', event.RawMET_pt, 'corr', math.sqrt(met_px_nom**2 + met_py_nom**2)
 
         return True
 
