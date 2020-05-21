@@ -408,33 +408,36 @@ class TopUtilities():
         p40_rec = ROOT.TLorentzVector(0.0, 0.0, 0.0, 0.0)
 
         if (a2-b) > 0:
-            root = TMath.Power((a2-b), 0.5)
-            pz = []
-            pz.append(a + root)
-            #pz1 = a + root
-            pz.append(a - root)
-            #pz2 = a - root
-            nNuSol = 2
-            pznu = 0.0
-
-            for i in range(nNuSol):
-                Enu = TMath.Power((MisET2 + pz[i]**2), 0.5)
-                #Enu = TMath.Power((MisET2 + pznu**2), 0.5)
-                p4nu = ROOT.TLorentzVector()
-                p4nu.SetPxPyPzE(metPx, metPy, pznu, Enu)
-                #p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
-                p4nu_rec.append(p4nu)
-
-            neutrino = copy.deepcopy(p4nu_rec)
-            return neutrino, IsNegative
-
+            
+            isNegative = False
         else:
             IsNegative = True
-            '''
-            Enu = (MisET2 + pznu**2)**0.5
-            p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
-            neutrino = p4nu_rec
-            '''
+
+        root = TMath.Power((a2-b), 0.5)
+        pz = []
+        pz.append((a + root).real)
+        #pz1 = a + root
+        pz.append((a - root).real)
+        #pz2 = a - root
+        nNuSol = 2
+        pznu = 0.0
+
+        for i in range(nNuSol):
+          Enu = TMath.Power((MisET2 + pz[i]**2), 0.5)
+          #Enu = TMath.Power((MisET2 + pznu**2), 0.5)
+          p4nu = ROOT.TLorentzVector()
+          p4nu.SetPxPyPzE(metPx, metPy, pznu, Enu)
+          #p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
+          p4nu_rec.append(p4nu)
+
+        neutrino = copy.deepcopy(p4nu_rec)
+        return neutrino, IsNegative
+        '''
+            
+            #Enu = (MisET2 + pznu**2)**0.5
+            #p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
+            #neutrino = p4nu_rec
+            
             EquationCoeff1 = [1,
                               (-3 * leptonPy * mW / leptonPt),
                               (((mW**2.) * (2. * leptonPy**2.) / (leptonPt**2)) + mW**2. - (4. * leptonPx**3. * metPx / leptonPt**2) - (4. * leptonPx**2. * leptonPy * metPy / leptonPt**2)),
@@ -489,8 +492,8 @@ class TopUtilities():
             #p4nu_rec.SetPxPyPzE(minPx, minPy, pznu, Enu)
             p4nu_rec.append(p4nu)
             neutrino = copy.deepcopy(p4nu)
-            
-            return neutrino, IsNegative
+        '''
+        #return neutrino, IsNegative
 
     def top4Momentum(self, lepton, jet, metPx, metPy):
         #topMt = self.topMtw(lepton, jet, metPx, metPy)
