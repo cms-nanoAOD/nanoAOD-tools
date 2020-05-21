@@ -158,7 +158,7 @@ def CMS_lumi(pad,  lumi_sqrtS,  iPosX , lepText):
                 latex.DrawLatex(posX_, posY_- relExtraDY*cmsTextSize*t, extraText)
                 #aggiunta per la stampa di lepText all'interno della Canvas
                 latex.SetTextFont(42)
-#                latex.SetTextAlign(31)
+                #latex.SetTextAlign(31)
                 latex.SetTextSize(lumiTextSize*t)
                 latex.DrawLatex(posX_, posY_- relExtraDY*cmsTextSize*t - relExtraDY*extraTextSize*t , lepText)      
     elif( writeExtraText ):
@@ -171,6 +171,6 @@ def CMS_lumi(pad,  lumi_sqrtS,  iPosX , lepText):
         latex.SetTextAlign(align_)
         latex.DrawLatex(posX_, posY_, extraText)      
 
-#    print lumiText," 3 "
-    pad.Update()
-#    print lumiText," 4 "
+        #    print lumiText," 3 "
+    #pad.Update()
+    #    print lumiText," 4 "

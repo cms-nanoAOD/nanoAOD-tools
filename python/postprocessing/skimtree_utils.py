@@ -139,36 +139,36 @@ def trig_map(HLT, year, runPeriod):
     if(year == 2016 and runPeriod != 'H'):
         if(HLT.Mu50 or HLT.TkMu50):
             passMu = True
-        elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
+        if(HLT.Ele115_CaloIdVT_GsfTrkIdT):
             passEle = True  
-        elif(HLT.PFHT800 or HLT.PFHT900):
+        if(HLT.PFHT800 or HLT.PFHT900):
             passHT = True
-        else:
+        if not(passMu and passEle and passHT):
             noTrigger = True
     elif(year == 2016 and runPeriod == 'H'):
         if(HLT.Mu50 or HLT.TkMu50):
             passMu = True
-        elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
+        if(HLT.Ele115_CaloIdVT_GsfTrkIdT):
             passEle = True  
-        elif(HLT.PFHT900):
+        if(HLT.PFHT900):
             passHT = True
-        else:
+        if not(passMu and passEle and passHT):
             noTrigger = True
     elif(year == 2017 and runPeriod != 'B' or year == 2018):
         if(HLT.Mu50):
             passMu = True
-        elif(HLT.Ele115_CaloIdVT_GsfTrkIdT):
+        if(HLT.Ele115_CaloIdVT_GsfTrkIdT):
             passEle = True  
-        elif(HLT.PFHT780 or HLT.PFHT890):
+        if(HLT.PFHT780 or HLT.PFHT890):
             passHT = True
-        else:
+        if not(passMu and passEle and passHT):
             noTrigger = True
     elif(year == 2017 and runPeriod == 'B'):
         if(HLT.Mu50):
             passMu = True
-        elif(HLT.PFHT780 or HLT.PFHT890):
+        if(HLT.PFHT780 or HLT.PFHT890):
             passHT = True
-        else:
+        if not(passMu and passEle and passHT):
             noTrigger = True
     else:
         print('Wrong year! Please enter 2016, 2017, or 2018')
