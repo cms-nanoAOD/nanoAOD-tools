@@ -8,7 +8,7 @@ import copy
 from array import array
 from skimtree_utils import *
 
-localrun = False # True #
+localrun = True # False #
 if not(localrun):
     from samples import *
 else:
@@ -18,7 +18,7 @@ part_idx = sys.argv[2]
 file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = False # True #
+Debug = True # False #
 MCReco = True
 DeltaFilter = True
 TriggerStudy = False # True #
@@ -174,7 +174,8 @@ best_RecoTop_mt_all = array.array('f', [0.])
 best_RecoTop_isNeg_all = array.array('i', [0])
 best_RecoTop_chi2_all = array.array('i', [0])
 
-nJet_all = array.array('i', [0])
+nJet_pt25_all = array.array('i', [0])
+nJet_pt50_all = array.array('i', [0])
 #Jet produced after top semilep decay
 if MCReco:
     MC_TopJet_pt_all = array.array('f', [0.])
@@ -309,7 +310,8 @@ w_PDF_all = array.array('f', [0.]*110)
 passed_mu_all = array.array('f', [0.])
 passed_ele_all = array.array('f', [0.])
 passed_ht_all = array.array('f', [0.])
-
+leadingjet_pt_all = array.array('f', [0.])
+subleadingjet_pt_all = array.array('f', [0.])
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
@@ -340,7 +342,10 @@ systTree.branchTreesSysts(trees, "all", "best_Wprime_phi", outTreeFile, best_Wpr
 systTree.branchTreesSysts(trees, "all", "best_Wprime_m", outTreeFile, best_Wprime_m_all)
 systTree.branchTreesSysts(trees, "all", "best_Wprime_mt", outTreeFile, best_Wprime_mt_all)
 
-systTree.branchTreesSysts(trees, "all", "nJet", outTreeFile, nJet_all)
+systTree.branchTreesSysts(trees, "all", "nJet_pt25", outTreeFile, nJet_pt25_all)
+systTree.branchTreesSysts(trees, "all", "nJet_pt50", outTreeFile, nJet_pt50_all)
+systTree.branchTreesSysts(trees, "all", "leadingjet_pt", outTreeFile, leadingjet_pt_all)
+systTree.branchTreesSysts(trees, "all", "subleadingjet_pt", outTreeFile, subleadingjet_pt_all)
 if MCReco:
     systTree.branchTreesSysts(trees, "all", "MC_RecoTop_pt", outTreeFile, MC_RecoTop_pt_all)
     systTree.branchTreesSysts(trees, "all", "MC_RecoTop_eta", outTreeFile, MC_RecoTop_eta_all)
@@ -462,1043 +467,7 @@ if(isMC and addPDF):
     systTree.branchTreesSysts(trees, "all", "w_PDF", outTreeFile, w_PDF_all)
 ####################################################################################################################################################################################################################################
 
-#++++++++++++++++++++++++++++++++++
-#++        2j0t category         ++
-#++++++++++++++++++++++++++++++++++
-#Reconstructed Wprime
-if MCReco:
-    MC_Wprime_pt_2j0t = array.array('f', [0.])
-    MC_Wprime_eta_2j0t = array.array('f', [0.])
-    MC_Wprime_phi_2j0t = array.array('f', [0.])
-    MC_Wprime_m_2j0t = array.array('f', [0.])
-    MC_Wprime_mt_2j0t = array.array('f', [0.])
-closest_Wprime_pt_2j0t = array.array('f', [0.])
-closest_Wprime_eta_2j0t = array.array('f', [0.])
-closest_Wprime_phi_2j0t = array.array('f', [0.])
-closest_Wprime_m_2j0t = array.array('f', [0.])
-closest_Wprime_mt_2j0t = array.array('f', [0.])
-chi_Wprime_pt_2j0t = array.array('f', [0.])
-chi_Wprime_eta_2j0t = array.array('f', [0.])
-chi_Wprime_phi_2j0t = array.array('f', [0.])
-chi_Wprime_m_2j0t = array.array('f', [0.])
-chi_Wprime_mt_2j0t = array.array('f', [0.])
-sublead_Wprime_pt_2j0t = array.array('f', [0.])
-sublead_Wprime_eta_2j0t = array.array('f', [0.])
-sublead_Wprime_phi_2j0t = array.array('f', [0.])
-sublead_Wprime_m_2j0t = array.array('f', [0.])
-sublead_Wprime_mt_2j0t = array.array('f', [0.])
-best_Wprime_pt_2j0t = array.array('f', [0.])
-best_Wprime_eta_2j0t = array.array('f', [0.])
-best_Wprime_phi_2j0t = array.array('f', [0.])
-best_Wprime_m_2j0t = array.array('f', [0.])
-best_Wprime_mt_2j0t = array.array('f', [0.])
-
-#Reconstructed Top
-if MCReco:
-    MC_RecoTop_pt_2j0t = array.array('f', [0.])
-    MC_RecoTop_eta_2j0t = array.array('f', [0.])
-    MC_RecoTop_phi_2j0t = array.array('f', [0.])
-    MC_RecoTop_m_2j0t = array.array('f', [0.])
-    MC_RecoTop_mt_2j0t = array.array('f', [0.])
-    MC_RecoTop_isNeg_2j0t = array.array('i', [0])
-    MC_RecoTop_chi2_2j0t = array.array('i', [0])
-closest_RecoTop_pt_2j0t = array.array('f', [0.])
-closest_RecoTop_eta_2j0t = array.array('f', [0.])
-closest_RecoTop_phi_2j0t = array.array('f', [0.])
-closest_RecoTop_m_2j0t = array.array('f', [0.])
-closest_RecoTop_mt_2j0t = array.array('f', [0.])
-closest_RecoTop_isNeg_2j0t = array.array('i', [0])
-closestRecoTop_chi2_2j0t = array.array('i', [0])
-chi_RecoTop_pt_2j0t = array.array('f', [0.])
-chi_RecoTop_eta_2j0t = array.array('f', [0.])
-chi_RecoTop_phi_2j0t = array.array('f', [0.])
-chi_RecoTop_m_2j0t = array.array('f', [0.])
-chi_RecoTop_mt_2j0t = array.array('f', [0.])
-chi_RecoTop_isNeg_2j0t = array.array('i', [0])
-chi_RecoTop_chi2_2j0t = array.array('i', [0])
-sublead_RecoTop_pt_2j0t = array.array('f', [0.])
-sublead_RecoTop_eta_2j0t = array.array('f', [0.])
-sublead_RecoTop_phi_2j0t = array.array('f', [0.])
-sublead_RecoTop_m_2j0t = array.array('f', [0.])
-sublead_RecoTop_mt_2j0t = array.array('f', [0.])
-sublead_RecoTop_isNeg_2j0t = array.array('i', [0])
-sublead_RecoTop_chi2_2j0t = array.array('i', [0])
-best_RecoTop_pt_2j0t = array.array('f', [0.])
-best_RecoTop_eta_2j0t = array.array('f', [0.])
-best_RecoTop_phi_2j0t = array.array('f', [0.])
-best_RecoTop_m_2j0t = array.array('f', [0.])
-best_RecoTop_mt_2j0t = array.array('f', [0.])
-best_RecoTop_isNeg_2j0t = array.array('i', [0])
-best_RecoTop_chi2_2j0t = array.array('i', [0])
-
-nJet_2j0t = array.array('i', [0])
-#Jet produced after top semilep decay
-if MCReco:
-    MC_TopJet_pt_2j0t = array.array('f', [0.])
-    MC_TopJet_eta_2j0t = array.array('f', [0.])
-    MC_TopJet_phi_2j0t = array.array('f', [0.])
-    MC_TopJet_m_2j0t = array.array('f', [0.])
-    MC_TopJet_dRLepJet_2j0t = array.array('f', [0])
-closest_TopJet_pt_2j0t = array.array('f', [0.])
-closest_TopJet_eta_2j0t = array.array('f', [0.])
-closest_TopJet_phi_2j0t = array.array('f', [0.])
-closest_TopJet_m_2j0t = array.array('f', [0.])
-closest_TopJet_isBTagged_2j0t = array.array('i', [0])
-closest_TopJet_dRLepJet_2j0t = array.array('f', [0])
-chi_TopJet_pt_2j0t = array.array('f', [0.])
-chi_TopJet_eta_2j0t = array.array('f', [0.])
-chi_TopJet_phi_2j0t = array.array('f', [0.])
-chi_TopJet_m_2j0t = array.array('f', [0.])
-chi_TopJet_isBTagged_2j0t = array.array('i', [0])
-chi_TopJet_dRLepJet_2j0t = array.array('f', [0])
-sublead_TopJet_pt_2j0t = array.array('f', [0.])
-sublead_TopJet_eta_2j0t = array.array('f', [0.])
-sublead_TopJet_phi_2j0t = array.array('f', [0.])
-sublead_TopJet_m_2j0t = array.array('f', [0.])
-sublead_TopJet_isBTagged_2j0t = array.array('i', [0])
-sublead_TopJet_dRLepJet_2j0t = array.array('f', [0])
-best_TopJet_pt_2j0t = array.array('f', [0.])
-best_TopJet_eta_2j0t = array.array('f', [0.])
-best_TopJet_phi_2j0t = array.array('f', [0.])
-best_TopJet_m_2j0t = array.array('f', [0.])
-best_TopJet_isBTagged_2j0t = array.array('i', [0])
-best_TopJet_dRLepJet_2j0t = array.array('f', [0])
-
-Event_HT_2j0t = array.array('f', [0.])
-
-'''
-closest_TopJet_isDFL_2j0t = array.array('i', [0])
-closest_TopJet_isDFM_2j0t = array.array('i', [0])
-closest_TopJet_isDFT_2j0t = array.array('i', [0])
-closest_TopJet_isDCL_2j0t = array.array('i', [0])
-closest_TopJet_isDCM_2j0t = array.array('i', [0])
-closest_TopJet_isDCT_2j0t = array.array('i', [0])
-chi_TopJet_isDFL_2j0t = array.array('i', [0])
-chi_TopJet_isDFM_2j0t = array.array('i', [0])
-chi_TopJet_isDFT_2j0t = array.array('i', [0])
-chi_TopJet_isDCL_2j0t = array.array('i', [0])
-chi_TopJet_isDCM_2j0t = array.array('i', [0])
-chi_TopJet_isDCT_2j0t = array.array('i', [0])
-sublead_TopJet_isDFL_2j0t = array.array('i', [0])
-sublead_TopJet_isDFM_2j0t = array.array('i', [0])
-sublead_TopJet_isDFT_2j0t = array.array('i', [0])
-sublead_TopJet_isDCL_2j0t = array.array('i', [0])
-sublead_TopJet_isDCM_2j0t = array.array('i', [0])
-sublead_TopJet_isDCT_2j0t = array.array('i', [0])
-best_TopJet_isDFL_2j0t = array.array('i', [0])
-best_TopJet_isDFM_2j0t = array.array('i', [0])
-best_TopJet_isDFT_2j0t = array.array('i', [0])
-best_TopJet_isDCL_2j0t = array.array('i', [0])
-best_TopJet_isDCM_2j0t = array.array('i', [0])
-best_TopJet_isDCT_2j0t = array.array('i', [0])
-'''
-
-#Prompt jet from Wprime decay
-if MCReco:
-    MC_WpJet_pt_2j0t = array.array('f', [0.])
-    MC_WpJet_eta_2j0t = array.array('f', [0.])
-    MC_WpJet_phi_2j0t = array.array('f', [0.])
-    MC_WpJet_m_2j0t = array.array('f', [0.])
-closest_WpJet_pt_2j0t = array.array('f', [0.])
-closest_WpJet_eta_2j0t = array.array('f', [0.])
-closest_WpJet_phi_2j0t = array.array('f', [0.])
-closest_WpJet_m_2j0t = array.array('f', [0.])
-closest_WpJet_isBTagged_2j0t = array.array('i', [0])
-chi_WpJet_pt_2j0t = array.array('f', [0.])
-chi_WpJet_eta_2j0t = array.array('f', [0.])
-chi_WpJet_phi_2j0t = array.array('f', [0.])
-chi_WpJet_m_2j0t = array.array('f', [0.])
-chi_WpJet_isBTagged_2j0t = array.array('i', [0])
-sublead_WpJet_pt_2j0t = array.array('f', [0.])
-sublead_WpJet_eta_2j0t = array.array('f', [0.])
-sublead_WpJet_phi_2j0t = array.array('f', [0.])
-sublead_WpJet_m_2j0t = array.array('f', [0.])
-sublead_WpJet_isBTagged_2j0t = array.array('i', [0])
-best_WpJet_pt_2j0t = array.array('f', [0.])
-best_WpJet_eta_2j0t = array.array('f', [0.])
-best_WpJet_phi_2j0t = array.array('f', [0.])
-best_WpJet_m_2j0t = array.array('f', [0.])
-best_WpJet_isBTagged_2j0t = array.array('i', [0])
-'''
-closest_WpJet_isDFL_2j0t = array.array('i', [0])
-closest_WpJet_isDFM_2j0t = array.array('i', [0])
-closest_WpJet_isDFT_2j0t = array.array('i', [0])
-closest_WpJet_isDCL_2j0t = array.array('i', [0])
-closest_WpJet_isDCM_2j0t = array.array('i', [0])
-closest_WpJet_isDCT_2j0t = array.array('i', [0])
-chi_WpJet_isDFL_2j0t = array.array('i', [0])
-chi_WpJet_isDFM_2j0t = array.array('i', [0])
-chi_WpJet_isDFT_2j0t = array.array('i', [0])
-chi_WpJet_isDCL_2j0t = array.array('i', [0])
-chi_WpJet_isDCM_2j0t = array.array('i', [0])
-chi_WpJet_isDCT_2j0t = array.array('i', [0])
-sublead_WpJet_isDFL_2j0t = array.array('i', [0])
-sublead_WpJet_isDFM_2j0t = array.array('i', [0])
-sublead_WpJet_isDFT_2j0t = array.array('i', [0])
-sublead_WpJet_isDCL_2j0t = array.array('i', [0])
-sublead_WpJet_isDCM_2j0t = array.array('i', [0])
-sublead_WpJet_isDCT_2j0t = array.array('i', [0])
-best_WpJet_isDFL_2j0t = array.array('i', [0])
-best_WpJet_isDFM_2j0t = array.array('i', [0])
-best_WpJet_isDFT_2j0t = array.array('i', [0])
-best_WpJet_isDCL_2j0t = array.array('i', [0])
-best_WpJet_isDCM_2j0t = array.array('i', [0])
-best_WpJet_isDCT_2j0t = array.array('i', [0])
-'''
-
-#Lepton
-lepton_pt_2j0t = array.array('f', [0.])
-lepton_eta_2j0t = array.array('f', [0.])
-lepton_phi_2j0t = array.array('f', [0.])
-lepton_miniIso_2j0t = array.array('f', [0.])
-isEle_2j0t = array.array('i', [0])
-isMu_2j0t = array.array('i', [0])
-
-MET_pt_2j0t = array.array('f', [0.])
-MET_phi_2j0t = array.array('f', [0.])
-
-nPU_2j0t = array.array('f', [0.])
-nPV_2j0t = array.array('f', [0.])
-mtw_2j0t = array.array('f', [0.])
-
-w_nominal_2j0t = array.array('f', [0.])
-w_PDF_2j0t = array.array('f', [0.]*110)
-passed_mu_2j0t = array.array('f', [0.])
-passed_ele_2j0t = array.array('f', [0.])
-passed_ht_2j0t = array.array('f', [0.])
-
-#++++++++++++++++++++++++++++++++++
-#++   branching the new trees    ++
-#++++++++++++++++++++++++++++++++++
-if MCReco:
-    systTree.branchTreesSysts(trees, "2j0t", "MC_Wprime_pt", outTreeFile, MC_Wprime_pt_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_Wprime_eta", outTreeFile, MC_Wprime_eta_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_Wprime_phi", outTreeFile, MC_Wprime_phi_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_Wprime_m", outTreeFile, MC_Wprime_m_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_Wprime_mt", outTreeFile, MC_Wprime_mt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_Wprime_pt", outTreeFile, closest_Wprime_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_Wprime_eta", outTreeFile, closest_Wprime_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_Wprime_phi", outTreeFile, closest_Wprime_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_Wprime_m", outTreeFile, closest_Wprime_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_Wprime_mt", outTreeFile, closest_Wprime_mt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_Wprime_pt", outTreeFile, chi_Wprime_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_Wprime_eta", outTreeFile, chi_Wprime_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_Wprime_phi", outTreeFile, chi_Wprime_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_Wprime_m", outTreeFile, chi_Wprime_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_Wprime_mt", outTreeFile, chi_Wprime_mt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_Wprime_pt", outTreeFile, sublead_Wprime_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_Wprime_eta", outTreeFile, sublead_Wprime_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_Wprime_phi", outTreeFile, sublead_Wprime_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_Wprime_m", outTreeFile, sublead_Wprime_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_Wprime_mt", outTreeFile, sublead_Wprime_mt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_Wprime_pt", outTreeFile, best_Wprime_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_Wprime_eta", outTreeFile, best_Wprime_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_Wprime_phi", outTreeFile, best_Wprime_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_Wprime_m", outTreeFile, best_Wprime_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_Wprime_mt", outTreeFile, best_Wprime_mt_2j0t)
-
-systTree.branchTreesSysts(trees, "2j0t", "nJet", outTreeFile, nJet_2j0t)
-if MCReco:
-    systTree.branchTreesSysts(trees, "2j0t", "MC_RecoTop_pt", outTreeFile, MC_RecoTop_pt_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_RecoTop_eta", outTreeFile, MC_RecoTop_eta_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_RecoTop_phi", outTreeFile, MC_RecoTop_phi_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_RecoTop_m", outTreeFile, MC_RecoTop_m_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_RecoTop_mt", outTreeFile, MC_RecoTop_mt_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_RecoTop_isNeg", outTreeFile, MC_RecoTop_isNeg_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_RecoTop_pt", outTreeFile, closest_RecoTop_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_RecoTop_eta", outTreeFile, closest_RecoTop_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_RecoTop_phi", outTreeFile, closest_RecoTop_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_RecoTop_m", outTreeFile, closest_RecoTop_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_RecoTop_mt", outTreeFile, closest_RecoTop_mt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_RecoTop_isNeg", outTreeFile, closest_RecoTop_isNeg_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_RecoTop_pt", outTreeFile, chi_RecoTop_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_RecoTop_eta", outTreeFile, chi_RecoTop_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_RecoTop_phi", outTreeFile, chi_RecoTop_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_RecoTop_m", outTreeFile, chi_RecoTop_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_RecoTop_mt", outTreeFile, chi_RecoTop_mt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_RecoTop_isNeg", outTreeFile, chi_RecoTop_isNeg_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_RecoTop_pt", outTreeFile, sublead_RecoTop_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_RecoTop_eta", outTreeFile, sublead_RecoTop_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_RecoTop_phi", outTreeFile, sublead_RecoTop_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_RecoTop_m", outTreeFile, sublead_RecoTop_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_RecoTop_mt", outTreeFile, sublead_RecoTop_mt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_RecoTop_isNeg", outTreeFile, sublead_RecoTop_isNeg_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_RecoTop_pt", outTreeFile, best_RecoTop_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_RecoTop_eta", outTreeFile, best_RecoTop_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_RecoTop_phi", outTreeFile, best_RecoTop_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_RecoTop_m", outTreeFile, best_RecoTop_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_RecoTop_mt", outTreeFile, best_RecoTop_mt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_RecoTop_isNeg", outTreeFile, best_RecoTop_isNeg_2j0t)
-
-if MCReco:
-    systTree.branchTreesSysts(trees, "2j0t", "MC_TopJet_pt", outTreeFile, MC_TopJet_pt_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_TopJet_eta", outTreeFile, MC_TopJet_eta_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_TopJet_phi", outTreeFile, MC_TopJet_phi_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_TopJet_m", outTreeFile, MC_TopJet_m_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_TopJet_dRLepJet", outTreeFile, MC_TopJet_dRLepJet_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_TopJet_pt", outTreeFile, closest_TopJet_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_TopJet_eta", outTreeFile, closest_TopJet_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_TopJet_phi", outTreeFile, closest_TopJet_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_TopJet_m", outTreeFile, closest_TopJet_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_TopJet_isBTagged", outTreeFile, closest_TopJet_isBTagged_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_TopJet_dRLepJet", outTreeFile, closest_TopJet_dRLepJet_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_TopJet_pt", outTreeFile, chi_TopJet_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_TopJet_eta", outTreeFile, chi_TopJet_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_TopJet_phi", outTreeFile, chi_TopJet_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_TopJet_m", outTreeFile, chi_TopJet_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_TopJet_isBTagged", outTreeFile, chi_TopJet_isBTagged_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_TopJet_dRLepJet", outTreeFile, chi_TopJet_dRLepJet_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_TopJet_pt", outTreeFile, sublead_TopJet_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_TopJet_eta", outTreeFile, sublead_TopJet_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_TopJet_phi", outTreeFile, sublead_TopJet_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_TopJet_m", outTreeFile, sublead_TopJet_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_TopJet_isBTagged", outTreeFile, sublead_TopJet_isBTagged_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_TopJet_dRLepJet", outTreeFile, sublead_TopJet_dRLepJet_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_TopJet_pt", outTreeFile, best_TopJet_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_TopJet_eta", outTreeFile, best_TopJet_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_TopJet_phi", outTreeFile, best_TopJet_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_TopJet_m", outTreeFile, best_TopJet_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_TopJet_isBTagged", outTreeFile, best_TopJet_isBTagged_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_TopJet_dRLepJet", outTreeFile, best_TopJet_dRLepJet_2j0t)
-
-if MCReco:
-    systTree.branchTreesSysts(trees, "2j0t", "MC_WpJet_pt", outTreeFile, MC_WpJet_pt_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_WpJet_eta", outTreeFile, MC_WpJet_eta_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_WpJet_phi", outTreeFile, MC_WpJet_phi_2j0t)
-    systTree.branchTreesSysts(trees, "2j0t", "MC_WpJet_m", outTreeFile, MC_WpJet_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_WpJet_pt", outTreeFile, closest_WpJet_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_WpJet_eta", outTreeFile, closest_WpJet_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_WpJet_phi", outTreeFile, closest_WpJet_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_WpJet_m", outTreeFile, closest_WpJet_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "closest_WpJet_isBTagged", outTreeFile, closest_WpJet_isBTagged_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_WpJet_pt", outTreeFile, chi_WpJet_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_WpJet_eta", outTreeFile, chi_WpJet_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_WpJet_phi", outTreeFile, chi_WpJet_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_WpJet_m", outTreeFile, chi_WpJet_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "chi_WpJet_isBTagged", outTreeFile, chi_WpJet_isBTagged_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_WpJet_pt", outTreeFile, sublead_WpJet_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_WpJet_eta", outTreeFile, sublead_WpJet_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_WpJet_phi", outTreeFile, sublead_WpJet_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_WpJet_m", outTreeFile, sublead_WpJet_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "sublead_WpJet_isBTagged", outTreeFile, sublead_WpJet_isBTagged_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_WpJet_pt", outTreeFile, best_WpJet_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_WpJet_eta", outTreeFile, best_WpJet_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_WpJet_phi", outTreeFile, best_WpJet_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_WpJet_m", outTreeFile, best_WpJet_m_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "best_WpJet_isBTagged", outTreeFile, best_WpJet_isBTagged_2j0t)
-
-systTree.branchTreesSysts(trees, "2j0t", "lepton_pt", outTreeFile, lepton_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "lepton_eta", outTreeFile, lepton_eta_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "lepton_phi", outTreeFile, lepton_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "lepton_miniIso", outTreeFile, lepton_miniIso_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "passed_mu", outTreeFile, passed_mu_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "passed_ele", outTreeFile, passed_ele_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "passed_ht", outTreeFile, passed_ht_2j0t)
-#if(isMC):
-    #systTree.branchTreesSysts(trees, "2j0t", "lepton_SF", outTreeFile, lepton_SF)
-systTree.branchTreesSysts(trees, "2j0t", "nPU", outTreeFile, nPU_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "nPV", outTreeFile, nPV_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "isEle", outTreeFile, isEle_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "isMu", outTreeFile, isMu_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "Event_HT", outTreeFile, Event_HT_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "MET_pt", outTreeFile, MET_pt_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "MET_phi", outTreeFile, MET_phi_2j0t)
-systTree.branchTreesSysts(trees, "2j0t", "mtw", outTreeFile, mtw_2j0t)
-print "Is MC: " + str(isMC) + "      option addPDF: " + str(addPDF)
-if(isMC and addPDF):
-    systTree.branchTreesSysts(trees, "2j0t", "w_PDF", outTreeFile, w_PDF_2j0t)
-####################################################################################################################################################################################################################################
-
-#++++++++++++++++++++++++++++++++++
-#++        2j2t category         ++
-#++++++++++++++++++++++++++++++++++
-#Reconstructed Wprime
-if MCReco:
-    MC_Wprime_pt_2j2t = array.array('f', [0.])
-    MC_Wprime_eta_2j2t = array.array('f', [0.])
-    MC_Wprime_phi_2j2t = array.array('f', [0.])
-    MC_Wprime_m_2j2t = array.array('f', [0.])
-    MC_Wprime_mt_2j2t = array.array('f', [0.])
-closest_Wprime_pt_2j2t = array.array('f', [0.])
-closest_Wprime_eta_2j2t = array.array('f', [0.])
-closest_Wprime_phi_2j2t = array.array('f', [0.])
-closest_Wprime_m_2j2t = array.array('f', [0.])
-closest_Wprime_mt_2j2t = array.array('f', [0.])
-chi_Wprime_pt_2j2t = array.array('f', [0.])
-chi_Wprime_eta_2j2t = array.array('f', [0.])
-chi_Wprime_phi_2j2t = array.array('f', [0.])
-chi_Wprime_m_2j2t = array.array('f', [0.])
-chi_Wprime_mt_2j2t = array.array('f', [0.])
-sublead_Wprime_pt_2j2t = array.array('f', [0.])
-sublead_Wprime_eta_2j2t = array.array('f', [0.])
-sublead_Wprime_phi_2j2t = array.array('f', [0.])
-sublead_Wprime_m_2j2t = array.array('f', [0.])
-sublead_Wprime_mt_2j2t = array.array('f', [0.])
-best_Wprime_pt_2j2t = array.array('f', [0.])
-best_Wprime_eta_2j2t = array.array('f', [0.])
-best_Wprime_phi_2j2t = array.array('f', [0.])
-best_Wprime_m_2j2t = array.array('f', [0.])
-best_Wprime_mt_2j2t = array.array('f', [0.])
-
-#Reconstructed Top
-if MCReco:
-    MC_RecoTop_pt_2j2t = array.array('f', [0.])
-    MC_RecoTop_eta_2j2t = array.array('f', [0.])
-    MC_RecoTop_phi_2j2t = array.array('f', [0.])
-    MC_RecoTop_m_2j2t = array.array('f', [0.])
-    MC_RecoTop_mt_2j2t = array.array('f', [0.])
-    MC_RecoTop_isNeg_2j2t = array.array('i', [0])
-    MC_RecoTop_chi2_2j2t = array.array('i', [0])
-closest_RecoTop_pt_2j2t = array.array('f', [0.])
-closest_RecoTop_eta_2j2t = array.array('f', [0.])
-closest_RecoTop_phi_2j2t = array.array('f', [0.])
-closest_RecoTop_m_2j2t = array.array('f', [0.])
-closest_RecoTop_mt_2j2t = array.array('f', [0.])
-closest_RecoTop_isNeg_2j2t = array.array('i', [0])
-closestRecoTop_chi2_2j2t = array.array('i', [0])
-chi_RecoTop_pt_2j2t = array.array('f', [0.])
-chi_RecoTop_eta_2j2t = array.array('f', [0.])
-chi_RecoTop_phi_2j2t = array.array('f', [0.])
-chi_RecoTop_m_2j2t = array.array('f', [0.])
-chi_RecoTop_mt_2j2t = array.array('f', [0.])
-chi_RecoTop_isNeg_2j2t = array.array('i', [0])
-chi_RecoTop_chi2_2j2t = array.array('i', [0])
-sublead_RecoTop_pt_2j2t = array.array('f', [0.])
-sublead_RecoTop_eta_2j2t = array.array('f', [0.])
-sublead_RecoTop_phi_2j2t = array.array('f', [0.])
-sublead_RecoTop_m_2j2t = array.array('f', [0.])
-sublead_RecoTop_mt_2j2t = array.array('f', [0.])
-sublead_RecoTop_isNeg_2j2t = array.array('i', [0])
-sublead_RecoTop_chi2_2j2t = array.array('i', [0])
-best_RecoTop_pt_2j2t = array.array('f', [0.])
-best_RecoTop_eta_2j2t = array.array('f', [0.])
-best_RecoTop_phi_2j2t = array.array('f', [0.])
-best_RecoTop_m_2j2t = array.array('f', [0.])
-best_RecoTop_mt_2j2t = array.array('f', [0.])
-best_RecoTop_isNeg_2j2t = array.array('i', [0])
-best_RecoTop_chi2_2j2t = array.array('i', [0])
-
-nJet_2j2t = array.array('i', [0])
-#Jet produced after top semilep decay
-if MCReco:
-    MC_TopJet_pt_2j2t = array.array('f', [0.])
-    MC_TopJet_eta_2j2t = array.array('f', [0.])
-    MC_TopJet_phi_2j2t = array.array('f', [0.])
-    MC_TopJet_m_2j2t = array.array('f', [0.])
-    MC_TopJet_dRLepJet_2j2t = array.array('f', [0])
-closest_TopJet_pt_2j2t = array.array('f', [0.])
-closest_TopJet_eta_2j2t = array.array('f', [0.])
-closest_TopJet_phi_2j2t = array.array('f', [0.])
-closest_TopJet_m_2j2t = array.array('f', [0.])
-closest_TopJet_isBTagged_2j2t = array.array('i', [0])
-closest_TopJet_dRLepJet_2j2t = array.array('f', [0])
-chi_TopJet_pt_2j2t = array.array('f', [0.])
-chi_TopJet_eta_2j2t = array.array('f', [0.])
-chi_TopJet_phi_2j2t = array.array('f', [0.])
-chi_TopJet_m_2j2t = array.array('f', [0.])
-chi_TopJet_isBTagged_2j2t = array.array('i', [0])
-chi_TopJet_dRLepJet_2j2t = array.array('f', [0])
-sublead_TopJet_pt_2j2t = array.array('f', [0.])
-sublead_TopJet_eta_2j2t = array.array('f', [0.])
-sublead_TopJet_phi_2j2t = array.array('f', [0.])
-sublead_TopJet_m_2j2t = array.array('f', [0.])
-sublead_TopJet_isBTagged_2j2t = array.array('i', [0])
-sublead_TopJet_dRLepJet_2j2t = array.array('f', [0])
-best_TopJet_pt_2j2t = array.array('f', [0.])
-best_TopJet_eta_2j2t = array.array('f', [0.])
-best_TopJet_phi_2j2t = array.array('f', [0.])
-best_TopJet_m_2j2t = array.array('f', [0.])
-best_TopJet_isBTagged_2j2t = array.array('i', [0])
-best_TopJet_dRLepJet_2j2t = array.array('f', [0])
-
-Event_HT_2j2t = array.array('f', [0.])
-
-'''
-closest_TopJet_isDFL_2j2t = array.array('i', [0])
-closest_TopJet_isDFM_2j2t = array.array('i', [0])
-closest_TopJet_isDFT_2j2t = array.array('i', [0])
-closest_TopJet_isDCL_2j2t = array.array('i', [0])
-closest_TopJet_isDCM_2j2t = array.array('i', [0])
-closest_TopJet_isDCT_2j2t = array.array('i', [0])
-chi_TopJet_isDFL_2j2t = array.array('i', [0])
-chi_TopJet_isDFM_2j2t = array.array('i', [0])
-chi_TopJet_isDFT_2j2t = array.array('i', [0])
-chi_TopJet_isDCL_2j2t = array.array('i', [0])
-chi_TopJet_isDCM_2j2t = array.array('i', [0])
-chi_TopJet_isDCT_2j2t = array.array('i', [0])
-sublead_TopJet_isDFL_2j2t = array.array('i', [0])
-sublead_TopJet_isDFM_2j2t = array.array('i', [0])
-sublead_TopJet_isDFT_2j2t = array.array('i', [0])
-sublead_TopJet_isDCL_2j2t = array.array('i', [0])
-sublead_TopJet_isDCM_2j2t = array.array('i', [0])
-sublead_TopJet_isDCT_2j2t = array.array('i', [0])
-best_TopJet_isDFL_2j2t = array.array('i', [0])
-best_TopJet_isDFM_2j2t = array.array('i', [0])
-best_TopJet_isDFT_2j2t = array.array('i', [0])
-best_TopJet_isDCL_2j2t = array.array('i', [0])
-best_TopJet_isDCM_2j2t = array.array('i', [0])
-best_TopJet_isDCT_2j2t = array.array('i', [0])
-'''
-
-#Prompt jet from Wprime decay
-if MCReco:
-    MC_WpJet_pt_2j2t = array.array('f', [0.])
-    MC_WpJet_eta_2j2t = array.array('f', [0.])
-    MC_WpJet_phi_2j2t = array.array('f', [0.])
-    MC_WpJet_m_2j2t = array.array('f', [0.])
-closest_WpJet_pt_2j2t = array.array('f', [0.])
-closest_WpJet_eta_2j2t = array.array('f', [0.])
-closest_WpJet_phi_2j2t = array.array('f', [0.])
-closest_WpJet_m_2j2t = array.array('f', [0.])
-closest_WpJet_isBTagged_2j2t = array.array('i', [0])
-chi_WpJet_pt_2j2t = array.array('f', [0.])
-chi_WpJet_eta_2j2t = array.array('f', [0.])
-chi_WpJet_phi_2j2t = array.array('f', [0.])
-chi_WpJet_m_2j2t = array.array('f', [0.])
-chi_WpJet_isBTagged_2j2t = array.array('i', [0])
-sublead_WpJet_pt_2j2t = array.array('f', [0.])
-sublead_WpJet_eta_2j2t = array.array('f', [0.])
-sublead_WpJet_phi_2j2t = array.array('f', [0.])
-sublead_WpJet_m_2j2t = array.array('f', [0.])
-sublead_WpJet_isBTagged_2j2t = array.array('i', [0])
-best_WpJet_pt_2j2t = array.array('f', [0.])
-best_WpJet_eta_2j2t = array.array('f', [0.])
-best_WpJet_phi_2j2t = array.array('f', [0.])
-best_WpJet_m_2j2t = array.array('f', [0.])
-best_WpJet_isBTagged_2j2t = array.array('i', [0])
-'''
-closest_WpJet_isDFL_2j2t = array.array('i', [0])
-closest_WpJet_isDFM_2j2t = array.array('i', [0])
-closest_WpJet_isDFT_2j2t = array.array('i', [0])
-closest_WpJet_isDCL_2j2t = array.array('i', [0])
-closest_WpJet_isDCM_2j2t = array.array('i', [0])
-closest_WpJet_isDCT_2j2t = array.array('i', [0])
-chi_WpJet_isDFL_2j2t = array.array('i', [0])
-chi_WpJet_isDFM_2j2t = array.array('i', [0])
-chi_WpJet_isDFT_2j2t = array.array('i', [0])
-chi_WpJet_isDCL_2j2t = array.array('i', [0])
-chi_WpJet_isDCM_2j2t = array.array('i', [0])
-chi_WpJet_isDCT_2j2t = array.array('i', [0])
-sublead_WpJet_isDFL_2j2t = array.array('i', [0])
-sublead_WpJet_isDFM_2j2t = array.array('i', [0])
-sublead_WpJet_isDFT_2j2t = array.array('i', [0])
-sublead_WpJet_isDCL_2j2t = array.array('i', [0])
-sublead_WpJet_isDCM_2j2t = array.array('i', [0])
-sublead_WpJet_isDCT_2j2t = array.array('i', [0])
-best_WpJet_isDFL_2j2t = array.array('i', [0])
-best_WpJet_isDFM_2j2t = array.array('i', [0])
-best_WpJet_isDFT_2j2t = array.array('i', [0])
-best_WpJet_isDCL_2j2t = array.array('i', [0])
-best_WpJet_isDCM_2j2t = array.array('i', [0])
-best_WpJet_isDCT_2j2t = array.array('i', [0])
-'''
-
-#Lepton
-lepton_pt_2j2t = array.array('f', [0.])
-lepton_eta_2j2t = array.array('f', [0.])
-lepton_phi_2j2t = array.array('f', [0.])
-lepton_miniIso_2j2t = array.array('f', [0.])
-isEle_2j2t = array.array('i', [0])
-isMu_2j2t = array.array('i', [0])
-
-MET_pt_2j2t = array.array('f', [0.])
-MET_phi_2j2t = array.array('f', [0.])
-
-nPU_2j2t = array.array('f', [0.])
-nPV_2j2t = array.array('f', [0.])
-mtw_2j2t = array.array('f', [0.])
-
-w_nominal_2j2t = array.array('f', [0.])
-w_PDF_2j2t = array.array('f', [0.]*110)
-passed_mu_2j2t = array.array('f', [0.])
-passed_ele_2j2t = array.array('f', [0.])
-passed_ht_2j2t = array.array('f', [0.])
-
-#++++++++++++++++++++++++++++++++++
-#++   branching the new trees    ++
-#++++++++++++++++++++++++++++++++++
-if MCReco:
-    systTree.branchTreesSysts(trees, "2j2t", "MC_Wprime_pt", outTreeFile, MC_Wprime_pt_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_Wprime_eta", outTreeFile, MC_Wprime_eta_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_Wprime_phi", outTreeFile, MC_Wprime_phi_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_Wprime_m", outTreeFile, MC_Wprime_m_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_Wprime_mt", outTreeFile, MC_Wprime_mt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_Wprime_pt", outTreeFile, closest_Wprime_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_Wprime_eta", outTreeFile, closest_Wprime_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_Wprime_phi", outTreeFile, closest_Wprime_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_Wprime_m", outTreeFile, closest_Wprime_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_Wprime_mt", outTreeFile, closest_Wprime_mt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_Wprime_pt", outTreeFile, chi_Wprime_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_Wprime_eta", outTreeFile, chi_Wprime_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_Wprime_phi", outTreeFile, chi_Wprime_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_Wprime_m", outTreeFile, chi_Wprime_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_Wprime_mt", outTreeFile, chi_Wprime_mt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_Wprime_pt", outTreeFile, sublead_Wprime_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_Wprime_eta", outTreeFile, sublead_Wprime_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_Wprime_phi", outTreeFile, sublead_Wprime_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_Wprime_m", outTreeFile, sublead_Wprime_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_Wprime_mt", outTreeFile, sublead_Wprime_mt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_Wprime_pt", outTreeFile, best_Wprime_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_Wprime_eta", outTreeFile, best_Wprime_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_Wprime_phi", outTreeFile, best_Wprime_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_Wprime_m", outTreeFile, best_Wprime_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_Wprime_mt", outTreeFile, best_Wprime_mt_2j2t)
-
-systTree.branchTreesSysts(trees, "2j2t", "nJet", outTreeFile, nJet_2j2t)
-if MCReco:
-    systTree.branchTreesSysts(trees, "2j2t", "MC_RecoTop_pt", outTreeFile, MC_RecoTop_pt_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_RecoTop_eta", outTreeFile, MC_RecoTop_eta_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_RecoTop_phi", outTreeFile, MC_RecoTop_phi_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_RecoTop_m", outTreeFile, MC_RecoTop_m_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_RecoTop_mt", outTreeFile, MC_RecoTop_mt_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_RecoTop_isNeg", outTreeFile, MC_RecoTop_isNeg_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_RecoTop_pt", outTreeFile, closest_RecoTop_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_RecoTop_eta", outTreeFile, closest_RecoTop_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_RecoTop_phi", outTreeFile, closest_RecoTop_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_RecoTop_m", outTreeFile, closest_RecoTop_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_RecoTop_mt", outTreeFile, closest_RecoTop_mt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_RecoTop_isNeg", outTreeFile, closest_RecoTop_isNeg_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_RecoTop_pt", outTreeFile, chi_RecoTop_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_RecoTop_eta", outTreeFile, chi_RecoTop_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_RecoTop_phi", outTreeFile, chi_RecoTop_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_RecoTop_m", outTreeFile, chi_RecoTop_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_RecoTop_mt", outTreeFile, chi_RecoTop_mt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_RecoTop_isNeg", outTreeFile, chi_RecoTop_isNeg_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_RecoTop_pt", outTreeFile, sublead_RecoTop_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_RecoTop_eta", outTreeFile, sublead_RecoTop_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_RecoTop_phi", outTreeFile, sublead_RecoTop_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_RecoTop_m", outTreeFile, sublead_RecoTop_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_RecoTop_mt", outTreeFile, sublead_RecoTop_mt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_RecoTop_isNeg", outTreeFile, sublead_RecoTop_isNeg_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_RecoTop_pt", outTreeFile, best_RecoTop_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_RecoTop_eta", outTreeFile, best_RecoTop_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_RecoTop_phi", outTreeFile, best_RecoTop_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_RecoTop_m", outTreeFile, best_RecoTop_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_RecoTop_mt", outTreeFile, best_RecoTop_mt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_RecoTop_isNeg", outTreeFile, best_RecoTop_isNeg_2j2t)
-
-if MCReco:
-    systTree.branchTreesSysts(trees, "2j2t", "MC_TopJet_pt", outTreeFile, MC_TopJet_pt_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_TopJet_eta", outTreeFile, MC_TopJet_eta_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_TopJet_phi", outTreeFile, MC_TopJet_phi_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_TopJet_m", outTreeFile, MC_TopJet_m_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_TopJet_dRLepJet", outTreeFile, MC_TopJet_dRLepJet_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_TopJet_pt", outTreeFile, closest_TopJet_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_TopJet_eta", outTreeFile, closest_TopJet_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_TopJet_phi", outTreeFile, closest_TopJet_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_TopJet_m", outTreeFile, closest_TopJet_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_TopJet_isBTagged", outTreeFile, closest_TopJet_isBTagged_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_TopJet_dRLepJet", outTreeFile, closest_TopJet_dRLepJet_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_TopJet_pt", outTreeFile, chi_TopJet_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_TopJet_eta", outTreeFile, chi_TopJet_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_TopJet_phi", outTreeFile, chi_TopJet_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_TopJet_m", outTreeFile, chi_TopJet_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_TopJet_isBTagged", outTreeFile, chi_TopJet_isBTagged_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_TopJet_dRLepJet", outTreeFile, chi_TopJet_dRLepJet_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_TopJet_pt", outTreeFile, sublead_TopJet_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_TopJet_eta", outTreeFile, sublead_TopJet_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_TopJet_phi", outTreeFile, sublead_TopJet_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_TopJet_m", outTreeFile, sublead_TopJet_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_TopJet_isBTagged", outTreeFile, sublead_TopJet_isBTagged_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_TopJet_dRLepJet", outTreeFile, sublead_TopJet_dRLepJet_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_TopJet_pt", outTreeFile, best_TopJet_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_TopJet_eta", outTreeFile, best_TopJet_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_TopJet_phi", outTreeFile, best_TopJet_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_TopJet_m", outTreeFile, best_TopJet_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_TopJet_isBTagged", outTreeFile, best_TopJet_isBTagged_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_TopJet_dRLepJet", outTreeFile, best_TopJet_dRLepJet_2j2t)
-
-if MCReco:
-    systTree.branchTreesSysts(trees, "2j2t", "MC_WpJet_pt", outTreeFile, MC_WpJet_pt_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_WpJet_eta", outTreeFile, MC_WpJet_eta_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_WpJet_phi", outTreeFile, MC_WpJet_phi_2j2t)
-    systTree.branchTreesSysts(trees, "2j2t", "MC_WpJet_m", outTreeFile, MC_WpJet_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_WpJet_pt", outTreeFile, closest_WpJet_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_WpJet_eta", outTreeFile, closest_WpJet_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_WpJet_phi", outTreeFile, closest_WpJet_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_WpJet_m", outTreeFile, closest_WpJet_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "closest_WpJet_isBTagged", outTreeFile, closest_WpJet_isBTagged_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_WpJet_pt", outTreeFile, chi_WpJet_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_WpJet_eta", outTreeFile, chi_WpJet_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_WpJet_phi", outTreeFile, chi_WpJet_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_WpJet_m", outTreeFile, chi_WpJet_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "chi_WpJet_isBTagged", outTreeFile, chi_WpJet_isBTagged_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_WpJet_pt", outTreeFile, sublead_WpJet_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_WpJet_eta", outTreeFile, sublead_WpJet_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_WpJet_phi", outTreeFile, sublead_WpJet_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_WpJet_m", outTreeFile, sublead_WpJet_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "sublead_WpJet_isBTagged", outTreeFile, sublead_WpJet_isBTagged_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_WpJet_pt", outTreeFile, best_WpJet_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_WpJet_eta", outTreeFile, best_WpJet_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_WpJet_phi", outTreeFile, best_WpJet_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_WpJet_m", outTreeFile, best_WpJet_m_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "best_WpJet_isBTagged", outTreeFile, best_WpJet_isBTagged_2j2t)
-
-systTree.branchTreesSysts(trees, "2j2t", "lepton_pt", outTreeFile, lepton_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "lepton_eta", outTreeFile, lepton_eta_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "lepton_phi", outTreeFile, lepton_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "lepton_miniIso", outTreeFile, lepton_miniIso_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "passed_mu", outTreeFile, passed_mu_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "passed_ele", outTreeFile, passed_ele_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "passed_ht", outTreeFile, passed_ht_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "nPU", outTreeFile, nPU_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "nPV", outTreeFile, nPV_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "isEle", outTreeFile, isEle_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "isMu", outTreeFile, isMu_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "Event_HT", outTreeFile, Event_HT_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "MET_pt", outTreeFile, MET_pt_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "MET_phi", outTreeFile, MET_phi_2j2t)
-systTree.branchTreesSysts(trees, "2j2t", "mtw", outTreeFile, mtw_2j2t)
-print "Is MC: " + str(isMC) + "      option addPDF: " + str(addPDF)
-if(isMC and addPDF):
-    systTree.branchTreesSysts(trees, "2j2t", "w_PDF", outTreeFile, w_PDF_2j2t)
-####################################################################################################################################################################################################################################
-
-#++++++++++++++++++++++++++++++++++
-#++        4j2t category         ++
-#++++++++++++++++++++++++++++++++++
-#Reconstructed Wprime 
-if MCReco :
-    MC_Wprime_pt_4j2t = array.array('f', [0.])
-    MC_Wprime_eta_4j2t = array.array('f', [0.])
-    MC_Wprime_phi_4j2t = array.array('f', [0.])
-    MC_Wprime_m_4j2t = array.array('f', [0.])
-    MC_Wprime_mt_4j2t = array.array('f', [0.])
-closest_Wprime_pt_4j2t = array.array('f', [0.])
-closest_Wprime_eta_4j2t = array.array('f', [0.])
-closest_Wprime_phi_4j2t = array.array('f', [0.])
-closest_Wprime_m_4j2t = array.array('f', [0.])
-closest_Wprime_mt_4j2t = array.array('f', [0.])
-chi_Wprime_pt_4j2t = array.array('f', [0.])
-chi_Wprime_eta_4j2t = array.array('f', [0.])
-chi_Wprime_phi_4j2t = array.array('f', [0.])
-chi_Wprime_m_4j2t = array.array('f', [0.])
-chi_Wprime_mt_4j2t = array.array('f', [0.])
-sublead_Wprime_pt_4j2t = array.array('f', [0.])
-sublead_Wprime_eta_4j2t = array.array('f', [0.])
-sublead_Wprime_phi_4j2t = array.array('f', [0.])
-sublead_Wprime_m_4j2t = array.array('f', [0.])
-sublead_Wprime_mt_4j2t = array.array('f', [0.])
-best_Wprime_pt_4j2t = array.array('f', [0.])
-best_Wprime_eta_4j2t = array.array('f', [0.])
-best_Wprime_phi_4j2t = array.array('f', [0.])
-best_Wprime_m_4j2t = array.array('f', [0.])
-best_Wprime_mt_4j2t = array.array('f', [0.])
-
-#Reconstructed Top
-if MCReco:
-    MC_RecoTop_pt_4j2t = array.array('f', [0.])
-    MC_RecoTop_eta_4j2t = array.array('f', [0.])
-    MC_RecoTop_phi_4j2t = array.array('f', [0.])
-    MC_RecoTop_m_4j2t = array.array('f', [0.])
-    MC_RecoTop_mt_4j2t = array.array('f', [0.])
-    MC_RecoTop_isNeg_4j2t = array.array('i', [0])
-    MC_RecoTop_chi2_4j2t = array.array('i', [0])
-closest_RecoTop_pt_4j2t = array.array('f', [0.])
-closest_RecoTop_eta_4j2t = array.array('f', [0.])
-closest_RecoTop_phi_4j2t = array.array('f', [0.])
-closest_RecoTop_m_4j2t = array.array('f', [0.])
-closest_RecoTop_mt_4j2t = array.array('f', [0.])
-closest_RecoTop_isNeg_4j2t = array.array('i', [0])
-closestRecoTop_chi2_4j2t = array.array('i', [0])
-chi_RecoTop_pt_4j2t = array.array('f', [0.])
-chi_RecoTop_eta_4j2t = array.array('f', [0.])
-chi_RecoTop_phi_4j2t = array.array('f', [0.])
-chi_RecoTop_m_4j2t = array.array('f', [0.])
-chi_RecoTop_mt_4j2t = array.array('f', [0.])
-chi_RecoTop_isNeg_4j2t = array.array('i', [0])
-chi_RecoTop_chi2_4j2t = array.array('i', [0])
-sublead_RecoTop_pt_4j2t = array.array('f', [0.])
-sublead_RecoTop_eta_4j2t = array.array('f', [0.])
-sublead_RecoTop_phi_4j2t = array.array('f', [0.])
-sublead_RecoTop_m_4j2t = array.array('f', [0.])
-sublead_RecoTop_mt_4j2t = array.array('f', [0.])
-sublead_RecoTop_isNeg_4j2t = array.array('i', [0])
-sublead_RecoTop_chi2_4j2t = array.array('i', [0])
-best_RecoTop_pt_4j2t = array.array('f', [0.])
-best_RecoTop_eta_4j2t = array.array('f', [0.])
-best_RecoTop_phi_4j2t = array.array('f', [0.])
-best_RecoTop_m_4j2t = array.array('f', [0.])
-best_RecoTop_mt_4j2t = array.array('f', [0.])
-best_RecoTop_isNeg_4j2t = array.array('i', [0])
-best_RecoTop_chi2_4j2t = array.array('i', [0])
-
-nJet_4j2t = array.array('i', [0])
-#Jet produced after top semilep decay
-if MCReco:
-    MC_TopJet_pt_4j2t = array.array('f', [0.])
-    MC_TopJet_eta_4j2t = array.array('f', [0.])
-    MC_TopJet_phi_4j2t = array.array('f', [0.])
-    MC_TopJet_m_4j2t = array.array('f', [0.])
-    MC_TopJet_dRLepJet_4j2t = array.array('f', [0])
-closest_TopJet_pt_4j2t = array.array('f', [0.])
-closest_TopJet_eta_4j2t = array.array('f', [0.])
-closest_TopJet_phi_4j2t = array.array('f', [0.])
-closest_TopJet_m_4j2t = array.array('f', [0.])
-closest_TopJet_isBTagged_4j2t = array.array('i', [0])
-closest_TopJet_dRLepJet_4j2t = array.array('f', [0])
-chi_TopJet_pt_4j2t = array.array('f', [0.])
-chi_TopJet_eta_4j2t = array.array('f', [0.])
-chi_TopJet_phi_4j2t = array.array('f', [0.])
-chi_TopJet_m_4j2t = array.array('f', [0.])
-chi_TopJet_isBTagged_4j2t = array.array('i', [0])
-chi_TopJet_dRLepJet_4j2t = array.array('f', [0])
-sublead_TopJet_pt_4j2t = array.array('f', [0.])
-sublead_TopJet_eta_4j2t = array.array('f', [0.])
-sublead_TopJet_phi_4j2t = array.array('f', [0.])
-sublead_TopJet_m_4j2t = array.array('f', [0.])
-sublead_TopJet_isBTagged_4j2t = array.array('i', [0])
-sublead_TopJet_dRLepJet_4j2t = array.array('f', [0])
-best_TopJet_pt_4j2t = array.array('f', [0.])
-best_TopJet_eta_4j2t = array.array('f', [0.])
-best_TopJet_phi_4j2t = array.array('f', [0.])
-best_TopJet_m_4j2t = array.array('f', [0.])
-best_TopJet_isBTagged_4j2t = array.array('i', [0])
-best_TopJet_dRLepJet_4j2t = array.array('f', [0])
-
-Event_HT_4j2t = array.array('f', [0.])
-
-'''
-closest_TopJet_isDFL_4j2t = array.array('i', [0])
-closest_TopJet_isDFM_4j2t = array.array('i', [0])
-closest_TopJet_isDFT_4j2t = array.array('i', [0])
-closest_TopJet_isDCL_4j2t = array.array('i', [0])
-closest_TopJet_isDCM_4j2t = array.array('i', [0])
-closest_TopJet_isDCT_4j2t = array.array('i', [0])
-chi_TopJet_isDFL_4j2t = array.array('i', [0])
-chi_TopJet_isDFM_4j2t = array.array('i', [0])
-chi_TopJet_isDFT_4j2t = array.array('i', [0])
-chi_TopJet_isDCL_4j2t = array.array('i', [0])
-chi_TopJet_isDCM_4j2t = array.array('i', [0])
-chi_TopJet_isDCT_4j2t = array.array('i', [0])
-sublead_TopJet_isDFL_4j2t = array.array('i', [0])
-sublead_TopJet_isDFM_4j2t = array.array('i', [0])
-sublead_TopJet_isDFT_4j2t = array.array('i', [0])
-sublead_TopJet_isDCL_4j2t = array.array('i', [0])
-sublead_TopJet_isDCM_4j2t = array.array('i', [0])
-sublead_TopJet_isDCT_4j2t = array.array('i', [0])
-best_TopJet_isDFL_4j2t = array.array('i', [0])
-best_TopJet_isDFM_4j2t = array.array('i', [0])
-best_TopJet_isDFT_4j2t = array.array('i', [0])
-best_TopJet_isDCL_4j2t = array.array('i', [0])
-best_TopJet_isDCM_4j2t = array.array('i', [0])
-best_TopJet_isDCT_4j2t = array.array('i', [0])
-'''
-
-#Prompt jet from Wprime decay
-if MCReco:
-    MC_WpJet_pt_4j2t = array.array('f', [0.])
-    MC_WpJet_eta_4j2t = array.array('f', [0.])
-    MC_WpJet_phi_4j2t = array.array('f', [0.])
-    MC_WpJet_m_4j2t = array.array('f', [0.])
-closest_WpJet_pt_4j2t = array.array('f', [0.])
-closest_WpJet_eta_4j2t = array.array('f', [0.])
-closest_WpJet_phi_4j2t = array.array('f', [0.])
-closest_WpJet_m_4j2t = array.array('f', [0.])
-closest_WpJet_isBTagged_4j2t = array.array('i', [0])
-chi_WpJet_pt_4j2t = array.array('f', [0.])
-chi_WpJet_eta_4j2t = array.array('f', [0.])
-chi_WpJet_phi_4j2t = array.array('f', [0.])
-chi_WpJet_m_4j2t = array.array('f', [0.])
-chi_WpJet_isBTagged_4j2t = array.array('i', [0])
-sublead_WpJet_pt_4j2t = array.array('f', [0.])
-sublead_WpJet_eta_4j2t = array.array('f', [0.])
-sublead_WpJet_phi_4j2t = array.array('f', [0.])
-sublead_WpJet_m_4j2t = array.array('f', [0.])
-sublead_WpJet_isBTagged_4j2t = array.array('i', [0])
-best_WpJet_pt_4j2t = array.array('f', [0.])
-best_WpJet_eta_4j2t = array.array('f', [0.])
-best_WpJet_phi_4j2t = array.array('f', [0.])
-best_WpJet_m_4j2t = array.array('f', [0.])
-best_WpJet_isBTagged_4j2t = array.array('i', [0])
-'''
-closest_WpJet_isDFL_4j2t = array.array('i', [0])
-closest_WpJet_isDFM_4j2t = array.array('i', [0])
-closest_WpJet_isDFT_4j2t = array.array('i', [0])
-closest_WpJet_isDCL_4j2t = array.array('i', [0])
-closest_WpJet_isDCM_4j2t = array.array('i', [0])
-closest_WpJet_isDCT_4j2t = array.array('i', [0])
-chi_WpJet_isDFL_4j2t = array.array('i', [0])
-chi_WpJet_isDFM_4j2t = array.array('i', [0])
-chi_WpJet_isDFT_4j2t = array.array('i', [0])
-chi_WpJet_isDCL_4j2t = array.array('i', [0])
-chi_WpJet_isDCM_4j2t = array.array('i', [0])
-chi_WpJet_isDCT_4j2t = array.array('i', [0])
-sublead_WpJet_isDFL_4j2t = array.array('i', [0])
-sublead_WpJet_isDFM_4j2t = array.array('i', [0])
-sublead_WpJet_isDFT_4j2t = array.array('i', [0])
-sublead_WpJet_isDCL_4j2t = array.array('i', [0])
-sublead_WpJet_isDCM_4j2t = array.array('i', [0])
-sublead_WpJet_isDCT_4j2t = array.array('i', [0])
-best_WpJet_isDFL_4j2t = array.array('i', [0])
-best_WpJet_isDFM_4j2t = array.array('i', [0])
-best_WpJet_isDFT_4j2t = array.array('i', [0])
-best_WpJet_isDCL_4j2t = array.array('i', [0])
-best_WpJet_isDCM_4j2t = array.array('i', [0])
-best_WpJet_isDCT_4j2t = array.array('i', [0])
-'''
-
-#Lepton
-lepton_pt_4j2t = array.array('f', [0.])
-lepton_eta_4j2t = array.array('f', [0.])
-lepton_phi_4j2t = array.array('f', [0.])
-lepton_miniIso_4j2t = array.array('f', [0.])
-isEle_4j2t = array.array('i', [0])
-isMu_4j2t = array.array('i', [0])
-
-MET_pt_4j2t = array.array('f', [0.])
-MET_phi_4j2t = array.array('f', [0.])
-
-nPU_4j2t = array.array('f', [0.])
-nPV_4j2t = array.array('f', [0.])
-mtw_4j2t = array.array('f', [0.])
-
-w_nominal_4j2t = array.array('f', [0.])
-w_PDF_4j2t = array.array('f', [0.]*110)
-passed_mu_4j2t = array.array('f', [0.])
-passed_ele_4j2t = array.array('f', [0.])
-passed_ht_4j2t = array.array('f', [0.])
-
-#++++++++++++++++++++++++++++++++++
-#++   branching the new trees    ++
-#++++++++++++++++++++++++++++++++++
-if MCReco:
-    systTree.branchTreesSysts(trees, "4j2t", "MC_Wprime_pt", outTreeFile, MC_Wprime_pt_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_Wprime_eta", outTreeFile, MC_Wprime_eta_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_Wprime_phi", outTreeFile, MC_Wprime_phi_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_Wprime_m", outTreeFile, MC_Wprime_m_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_Wprime_mt", outTreeFile, MC_Wprime_mt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_Wprime_pt", outTreeFile, closest_Wprime_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_Wprime_eta", outTreeFile, closest_Wprime_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_Wprime_phi", outTreeFile, closest_Wprime_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_Wprime_m", outTreeFile, closest_Wprime_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_Wprime_mt", outTreeFile, closest_Wprime_mt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_Wprime_pt", outTreeFile, chi_Wprime_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_Wprime_eta", outTreeFile, chi_Wprime_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_Wprime_phi", outTreeFile, chi_Wprime_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_Wprime_m", outTreeFile, chi_Wprime_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_Wprime_mt", outTreeFile, chi_Wprime_mt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_Wprime_pt", outTreeFile, sublead_Wprime_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_Wprime_eta", outTreeFile, sublead_Wprime_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_Wprime_phi", outTreeFile, sublead_Wprime_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_Wprime_m", outTreeFile, sublead_Wprime_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_Wprime_mt", outTreeFile, sublead_Wprime_mt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_Wprime_pt", outTreeFile, best_Wprime_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_Wprime_eta", outTreeFile, best_Wprime_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_Wprime_phi", outTreeFile, best_Wprime_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_Wprime_m", outTreeFile, best_Wprime_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_Wprime_mt", outTreeFile, best_Wprime_mt_4j2t)
-
-systTree.branchTreesSysts(trees, "4j2t", "nJet", outTreeFile, nJet_4j2t)
-if MCReco:
-    systTree.branchTreesSysts(trees, "4j2t", "MC_RecoTop_pt", outTreeFile, MC_RecoTop_pt_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_RecoTop_eta", outTreeFile, MC_RecoTop_eta_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_RecoTop_phi", outTreeFile, MC_RecoTop_phi_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_RecoTop_m", outTreeFile, MC_RecoTop_m_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_RecoTop_mt", outTreeFile, MC_RecoTop_mt_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_RecoTop_isNeg", outTreeFile, MC_RecoTop_isNeg_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_RecoTop_pt", outTreeFile, closest_RecoTop_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_RecoTop_eta", outTreeFile, closest_RecoTop_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_RecoTop_phi", outTreeFile, closest_RecoTop_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_RecoTop_m", outTreeFile, closest_RecoTop_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_RecoTop_mt", outTreeFile, closest_RecoTop_mt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_RecoTop_isNeg", outTreeFile, closest_RecoTop_isNeg_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_RecoTop_pt", outTreeFile, chi_RecoTop_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_RecoTop_eta", outTreeFile, chi_RecoTop_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_RecoTop_phi", outTreeFile, chi_RecoTop_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_RecoTop_m", outTreeFile, chi_RecoTop_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_RecoTop_mt", outTreeFile, chi_RecoTop_mt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_RecoTop_isNeg", outTreeFile, chi_RecoTop_isNeg_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_RecoTop_pt", outTreeFile, sublead_RecoTop_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_RecoTop_eta", outTreeFile, sublead_RecoTop_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_RecoTop_phi", outTreeFile, sublead_RecoTop_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_RecoTop_m", outTreeFile, sublead_RecoTop_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_RecoTop_mt", outTreeFile, sublead_RecoTop_mt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_RecoTop_isNeg", outTreeFile, sublead_RecoTop_isNeg_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_RecoTop_pt", outTreeFile, best_RecoTop_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_RecoTop_eta", outTreeFile, best_RecoTop_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_RecoTop_phi", outTreeFile, best_RecoTop_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_RecoTop_m", outTreeFile, best_RecoTop_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_RecoTop_mt", outTreeFile, best_RecoTop_mt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_RecoTop_isNeg", outTreeFile, best_RecoTop_isNeg_4j2t)
-
-if MCReco:
-    systTree.branchTreesSysts(trees, "4j2t", "MC_TopJet_pt", outTreeFile, MC_TopJet_pt_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_TopJet_eta", outTreeFile, MC_TopJet_eta_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_TopJet_phi", outTreeFile, MC_TopJet_phi_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_TopJet_m", outTreeFile, MC_TopJet_m_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_TopJet_dRLepJet", outTreeFile, MC_TopJet_dRLepJet_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_TopJet_pt", outTreeFile, closest_TopJet_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_TopJet_eta", outTreeFile, closest_TopJet_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_TopJet_phi", outTreeFile, closest_TopJet_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_TopJet_m", outTreeFile, closest_TopJet_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_TopJet_isBTagged", outTreeFile, closest_TopJet_isBTagged_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_TopJet_dRLepJet", outTreeFile, closest_TopJet_dRLepJet_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_TopJet_pt", outTreeFile, chi_TopJet_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_TopJet_eta", outTreeFile, chi_TopJet_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_TopJet_phi", outTreeFile, chi_TopJet_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_TopJet_m", outTreeFile, chi_TopJet_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_TopJet_isBTagged", outTreeFile, chi_TopJet_isBTagged_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_TopJet_dRLepJet", outTreeFile, chi_TopJet_dRLepJet_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_TopJet_pt", outTreeFile, sublead_TopJet_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_TopJet_eta", outTreeFile, sublead_TopJet_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_TopJet_phi", outTreeFile, sublead_TopJet_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_TopJet_m", outTreeFile, sublead_TopJet_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_TopJet_isBTagged", outTreeFile, sublead_TopJet_isBTagged_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_TopJet_dRLepJet", outTreeFile, sublead_TopJet_dRLepJet_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_TopJet_pt", outTreeFile, best_TopJet_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_TopJet_eta", outTreeFile, best_TopJet_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_TopJet_phi", outTreeFile, best_TopJet_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_TopJet_m", outTreeFile, best_TopJet_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_TopJet_isBTagged", outTreeFile, best_TopJet_isBTagged_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_TopJet_dRLepJet", outTreeFile, best_TopJet_dRLepJet_4j2t)
-
-if MCReco:
-    systTree.branchTreesSysts(trees, "4j2t", "MC_WpJet_pt", outTreeFile, MC_WpJet_pt_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_WpJet_eta", outTreeFile, MC_WpJet_eta_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_WpJet_phi", outTreeFile, MC_WpJet_phi_4j2t)
-    systTree.branchTreesSysts(trees, "4j2t", "MC_WpJet_m", outTreeFile, MC_WpJet_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_WpJet_pt", outTreeFile, closest_WpJet_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_WpJet_eta", outTreeFile, closest_WpJet_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_WpJet_phi", outTreeFile, closest_WpJet_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_WpJet_m", outTreeFile, closest_WpJet_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "closest_WpJet_isBTagged", outTreeFile, closest_WpJet_isBTagged_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_WpJet_pt", outTreeFile, chi_WpJet_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_WpJet_eta", outTreeFile, chi_WpJet_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_WpJet_phi", outTreeFile, chi_WpJet_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_WpJet_m", outTreeFile, chi_WpJet_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "chi_WpJet_isBTagged", outTreeFile, chi_WpJet_isBTagged_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_WpJet_pt", outTreeFile, sublead_WpJet_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_WpJet_eta", outTreeFile, sublead_WpJet_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_WpJet_phi", outTreeFile, sublead_WpJet_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_WpJet_m", outTreeFile, sublead_WpJet_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "sublead_WpJet_isBTagged", outTreeFile, sublead_WpJet_isBTagged_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_WpJet_pt", outTreeFile, best_WpJet_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_WpJet_eta", outTreeFile, best_WpJet_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_WpJet_phi", outTreeFile, best_WpJet_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_WpJet_m", outTreeFile, best_WpJet_m_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "best_WpJet_isBTagged", outTreeFile, best_WpJet_isBTagged_4j2t)
-
-systTree.branchTreesSysts(trees, "4j2t", "lepton_pt", outTreeFile, lepton_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "lepton_eta", outTreeFile, lepton_eta_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "lepton_phi", outTreeFile, lepton_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "lepton_miniIso", outTreeFile, lepton_miniIso_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "passed_mu", outTreeFile, passed_mu_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "passed_ele", outTreeFile, passed_ele_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "passed_ht", outTreeFile, passed_ht_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "nPU", outTreeFile, nPU_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "nPV", outTreeFile, nPV_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "isEle", outTreeFile, isEle_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "isMu", outTreeFile, isMu_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "Event_HT", outTreeFile, Event_HT_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "MET_pt", outTreeFile, MET_pt_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "MET_phi", outTreeFile, MET_phi_4j2t)
-systTree.branchTreesSysts(trees, "4j2t", "mtw", outTreeFile, mtw_4j2t)
-print "Is MC: " + str(isMC) + "      option addPDF: " + str(addPDF)
-if(isMC and addPDF):
-    systTree.branchTreesSysts(trees, "4j2t", "w_PDF", outTreeFile, w_PDF_4j2t)
-
-w_nominal[0] = 1.
+w_nominal_all[0] = 1.
 
 #++++++++++++++++++++++++++++++++++
 #++      taking MC weights       ++
@@ -1581,9 +550,9 @@ for i in xrange(0,tree.GetEntries()):
     else:
         runPeriod = sample.runP
     passMu, passEle, passHT, noTrigger = trig_map(HLT, year, runPeriod)
-    passed_mu_all[0] = passed_mu_2j0t[0] = passed_mu_2j2t[0] = passed_mu_4j2t[0] = int(passMu)
-    passed_ele_all[0] = passed_ele_2j0t[0] = passed_ele_2j2t[0] = passed_ele_4j2t[0] = int(passEle)
-    passed_ht_all[0] = passed_ht_2j0t[0] = passed_ht_2j2t[0] = passed_ht_4j2t[0] = int(passHT)
+    passed_mu_all[0] = int(passMu)
+    passed_ele_all[0] = int(passEle)
+    passed_ht_all[0] = int(passHT)
     isDilepton = False
     isMuon = (len(goodMu) == 1) and (len(goodEle) == 0) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT)
     isElectron = (len(goodMu) == 0) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passEle or passHT)
@@ -1591,8 +560,8 @@ for i in xrange(0,tree.GetEntries()):
         isdileptonic[0] = 0
         isDilepton = (len(goodMu) == 1) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT or passEle)
     if(isMuon):
-        isEle[0] = 0
-        isMu[0] = 1
+        isEle_all[0] = 0
+        isMu_all[0] = 1
         tightlep = goodMu[0]
         tightlep_p4 = ROOT.TLorentzVector()
         tightlep_p4.SetPtEtaPhiM(goodMu[0].pt,goodMu[0].eta,goodMu[0].phi,goodMu[0].mass)
@@ -1606,8 +575,8 @@ for i in xrange(0,tree.GetEntries()):
             systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SFUp))
             systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SFDown))
     elif(isElectron):
-        isEle[0] = 1
-        isMu[0] = 0
+        isEle_all[0] = 1
+        isMu_all[0] = 0
         tightlep = goodEle[0]
         tightlep_p4 = ROOT.TLorentzVector()
         tightlep_p4.SetPtEtaPhiM(goodEle[0].pt,goodEle[0].eta,goodEle[0].phi,goodEle[0].mass)
@@ -1653,33 +622,33 @@ for i in xrange(0,tree.GetEntries()):
     recomet_p4t = ROOT.TLorentzVector()
     recomet_p4t.SetPtEtaPhiM(met.pt, 0., met.phi, 0)
 
-    nPU_all[0] = nPU_2j0t[0] = nPU_2j2t[0] = nPU_4j2t[0] = PU.nPU
-    nPV_all[0] = nPV_2j0t[0] = nPV_2j2t[0] = nPV_4j2t[0] = chain.nOtherPV
+    nPU_all[0] = PU.nPU
+    nPV_all[0] = chain.nOtherPV
  
     if tightlep != None:
         nJet_pt25_all[0] = njets
         nJet_pt50_all[0] = len(get_Jet(jets, 50))
         leadingjet_pt_all[0] = jets[0].pt
         subleadingjet_pt_all[0] = jets[1].pt
-        lepton_pt_all[0] = lepton_pt_2j0t[0] = lepton_pt_2j2t[0] = lepton_pt_4j2t[0] = tightlep_p4.Pt()
-        lepton_eta_all[0] = lepton_eta_2j0t[0] = lepton_eta_2j2t[0] = lepton_eta_4j2t[0] = tightlep_p4.Eta()
-        lepton_phi_all[0] = lepton_phi_2j0t[0] = lepton_phi_2j2t[0] = lepton_phi_4j2t[0] = tightlep_p4.Phi()
-        lepton_miniIso_all[0] = lepton_miniIso_2j0t[0] = lepton_miniIso_2j2t[0] = lepton_miniIso_4j2t[0] = tightlep.miniPFRelIso_all
-        MET_pt_all[0] = MET_pt_2j0t[0] =MET_pt_2j2t[0] =MET_pt_4j2t[0] = met.pt
-        MET_phi_all[0] = MET_phi_2j0t[0] = MET_phi_2j2t[0] = MET_phi_4j2t[0] = met.phi
-        Event_HT_all[0] = Event_HT_2j0t[0] = Event_HT_2j2t[0] = Event_HT_4j2t[0] = HT.eventHT
+        lepton_pt_all[0] = tightlep_p4.Pt()
+        lepton_eta_all[0] = tightlep_p4.Eta()
+        lepton_phi_all[0] = tightlep_p4.Phi()
+        lepton_miniIso_all[0] = tightlep.miniPFRelIso_all
+        MET_pt_all[0] = met.pt
+        MET_phi_all[0] = met.phi
+        Event_HT_all[0] = HT.eventHT
     else:
         nJet_pt25_all[0] = -1
         nJet_pt50_all[0] = -1
         leadingjet_pt_all[0] = -100.
         subleadingjet_pt_all[0] = -100.
-        lepton_pt_all[0] = lepton_pt_2j0t[0] = lepton_pt_2j2t[0] = lepton_pt_4j2t[0] = -100.
-        lepton_eta_all[0] = lepton_eta_2j0t[0] = lepton_eta_2j2t[0] = lepton_eta_4j2t[0] = -100.
-        lepton_phi_all[0] = lepton_phi_2j0t[0] = lepton_phi_2j2t[0] = lepton_phi_4j2t[0] = -100.
-        lepton_miniIso_all[0] = lepton_miniIso_2j0t[0] = lepton_miniIso_2j2t[0] = lepton_miniIso_4j2t[0] = -100.
-        MET_pt_all[0] = MET_pt_2j0t[0] =MET_pt_2j2t[0] =MET_pt_4j2t[0] = -100.
-        MET_phi_all[0] = MET_phi_2j0t[0] = MET_phi_2j2t[0] = MET_phi_4j2t[0] = -100.
-        Event_HT_all[0] = Event_HT_2j0t[0] = Event_HT_2j2t[0] = Event_HT_4j2t[0] = -100.
+        lepton_pt_all[0] = -100.
+        lepton_eta_all[0] = -100.
+        lepton_phi_all[0] = -100.
+        lepton_miniIso_all[0] = -100.
+        MET_pt_all[0] = -100.
+        MET_phi_all[0] = -100.
+        Event_HT_all[0] = -100.
 
     # requiring mtt < 700 to merge inclusive tt with the mtt > 700
     if('TT_incl' in sample.label):
@@ -1694,11 +663,8 @@ for i in xrange(0,tree.GetEntries()):
         tt_q4 = top_q4 + antitop_q4
         if(tt_q4.M() > 700.):
             w_nominal_all[0] *= 0 #trick to make the events with mtt > 700 count zero
-            w_nominal_2j0t[0] *= 0
-            w_nominal_2j2t[0] *= 0
-            w_nominal_4j2t[0] *= 0
 
-    mtw_all[0] = mtw_2j0t[0] = mtw_2j2t[0] = mtw_4j2t[0] = math.sqrt(2*tightlep_p4.Pt() * met.pt *(1-math.cos(abs(deltaPhi(tightlep_p4.Phi(), met.phi)))))
+    mtw_all[0] = math.sqrt(2*tightlep_p4.Pt() * met.pt *(1-math.cos(abs(deltaPhi(tightlep_p4.Phi(), met.phi)))))
 
     goodJets = get_Jet(jets, 30)
     bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
@@ -1799,48 +765,48 @@ for i in xrange(0,tree.GetEntries()):
             mcWprime_p4 = mctop_p4 + mcpromptbjet_p4
             mcWprime_p4t = mctop_p4t + mcpromptbjet_p4t
             mcChi2_topmass = Chi_TopMass(mctop_p4.M())
-            MC_Wprime_m[0] = mcWprime_p4.M()
-            MC_Wprime_m[0] = mcWprime_p4.M()
-            MC_Wprime_mt[0] = mcWprime_p4t.M()
-            MC_Wprime_pt[0] = mcWprime_p4.Pt()
-            MC_Wprime_eta[0] = mcWprime_p4.Eta()
-            MC_Wprime_phi[0] = mcWprime_p4.Phi()
-            MC_RecoTop_m[0] = mctop_p4.M()
-            MC_RecoTop_mt[0] = mctop_p4t.M()
-            MC_RecoTop_pt[0] = mctop_p4.Pt()
-            MC_RecoTop_eta[0] = mctop_p4.Eta()
-            MC_RecoTop_phi[0] = mctop_p4.Phi()
-            MC_RecoTop_isNeg[0] = int(IsmcNeg)
-            MC_TopJet_m[0] = mctopbjet_p4.M()
-            MC_TopJet_pt[0] = mctopbjet_p4.Pt()
-            MC_TopJet_eta[0] = mctopbjet_p4.Eta()
-            MC_TopJet_phi[0] = mctopbjet_p4.Phi()
-            MC_TopJet_dRLepJet[0] = copy.deepcopy(mcdR_lepjet)
-            MC_WpJet_m[0] = mcpromptbjet_p4.M()
-            MC_WpJet_pt[0] = mcpromptbjet_p4.Pt()
-            MC_WpJet_eta[0] = mcpromptbjet_p4.Eta()
-            MC_WpJet_phi[0] = mcpromptbjet_p4.Phi()
+            MC_Wprime_m_all[0] = mcWprime_p4.M()
+            MC_Wprime_m_all[0] = mcWprime_p4.M()
+            MC_Wprime_mt_all[0] = mcWprime_p4t.M()
+            MC_Wprime_pt_all[0] = mcWprime_p4.Pt()
+            MC_Wprime_eta_all[0] = mcWprime_p4.Eta()
+            MC_Wprime_phi_all[0] = mcWprime_p4.Phi()
+            MC_RecoTop_m_all[0] = mctop_p4.M()
+            MC_RecoTop_mt_all[0] = mctop_p4t.M()
+            MC_RecoTop_pt_all[0] = mctop_p4.Pt()
+            MC_RecoTop_eta_all[0] = mctop_p4.Eta()
+            MC_RecoTop_phi_all[0] = mctop_p4.Phi()
+            MC_RecoTop_isNeg_all[0] = int(IsmcNeg)
+            MC_TopJet_m_all[0] = mctopbjet_p4.M()
+            MC_TopJet_pt_all[0] = mctopbjet_p4.Pt()
+            MC_TopJet_eta_all[0] = mctopbjet_p4.Eta()
+            MC_TopJet_phi_all[0] = mctopbjet_p4.Phi()
+            MC_TopJet_dRLepJet_all[0] = copy.deepcopy(mcdR_lepjet)
+            MC_WpJet_m_all[0] = mcpromptbjet_p4.M()
+            MC_WpJet_pt_all[0] = mcpromptbjet_p4.Pt()
+            MC_WpJet_eta_all[0] = mcpromptbjet_p4.Eta()
+            MC_WpJet_phi_all[0] = mcpromptbjet_p4.Phi()
         else:
-            MC_Wprime_m[0] = -100.
-            MC_Wprime_mt[0] = -100.
-            MC_Wprime_pt[0] = -100.
-            MC_Wprime_eta[0] = -100.
-            MC_Wprime_phi[0] = -100.
-            MC_RecoTop_m[0] = -100.
-            MC_RecoTop_mt[0] = -100.
-            MC_RecoTop_pt[0] = -100.
-            MC_RecoTop_eta[0] = -100.
-            MC_RecoTop_phi[0] = -100.
-            MC_RecoTop_isNeg[0] = -1
-            MC_TopJet_m[0] = -100.
-            MC_TopJet_pt[0] = -100.
-            MC_TopJet_eta[0] = -100.
-            MC_TopJet_phi[0] = -100.
-            MC_TopJet_dRLepJet[0] = -100.
-            MC_WpJet_m[0] = -100.
-            MC_WpJet_pt[0] = -100.
-            MC_WpJet_eta[0] = -100.
-            MC_WpJet_phi[0] = -100.
+            MC_Wprime_m_all[0] = -100.
+            MC_Wprime_mt_all[0] = -100.
+            MC_Wprime_pt_all[0] = -100.
+            MC_Wprime_eta_all[0] = -100.
+            MC_Wprime_phi_all[0] = -100.
+            MC_RecoTop_m_all[0] = -100.
+            MC_RecoTop_mt_all[0] = -100.
+            MC_RecoTop_pt_all[0] = -100.
+            MC_RecoTop_eta_all[0] = -100.
+            MC_RecoTop_phi_all[0] = -100.
+            MC_RecoTop_isNeg_all[0] = -1
+            MC_TopJet_m_all[0] = -100.
+            MC_TopJet_pt_all[0] = -100.
+            MC_TopJet_eta_all[0] = -100.
+            MC_TopJet_phi_all[0] = -100.
+            MC_TopJet_dRLepJet_all[0] = -100.
+            MC_WpJet_m_all[0] = -100.
+            MC_WpJet_pt_all[0] = -100.
+            MC_WpJet_eta_all[0] = -100.
+            MC_WpJet_phi_all[0] = -100.
 
     #DetReco(nstruction)
     if len(goodJets) < 2:
@@ -2021,201 +987,201 @@ for i in xrange(0,tree.GetEntries()):
     if closest_recotop_p4 != None :
         closest_Wprime_p4 = closest_recotop_p4 + closest_promptjet.p4()
         closest_Wprime_p4t = closest_recotop_p4t + closest_promptjet_p4t
-        closest_Wprime_m[0] = closest_Wprime_p4.M()
-        closest_Wprime_mt[0] = closest_Wprime_p4t.M()
-        closest_Wprime_pt[0] = closest_Wprime_p4.Pt()
-        closest_Wprime_eta[0] = closest_Wprime_p4.Eta()
-        closest_Wprime_phi[0] = closest_Wprime_p4.Phi()
-        closest_RecoTop_m[0] = closest_recotop_p4.M()
-        closest_RecoTop_mt[0] = closest_recotop_p4t.M()
-        closest_RecoTop_pt[0] = closest_recotop_p4.Pt()
-        closest_RecoTop_eta[0] = closest_recotop_p4.Eta()
-        closest_RecoTop_phi[0] = closest_recotop_p4.Phi()
-        closest_RecoTop_isNeg[0] = int(IsNeg_closest)
-        closest_TopJet_m[0] = closest_jet_p4.M()
-        closest_TopJet_pt[0] = closest_jet_p4.Pt()
-        closest_TopJet_eta[0] = closest_jet_p4.Eta()
-        closest_TopJet_phi[0] = closest_jet_p4.Phi()
-        closest_TopJet_isBTagged[0] = int(len(bjet_filter([closest_jet], 'DeepFlv', 'M')))
-        closest_TopJet_dRLepJet[0] = copy.deepcopy(closest_dR_lepjet)
-        closest_WpJet_m[0] = closest_promptjet.p4().M()
-        closest_WpJet_pt[0] = closest_promptjet.p4().Pt()
-        closest_WpJet_eta[0] = closest_promptjet.p4().Eta()
-        closest_WpJet_phi[0] = closest_promptjet.p4().Phi()
-        closest_WpJet_isBTagged[0] = int(len(bjet_filter([closest_promptjet], 'DeepFlv', 'M')))
+        closest_Wprime_m_all[0] = closest_Wprime_p4.M()
+        closest_Wprime_mt_all[0] = closest_Wprime_p4t.M()
+        closest_Wprime_pt_all[0] = closest_Wprime_p4.Pt()
+        closest_Wprime_eta_all[0] = closest_Wprime_p4.Eta()
+        closest_Wprime_phi_all[0] = closest_Wprime_p4.Phi()
+        closest_RecoTop_m_all[0] = closest_recotop_p4.M()
+        closest_RecoTop_mt_all[0] = closest_recotop_p4t.M()
+        closest_RecoTop_pt_all[0] = closest_recotop_p4.Pt()
+        closest_RecoTop_eta_all[0] = closest_recotop_p4.Eta()
+        closest_RecoTop_phi_all[0] = closest_recotop_p4.Phi()
+        closest_RecoTop_isNeg_all[0] = int(IsNeg_closest)
+        closest_TopJet_m_all[0] = closest_jet_p4.M()
+        closest_TopJet_pt_all[0] = closest_jet_p4.Pt()
+        closest_TopJet_eta_all[0] = closest_jet_p4.Eta()
+        closest_TopJet_phi_all[0] = closest_jet_p4.Phi()
+        closest_TopJet_isBTagged_all[0] = int(len(bjet_filter([closest_jet], 'DeepFlv', 'M')))
+        closest_TopJet_dRLepJet_all[0] = copy.deepcopy(closest_dR_lepjet)
+        closest_WpJet_m_all[0] = closest_promptjet.p4().M()
+        closest_WpJet_pt_all[0] = closest_promptjet.p4().Pt()
+        closest_WpJet_eta_all[0] = closest_promptjet.p4().Eta()
+        closest_WpJet_phi_all[0] = closest_promptjet.p4().Phi()
+        closest_WpJet_isBTagged_all[0] = int(len(bjet_filter([closest_promptjet], 'DeepFlv', 'M')))
     else:
-        closest_Wprime_m[0] = -100.
-        closest_Wprime_mt[0] = -100.
-        closest_Wprime_pt[0] = -100.
-        closest_Wprime_eta[0] = -100.
-        closest_Wprime_phi[0] = -100.
-        closest_RecoTop_m[0] = -100.
-        closest_RecoTop_mt[0] = -100.
-        closest_RecoTop_pt[0] = -100.
-        closest_RecoTop_eta[0] = -100.
-        closest_RecoTop_phi[0] = -100.
-        closest_RecoTop_isNeg[0] = -1
-        closest_TopJet_m[0] = -100.
-        closest_TopJet_pt[0] = -100.
-        closest_TopJet_eta[0] = -100.
-        closest_TopJet_phi[0] = -100.
-        closest_TopJet_isBTagged[0] = -1
-        closest_TopJet_dRLepJet[0] = -100.
-        closest_WpJet_m[0] = -100.
-        closest_WpJet_pt[0] = -100.
-        closest_WpJet_eta[0] = -100.
-        closest_WpJet_phi[0] = -100.
-        closest_WpJet_isBTagged[0] = -1
+        closest_Wprime_m_all[0] = -100.
+        closest_Wprime_mt_all[0] = -100.
+        closest_Wprime_pt_all[0] = -100.
+        closest_Wprime_eta_all[0] = -100.
+        closest_Wprime_phi_all[0] = -100.
+        closest_RecoTop_m_all[0] = -100.
+        closest_RecoTop_mt_all[0] = -100.
+        closest_RecoTop_pt_all[0] = -100.
+        closest_RecoTop_eta_all[0] = -100.
+        closest_RecoTop_phi_all[0] = -100.
+        closest_RecoTop_isNeg_all[0] = -1
+        closest_TopJet_m_all[0] = -100.
+        closest_TopJet_pt_all[0] = -100.
+        closest_TopJet_eta_all[0] = -100.
+        closest_TopJet_phi_all[0] = -100.
+        closest_TopJet_isBTagged_all[0] = -1
+        closest_TopJet_dRLepJet_all[0] = -100.
+        closest_WpJet_m_all[0] = -100.
+        closest_WpJet_pt_all[0] = -100.
+        closest_WpJet_eta_all[0] = -100.
+        closest_WpJet_phi_all[0] = -100.
+        closest_WpJet_isBTagged_all[0] = -1
 
     if chi_recotop_p4 != None :
         chi_Wprime_p4 = chi_recotop_p4 + chi_promptjet.p4()
         chi_Wprime_p4t = chi_recotop_p4t + chi_promptjet_p4t
-        chi_Wprime_m[0] = chi_Wprime_p4.M()
-        chi_Wprime_mt[0] = chi_Wprime_p4t.M()
-        chi_Wprime_pt[0] = chi_Wprime_p4.Pt()
-        chi_Wprime_eta[0] = chi_Wprime_p4.Eta()
-        chi_Wprime_phi[0] = chi_Wprime_p4.Phi()
-        chi_RecoTop_m[0] = chi_recotop_p4.M()
-        chi_RecoTop_mt[0] = chi_recotop_p4t.M()
-        chi_RecoTop_pt[0] = chi_recotop_p4.Pt()
-        chi_RecoTop_eta[0] = chi_recotop_p4.Eta()
-        chi_RecoTop_phi[0] = chi_recotop_p4.Phi()
-        chi_RecoTop_isNeg[0] = int(IsNeg_chi)
-        chi_TopJet_m[0] = chi_jet_p4.M()
-        chi_TopJet_pt[0] = chi_jet_p4.Pt()
-        chi_TopJet_eta[0] = chi_jet_p4.Eta()
-        chi_TopJet_phi[0] = chi_jet_p4.Phi()
-        chi_TopJet_isBTagged[0] = int(len(bjet_filter([chi_jet], 'DeepFlv', 'M')))
-        chi_TopJet_dRLepJet[0] = copy.deepcopy(chi_dR_lepjet)
-        chi_WpJet_m[0] = chi_promptjet.p4().M()
-        chi_WpJet_pt[0] = chi_promptjet.p4().Pt()
-        chi_WpJet_eta[0] = chi_promptjet.p4().Eta()
-        chi_WpJet_phi[0] = chi_promptjet.p4().Phi()
-        chi_WpJet_isBTagged[0] = int(len(bjet_filter([chi_promptjet], 'DeepFlv', 'M')))
+        chi_Wprime_m_all[0] = chi_Wprime_p4.M()
+        chi_Wprime_mt_all[0] = chi_Wprime_p4t.M()
+        chi_Wprime_pt_all[0] = chi_Wprime_p4.Pt()
+        chi_Wprime_eta_all[0] = chi_Wprime_p4.Eta()
+        chi_Wprime_phi_all[0] = chi_Wprime_p4.Phi()
+        chi_RecoTop_m_all[0] = chi_recotop_p4.M()
+        chi_RecoTop_mt_all[0] = chi_recotop_p4t.M()
+        chi_RecoTop_pt_all[0] = chi_recotop_p4.Pt()
+        chi_RecoTop_eta_all[0] = chi_recotop_p4.Eta()
+        chi_RecoTop_phi_all[0] = chi_recotop_p4.Phi()
+        chi_RecoTop_isNeg_all[0] = int(IsNeg_chi)
+        chi_TopJet_m_all[0] = chi_jet_p4.M()
+        chi_TopJet_pt_all[0] = chi_jet_p4.Pt()
+        chi_TopJet_eta_all[0] = chi_jet_p4.Eta()
+        chi_TopJet_phi_all[0] = chi_jet_p4.Phi()
+        chi_TopJet_isBTagged_all[0] = int(len(bjet_filter([chi_jet], 'DeepFlv', 'M')))
+        chi_TopJet_dRLepJet_all[0] = copy.deepcopy(chi_dR_lepjet)
+        chi_WpJet_m_all[0] = chi_promptjet.p4().M()
+        chi_WpJet_pt_all[0] = chi_promptjet.p4().Pt()
+        chi_WpJet_eta_all[0] = chi_promptjet.p4().Eta()
+        chi_WpJet_phi_all[0] = chi_promptjet.p4().Phi()
+        chi_WpJet_isBTagged_all[0] = int(len(bjet_filter([chi_promptjet], 'DeepFlv', 'M')))
     else:
-        chi_Wprime_m[0] = -100.
-        chi_Wprime_mt[0] = -100.
-        chi_Wprime_pt[0] = -100.
-        chi_Wprime_eta[0] = -100.
-        chi_Wprime_phi[0] = -100.
-        chi_RecoTop_m[0] = -100.
-        chi_RecoTop_mt[0] = -100.
-        chi_RecoTop_pt[0] = -100.
-        chi_RecoTop_eta[0] = -100.
-        chi_RecoTop_phi[0] = -100.
-        chi_RecoTop_isNeg[0] = -1
-        chi_TopJet_m[0] = -100.
-        chi_TopJet_pt[0] = -100.
-        chi_TopJet_eta[0] = -100.
-        chi_TopJet_phi[0] = -100.
-        chi_TopJet_isBTagged[0] = -1
-        chi_TopJet_dRLepJet[0] = -100.
-        chi_WpJet_m[0] = -100.
-        chi_WpJet_pt[0] = -100.
-        chi_WpJet_eta[0] = -100.
-        chi_WpJet_phi[0] = -100.
-        chi_WpJet_isBTagged[0] = -1
+        chi_Wprime_m_all[0] = -100.
+        chi_Wprime_mt_all[0] = -100.
+        chi_Wprime_pt_all[0] = -100.
+        chi_Wprime_eta_all[0] = -100.
+        chi_Wprime_phi_all[0] = -100.
+        chi_RecoTop_m_all[0] = -100.
+        chi_RecoTop_mt_all[0] = -100.
+        chi_RecoTop_pt_all[0] = -100.
+        chi_RecoTop_eta_all[0] = -100.
+        chi_RecoTop_phi_all[0] = -100.
+        chi_RecoTop_isNeg_all[0] = -1
+        chi_TopJet_m_all[0] = -100.
+        chi_TopJet_pt_all[0] = -100.
+        chi_TopJet_eta_all[0] = -100.
+        chi_TopJet_phi_all[0] = -100.
+        chi_TopJet_isBTagged_all[0] = -1
+        chi_TopJet_dRLepJet_all[0] = -100.
+        chi_WpJet_m_all[0] = -100.
+        chi_WpJet_pt_all[0] = -100.
+        chi_WpJet_eta_all[0] = -100.
+        chi_WpJet_phi_all[0] = -100.
+        chi_WpJet_isBTagged_all[0] = -1
 
     if sublead_recotop_p4 != None :
         sublead_Wprime_p4 = sublead_recotop_p4 + sublead_promptjet.p4()
         sublead_Wprime_p4t = sublead_recotop_p4t + sublead_promptjet_p4t
-        sublead_Wprime_m[0] = sublead_Wprime_p4.M()
-        sublead_Wprime_mt[0] = sublead_Wprime_p4t.M()
-        sublead_Wprime_pt[0] = sublead_Wprime_p4.Pt()
-        sublead_Wprime_eta[0] = sublead_Wprime_p4.Eta()
-        sublead_Wprime_phi[0] = sublead_Wprime_p4.Phi()
-        sublead_RecoTop_m[0] = sublead_recotop_p4.M()
-        sublead_RecoTop_mt[0] = sublead_recotop_p4t.M()
-        sublead_RecoTop_pt[0] = sublead_recotop_p4.Pt()
-        sublead_RecoTop_eta[0] = sublead_recotop_p4.Eta()
-        sublead_RecoTop_phi[0] = sublead_recotop_p4.Phi()
-        sublead_RecoTop_isNeg[0] = int(IsNeg_sublead)
-        sublead_TopJet_m[0] = sublead_jet_p4.M()
-        sublead_TopJet_pt[0] = sublead_jet_p4.Pt()
-        sublead_TopJet_eta[0] = sublead_jet_p4.Eta()
-        sublead_TopJet_phi[0] = sublead_jet_p4.Phi()
-        sublead_TopJet_isBTagged[0] = int(len(bjet_filter([sublead_jet], 'DeepFlv', 'M')))
-        sublead_TopJet_dRLepJet[0] = copy.deepcopy(sublead_dR_lepjet)
-        sublead_WpJet_m[0] = sublead_promptjet.p4().M()
-        sublead_WpJet_pt[0] = sublead_promptjet.p4().Pt()
-        sublead_WpJet_eta[0] = sublead_promptjet.p4().Eta()
-        sublead_WpJet_phi[0] = sublead_promptjet.p4().Phi()
-        sublead_WpJet_isBTagged[0] = int(len(bjet_filter([sublead_promptjet], 'DeepFlv', 'M')))
+        sublead_Wprime_m_all[0] = sublead_Wprime_p4.M()
+        sublead_Wprime_mt_all[0] = sublead_Wprime_p4t.M()
+        sublead_Wprime_pt_all[0] = sublead_Wprime_p4.Pt()
+        sublead_Wprime_eta_all[0] = sublead_Wprime_p4.Eta()
+        sublead_Wprime_phi_all[0] = sublead_Wprime_p4.Phi()
+        sublead_RecoTop_m_all[0] = sublead_recotop_p4.M()
+        sublead_RecoTop_mt_all[0] = sublead_recotop_p4t.M()
+        sublead_RecoTop_pt_all[0] = sublead_recotop_p4.Pt()
+        sublead_RecoTop_eta_all[0] = sublead_recotop_p4.Eta()
+        sublead_RecoTop_phi_all[0] = sublead_recotop_p4.Phi()
+        sublead_RecoTop_isNeg_all[0] = int(IsNeg_sublead)
+        sublead_TopJet_m_all[0] = sublead_jet_p4.M()
+        sublead_TopJet_pt_all[0] = sublead_jet_p4.Pt()
+        sublead_TopJet_eta_all[0] = sublead_jet_p4.Eta()
+        sublead_TopJet_phi_all[0] = sublead_jet_p4.Phi()
+        sublead_TopJet_isBTagged_all[0] = int(len(bjet_filter([sublead_jet], 'DeepFlv', 'M')))
+        sublead_TopJet_dRLepJet_all[0] = copy.deepcopy(sublead_dR_lepjet)
+        sublead_WpJet_m_all[0] = sublead_promptjet.p4().M()
+        sublead_WpJet_pt_all[0] = sublead_promptjet.p4().Pt()
+        sublead_WpJet_eta_all[0] = sublead_promptjet.p4().Eta()
+        sublead_WpJet_phi_all[0] = sublead_promptjet.p4().Phi()
+        sublead_WpJet_isBTagged_all[0] = int(len(bjet_filter([sublead_promptjet], 'DeepFlv', 'M')))
     else:
-        sublead_Wprime_m[0] = -100.
-        sublead_Wprime_mt[0] = -100.
-        sublead_Wprime_pt[0] = -100.
-        sublead_Wprime_eta[0] = -100.
-        sublead_Wprime_phi[0] = -100.
-        sublead_RecoTop_m[0] = -100.
-        sublead_RecoTop_mt[0] = -100.
-        sublead_RecoTop_pt[0] = -100.
-        sublead_RecoTop_eta[0] = -100.
-        sublead_RecoTop_phi[0] = -100.
-        sublead_RecoTop_isNeg[0] = -1
-        sublead_TopJet_dRLepJet[0] = -100.
-        sublead_TopJet_m[0] = -100.
-        sublead_TopJet_pt[0] = -100.
-        sublead_TopJet_eta[0] = -100.
-        sublead_TopJet_phi[0] = -100.
-        sublead_TopJet_isBTagged[0] = -1
-        sublead_WpJet_m[0] = -100.
-        sublead_WpJet_pt[0] = -100.
-        sublead_WpJet_eta[0] = -100.
-        sublead_WpJet_phi[0] = -100.
-        sublead_WpJet_isBTagged[0] = -1
+        sublead_Wprime_m_all[0] = -100.
+        sublead_Wprime_mt_all[0] = -100.
+        sublead_Wprime_pt_all[0] = -100.
+        sublead_Wprime_eta_all[0] = -100.
+        sublead_Wprime_phi_all[0] = -100.
+        sublead_RecoTop_m_all[0] = -100.
+        sublead_RecoTop_mt_all[0] = -100.
+        sublead_RecoTop_pt_all[0] = -100.
+        sublead_RecoTop_eta_all[0] = -100.
+        sublead_RecoTop_phi_all[0] = -100.
+        sublead_RecoTop_isNeg_all[0] = -1
+        sublead_TopJet_dRLepJet_all[0] = -100.
+        sublead_TopJet_m_all[0] = -100.
+        sublead_TopJet_pt_all[0] = -100.
+        sublead_TopJet_eta_all[0] = -100.
+        sublead_TopJet_phi_all[0] = -100.
+        sublead_TopJet_isBTagged_all[0] = -1
+        sublead_WpJet_m_all[0] = -100.
+        sublead_WpJet_pt_all[0] = -100.
+        sublead_WpJet_eta_all[0] = -100.
+        sublead_WpJet_phi_all[0] = -100.
+        sublead_WpJet_isBTagged_all[0] = -1
 
     if best_recotop_p4 != None :
         best_Wprime_p4 = best_recotop_p4 + best_promptjet.p4()
         best_Wprime_p4t = best_recotop_p4t + best_promptjet_p4t
-        best_Wprime_m[0] = best_Wprime_p4.M()
-        best_Wprime_mt[0] = best_Wprime_p4t.M()
-        best_Wprime_pt[0] = best_Wprime_p4.Pt()
-        best_Wprime_eta[0] = best_Wprime_p4.Eta()
-        best_Wprime_phi[0] = best_Wprime_p4.Phi()
-        best_RecoTop_m[0] = best_recotop_p4.M()
-        best_RecoTop_mt[0] = best_recotop_p4t.M()
-        best_RecoTop_pt[0] = best_recotop_p4.Pt()
-        best_RecoTop_eta[0] = best_recotop_p4.Eta()
-        best_RecoTop_phi[0] = best_recotop_p4.Phi()
-        best_RecoTop_isNeg[0] = int(IsNeg_best)
-        best_TopJet_m[0] = best_jet_p4.M()
-        best_TopJet_pt[0] = best_jet_p4.Pt()
-        best_TopJet_eta[0] = best_jet_p4.Eta()
-        best_TopJet_phi[0] = best_jet_p4.Phi()
-        best_TopJet_isBTagged[0] = int(len(bjet_filter([best_jet], 'DeepFlv', 'M')))
-        best_TopJet_dRLepJet[0] = copy.deepcopy(best_dR_lepjet)
-        best_WpJet_m[0] = best_promptjet.p4().M()
-        best_WpJet_pt[0] = best_promptjet.p4().Pt()
-        best_WpJet_eta[0] = best_promptjet.p4().Eta()
-        best_WpJet_phi[0] = best_promptjet.p4().Phi()
-        best_WpJet_isBTagged[0] = int(len(bjet_filter([best_promptjet], 'DeepFlv', 'M')))
+        best_Wprime_m_all[0] = best_Wprime_p4.M()
+        best_Wprime_mt_all[0] = best_Wprime_p4t.M()
+        best_Wprime_pt_all[0] = best_Wprime_p4.Pt()
+        best_Wprime_eta_all[0] = best_Wprime_p4.Eta()
+        best_Wprime_phi_all[0] = best_Wprime_p4.Phi()
+        best_RecoTop_m_all[0] = best_recotop_p4.M()
+        best_RecoTop_mt_all[0] = best_recotop_p4t.M()
+        best_RecoTop_pt_all[0] = best_recotop_p4.Pt()
+        best_RecoTop_eta_all[0] = best_recotop_p4.Eta()
+        best_RecoTop_phi_all[0] = best_recotop_p4.Phi()
+        best_RecoTop_isNeg_all[0] = int(IsNeg_best)
+        best_TopJet_m_all[0] = best_jet_p4.M()
+        best_TopJet_pt_all[0] = best_jet_p4.Pt()
+        best_TopJet_eta_all[0] = best_jet_p4.Eta()
+        best_TopJet_phi_all[0] = best_jet_p4.Phi()
+        best_TopJet_isBTagged_all[0] = int(len(bjet_filter([best_jet], 'DeepFlv', 'M')))
+        best_TopJet_dRLepJet_all[0] = copy.deepcopy(best_dR_lepjet)
+        best_WpJet_m_all[0] = best_promptjet.p4().M()
+        best_WpJet_pt_all[0] = best_promptjet.p4().Pt()
+        best_WpJet_eta_all[0] = best_promptjet.p4().Eta()
+        best_WpJet_phi_all[0] = best_promptjet.p4().Phi()
+        best_WpJet_isBTagged_all[0] = int(len(bjet_filter([best_promptjet], 'DeepFlv', 'M')))
     else:
-        best_Wprime_m[0] = -100.
-        best_Wprime_mt[0] = -100.
-        best_Wprime_pt[0] = -100.
-        best_Wprime_eta[0] = -100.
-        best_Wprime_phi[0] = -100.
-        best_RecoTop_m[0] = -100.
-        best_RecoTop_mt[0] = -100.
-        best_RecoTop_pt[0] = -100.
-        best_RecoTop_eta[0] = -100.
-        best_RecoTop_phi[0] = -100.
-        best_RecoTop_isNeg[0] = -1
-        best_TopJet_m[0] = -100.
-        best_TopJet_pt[0] = -100.
-        best_TopJet_eta[0] = -100.
-        best_TopJet_phi[0] = -100.
-        best_TopJet_isBTagged[0] = -1
-        best_TopJet_dRLepJet[0] = -100.
-        best_WpJet_m[0] = -100.
-        best_WpJet_pt[0] = -100.
-        best_WpJet_eta[0] = -100.
-        best_WpJet_phi[0] = -100.                    
-        best_WpJet_isBTagged[0] = -1
+        best_Wprime_m_all[0] = -100.
+        best_Wprime_mt_all[0] = -100.
+        best_Wprime_pt_all[0] = -100.
+        best_Wprime_eta_all[0] = -100.
+        best_Wprime_phi_all[0] = -100.
+        best_RecoTop_m_all[0] = -100.
+        best_RecoTop_mt_all[0] = -100.
+        best_RecoTop_pt_all[0] = -100.
+        best_RecoTop_eta_all[0] = -100.
+        best_RecoTop_phi_all[0] = -100.
+        best_RecoTop_isNeg_all[0] = -1
+        best_TopJet_m_all[0] = -100.
+        best_TopJet_pt_all[0] = -100.
+        best_TopJet_eta_all[0] = -100.
+        best_TopJet_phi_all[0] = -100.
+        best_TopJet_isBTagged_all[0] = -1
+        best_TopJet_dRLepJet_all[0] = -100.
+        best_WpJet_m_all[0] = -100.
+        best_WpJet_pt_all[0] = -100.
+        best_WpJet_eta_all[0] = -100.
+        best_WpJet_phi_all[0] = -100.                    
+        best_WpJet_isBTagged_all[0] = -1
         
-    systTree.setWeightName("w_nominal",copy.deepcopy(w_nominal[0]))
-    systTree.fillTreesSysts(trees, "2j2t")
+    systTree.setWeightName("w_nominal",copy.deepcopy(w_nominal_all[0]))
+    systTree.fillTreesSysts(trees, "all")
 
 #trees[0].Print()
 outTreeFile.cd()

@@ -94,7 +94,7 @@ def cutToTag(cut):
     return newstring
 
 def plot(lep, reg, variable, sample, cut_tag, syst):
-     print "plotting ", variable._name, " ", cut_tag, " ", syst
+     print "plotting ", variable._name, " for sample ", sample.label, " with cut ", cut_tag, " ", syst
      ROOT.TH1.SetDefaultSumw2()
      f1 = ROOT.TFile.Open(filerepo + sample.label + "/"  + sample.label + ".root")
      treename = "events_signal"
@@ -107,8 +107,8 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      h1.Sumw2()
      if 'muon' in lep: 
           cut  = variable._taglio+ '*isMu'
-          if not 'Data' in sample.label:
-               cut += '*passed_mu'
+          #if not 'Data' in sample.label:
+               #cut += '*passed_mu'
           if 'TT_incl' in sample.label:
                cut += '*islowmtt'
      elif 'electron' in lep:
@@ -131,7 +131,7 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
             if(channel == "WJets_ext" and lep.startswith("electron")):
                 taglio = variable._taglio+"*w_nominal*(abs(w)<10)"
      '''
-     print treename
+     #print treename
      f1.Get(treename).Project(histoname,variable._name,cut)
      h1.SetBinContent(1, h1.GetBinContent(0) + h1.GetBinContent(1))
      h1.SetBinError(1, math.sqrt(pow(h1.GetBinError(0),2) + pow(h1.GetBinError(1),2)))
@@ -188,7 +188,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           tmp.SetLineColor(ROOT.kBlack)
           tmp.SetName(s.leglabel)
           if('Data' in s.label):
-               hdata = ROOT.TH1F(tmp.Clone(""))
+               hdata.Add(ROOT.TH1F(tmp.Clone("")))
                hdata.SetMarkerStyle(20)
                hdata.SetMarkerSize(0.9)
                leg_stack.AddEntry(hdata, "Data", "lp")
@@ -395,7 +395,7 @@ if(opt.dat!= 'all'):
      [dataset_dict[str(sample.year)].append(sample) for sample in samples]
 else:
      dataset_dict = {
-          '2016':[DataMu_2016, DataEle_2016, ST_2016, QCD_2016, TT_Mtt_2016, TT_incl_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
+          '2016':[DataMu_2016, DataEle_2016, DataHT_2016, ST_2016, QCD_2016, TT_Mtt_2016, TT_incl_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
           '2017':[DataMu_2017, DataEle_2017, TT_Mtt_2017, WJets_2017],
           '2018':[DataMu_2018, DataEle_2018, TT_Mtt_2018, WJets_2018]}
 print(dataset_dict)
