@@ -30,8 +30,6 @@ colors = [ROOT.kBlue,
           ROOT.kAzure+6
 ]
 
-
-
 #### ========= UTILITIES =======================
 def deltaPhi(phi1,phi2):
     ## Catch if being called with two objects
@@ -60,6 +58,59 @@ def closest(obj,collection,presel=lambda x,y: True):
         if dr < drMin: 
             ret = x; drMin = dr
     return (ret,drMin)
+
+def add_to_hemisphere(selobj, obj, pos, neg):
+    px_obj = obj.pt*ROOT.TMath.Cos(obj.phi)
+    py_obj = obj.pt*ROOT.TMath.Sin(obj.phi)
+    if obj == selobj:
+        pos.append([copy.deepcopy(px_obj), copy.deepcopy(py_obj)])
+        neg.append([copy.deepcopy(px_obj), copy.deepcopy(py_obj)])
+    elif 0. < deltaPhi(selobj, obj) < math.pi:
+        pos.append([copy.deepcopy(px_obj), copy.deepcopy(py_obj)])
+    elif -math.pi < deltaPhi(selobj, obj) < 0.:
+        neg.append([copy.deepcopy(px_obj), copy.deepcopy(py_obj)])
+
+def hemisphere_thrust(objs):
+    thrust_px = 0.
+    thrust_py = 0.
+    num = 0.
+    den = 0.
+    for obj in objs:
+        obj_px = obj[0]
+        thrust_px += obj_px
+        obj_py = obj[1]
+        thrust_py += obj_py
+        den += math.hypot(obj_px, obj_py)
+    mod = math.hypot(thrust_px, thrust_py)
+    thrust_px = thrust_px / mod
+    thrust_py = thrust_py / mod
+    for obj in objs:
+        num += math.fabs(thrust_px*obj[0] + thrust_py*obj[1])
+    thrust = num / den
+    return thrust
+
+def event_thrust(lep, jets, met):
+    ovr_thrust = []
+    had_thrust = []
+    for i, seljet in enumerate(jets): #build hemispheres for every jet
+        neg_ovr = []
+        neg_had = []
+        pos_ovr = []
+        pos_had = []
+        for j, jet in enumerate(jets):
+            add_to_hemisphere(seljet, jet, pos_had, neg_had)
+        pos_ovr = copy.deepcopy(pos_had)
+        neg_ovr = copy.deepcopy(neg_had)
+        add_to_hemisphere(seljet, lep, pos_ovr, neg_ovr)
+        add_to_hemisphere(seljet, met, pos_ovr, neg_ovr)
+        ovr_thrust.append(copy.deepcopy(hemisphere_thrust(pos_ovr)))
+        ovr_thrust.append(copy.deepcopy(hemisphere_thrust(neg_ovr)))
+        had_thrust.append(copy.deepcopy(hemisphere_thrust(pos_had)))
+        had_thrust.append(copy.deepcopy(hemisphere_thrust(neg_had)))
+
+    ovr_thrust.sort(reverse = True)
+    had_thrust.sort(reverse = True)
+    return round(ovr_thrust[0], 5), round(had_thrust[0], 5)
 
 def matchObjectCollection(objs,collection,dRmax=0.4,presel=lambda x,y: True):
     pairs = {}
