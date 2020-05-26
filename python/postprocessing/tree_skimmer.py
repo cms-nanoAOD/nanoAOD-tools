@@ -176,6 +176,9 @@ best_RecoTop_chi2_all = array.array('i', [0])
 
 nJet_pt25_all = array.array('i', [0])
 nJet_pt50_all = array.array('i', [0])
+nbJet_pt25_all = array.array('i', [0])
+nbJet_pt50_all = array.array('i', [0])
+
 #Jet produced after top semilep decay
 if MCReco:
     MC_TopJet_pt_all = array.array('f', [0.])
@@ -312,6 +315,14 @@ passed_ele_all = array.array('f', [0.])
 passed_ht_all = array.array('f', [0.])
 leadingjet_pt_all = array.array('f', [0.])
 subleadingjet_pt_all = array.array('f', [0.])
+
+leadingjets_ratio_deltaPhideltaEta = array.array('f', [0.])
+bjets_ratio_deltaPhideltaEta = array.array('f', [0.])
+had_thrust = array.array('f', [0.])
+had_transverse_thrust = array.array('f', [0.])
+ovr_thrust = array.array('f', [0.])
+ovr_transverse_thrust = array.array('f', [0.])
+
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
@@ -344,8 +355,16 @@ systTree.branchTreesSysts(trees, "all", "best_Wprime_mt", outTreeFile, best_Wpri
 
 systTree.branchTreesSysts(trees, "all", "nJet_pt25", outTreeFile, nJet_pt25_all)
 systTree.branchTreesSysts(trees, "all", "nJet_pt50", outTreeFile, nJet_pt50_all)
+systTree.branchTreesSysts(trees, "all", "nbJet_pt25", outTreeFile, nbJet_pt25_all)
+systTree.branchTreesSysts(trees, "all", "nbJet_pt50", outTreeFile, nbJet_pt50_all)
 systTree.branchTreesSysts(trees, "all", "leadingjet_pt", outTreeFile, leadingjet_pt_all)
 systTree.branchTreesSysts(trees, "all", "subleadingjet_pt", outTreeFile, subleadingjet_pt_all)
+systTree.branchTreesSysts(trees, "all", "leadingjets_ratio_deltaPhideltaEta", outTreeFile, leadingjets_ratio_deltaPhideltaEta)
+systTree.branchTreesSysts(trees, "all", "bjets_ratio_deltaPhideltaEta", outTreeFile, bjets_ratio_deltaPhideltaEta)
+systTree.branchTreesSysts(trees, "all", "had_thrust", outTreeFile, had_thrust)
+systTree.branchTreesSysts(trees, "all", "had_transverse_thrust", outTreeFile, had_transverse_thrust)
+systTree.branchTreesSysts(trees, "all", "ovr_thrust", outTreeFile, ovr_thrust)
+systTree.branchTreesSysts(trees, "all", "ovr_transverse_thrust", outTreeFile, ovr_transverse_thrust)
 if MCReco:
     systTree.branchTreesSysts(trees, "all", "MC_RecoTop_pt", outTreeFile, MC_RecoTop_pt_all)
     systTree.branchTreesSysts(trees, "all", "MC_RecoTop_eta", outTreeFile, MC_RecoTop_eta_all)
@@ -517,6 +536,7 @@ for i in xrange(0,tree.GetEntries()):
     PU = Object(event, "Pileup")
     genpart = None
 
+
     if isMC:
         genpart = Collection(event, "GenPart")
         LHE = Collection(event, "LHEPart")
@@ -624,12 +644,16 @@ for i in xrange(0,tree.GetEntries()):
 
     nPU_all[0] = PU.nPU
     nPV_all[0] = chain.nOtherPV
- 
+
     if tightlep != None:
+        prebjets, prenobjets = bjet_filter(jets, 'DeepFlv', 'M')
         nJet_pt25_all[0] = njets
+        nbJet_pt25_all[0] = len(prebjets)
         nJet_pt50_all[0] = len(get_Jet(jets, 50))
+        nbJet_pt50_all[0] = len(get_Jet(prebjets, 50))
         leadingjet_pt_all[0] = jets[0].pt
         subleadingjet_pt_all[0] = jets[1].pt
+        leadingjets_ratio_deltaPhideltaEta[0] = ( deltaPhi(jets[0].phi, jets[1].phi) ) / ( jets[0].eta - jets[1].eta )
         lepton_pt_all[0] = tightlep_p4.Pt()
         lepton_eta_all[0] = tightlep_p4.Eta()
         lepton_phi_all[0] = tightlep_p4.Phi()
@@ -640,6 +664,8 @@ for i in xrange(0,tree.GetEntries()):
     else:
         nJet_pt25_all[0] = -1
         nJet_pt50_all[0] = -1
+        nbJet_pt25_all[0] = -1
+        nbJet_pt50_all[0] = -1
         leadingjet_pt_all[0] = -100.
         subleadingjet_pt_all[0] = -100.
         lepton_pt_all[0] = -100.
@@ -671,6 +697,17 @@ for i in xrange(0,tree.GetEntries()):
     mcbjets = None
     mclepton = None
 
+    if tightlep != None:
+        ovrthrust, hadthrust = event_thrust(tightlep, jets, met)
+        ovr_thrust[0] = copy.deepcopy(ovrthrust)
+        ovr_transverse_thrust[0] = copy.deepcopy(round((1. - ovrthrust), 5))
+        had_thrust[0] = copy.deepcopy(hadthrust)
+        had_transverse_thrust[0] = copy.deepcopy(round((1. - hadthrust), 5))
+    else:
+        ovr_thrust[0] = -100.
+        had_thrust[0] = -100.
+        ovr_transverse_thrust[0] = -100.
+        had_transverse_thrust[0] = -100.
     recotop = TopUtilities()
     #MCtruth event reconstruction                                                      
     if MCReco:
@@ -761,7 +798,7 @@ for i in xrange(0,tree.GetEntries()):
                     mcpromptbjet_p4t.SetPz(0.)
                     Wpgot_ak4 = True
 
-        if topgot_ak4 and Wpgot_ak4:
+        if topgot_ak4 and Wpgot_ak4 and tightlep != None:
             mcWprime_p4 = mctop_p4 + mcpromptbjet_p4
             mcWprime_p4t = mctop_p4t + mcpromptbjet_p4t
             mcChi2_topmass = Chi_TopMass(mctop_p4.M())
@@ -984,7 +1021,7 @@ for i in xrange(0,tree.GetEntries()):
         btag_countings_best = len(bjet_filter([best_promptjet, best_jet], 'DeepFlv', 'M'))
 
     #Wprime reco                                                                        
-    if closest_recotop_p4 != None :
+    if closest_recotop_p4 != None and tightlep != None:
         closest_Wprime_p4 = closest_recotop_p4 + closest_promptjet.p4()
         closest_Wprime_p4t = closest_recotop_p4t + closest_promptjet_p4t
         closest_Wprime_m_all[0] = closest_Wprime_p4.M()
@@ -1033,7 +1070,7 @@ for i in xrange(0,tree.GetEntries()):
         closest_WpJet_phi_all[0] = -100.
         closest_WpJet_isBTagged_all[0] = -1
 
-    if chi_recotop_p4 != None :
+    if chi_recotop_p4 != None and tightlep != None:
         chi_Wprime_p4 = chi_recotop_p4 + chi_promptjet.p4()
         chi_Wprime_p4t = chi_recotop_p4t + chi_promptjet_p4t
         chi_Wprime_m_all[0] = chi_Wprime_p4.M()
@@ -1082,7 +1119,7 @@ for i in xrange(0,tree.GetEntries()):
         chi_WpJet_phi_all[0] = -100.
         chi_WpJet_isBTagged_all[0] = -1
 
-    if sublead_recotop_p4 != None :
+    if sublead_recotop_p4 != None and tightlep != None:
         sublead_Wprime_p4 = sublead_recotop_p4 + sublead_promptjet.p4()
         sublead_Wprime_p4t = sublead_recotop_p4t + sublead_promptjet_p4t
         sublead_Wprime_m_all[0] = sublead_Wprime_p4.M()
@@ -1131,7 +1168,7 @@ for i in xrange(0,tree.GetEntries()):
         sublead_WpJet_phi_all[0] = -100.
         sublead_WpJet_isBTagged_all[0] = -1
 
-    if best_recotop_p4 != None :
+    if best_recotop_p4 != None and tightlep != None:
         best_Wprime_p4 = best_recotop_p4 + best_promptjet.p4()
         best_Wprime_p4t = best_recotop_p4t + best_promptjet_p4t
         best_Wprime_m_all[0] = best_Wprime_p4.M()
