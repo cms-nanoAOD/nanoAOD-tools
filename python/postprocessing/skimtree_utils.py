@@ -70,28 +70,110 @@ def add_to_hemisphere(selobj, obj, pos, neg):
     elif -math.pi < deltaPhi(selobj, obj) < 0.:
         neg.append([copy.deepcopy(px_obj), copy.deepcopy(py_obj)])
 
-def hemisphere_thrust(objs):
+def hemisphere_pt(objs):
     thrust_px = 0.
     thrust_py = 0.
     num = 0.
     den = 0.
     for obj in objs:
-        obj_px = obj[0]
+        obj_px = copy.deepcopy(obj[0])
         thrust_px += obj_px
-        obj_py = obj[1]
+        obj_py = copy.deepcopy(obj[1])
         thrust_py += obj_py
-        den += math.hypot(obj_px, obj_py)
+    #den = copy.deepcopy(total_pt)
     mod = math.hypot(thrust_px, thrust_py)
+    return thrust_px, thrust_py, mod
+    '''
     thrust_px = thrust_px / mod
     thrust_py = thrust_py / mod
     for obj in objs:
         num += math.fabs(thrust_px*obj[0] + thrust_py*obj[1])
-    thrust = num / den
+    #print "num: ", num
+    thrust = * num / den
+    #print "thrust: ", thrust
     return thrust
+    '''
 
+def event_thrust(lep, jets, met):
+    ovr_thrust = 0.
+    had_thrust = 0.
+    ovr_pt = 0.
+    had_pt = 0.
+    for jet in jets:
+        had_pt += math.fabs(jet.pt)
+
+    ovr_pt = copy.deepcopy(had_pt)
+    ovr_pt += math.fabs(lep.pt) + math.fabs(met.pt)
+
+    had_max_hempt = 0.
+    had_thrust_ax_x = 0.
+    had_thrust_ax_y = 0.
+    ovr_max_hempt = 0.
+    ovr_thrust_ax_x = 0.
+    ovr_thrust_ax_y = 0.
+    for i, seljet in enumerate(jets): #build hemispheres for every jet
+        neg_ovr = []
+        neg_had = []
+        pos_ovr = []
+        pos_had = []
+        neg_ovr_res = []
+        neg_had_res = []
+        pos_ovr_res = []
+        pos_had_res = []
+        for j, jet in enumerate(jets):
+            add_to_hemisphere(seljet, jet, pos_had, neg_had)
+        pos_ovr = copy.deepcopy(pos_had)
+        neg_ovr = copy.deepcopy(neg_had)
+        add_to_hemisphere(seljet, lep, pos_ovr, neg_ovr)
+        add_to_hemisphere(seljet, met, pos_ovr, neg_ovr)
+
+        pos_had_res = list(hemisphere_pt(pos_had))
+        neg_had_res = list(hemisphere_pt(neg_had))
+        
+        if had_max_hempt < pos_had_res[2]:
+            had_max_hempt = copy.deepcopy(pos_had_res[2])
+            had_thrust_ax_x = copy.deepcopy(pos_had_res[0]/pos_had_res[2])
+            had_thrust_ax_y = copy.deepcopy(pos_had_res[1]/pos_had_res[2])        
+        if had_max_hempt < neg_had_res[2]:
+            had_max_hempt = copy.deepcopy(neg_had_res[2])
+            had_thrust_ax_x = copy.deepcopy(neg_had_res[0]/neg_had_res[2])
+            had_thrust_ax_y = copy.deepcopy(neg_had_res[1]/neg_had_res[2])        
+
+        pos_ovr_res = list(hemisphere_pt(pos_ovr))
+        neg_ovr_res = list(hemisphere_pt(neg_ovr))
+        if ovr_max_hempt < pos_ovr_res[2]:
+            ovr_max_hempt = copy.deepcopy(pos_ovr_res[2])
+            ovr_thrust_ax_x = copy.deepcopy(pos_ovr_res[0]/pos_ovr_res[2])
+            ovr_thrust_ax_y = copy.deepcopy(pos_ovr_res[1]/pos_ovr_res[2])        
+        if ovr_max_hempt < neg_ovr_res[2]:
+            ovr_max_hempt = copy.deepcopy(neg_ovr_res[2])
+            ovr_thrust_ax_x = copy.deepcopy(neg_ovr_res[0]/neg_ovr_res[2])
+            ovr_thrust_ax_y = copy.deepcopy(neg_ovr_res[1]/neg_ovr_res[2])
+            
+    for jet in jets:
+        jpx = jet.pt*ROOT.TMath.Cos(jet.phi)
+        jpy = jet.pt*ROOT.TMath.Sin(jet.phi)
+        had_thrust += math.fabs(jpx*had_thrust_ax_x + jpy*had_thrust_ax_y)
+        ovr_thrust += math.fabs(jpx*ovr_thrust_ax_x + jpy*ovr_thrust_ax_y)
+    ovr_thrust += math.fabs(lep.pt*(ROOT.TMath.Cos(lep.phi)*ovr_thrust_ax_x + ROOT.TMath.Sin(lep.phi)*ovr_thrust_ax_y))
+    ovr_thrust += math.fabs(met.pt*(ROOT.TMath.Cos(met.phi)*ovr_thrust_ax_x + ROOT.TMath.Sin(met.phi)*ovr_thrust_ax_y))
+    had_thrust = had_thrust / had_pt
+    ovr_thrust = ovr_thrust / ovr_pt
+    
+    return round(ovr_thrust, 5), round(had_thrust, 5)
+
+'''
 def event_thrust(lep, jets, met):
     ovr_thrust = []
     had_thrust = []
+    ovr_pt = 0.
+    had_pt = 0.
+    for jet in jets:
+        had_pt += math.fabs(jet.pt)
+    #print "had_pt: ", had_pt
+    ovr_pt = copy.deepcopy(had_pt)
+    ovr_pt += math.fabs(lep.pt) + math.fabs(met.pt)
+    #print "ovr_pt: ", ovr_pt
     for i, seljet in enumerate(jets): #build hemispheres for every jet
         neg_ovr = []
         neg_had = []
@@ -103,14 +185,15 @@ def event_thrust(lep, jets, met):
         neg_ovr = copy.deepcopy(neg_had)
         add_to_hemisphere(seljet, lep, pos_ovr, neg_ovr)
         add_to_hemisphere(seljet, met, pos_ovr, neg_ovr)
-        ovr_thrust.append(copy.deepcopy(hemisphere_thrust(pos_ovr)))
-        ovr_thrust.append(copy.deepcopy(hemisphere_thrust(neg_ovr)))
-        had_thrust.append(copy.deepcopy(hemisphere_thrust(pos_had)))
-        had_thrust.append(copy.deepcopy(hemisphere_thrust(neg_had)))
+        ovr_thrust.append(copy.deepcopy(hemisphere_thrust(pos_ovr, ovr_pt)))
+        ovr_thrust.append(copy.deepcopy(hemisphere_thrust(neg_ovr, ovr_pt)))
+        had_thrust.append(copy.deepcopy(hemisphere_thrust(pos_had, had_pt)))
+        had_thrust.append(copy.deepcopy(hemisphere_thrust(neg_had, had_pt)))
 
     ovr_thrust.sort(reverse = True)
     had_thrust.sort(reverse = True)
     return round(ovr_thrust[0], 5), round(had_thrust[0], 5)
+'''
 
 def matchObjectCollection(objs,collection,dRmax=0.4,presel=lambda x,y: True):
     pairs = {}
