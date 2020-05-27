@@ -322,10 +322,10 @@ bjets_deltaPhi = array.array('f', [0.])
 bjets_deltaEta = array.array('f', [0.])
 bjets_deltaR = array.array('f', [0.])
 bjets_pt = array.array('f', [0.])
-had_thrust = array.array('f', [0.])
-had_transverse_thrust = array.array('f', [0.])
-ovr_thrust = array.array('f', [0.])
-ovr_transverse_thrust = array.array('f', [0.])
+had_global_thrust = array.array('f', [0.])
+had_central_thrust = array.array('f', [0.])
+ovr_global_thrust = array.array('f', [0.])
+ovr_central_thrust = array.array('f', [0.])
 
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
@@ -371,10 +371,10 @@ systTree.branchTreesSysts(trees, "all", "bjets_deltaR", outTreeFile, bjets_delta
 systTree.branchTreesSysts(trees, "all", "bjets_deltaPhi", outTreeFile, bjets_deltaPhi)
 systTree.branchTreesSysts(trees, "all", "bjets_deltaEta", outTreeFile, bjets_deltaEta)
 systTree.branchTreesSysts(trees, "all", "bjets_pt", outTreeFile, bjets_pt)
-systTree.branchTreesSysts(trees, "all", "had_thrust", outTreeFile, had_thrust)
-systTree.branchTreesSysts(trees, "all", "had_transverse_thrust", outTreeFile, had_transverse_thrust)
-systTree.branchTreesSysts(trees, "all", "ovr_thrust", outTreeFile, ovr_thrust)
-systTree.branchTreesSysts(trees, "all", "ovr_transverse_thrust", outTreeFile, ovr_transverse_thrust)
+systTree.branchTreesSysts(trees, "all", "had_global_thrust", outTreeFile, had_global_thrust)
+systTree.branchTreesSysts(trees, "all", "had_central_thrust", outTreeFile, had_central_thrust)
+systTree.branchTreesSysts(trees, "all", "ovr_global_thrust", outTreeFile, ovr_global_thrust)
+systTree.branchTreesSysts(trees, "all", "ovr_central_thrust", outTreeFile, ovr_central_thrust)
 if MCReco:
     systTree.branchTreesSysts(trees, "all", "MC_RecoTop_pt", outTreeFile, MC_RecoTop_pt_all)
     systTree.branchTreesSysts(trees, "all", "MC_RecoTop_eta", outTreeFile, MC_RecoTop_eta_all)
@@ -736,15 +736,15 @@ for i in xrange(0,tree.GetEntries()):
 
     if tightlep != None:
         ovrthrust, hadthrust = event_thrust(tightlep, jets, met)
-        ovr_thrust[0] = copy.deepcopy(ovrthrust)
-        ovr_transverse_thrust[0] = copy.deepcopy(round((1. - ovrthrust), 5))
-        had_thrust[0] = copy.deepcopy(hadthrust)
-        had_transverse_thrust[0] = copy.deepcopy(round((1. - hadthrust), 5))
+        ovr_global_thrust[0] = copy.deepcopy(ovrthrust)
+        ovr_central_thrust[0] = copy.deepcopy(round((1. - ovrthrust), 5))
+        had_global_thrust[0] = copy.deepcopy(hadthrust)
+        had_central_thrust[0] = copy.deepcopy(round((1. - hadthrust), 5))
     else:
-        ovr_thrust[0] = -100.
-        had_thrust[0] = -100.
-        ovr_transverse_thrust[0] = -100.
-        had_transverse_thrust[0] = -100.
+        ovr_global_thrust[0] = -100.
+        had_global_thrust[0] = -100.
+        ovr_central_thrust[0] = -100.
+        had_central_thrust[0] = -100.
     recotop = TopUtilities()
     #MCtruth event reconstruction                                                      
     if MCReco:
