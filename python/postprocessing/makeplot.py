@@ -107,8 +107,8 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      h1.Sumw2()
      if 'muon' in lep: 
           cut  = variable._taglio+ '*isMu'
-          #if not 'Data' in sample.label:
-               #cut += '*passed_mu'
+          if not 'Data' in sample.label:
+               cut += '*passed_mu'
           if 'TT_incl' in sample.label:
                cut += '*islowmtt'
      elif 'electron' in lep:
@@ -151,6 +151,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      histo = []
      tmp = ROOT.TH1F()
      h = ROOT.TH1F()
+     hdata = ROOT.TH1F('h','h', variabile_._nbins, variabile_._xmin, variabile_._xmax)
      h_sig = []
      h_err = ROOT.TH1F()
      h_bkg_err = ROOT.TH1F()
@@ -395,7 +396,7 @@ if(opt.dat!= 'all'):
      [dataset_dict[str(sample.year)].append(sample) for sample in samples]
 else:
      dataset_dict = {
-          '2016':[DataMu_2016, DataEle_2016, DataHT_2016, ST_2016, QCD_2016, TT_Mtt_2016, TT_incl_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
+          '2016':[DataMu_2016, DataEle_2016, ST_2016, QCD_2016, TT_Mtt_2016, TT_incl_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
           '2017':[DataMu_2017, DataEle_2017, TT_Mtt_2017, WJets_2017],
           '2018':[DataMu_2018, DataEle_2018, TT_Mtt_2018, WJets_2018]}
 print(dataset_dict)

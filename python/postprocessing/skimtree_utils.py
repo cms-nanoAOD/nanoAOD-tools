@@ -912,13 +912,13 @@ class systWeights(object):
             ns = str(self.weightedNames[sy])
             if sy == 0:
                 ns = "w_nominal"
-            print "Branch: ", ns
+            #print "Branch: ", ns
             tystring = str(ns + pytocpptypes(self.weightedSysts[int(sy)]))
             tree.Branch(ns, self.weightedSysts[int(sy)], tystring)
         for c in range(self.nCategories):         
             cname = str(self.categoriesNames[c])
             tystring = str(cname + pytocpptypes(self.wCats[c]))
-            print "Branch: ", ns
+            #print "Branch: ", ns
             if c > 1: tree.Branch(cname, self.wCats[c], tystring)
 
     def addSelection(self, selection):
