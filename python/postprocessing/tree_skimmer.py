@@ -8,7 +8,7 @@ import copy
 from array import array
 from skimtree_utils import *
 
-localrun = True # False #
+localrun = False # True #
 if not(localrun):
     from samples import *
 else:
@@ -18,7 +18,7 @@ part_idx = sys.argv[2]
 file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = True # False #
+Debug = False # True #
 MCReco = True
 DeltaFilter = True
 TriggerStudy = False # True #
@@ -301,8 +301,8 @@ isMu_all = array.array('i', [0])
 MET_pt_all = array.array('f', [0.])
 MET_phi_all = array.array('f', [0.])
 
-nPU_all = array.array('f', [0.])
-nPV_all = array.array('f', [0.])
+nPV_tot_all = array.array('f', [0.])
+nPV_good_all = array.array('f', [0.])
 mtw_all = array.array('f', [0.])
 #mtt = array.array('f', [0.])
 
@@ -471,8 +471,8 @@ systTree.branchTreesSysts(trees, "all", "lepton_miniIso", outTreeFile, lepton_mi
 systTree.branchTreesSysts(trees, "all", "passed_mu", outTreeFile, passed_mu_all)
 systTree.branchTreesSysts(trees, "all", "passed_ele", outTreeFile, passed_ele_all)
 systTree.branchTreesSysts(trees, "all", "passed_ht", outTreeFile, passed_ht_all)
-systTree.branchTreesSysts(trees, "all", "nPU", outTreeFile, nPU_all)
-systTree.branchTreesSysts(trees, "all", "nPV", outTreeFile, nPV_all)
+systTree.branchTreesSysts(trees, "all", "nPV_good", outTreeFile, nPV_good_all)
+systTree.branchTreesSysts(trees, "all", "nPV_tot", outTreeFile, nPV_tot_all)
 systTree.branchTreesSysts(trees, "all", "isEle", outTreeFile, isEle_all)
 systTree.branchTreesSysts(trees, "all", "isMu", outTreeFile, isMu_all)
 systTree.branchTreesSysts(trees, "all", "Event_HT", outTreeFile, Event_HT_all)
@@ -543,7 +543,7 @@ for i in xrange(0,tree.GetEntries()):
     Flag = Object(event, 'Flag')
     met = Object(event, "MET")
     MET = {'metPx': met.pt*ROOT.TMath.Cos(met.phi), 'metPy': met.pt*ROOT.TMath.Sin(met.phi)}
-    PU = Object(event, "Pileup")
+    #PU = Object(event, "Pileup")
     genpart = None
 
     if isMC:
@@ -654,8 +654,8 @@ for i in xrange(0,tree.GetEntries()):
     recomet_p4t = ROOT.TLorentzVector()
     recomet_p4t.SetPtEtaPhiM(met.pt, 0., met.phi, 0)
 
-    nPU_all[0] = PU.nPU
-    nPV_all[0] = chain.nOtherPV
+    nPV_good_all[0] = PV.npvsGood
+    nPV_tot_all[0] = PV.npvs
 
     if tightlep != None:
         prebjets, prenobjets = bjet_filter(jets, 'DeepFlv', 'M')
@@ -663,16 +663,6 @@ for i in xrange(0,tree.GetEntries()):
         nbJet_pt25_all[0] = len(prebjets)
         nJet_pt50_all[0] = len(get_Jet(jets, 50))
         nbJet_pt50_all[0] = len(get_Jet(prebjets, 50))
-        leadingjet_pt_all[0] = jets[0].pt
-        subleadingjet_pt_all[0] = jets[1].pt
-        leadingjets_deltaR[0] = deltaR(jets[0].eta, jets[0].phi, jets[1].eta, jets[1].phi)
-        leadingjets_deltaPhi[0] = deltaPhi(jets[0].phi, jets[1].phi)
-        leadingjets_deltaEta[0] = jets[0].eta - jets[1].eta
-        leadingjet_p4 = ROOT.TLorentzVector()
-        subleadingjet_p4 = ROOT.TLorentzVector()
-        leadingjet_p4.SetPtEtaPhiM(jets[0].pt, jets[0].eta, jets[0].phi, jets[0].mass)
-        subleadingjet_p4.SetPtEtaPhiM(jets[1].pt, jets[1].eta, jets[1].phi, jets[1].mass)
-        leadingjets_pt[0] = (leadingjet_p4 + subleadingjet_p4).Pt()
         lepton_pt_all[0] = tightlep_p4.Pt()
         lepton_eta_all[0] = tightlep_p4.Eta()
         lepton_phi_all[0] = tightlep_p4.Phi()
@@ -685,8 +675,6 @@ for i in xrange(0,tree.GetEntries()):
         nJet_pt50_all[0] = -1
         nbJet_pt25_all[0] = -1
         nbJet_pt50_all[0] = -1
-        leadingjet_pt_all[0] = -100.
-        subleadingjet_pt_all[0] = -100.
         lepton_pt_all[0] = -100.
         lepton_eta_all[0] = -100.
         lepton_phi_all[0] = -100.
@@ -885,7 +873,18 @@ for i in xrange(0,tree.GetEntries()):
     #DetReco(nstruction)
     if len(goodJets) < 2:
         continue
-        
+
+    leadingjet_pt_all[0] = jets[0].pt
+    subleadingjet_pt_all[0] = jets[1].pt
+    leadingjets_deltaR[0] = deltaR(jets[0].eta, jets[0].phi, jets[1].eta, jets[1].phi)
+    leadingjets_deltaPhi[0] = deltaPhi(jets[0].phi, jets[1].phi)
+    leadingjets_deltaEta[0] = jets[0].eta - jets[1].eta
+    leadingjet_p4 = ROOT.TLorentzVector()
+    subleadingjet_p4 = ROOT.TLorentzVector()
+    leadingjet_p4.SetPtEtaPhiM(jets[0].pt, jets[0].eta, jets[0].phi, jets[0].mass)
+    subleadingjet_p4.SetPtEtaPhiM(jets[1].pt, jets[1].eta, jets[1].phi, jets[1].mass)
+    leadingjets_pt[0] = (leadingjet_p4 + subleadingjet_p4).Pt()
+
     highptJets = get_Jet(goodJets, leadingjet_ptcut)
     if len(highptJets) < 1:
         continue

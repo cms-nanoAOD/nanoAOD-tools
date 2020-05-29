@@ -18,7 +18,7 @@ tag_2018 = 'RunIIAutumn18NanoAODv6-Nano25Oct2019_102X_upgrade2018_realistic_v20'
 
 ################################ TTbar ################################
 TT_incl_2016 = sample(ROOT.kRed, 1, 1001, "t#bar{t}", "TT_incl_2016")
-TT_incl_2016.sigma = 80.5 #pb
+TT_incl_2016.sigma = 831.76 #pb
 TT_incl_2016.year = 2016
 TT_incl_2016.dataset = "/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/"+tag_2016+"-v2/NANOAODSIM"
 
@@ -36,7 +36,7 @@ TT_Mtt1000toInf_2016.dataset = "/TT_Mtt-1000toInf_TuneCUETP8M2T4_13TeV-powheg-py
 
 TT_Mtt_2016 = sample(ROOT.kRed, 1, 1001, "t#bar{t}", "TT_Mtt_2016")
 TT_Mtt_2016.year = 2016
-TT_Mtt_2016.components = [TT_Mtt700to1000_2016, TT_Mtt1000toInf_2016]
+TT_Mtt_2016.components = [TT_incl_2016, TT_Mtt700to1000_2016, TT_Mtt1000toInf_2016]
 
 ################################ QCD ################################
 QCDHT_300to500_2016 = sample(ROOT.kGray, 1, 1001, "QCD", "QCDHT_300to500_2016")
@@ -69,40 +69,40 @@ QCD_2016.year = 2016
 QCD_2016.components = [QCDHT_300to500_2016, QCDHT_500to700_2016, QCDHT_700to1000_2016, QCDHT_1000to1500_2016, QCDHT_1500to2000_2016, QCDHT_2000toInf_2016]
 
 ################################ WJets ################################
-WJetsHT70to100_2016 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT70to100_2016")
+WJetsHT70to100_2016 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT70to100_2016")
 WJetsHT70to100_2016.sigma = 1353.0 * 1.21 #pb
 WJetsHT70to100_2016.year = 2016
 WJetsHT70to100_2016.dataset = "/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/"+tag_2016+"-v1/NANOAODSIM"
-WJetsHT100to200_2016 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT100to200_2016")
+WJetsHT100to200_2016 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT100to200_2016")
 WJetsHT100to200_2016.sigma = 1345 * 1.21 #pb
 WJetsHT100to200_2016.year = 2016
 WJetsHT100to200_2016.dataset = "/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/"+tag_2016+"-v1/NANOAODSIM"
-WJetsHT200to400_2016 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT200to400_2016")
+WJetsHT200to400_2016 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT200to400_2016")
 WJetsHT200to400_2016.sigma = 359.7 * 1.21 #pb
 WJetsHT200to400_2016.year = 2016
 WJetsHT200to400_2016.dataset = "/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/"+tag_2016+"-v1/NANOAODSIM"
 #WJetsHT200to400_2016.files = jr.json_reader(path+"/WJets_HT200To400_2016.json")
-WJetsHT400to600_2016 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT400to600_2016")
+WJetsHT400to600_2016 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT400to600_2016")
 WJetsHT400to600_2016.sigma = 48.91 * 1.21 #pb
 WJetsHT400to600_2016.year = 2016
 WJetsHT400to600_2016.dataset = "/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/"+tag_2016+"-v1/NANOAODSIM"
 #WJetsHT400to600_2016.files = jr.json_reader(path+"/WJets_HT400To600_2016.json")
-WJetsHT600to800_2016 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT600to800_2016")
+WJetsHT600to800_2016 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT600to800_2016")
 WJetsHT600to800_2016.sigma = 12.05 * 1.21 #pb
 WJetsHT600to800_2016.year = 2016
 WJetsHT600to800_2016.dataset = "/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/"+tag_2016+"-v1/NANOAODSIM"
 #WJetsHT600to800_2016.files = jr.json_reader(path+"/WJets_HT600To800_2016.json")
-WJetsHT800to1200_2016 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT800to1200_2016")
+WJetsHT800to1200_2016 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT800to1200_2016")
 WJetsHT800to1200_2016.sigma = 5.501 * 1.21 #pb
 WJetsHT800to1200_2016.year = 2016
 WJetsHT800to1200_2016.dataset = "/WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/"+tag_2016+"-v1/NANOAODSIM"
 #WJetsHT800to1200_2016.files = jr.json_reader(path+"/WJets_HT800To1200_2016.json")
-WJetsHT1200to2500_2016 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT1200to2500_2016")
+WJetsHT1200to2500_2016 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT1200to2500_2016")
 WJetsHT1200to2500_2016.sigma = 1.329 * 1.21 #pb
 WJetsHT1200to2500_2016.year = 2016
 WJetsHT1200to2500_2016.dataset = "/WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/"+tag_2016+"-v1/NANOAODSIM"
 #WJetsHT1200to2500_2016.files = jr.json_reader(path+"/WJets_HT1200To2500_2016.json")
-WJetsHT2500toInf_2016 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT2500toInf_2016")
+WJetsHT2500toInf_2016 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT2500toInf_2016")
 WJetsHT2500toInf_2016.sigma = 0.03216 * 1.2 #pb
 WJetsHT2500toInf_2016.year = 2016
 WJetsHT2500toInf_2016.dataset = "/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/"+tag_2016+"-v1/NANOAODSIM"
@@ -110,7 +110,8 @@ WJetsHT2500toInf_2016.dataset = "/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-mad
 
 WJets_2016 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJets_2016")
 WJets_2016.year = 2016
-WJets_2016.components = [WJetsHT70to100_2016, WJetsHT100to200_2016, WJetsHT200to400_2016, WJetsHT400to600_2016, WJetsHT600to800_2016, WJetsHT800to1200_2016, WJetsHT1200to2500_2016, WJetsHT2500toInf_2016]
+#WJets_2016.components = [WJetsHT70to100_2016, WJetsHT100to200_2016, WJetsHT200to400_2016, WJetsHT400to600_2016, WJetsHT600to800_2016, WJetsHT800to1200_2016, WJetsHT1200to2500_2016, WJetsHT2500toInf_2016]
+WJets_2016.components = [WJetsHT100to200_2016, WJetsHT200to400_2016, WJetsHT400to600_2016, WJetsHT600to800_2016, WJetsHT800to1200_2016, WJetsHT1200to2500_2016, WJetsHT2500toInf_2016]
 
 ################################ Single Top ################################
 ST_tch_t_2016 = sample(ROOT.kYellow, 1, 1001, "ST t-ch", "ST_tch_t_2016")
@@ -199,37 +200,37 @@ TT_dilep_2017.sigma =  831.76 * 0.10 #pb
 TT_dilep_2017.year = 2017
 TT_dilep_2017.dataset = "/TT_DiLept_TuneCP5_13TeV-powheg-pythia8/"+tag_2017+"-v1/NANOAODSIM"
 
-WJetsHT200to400_2017 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT200to400_2017")
+WJetsHT200to400_2017 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT200to400_2017")
 WJetsHT200to400_2017.sigma = 359.7 * 1.21 #pb
 WJetsHT200to400_2017.year = 2017
 WJetsHT200to400_2017.dataset = "/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2017+"-v1/NANOAODSIM"
 #WJetsHT200to400_2017.files = jr.json_reader(path+"/WJets_HT200To400_2017.json")
 
-WJetsHT400to600_2017 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT400to600_2017")
+WJetsHT400to600_2017 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT400to600_2017")
 WJetsHT400to600_2017.sigma = 48.91 * 1.21 #pb
 WJetsHT400to600_2017.year = 2017
 WJetsHT400to600_2017.dataset = "/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2017+"-v1/NANOAODSIM"
 #WJetsHT400to600_2017.files = jr.json_reader(path+"/WJets_HT400To600_2017.json")
 
-WJetsHT600to800_2017 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT600to800_2017")
+WJetsHT600to800_2017 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT600to800_2017")
 WJetsHT600to800_2017.sigma = 12.05 * 1.21 #pb
 WJetsHT600to800_2017.year = 2017
 WJetsHT600to800_2017.dataset = "/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2017+"-v1/NANOAODSIM"
 #WJetsHT600to800_2017.files = jr.json_reader(path+"/WJets_HT600To800_2017.json")
 
-WJetsHT800to1200_2017 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT800to1200_2017")
+WJetsHT800to1200_2017 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT800to1200_2017")
 WJetsHT800to1200_2017.sigma = 5.501 * 1.21 #pb
 WJetsHT800to1200_2017.year = 2017
 WJetsHT800to1200_2017.dataset = "/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2017+"-v1/NANOAODSIM"
 #WJetsHT800to1200_2017.files = jr.json_reader(path+"/WJets_HT800To1200_2017.json")
 
-WJetsHT1200to2500_2017 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT1200to2500_2017")
+WJetsHT1200to2500_2017 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT1200to2500_2017")
 WJetsHT1200to2500_2017.sigma = 1.329 * 1.21 #pb
 WJetsHT1200to2500_2017.year = 2017
 WJetsHT1200to2500_2017.dataset = "/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2017+"-v1/NANOAODSIM"
 #WJetsHT1200to2500_2017.files = jr.json_reader(path+"/WJets_HT1200To2500_2017.json")
 
-WJetsHT2500toInf_2017 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT2500toInf_2017")
+WJetsHT2500toInf_2017 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT2500toInf_2017")
 WJetsHT2500toInf_2017.sigma = 0.03216 * 1.2 #pb
 WJetsHT2500toInf_2017.year = 2017
 WJetsHT2500toInf_2017.dataset = "/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2017+"-v1/NANOAODSIM"
@@ -260,37 +261,37 @@ TT_dilep_2018.sigma =  831.76 * 0.10 #pb
 TT_dilep_2018.year = 2018
 TT_dilep_2018.dataset = "/TT_DiLept_TuneCP5_13TeV-powheg-pythia8/"+tag_2018+"-v1/NANOAODSIM"
 
-WJetsHT200to400_2018 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT200to400_2018")
+WJetsHT200to400_2018 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT200to400_2018")
 WJetsHT200to400_2018.sigma = 359.7 * 1.21 #pb
 WJetsHT200to400_2018.year = 2018
 WJetsHT200to400_2018.dataset = "/WJetsToLNu_HT-200To400_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2018+"-v1/NANOAODSIM"
 #WJetsHT200to400_2018.files = jr.json_reader(path+"/WJets_HT200To400_2018.json")
 
-WJetsHT400to600_2018 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT400to600_2018")
+WJetsHT400to600_2018 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT400to600_2018")
 WJetsHT400to600_2018.sigma = 48.91 * 1.21 #pb
 WJetsHT400to600_2018.year = 2018
 WJetsHT400to600_2018.dataset = "/WJetsToLNu_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2018+"-v1/NANOAODSIM"
 #WJetsHT400to600_2018.files = jr.json_reader(path+"/WJets_HT400To600_2018.json")
 
-WJetsHT600to800_2018 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT600to800_2018")
+WJetsHT600to800_2018 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT600to800_2018")
 WJetsHT600to800_2018.sigma = 12.05 * 1.21 #pb
 WJetsHT600to800_2018.year = 2018
 WJetsHT600to800_2018.dataset = "/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2018+"-v1/NANOAODSIM"
 #WJetsHT600to800_2018.files = jr.json_reader(path+"/WJets_HT600To800_2018.json")
 
-WJetsHT800to1200_2018 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT800to1200_2018")
+WJetsHT800to1200_2018 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT800to1200_2018")
 WJetsHT800to1200_2018.sigma = 5.501 * 1.21 #pb
 WJetsHT800to1200_2018.year = 2018
 WJetsHT800to1200_2018.dataset = "/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2018+"-v1/NANOAODSIM"
 #WJetsHT800to1200_2018.files = jr.json_reader(path+"/WJets_HT800To1200_2018.json")
 
-WJetsHT1200to2500_2018 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT1200to2500_2018")
+WJetsHT1200to2500_2018 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT1200to2500_2018")
 WJetsHT1200to2500_2018.sigma = 1.329 * 1.21 #pb
 WJetsHT1200to2500_2018.year = 2018
 WJetsHT1200to2500_2018.dataset = "/WJetsToLNu_HT-1200To2500_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2018+"-v1/NANOAODSIM"
 #WJetsHT1200to2500_2018.files = jr.json_reader(path+"/WJets_HT1200To2500_2018.json")
 
-WJetsHT2500toInf_2018 = sample(ROOT.kYellow-7, 1, 1001, "W + Jets", "WJetsHT2500toInf_2018")
+WJetsHT2500toInf_2018 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT2500toInf_2018")
 WJetsHT2500toInf_2018.sigma = 0.03216 * 1.2 #pb
 WJetsHT2500toInf_2018.year = 2018
 WJetsHT2500toInf_2018.dataset = "/WJetsToLNu_HT-2500ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/"+tag_2018+"-v1/NANOAODSIM"
