@@ -8,7 +8,7 @@ import copy
 from array import array
 from skimtree_utils import *
 
-localrun = False # True #
+localrun = True # False #
 if not(localrun):
     from samples import *
 else:
@@ -18,7 +18,7 @@ part_idx = sys.argv[2]
 file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = False # True #
+Debug = True # False #
 MCReco = True
 DeltaFilter = True
 TriggerStudy = False # True #
@@ -326,6 +326,9 @@ had_global_thrust = array.array('f', [0.])
 had_central_thrust = array.array('f', [0.])
 ovr_global_thrust = array.array('f', [0.])
 ovr_central_thrust = array.array('f', [0.])
+deltaR_lep_closestjet = array.array('f', [0.])
+deltaR_lep_leadingjet = array.array('f', [0.])
+deltaR_lep_subleadingjet = array.array('f', [0.])
 
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
@@ -375,6 +378,9 @@ systTree.branchTreesSysts(trees, "all", "had_global_thrust", outTreeFile, had_gl
 systTree.branchTreesSysts(trees, "all", "had_central_thrust", outTreeFile, had_central_thrust)
 systTree.branchTreesSysts(trees, "all", "ovr_global_thrust", outTreeFile, ovr_global_thrust)
 systTree.branchTreesSysts(trees, "all", "ovr_central_thrust", outTreeFile, ovr_central_thrust)
+systTree.branchTreesSysts(trees, "all", "deltaR_lep_closestjet", outTreeFile, deltaR_lep_closestjet)
+systTree.branchTreesSysts(trees, "all", "deltaR_lep_leadingjet", outTreeFile, deltaR_lep_leadingjet)
+systTree.branchTreesSysts(trees, "all", "deltaR_lep_subleadingjet", outTreeFile, deltaR_lep_subleadingjet)
 if MCReco:
     systTree.branchTreesSysts(trees, "all", "MC_RecoTop_pt", outTreeFile, MC_RecoTop_pt_all)
     systTree.branchTreesSysts(trees, "all", "MC_RecoTop_eta", outTreeFile, MC_RecoTop_eta_all)
@@ -707,6 +713,9 @@ for i in xrange(0,tree.GetEntries()):
     mcbjets = None
     mclepton = None
 
+    if len(goodJets) < 2:
+        continue
+
     if(len(bjets) >= 2):
         bjets_deltaR[0] = deltaR(bjets[0].eta, bjets[0].phi, bjets[1].eta, bjets[1].phi)
         bjets_deltaPhi[0] = deltaPhi(bjets[0].phi, bjets[1].phi)
@@ -722,17 +731,6 @@ for i in xrange(0,tree.GetEntries()):
         bjets_deltaEta[0] = -999.
         bjets_pt[0] = -999.
 
-    if tightlep != None:
-        ovrthrust, hadthrust = event_thrust(tightlep, jets, met)
-        ovr_global_thrust[0] = copy.deepcopy(ovrthrust)
-        ovr_central_thrust[0] = copy.deepcopy(round((1. - ovrthrust), 5))
-        had_global_thrust[0] = copy.deepcopy(hadthrust)
-        had_central_thrust[0] = copy.deepcopy(round((1. - hadthrust), 5))
-    else:
-        ovr_global_thrust[0] = -100.
-        had_global_thrust[0] = -100.
-        ovr_central_thrust[0] = -100.
-        had_central_thrust[0] = -100.
     recotop = TopUtilities()
     #MCtruth event reconstruction                                                      
     if MCReco:
@@ -871,8 +869,21 @@ for i in xrange(0,tree.GetEntries()):
             MC_WpJet_phi_all[0] = -100.
 
     #DetReco(nstruction)
-    if len(goodJets) < 2:
-        continue
+
+    if tightlep != None:
+        ovrthrust, hadthrust = event_thrust(tightlep, jets, met)
+        ovr_global_thrust[0] = copy.deepcopy(ovrthrust)
+        ovr_central_thrust[0] = copy.deepcopy(round((1. - ovrthrust), 5))
+        had_global_thrust[0] = copy.deepcopy(hadthrust)
+        had_central_thrust[0] = copy.deepcopy(round((1. - hadthrust), 5))
+        closj, dR_lj = closest(tightlep, goodJets)
+        deltaR_lep_closestjet[0] = copy.deepcopy(dR_lj)
+    else:
+        ovr_global_thrust[0] = -100.
+        had_global_thrust[0] = -100.
+        ovr_central_thrust[0] = -100.
+        had_central_thrust[0] = -100.
+        deltaR_lep_closestjet[0] = -100.
 
     leadingjet_pt_all[0] = jets[0].pt
     subleadingjet_pt_all[0] = jets[1].pt
@@ -884,6 +895,8 @@ for i in xrange(0,tree.GetEntries()):
     leadingjet_p4.SetPtEtaPhiM(jets[0].pt, jets[0].eta, jets[0].phi, jets[0].mass)
     subleadingjet_p4.SetPtEtaPhiM(jets[1].pt, jets[1].eta, jets[1].phi, jets[1].mass)
     leadingjets_pt[0] = (leadingjet_p4 + subleadingjet_p4).Pt()
+    deltaR_lep_leadingjet[0] = copy.deepcopy(deltaR(tightlep, jets[0]))
+    deltaR_lep_subleadingjet[0] = copy.deepcopy(deltaR(tightlep, jets[1]))
 
     highptJets = get_Jet(goodJets, leadingjet_ptcut)
     if len(highptJets) < 1:
