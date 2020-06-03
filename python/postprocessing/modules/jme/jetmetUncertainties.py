@@ -211,6 +211,8 @@ class jetmetUncertaintiesProducer(Module):
         
         met     = Object(event, self.metBranchName)
         rawmet  = Object(event, "RawMET")
+        if  "Puppi" in self.metBranchName :
+            rawmet  = Object(event, "RawPuppiMET")
         defmet  = Object(event, "MET")
 
         ( t1met_px,       t1met_py       ) = ( met.pt*math.cos(met.phi), met.pt*math.sin(met.phi) )
