@@ -1,19 +1,25 @@
 import ROOT
 import math
 from array import array
-from PhysicsTools.NanoAODTools.postprocessing.tools import *
+#from PhysicsTools.NanoAODTools.postprocessing.tools import *
+from PhysicsTools.NanoAODTools.postprocessing.skimtree_utils import *
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object, Event
 from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import *
 
-inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/" 
-inpfiles = ['Wprime_4000_RH'
+#inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/" 
+inputpath = "/eos/home-a/apiccine/private/Wprime_BkgSample/merged/"
+
+inpfiles = ["Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8",
+            "Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
+            "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8",
+            #'Wprime_4000_RH'
             #,"TT_Mtt-700to1000"
-            ,'TT_Mtt-1000toInf_2016_1'
+            #,'TT_Mtt-1000toInf_2016_1'
             #,"WJets"
             #,'QCD_Pt_600to800_1'
             #"SingleMuon_Run2016G_1"
             #,'Wprimetotb_M2000W20_RH_MG_8'
-            ,'Wprimetotb_M4000W400_RH_MG_1'
+            #,'Wprimetotb_M4000W400_RH_MG_1'
             #,'TT_Incl_2016_1'
         ]
 
@@ -24,7 +30,7 @@ ROOT.gROOT.SetBatch()        # don't pop up canvases
 ROOT.TH1.SetDefaultSumw2()
 #ROOT.TGaxis.SetMaxDigits(3)
 
-plotpath = './plots/'
+plotpath = './plots/preliminary'
 
 # b-tag working points: mistagging efficiency tight = 0.1%, medium 1% and loose = 10% 
 deepFlv_T = 0.7264 
@@ -32,7 +38,7 @@ deepFlv_M = 0.2770
 deepFlv_L = 0.0494 
 deepCSV_T = 0.7527 
 deepCSV_M = 0.4184 
-deepCSV_L = 0.1241 
+deepCSV_L = 0.1241
 
 for inpfile in inpfiles:
     infile = ROOT.TFile.Open(inputpath + inpfile + ".root")
@@ -44,8 +50,8 @@ for inpfile in inpfiles:
     nbins = 15
     nmin = 0
     nmax = 400
-    edges = array('f',[0., 20., 40., 60., 80., 100., 130., 160., 190., 230., 270., 320., 360., 400., 700., 1000.])
-    edges_HT = array('f',[0., 200., 400., 600., 800., 1000., 1200., 1400., 1600., 1800., 2000., 2200., 2400., 2800., 3400., 4000.])
+    edges = array.array('f',[0., 20., 40., 60., 80., 100., 130., 160., 190., 230., 270., 320., 360., 400., 700., 1000.])
+    edges_HT = array.array('f',[0., 200., 400., 600., 800., 1000., 1200., 1400., 1600., 1800., 2000., 2200., 2400., 2800., 3400., 4000.])
     h_muonpt_HLT = ROOT.TH1F("Muon_pt", "Muon_pt", nbins, edges)
     h_HLT_Mu50 = ROOT.TH1F("HLT_Mu50", "HLT_Mu50", nbins, edges)
     h_HLT_TkMu50 = ROOT.TH1F("HLT_TkMu50", "HLT_TkMu50", nbins, edges)
@@ -62,6 +68,9 @@ for inpfile in inpfiles:
     h_HLT_HT = ROOT.TH1F("HLT_HT", "HLT_HT", nbins, edges_HT)
     h_HLT_HT_muon = ROOT.TH1F("HLT_HLT_MU_OR", "HLT_HLT_MU_OR", nbins, edges_HT)
     h_HLT_HT_electron = ROOT.TH1F("HLT_HT_ELE_OR", "HLT_HLT_ELE_OR", nbins, edges_HT)
+    h_electronpt_mcmatched = ROOT.TH1F("Electron_pt_mcmatched", "Electron_pt_mcmatched", nbins, edges)
+    h_electronpt_mcmatched_HLT_Lep_OR_HT = ROOT.TH1F("Electron_pt_mcmatched_HLT_Lep_OR_HT", "Electron_pt_mcmatched_HLT_Lep_OR_HT", nbins, edges)
+    h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph = ROOT.TH1F("Electron_pt_mcmatched_HLT_Lep_OR_HT_OR_Ph", "Electron_pt_mcmatched_HLT_Lep_OR_HT_OR_Ph", nbins, edges)
     h_electron_trigger_den = ROOT.TH1F("HLT_ELE_OR_den", "HLT_ELE_OR", nbins, edges)
     h_electron_trigger_num = ROOT.TH1F("HLT_ELE_OR_num", "HLT_ELE_OR", nbins, edges)
     h_muon_trigger_den = ROOT.TH1F("HLT_MU_OR_den", "HLT_MU_OR", nbins, edges)
@@ -174,7 +183,7 @@ for inpfile in inpfiles:
 
 
     for i in xrange(0,tree.GetEntries()):
-    #for i in xrange(0,20):
+    #for i in xrange(0,10000):
         event = Event(tree,i)
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
@@ -186,7 +195,7 @@ for inpfile in inpfiles:
         Flag = Object(event, 'Flag')
         LHEPdfWeight = Collection(event, 'LHEPdfWeight')
 
-        print "no. of pdf weights " + str(len(LHEPdfWeight))
+        #print "no. of pdf weights " + str(len(LHEPdfWeight))
         for pdfw in LHEPdfWeight:
             print str(pdfw.__getattr__(""))
 
@@ -220,12 +229,15 @@ for inpfile in inpfiles:
             continue
         HT = get_HT(jets)
 
+        goodMu = get_Mu(muons)
+        goodEle = get_Ele(electrons)
+
         if isMu:
             if(dominiisoscan):
                 totalMCmu,mumatch_iso0p1_pt_50,mumatch_iso0p1_pt_75,mumatch_iso0p1_pt_100,mumatch_iso0p1_pt_125,totalnoMCmu,munomatch_iso0p1_pt_50,munomatch_iso0p1_pt_75,munomatch_iso0p1_pt_100,munomatch_iso0p1_pt_125 = miniisoscan(isMu,0.1,muons)
                 totalMCmu,mumatch_iso0p2_pt_50,mumatch_iso0p2_pt_75,mumatch_iso0p2_pt_100,mumatch_iso0p2_pt_125,totalnoMCmu,munomatch_iso0p2_pt_50,munomatch_iso0p2_pt_75,munomatch_iso0p2_pt_100,munomatch_iso0p2_pt_125 = miniisoscan(isMu,0.2,muons)
             for muon in muons:
-                if(muon.genPartFlav == 1 or muon.genPartFlav == 15):
+                if isMC and (muon.genPartFlav == 1 or muon.genPartFlav == 15):
                     h_miniiso_muon_matched.Fill(muon.miniPFRelIso_all)
                     h_miniiso_pt_muon_matched.Fill(muon.miniPFRelIso_all, muon.pt)
                     h_muonpt.Fill(muon.pt)
@@ -308,6 +320,15 @@ for inpfile in inpfiles:
                 h_HLT_HT.Fill(HT)
             if(HLT.PFHT800 or HLT.PFHT900 or HLT.Ele115_CaloIdVT_GsfTrkIdT):
                 h_HLT_HT_electron.Fill(HT)
+            for ele in goodEle:
+                if ele.genPartFlav == 1 or ele.genPartFlav == 15:
+                    #print "filling elept_mcmatched"
+                    h_electronpt_mcmatched.Fill(ele.pt)
+                    if HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.PFHT800 or HLT.PFHT900:
+                        h_electronpt_mcmatched_HLT_Lep_OR_HT.Fill(ele.pt)
+                    if HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.PFHT800 or HLT.PFHT900 or HLT.Photon175:
+                        h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph.Fill(ele.pt)
+
 
         if isMu or isEle:
             for jet in jets:
@@ -339,8 +360,11 @@ for inpfile in inpfiles:
                     h_btag_DeepFlv_T_num.Fill(jet.pt)
                 if(jet.btagDeepFlavB > deepFlv_T and not abs(jet.partonFlavour) == 5 and not jet.hadronFlavour == 5):
                     h_mistag_DeepFlv_T_num.Fill(jet.pt)
-                
+
+
     print 'Total events: %d     ||     Bad MET flag events %d     ||     Bad events %d' %(tree.GetEntries(), badflag, badevt)
+    print h_electronpt_mcmatched.Integral()                
+    '''
     print totalMCmu
     if (miniisoscan):
         print  ' %.2f percent and %.2f percent and %.2f percent and  %.2f ' %(mumatch_iso0p1_pt_50/totalMCmu*100, mumatch_iso0p1_pt_75/totalMCmu*100, mumatch_iso0p1_pt_100/totalMCmu*100, mumatch_iso0p1_pt_125/totalMCmu*100),
@@ -352,6 +376,7 @@ for inpfile in inpfiles:
         print ' %.2f percent and %.2f percent and %.2f percent and %.2f '  %(elenomatch_iso0p1_pt_50/totalnoMCele*100, elenomatch_iso0p1_pt_75/totalnoMCele*100, elenomatch_iso0p1_pt_100/totalnoMCele*100, elenomatch_iso0p1_pt_125/totalnoMCele*100),
         print ' and %.2f percent and %.2f percent and %.2f percent and %.2f \\\\'  %(elenomatch_iso0p2_pt_50/totalnoMCele*100, elenomatch_iso0p2_pt_75/totalnoMCele*100, elenomatch_iso0p2_pt_100/totalnoMCele*100, elenomatch_iso0p2_pt_125/totalnoMCele*100)
         print '2D cut muon %.2f electron %.2f \\\\'  %(good_mu_ptrel_drmin/total_mu_ptrel_drmin*100, good_ele_ptrel_drmin/total_ele_ptrel_drmin*100)
+    
     print_hist(inpfile, plotpath, h_drmin_ptrel_mu, "COLZ",1)
     print_hist(inpfile, plotpath, h_drmin_mu)
     print_hist(inpfile, plotpath, h_leadingjet_mu)
@@ -393,10 +418,18 @@ for inpfile in inpfiles:
     save_hist(inpfile, plotpath, h_miniiso_pt_muon_matched, "COLZ")
     print_hist(inpfile, plotpath, h_miniiso_pt_muon_nomatched, "COLZ", 1)
     print_hist(inpfile, plotpath, h_miniiso_pt_muon_matched, "COLZ", 1)
-
+    
     h_miniiso_electron_nomatched.SetLineColor(ROOT.kRed)
     print_hist(inpfile, plotpath, [h_miniiso_electron_matched, h_miniiso_electron_nomatched])
+    '''
+    save_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph, "HIST")
+    save_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_Lep_OR_HT, "HIST")
+    save_hist(inpfile, plotpath, h_electronpt_mcmatched, "HIST")
+    print_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph, "HIST")
+    print_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_Lep_OR_HT, "HIST")
+    print_hist(inpfile, plotpath, h_electronpt_mcmatched, "HIST")
 
+    '''
     h_HLT_Mu50Eff = ROOT.TEfficiency(h_HLT_Mu50, h_muonpt_HLT)
     h_HLT_Mu50Eff.SetTitle("HLT_Mu50; muon_pt [GeV];#epsilon")
     h_HLT_Mu50Eff.SetLineColor(ROOT.kGreen)
@@ -447,7 +480,26 @@ for inpfile in inpfiles:
     save_hist(inpfile, plotpath, h_HLT_HT_electronEff)
     print_hist(inpfile, plotpath, h_HLT_HT_electronEff, 'AP')
     print_hist(inpfile, plotpath, [h_HLT_HT_electronEff, h_HLT_HT_muonEff, h_HLT_HTEff], 'AP')
+    '''
 
+    h_electronpt_mcmatched_HLT_Lep_OR_HT_Eff = ROOT.TEfficiency(h_electronpt_mcmatched_HLT_Lep_OR_HT, h_electronpt_mcmatched)
+    h_electronpt_mcmatched_HLT_Lep_OR_HT_Eff.SetTitle("MCmatched_HLT_Lep_OR_HT_Eff;Electron pt [GeV];#varepsilon")
+    h_electronpt_mcmatched_HLT_Lep_OR_HT_Eff.SetName("MCmatched_HLT_Lep_OR_HT_Eff")
+    h_electronpt_mcmatched_HLT_Lep_OR_HT_Eff.SetLineColor(ROOT.kBlue)
+    save_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_Lep_OR_HT_Eff)
+    print_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_Lep_OR_HT_Eff, 'AP')
+    h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff = ROOT.TEfficiency(h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph, h_electronpt_mcmatched)
+    h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff.SetTitle("MCmatched_HLT_Lep_OR_HT_OR_Ph_Eff;Electron pt [GeV];#varepsilon")
+    h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff.SetName("MCmatched_HLT_Lep_OR_HT_OR_Ph_Eff")
+    h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff.SetLineColor(ROOT.kBlue)
+    save_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff)
+    print_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff, 'AP')
+
+    print_hist(inpfile, plotpath, [h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff, h_electronpt_mcmatched_HLT_Lep_OR_HT_Eff], 'AP')
+
+    
+
+    '''
     #Lepton trigger efficiency in HT bins
     h_HLT_Muon_HTEff = ROOT.TEfficiency(h_mu_HT_binned, h_HT_mu)
     h_HLT_Muon_HTEff.SetTitle("HLT_Muon_50_HT_binned; Event HT [GeV];#epsilon")
@@ -538,3 +590,6 @@ for inpfile in inpfiles:
     save_hist(inpfile, plotpath, h_mistag_DeepFlv_T_Eff)
     print_hist(inpfile, plotpath, h_mistag_DeepFlv_T_Eff, 'AP')
     print_hist(inpfile, plotpath, [h_mistag_DeepFlv_T_Eff, h_mistag_DeepFlv_M_Eff, h_mistag_DeepFlv_L_Eff], 'AP')
+'''
+
+raise ValueError
