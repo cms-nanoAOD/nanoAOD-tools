@@ -129,7 +129,7 @@ def event_thrust(lep, jets, met):
 
         pos_had_res = list(hemisphere_pt(pos_had))
         neg_had_res = list(hemisphere_pt(neg_had))
-        
+
         if had_max_hempt < pos_had_res[2]:
             had_max_hempt = copy.deepcopy(pos_had_res[2])
             had_thrust_ax_x = copy.deepcopy(pos_had_res[0]/pos_had_res[2])
@@ -141,6 +141,7 @@ def event_thrust(lep, jets, met):
 
         pos_ovr_res = list(hemisphere_pt(pos_ovr))
         neg_ovr_res = list(hemisphere_pt(neg_ovr))
+
         if ovr_max_hempt < pos_ovr_res[2]:
             ovr_max_hempt = copy.deepcopy(pos_ovr_res[2])
             ovr_thrust_ax_x = copy.deepcopy(pos_ovr_res[0]/pos_ovr_res[2])
@@ -149,7 +150,7 @@ def event_thrust(lep, jets, met):
             ovr_max_hempt = copy.deepcopy(neg_ovr_res[2])
             ovr_thrust_ax_x = copy.deepcopy(neg_ovr_res[0]/neg_ovr_res[2])
             ovr_thrust_ax_y = copy.deepcopy(neg_ovr_res[1]/neg_ovr_res[2])
-            
+  
     for jet in jets:
         jpx = jet.pt*ROOT.TMath.Cos(jet.phi)
         jpy = jet.pt*ROOT.TMath.Sin(jet.phi)
@@ -334,12 +335,12 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
         hist.Draw(option)            
         c1.Print(plotpath + "/" + infile + "_" + hist.GetName() + ".png")
         c1.Print(plotpath + "/" + infile + "_" + hist.GetName() + ".root")
-    elif isinstance(hist, list) and len(hist) > 1:
+    elif isinstance(hist, list):
         c1 = ROOT.TCanvas(infile + "_" + hist[0].GetName(), "c1", 50,50,700,600)
-        if not (infile == ""):
+        if not (infile == "") or len(hist) > 1:
             c1 = ROOT.TCanvas(infile + "_" + hist[0].GetName() + '_comparison', "c1", 50,50,700,600)
-        else:
-            c1 = ROOT.TCanvas('comparison', "c1", 50,50,700,600)
+         #else:
+            #c1 = ROOT.TCanvas('comparison', "c1", 50,50,700,600)
 
         if isinstance(hist[0], ROOT.TGraph) or isinstance(hist[0], ROOT.TGraphAsymmErrors):
             i = 0
