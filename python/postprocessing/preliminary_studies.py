@@ -9,9 +9,9 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools imp
 #inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/" 
 inputpath = "/eos/home-a/apiccine/private/Wprime_BkgSample/merged/"
 
-inpfiles = ["Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8",
-            "Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
-            "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8",
+inpfiles = ["Wprimetotb_M2000W20_RH_MG",
+            "Wprimetotb_M3000W300_RH_MG",
+            "Wprimetotb_M4000W400_RH_MG",
             #'Wprime_4000_RH'
             #,"TT_Mtt-700to1000"
             #,'TT_Mtt-1000toInf_2016_1'
