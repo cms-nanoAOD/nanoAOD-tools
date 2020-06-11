@@ -366,6 +366,7 @@ class jetmetUncertaintiesProducer(Module):
             # (cf. https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution )
             if not self.isData:
               ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
+              ( jet_pt_jerNomVal_T1Smear, jet_pt_jerUpVal_T1Smear, jet_pt_jerDownVal_T1Smear) = self.jetSmearer.getSmearValsPt(jet, genJet, rho, t1smear=True)
             else:
               # if you want to do something with JER in data, please add it here.
               ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = (1,1,1)
@@ -499,10 +500,10 @@ class jetmetUncertaintiesProducer(Module):
                           met_T1_px_jesDown[jesUncertainty] = met_T1_px_jesDown[jesUncertainty] - (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1)*jet_cosPhi
                           met_T1_py_jesDown[jesUncertainty] = met_T1_py_jesDown[jesUncertainty] - (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1)*jet_sinPhi
                           # Calculate JES uncertainties on smeared MET
-                          met_T1Smear_px_jesUp[jesUncertainty]   = met_T1Smear_px_jesUp[jesUncertainty]   - (jet_pt_jesUpT1[jesUncertainty]   - jet_pt_L1)*jet_pt_jerNomVal*jet_cosPhi
-                          met_T1Smear_py_jesUp[jesUncertainty]   = met_T1Smear_py_jesUp[jesUncertainty]   - (jet_pt_jesUpT1[jesUncertainty]   - jet_pt_L1)*jet_pt_jerNomVal*jet_sinPhi
-                          met_T1Smear_px_jesDown[jesUncertainty] = met_T1Smear_px_jesDown[jesUncertainty] - (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1)*jet_pt_jerNomVal*jet_cosPhi
-                          met_T1Smear_py_jesDown[jesUncertainty] = met_T1Smear_py_jesDown[jesUncertainty] - (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1)*jet_pt_jerNomVal*jet_sinPhi
+                          met_T1Smear_px_jesUp[jesUncertainty]   = met_T1Smear_px_jesUp[jesUncertainty]   - (jet_pt_jesUpT1[jesUncertainty]   - jet_pt_L1)*jet_pt_jerNomVal_T1Smear*jet_cosPhi
+                          met_T1Smear_py_jesUp[jesUncertainty]   = met_T1Smear_py_jesUp[jesUncertainty]   - (jet_pt_jesUpT1[jesUncertainty]   - jet_pt_L1)*jet_pt_jerNomVal_T1Smear*jet_sinPhi
+                          met_T1Smear_px_jesDown[jesUncertainty] = met_T1Smear_px_jesDown[jesUncertainty] - (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1)*jet_pt_jerNomVal_T1Smear*jet_cosPhi
+                          met_T1Smear_py_jesDown[jesUncertainty] = met_T1Smear_py_jesDown[jesUncertainty] - (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1)*jet_pt_jerNomVal_T1Smear*jet_sinPhi
 
 
         # propagate "unclustered energy" uncertainty to MET

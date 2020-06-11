@@ -72,7 +72,7 @@ class jetSmearer(Module):
         return ( jet_pt_nomVal*jet.pt, jet_pt_jerUpVal*jet.pt, jet_pt_jerDownVal*jet.pt )
         
     
-    def getSmearValsPt(self, jetIn, genJetIn, rho):
+    def getSmearValsPt(self, jetIn, genJetIn, rho, t1Smear=False):
         
         if hasattr( jetIn, "p4"):
             jet = jetIn.p4()
