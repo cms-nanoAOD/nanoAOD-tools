@@ -369,7 +369,7 @@ class jetmetUncertaintiesProducer(Module):
               ( jet_pt_jerNomVal_T1, jet_pt_jerUpVal_T1, jet_pt_jerDownVal_T1 ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
               
               # Get the smearing factors for T1Smear MET correction
-              ( jet_pt_jerNomVal_T1Smear, jet_pt_jerUpVal_T1Smear, jet_pt_jerDownVal_T1Smear) = self.jetSmearer.getSmearValsPt(jet, genJet, rho, t1smear=True)
+              ( jet_pt_jerNomVal_T1Smear, jet_pt_jerUpVal_T1Smear, jet_pt_jerDownVal_T1Smear) = self.jetSmearer.getSmearValsPt(jet, genJet, rho, t1Smear=True)
               ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = ( jet_pt_jerNomVal_T1Smear, jet_pt_jerUpVal_T1Smear, jet_pt_jerDownVal_T1Smear )
             else:
               # if you want to do something with JER in data, please add it here.
