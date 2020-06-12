@@ -504,10 +504,12 @@ class jetmetUncertaintiesProducer(Module):
                           met_T1_px_jesDown[jesUncertainty] = met_T1_px_jesDown[jesUncertainty] - (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1)*jet_cosPhi
                           met_T1_py_jesDown[jesUncertainty] = met_T1_py_jesDown[jesUncertainty] - (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1)*jet_sinPhi
                           # Calculate JES uncertainties on smeared MET
-                          met_T1Smear_px_jesUp[jesUncertainty]   = met_T1Smear_px_jesUp[jesUncertainty]   - (jet_pt_jesUpT1[jesUncertainty]   - jet_pt_L1)*jet_pt_jerNomVal_T1Smear*jet_cosPhi
-                          met_T1Smear_py_jesUp[jesUncertainty]   = met_T1Smear_py_jesUp[jesUncertainty]   - (jet_pt_jesUpT1[jesUncertainty]   - jet_pt_L1)*jet_pt_jerNomVal_T1Smear*jet_sinPhi
-                          met_T1Smear_px_jesDown[jesUncertainty] = met_T1Smear_px_jesDown[jesUncertainty] - (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1)*jet_pt_jerNomVal_T1Smear*jet_cosPhi
-                          met_T1Smear_py_jesDown[jesUncertainty] = met_T1Smear_py_jesDown[jesUncertainty] - (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1)*jet_pt_jerNomVal_T1Smear*jet_sinPhi
+                          jesUp_correction_forT1SmearMET   =  (jet_pt_L1L2L3 - jet_pt_L1)*jet_pt_jerNomVal_T1Smear + (jet_pt_jesUpT1[jesUncertainty] - jet_pt_L1L2L3) 
+                          jesDown_correction_forT1SmearMET =  (jet_pt_L1L2L3 - jet_pt_L1)*jet_pt_jerNomVal_T1Smear + (jet_pt_jesDownT1[jesUncertainty] - jet_pt_L1L2L3) 
+                          met_T1Smear_px_jesUp[jesUncertainty]   = met_T1Smear_px_jesUp[jesUncertainty]   - jesUp_correction_forT1SmearMET*jet_cosPhi
+                          met_T1Smear_py_jesUp[jesUncertainty]   = met_T1Smear_py_jesUp[jesUncertainty]   - jesUp_correction_forT1SmearMET*jet_sinPhi
+                          met_T1Smear_px_jesDown[jesUncertainty] = met_T1Smear_px_jesDown[jesUncertainty] - jesDown_correction_forT1SmearMET*jet_cosPhi
+                          met_T1Smear_py_jesDown[jesUncertainty] = met_T1Smear_py_jesDown[jesUncertainty] - jesDown_correction_forT1SmearMET*jet_sinPhi
 
 
         # propagate "unclustered energy" uncertainty to MET
