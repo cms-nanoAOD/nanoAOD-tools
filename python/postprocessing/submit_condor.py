@@ -57,6 +57,7 @@ if not os.path.exists("/tmp/x509up_u" + str(uid)):
     os.system('voms-proxy-init --rfc --voms cms -valid 192:00')
 os.popen("cp /tmp/x509up_u" + str(uid) + " /afs/cern.ch/user/"+str(os.environ.get('USER')[0])+"/"+str(os.environ.get('USER'))+"/private/x509up")
 
+folder = opt.folder
 split = 50
 #Writing the configuration file
 for sample in samples:
@@ -70,14 +71,14 @@ for sample in samples:
     print(str(len(files_list)))
     if(isMC):
         for i, files in enumerate(files_list):
-            sub_writer(sample, i, files)
+            sub_writer(sample, i, files, folder)
             os.popen('condor_submit condor.sub')
             print('condor_submit condor.sub')
             #os.popen("python tree_skimmer.py " " + sample.label + " " + str(i) + " " + str(files))
             print("python tree_skimmer.py " + sample.label + " " + str(i) + " " + str(files))
     else:
         for i in range(len(files_list)/split+1):
-            sub_writer(sample, i,  ",".join( e for e in files_list[split*i:split*(i+1)]))
+            sub_writer(sample, i,  ",".join( e for e in files_list[split*i:split*(i+1)]), folder)
             print('condor_submit condor.sub')
             os.popen('condor_submit condor.sub')
             #os.popen("python tree_skimmer.py " + sample.label + " " + str(i) + " " + ",".join( e for e in files_list[split*i:split*(i+1)]))

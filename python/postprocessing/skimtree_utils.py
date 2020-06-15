@@ -383,14 +383,14 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
                 h.SetLineColor(colors[i])
                 if stack:
                     h.SetFillColor(colors[i])
-                mg.Add(h)
-                i += 1
-            mg.Draw(option)
-            mg.GetXaxis().SetTitle(hist[0].GetXaxis().GetTitle())
-            mg.GetYaxis().SetTitle(hist[0].GetYaxis().GetTitle())
-        else:
-            for h in hist:
-                h.Draw(option+'SAME')
+                    mg.Add(h)
+                    i += 1
+                    mg.Draw(option)
+                    mg.GetXaxis().SetTitle(hist[0].GetXaxis().GetTitle())
+                    mg.GetYaxis().SetTitle(hist[0].GetYaxis().GetTitle())
+                else:
+                  for h in hist:
+                    h.Draw(option+'SAME')
 
         #c1.Modified()
         #c1.Update()
@@ -861,7 +861,7 @@ class Object:
     """Class that allows seeing a set branches plus possibly an index as an Object"""
     def __init__(self,event,prefix,index=None):
         self._event = event
-        if not (prefix == 'LHEPdfWeight'):
+        if not (prefix == 'LHEPdfWeight' or prefix == 'LHEScaleWeight' or prefix == 'PSWeight'):
             self._prefix = prefix+"_"
         else:
             self._prefix = prefix

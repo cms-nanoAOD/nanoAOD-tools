@@ -18,12 +18,20 @@ parser.add_option('-L', '--lep', dest='lep', type='string', default = 'muon', he
 parser.add_option('-S', '--syst', dest='syst', type='string', default = 'all', help='Default all systematics added')
 parser.add_option('-C', '--cut', dest='cut', type='string', default = 'lepton_eta>-10.', help='Default no cut')
 parser.add_option('-y', '--year', dest='year', type='string', default = 'all', help='Default 2016, 2017 and 2018 are included')
+parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v0', help='Default folder is v0')
 #parser.add_option('-T', '--topol', dest='topol', type='string', default = 'all', help='Default all njmt')
 parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', help="")
 (opt, args) = parser.parse_args()
 
-filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/'
+folder = opt.folder
+filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
 ROOT.gROOT.SetBatch() # don't pop up canvases
+if not os.path.exists(filerepo + 'plot/muon'):
+     os.makedirs(filerepo + 'plot/muon')
+if not os.path.exists(filerepo + 'plot/electron'):
+     os.makedirs(filerepo + 'plot/electron')
+if not os.path.exists(filerepo + 'stack'):
+     os.makedirs(filerepo + 'stack')
 
 def mergepart(dataset):
      samples = []
@@ -90,7 +98,7 @@ def lumi_writer(dataset, lumi):
                os.popen("mv " + filerepo + sample.label + "/"  + sample.label + "_merged.root " + filerepo + sample.label + "/"  + sample.label + ".root")
 
 def cutToTag(cut):
-    newstring = cut.replace(">=","_GE_").replace(">","_G_").replace(" ","").replace("&&","_AND_").replace("||","_OR_").replace("<=","_LE_").replace("<","_L_").replace(".","p").replace("(","").replace(")","").replace("==","_EQ_").replace("=","_EQ_").replace("*","_AND_").replace("+","_OR_")
+    newstring = cut.replace(">=","_GE_").replace(">","_G_").replace(" ","").replace("&&","_AND_").replace("||","_OR_").replace("<=","_LE_").replace("<","_L_").replace(".","p").replace("(","").replace(")","").replace("==","_EQ_").replace("!=","_NEQ_").replace("=","_EQ_").replace("*","_AND_").replace("+","_OR_")
     return newstring
 
 def plot(lep, reg, variable, sample, cut_tag, syst):
@@ -99,11 +107,11 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      f1 = ROOT.TFile.Open(filerepo + sample.label + "/"  + sample.label + ".root")
      treename = "events_all"
      if(cut_tag == ""):
-          histoname = "h_"+reg+"_"+variable._name
+          histoname = "h_" + reg + "_" + variable._name
      else:
-          histoname = "h_"+reg+"_"+variable._name+"_"+cut_tag
+          histoname = "h_" + reg + "_" + variable._name + "_" + cut_tag
      nbins = variable._nbins
-     h1 = ROOT.TH1F(histoname, variable._name+"_"+reg, variable._nbins, variable._xmin, variable._xmax)
+     h1 = ROOT.TH1F(histoname, variable._name + "_" + reg, variable._nbins, variable._xmin, variable._xmax)
      h1.Sumw2()
      if 'muon' in lep: 
           cut  = variable._taglio+ '*isMu'
@@ -114,7 +122,7 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
           #if not 'Data' in sample.label:
                #cut += '*passed_ele'
      print str(cut)
-     foutput = filerepo + "plot/"+lep+"/"+ sample.label +"_"+lep+".root"
+     foutput = filerepo + "plot/" + lep + "/" + sample.label + "_" + lep+".root"
      '''
      else:
           if(syst==""):
@@ -156,10 +164,10 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      ROOT.gStyle.SetPalette(1)
      ROOT.gStyle.SetOptStat(0)
      ROOT.TH1.SetDefaultSumw2()
-     if cut_tag_ == "":
-          histoname = "h_"+reg_+"_"+variabile_._name
-          stackname = "stack_"+reg_+"_"+variabile_._name
-          canvasname = "stack_"+reg_+"_"+variabile_._name+"_"+lep_
+     if(cut_tag_ == ""):
+          histoname = "h_" + reg_ + "_" + variabile_._name
+          stackname = "stack_" + reg_ + "_" + variabile_._name
+          canvasname = "stack_" + reg_ + "_" + variabile_._name + "_" + lep_
      else:
           histoname = "h_"+reg_+"_"+variabile_._name+"_"+cut_tag_
           stackname = "stack_"+reg_+"_"+variabile_._name+"_"+cut_tag_
@@ -172,12 +180,13 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      for s in samples_:
           if('WP' in s.label):
                signal = True
-          if(syst_==""):
-               outfile = filerepo + "stack_"+str(lep_).strip('[]')+".root"
-               infile[s.label] = ROOT.TFile.Open(filerepo + "plot/"+lep+"/"+ s.label +"_"+lep+".root")
+          if(syst_ == ""):
+               outfile = filerepo + "stack_" + str(lep_).strip('[]') + ".root"
+               infile[s.label] = ROOT.TFile.Open(filerepo + "plot/" + lep + "/" + s.label + "_" + lep + ".root")
           else:
                outfile = filerepo + "stack_"+syst_+"_"+str(lep_).strip('[]')+".root"
-               infile[s.label] = ROOT.TFile.Open(filerepo + "plot/"+lep+"/"+ s.label +"_"+lep+"_"+syst_+".root")
+               infile[s.label] = ROOT.TFile.Open(filerepo + "plot/" + lep + "/" + s.label + "_" + lep + "_" + syst_ + ".root")
+     i = 0
      for s in samples_:
           infile[s.label].cd()
           print "opening file: ", infile[s.label].GetName()
@@ -188,7 +197,9 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
                hdata.Add(ROOT.TH1F(tmp.Clone("")))
                hdata.SetMarkerStyle(20)
                hdata.SetMarkerSize(0.9)
-               leg_stack.AddEntry(hdata, "Data", "lp")
+               if(i == 0): # trick to add Data flag to legend only once
+                    leg_stack.AddEntry(hdata, "Data", "ep")
+               i += 1
           elif('WP' in s.label):
                #tmp.SetLineStyle(9)
                tmp.SetLineColor(s.color)
@@ -241,7 +252,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      logscale = True # False #
      if(logscale):
           pad1.SetLogy()
-          stack.SetMaximum(maximum*10000)
+          stack.SetMaximum(maximum*1000)
      else:
           stack.SetMaximum(maximum*1.6)
      stack.SetMinimum(0.01)
@@ -250,14 +261,14 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      print str(step)
      if "GeV" in variabile_._title:
           if step.is_integer():
-               ytitle = "Events/%.0f GeV" %step
+               ytitle = "Events / %.0f GeV" %step
           else:
-               ytitle = "Events/%.2f GeV" %step
+               ytitle = "Events / %.2f GeV" %step
      else:
           if step.is_integer():
-               ytitle = "Events/%.0f units" %step
+               ytitle = "Events / %.0f units" %step
           else:
-               ytitle = "Events/%.2f units" %step
+               ytitle = "Events / %.2f units" %step
      stack.GetYaxis().SetTitle(ytitle)
      stack.GetYaxis().SetTitleFont(42)
      stack.GetXaxis().SetLabelOffset(1.8)
@@ -392,7 +403,7 @@ if(opt.dat!= 'all'):
      [dataset_dict[str(sample.year)].append(sample) for sample in samples]
 else:
      dataset_dict = {
-          '2016':[DataMu_2016, DataEle_2016, DataHT_2016, ST_2016, QCD_2016, TT_Mtt_2016, WJets_2016, WJetsHT70to100_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
+          '2016':[DataMu_2016, DataEle_2016, DataHT_2016, ST_2016, QCD_2016, TT_Mtt_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
           '2017':[DataMu_2017, DataEle_2017, TT_Mtt_2017, WJets_2017],
           '2018':[DataMu_2018, DataEle_2018, TT_Mtt_2018, WJets_2018]}
 #print(dataset_dict.keys())
@@ -419,19 +430,25 @@ wzero = 'w_nominal'
 #variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 1200))
 variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
 variables.append(variabile('lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
-variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20,-3.14, 3.14))
+variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+variables.append(variabile('lepton_miniIso', 'lepton miniIso',  wzero+'*('+cut+')', 100, 0, 0.1))
+variables.append(variabile('lepMET_deltaPhi', '#Delta#phi(#ell, MET)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
 variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', 100, 0, 1000))
 variables.append(variabile('Event_HT', 'event HT [GeV]', wzero+'*('+cut+')', 70, 0, 1400))
-variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')',20,-3.14, 3.14))
+variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+variables.append(variabile('best_RecoTop_pt', 'top p_{T} [GeV]',  wzero+'*(best_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
+variables.append(variabile('best_RecoTop_eta', 'top #eta', wzero+'*(best_RecoTop_eta>-10.&&'+cut+')', 48, -3., 3.))
+variables.append(variabile('best_RecoTop_phi', 'top #phi',  wzero+'*(best_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+variables.append(variabile('best_RecoTop_m', 'top mass [GeV]',  wzero+'*(best_RecoTop_m>0&&'+cut+')',  192, 80, 2000))
 #variables.append(variabile('sublead_TopJet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 1200))
 #variables.append(variabile('sublead_TopJet_eta', 'sub leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
 #variables.append(variabile('sublead_WpJet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
 #variables.append(variabile('sublead_WpJet_eta', 'leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
 variables.append(variabile('sublead_WpJet_isBTagged', 'leading jet b tagged',  wzero+'*('+cut+')', 2, -0.5, 1.5))
-variables.append(variabile('nJet_pt25', 'no. of jets with p_{T} > 25 [GeV]',  wzero+'*('+cut+')', 8, 1.5, 9.5))
-variables.append(variabile('nJet_pt50', 'no. of jets with p_{T} > 50 [GeV]',  wzero+'*('+cut+')', 8, 1.5, 9.5))
-variables.append(variabile('nbJet_pt25', 'no. of b jets with p_{T} > 25 [GeV]',  wzero+'*('+cut+')', 9, -0.5, 8.5))
-variables.append(variabile('nbJet_pt50', 'no. of b jets with p_{T} > 50 [GeV]',  wzero+'*('+cut+')', 7, -0.5, 6.5))
+variables.append(variabile('nJet_pt25', 'no. of jets with p_{T} > 25 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
+variables.append(variabile('nJet_pt50', 'no. of jets with p_{T} > 50 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
+variables.append(variabile('nbJet_pt25', 'no. of b jets with p_{T} > 25 GeV',  wzero+'*('+cut+')', 9, -0.5, 8.5))
+variables.append(variabile('nbJet_pt50', 'no. of b jets with p_{T} > 50 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
 variables.append(variabile('leadingjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 150, 2000))
 variables.append(variabile('subleadingjet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
 variables.append(variabile('leadingjets_deltaR', 'leadings jets #DeltaR',  wzero+'*('+cut+')', 10, 0, 5))
@@ -444,16 +461,13 @@ variables.append(variabile('bjets_deltaEta', 'b jets #Delta#eta',  wzero+'*(bjet
 variables.append(variabile('bjets_pt', 'b jets system p_{T} [GeV]',  wzero+'*(bjets_pt>-10.&&'+cut+')', 100, 0, 2000))
 variables.append(variabile('mtw', 'W boson transverse mass [GeV]',  wzero+'*('+cut+')', 100, 0, 500))
 variables.append(variabile('had_global_thrust', 'hadronic global thrust',  wzero+'*('+cut+')', 20, 0.5, 1))
-variables.append(variabile('had_central_thrust', 'hadronic central thrust',  wzero+'*('+cut+')', 20, 0, 0.5))
+variables.append(variabile('had_central_thrust', 'hadronic transverse thrust',  wzero+'*('+cut+')', 20, 0, 0.5))
 variables.append(variabile('ovr_global_thrust', 'event global thrust',  wzero+'*('+cut+')', 20, 0.5, 1))
-variables.append(variabile('ovr_central_thrust', 'event central thrust',  wzero+'*('+cut+')', 20, 0, 0.5))
-
-variables.append(variabile('best_TopJet_dRLepJet', '#DeltaR lep jet (best crit)',  wzero+'*('+cut+')', 10, 0, 5))
-variables.append(variabile('closest_TopJet_dRLepJet', '#DeltaR lep jet (closest crit)',  wzero+'*('+cut+')', 10, 0, 5))
-variables.append(variabile('sublead_TopJet_dRLepJet', '#DeltaR lep jet (sublead crit)',  wzero+'*('+cut+')', 10, 0, 5))
-variables.append(variabile('chi_TopJet_dRLepJet', '#DeltaR lep jet (chi crit)',  wzero+'*('+cut+')', 10, 0, 5))
-
-
+variables.append(variabile('ovr_central_thrust', 'event transverse thrust',  wzero+'*('+cut+')', 20, 0, 0.5))
+variables.append(variabile('best_TopJet_dRLepJet', '#DeltaR lep jet (best crit)',  wzero+'*('+cut+')', 50, 0, 5))
+variables.append(variabile('closest_TopJet_dRLepJet', '#DeltaR lep jet (closest crit)',  wzero+'*('+cut+')', 50, 0, 5))
+variables.append(variabile('sublead_TopJet_dRLepJet', '#DeltaR lep jet (sublead crit)',  wzero+'*('+cut+')', 50, 0, 5))
+variables.append(variabile('chi_TopJet_dRLepJet', '#DeltaR lep jet (chi crit)',  wzero+'*('+cut+')', 50, 0, 5))
 
 for year in years:
      for sample in dataset_dict[year]:
@@ -474,10 +488,10 @@ for year in years:
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
-                         plot(lep, 'SR', var, sample, cut_tag, "")
+                         plot(lep, 'jets', var, sample, cut_tag, "")
           if(opt.stack):
                for var in variables:
-                    makestack(lep, 'SR', var, dataset_new, cut_tag, "", lumi[str(year)])
+                    makestack(lep, 'jets', var, dataset_new, cut_tag, "", lumi[str(year)])
 #if hasattr(dataset_dict[str(year)], 'components'): # How to check whether this exists or not
 #     samples = [sample for sample in dataset.components]# Method exists and was used.
 #else:

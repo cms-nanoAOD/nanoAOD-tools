@@ -8,7 +8,7 @@ import copy
 from array import array
 from skimtree_utils import *
 
-localrun = True # False #
+localrun = False # True #
 if not(localrun):
     from samples import *
 else:
@@ -18,7 +18,7 @@ part_idx = sys.argv[2]
 file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = True # False #
+Debug = False # True #
 MCReco = True
 DeltaFilter = True
 TriggerStudy = False # True #
@@ -295,6 +295,7 @@ lepton_pt_all = array.array('f', [0.])
 lepton_eta_all = array.array('f', [0.])
 lepton_phi_all = array.array('f', [0.])
 lepton_miniIso_all = array.array('f', [0.])
+lepMET_deltaPhi_all = array.array('f', [0.])
 isEle_all = array.array('i', [0])
 isMu_all = array.array('i', [0])
 
@@ -474,6 +475,7 @@ systTree.branchTreesSysts(trees, "all", "lepton_pt", outTreeFile, lepton_pt_all)
 systTree.branchTreesSysts(trees, "all", "lepton_eta", outTreeFile, lepton_eta_all)
 systTree.branchTreesSysts(trees, "all", "lepton_phi", outTreeFile, lepton_phi_all)
 systTree.branchTreesSysts(trees, "all", "lepton_miniIso", outTreeFile, lepton_miniIso_all)
+systTree.branchTreesSysts(trees, "all", "lepMET_deltaPhi", outTreeFile, lepMET_deltaPhi_all)
 systTree.branchTreesSysts(trees, "all", "passed_mu", outTreeFile, passed_mu_all)
 systTree.branchTreesSysts(trees, "all", "passed_ele", outTreeFile, passed_ele_all)
 systTree.branchTreesSysts(trees, "all", "passed_ht", outTreeFile, passed_ht_all)
@@ -549,7 +551,6 @@ for i in xrange(0,tree.GetEntries()):
     Flag = Object(event, 'Flag')
     met = Object(event, "MET")
     MET = {'metPx': met.pt*ROOT.TMath.Cos(met.phi), 'metPy': met.pt*ROOT.TMath.Sin(met.phi)}
-    #PU = Object(event, "Pileup")
     genpart = None
 
     if isMC:
@@ -706,6 +707,7 @@ for i in xrange(0,tree.GetEntries()):
         else:
             w_nominal_all[0] = 1.
 
+    lepMET_deltaPhi_all[0] = deltaPhi(tightlep_p4.Phi(), met.phi)
     mtw_all[0] = math.sqrt(2*tightlep_p4.Pt() * met.pt *(1-math.cos(abs(deltaPhi(tightlep_p4.Phi(), met.phi)))))
 
     goodJets = get_Jet(jets, 30)

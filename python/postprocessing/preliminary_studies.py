@@ -9,9 +9,9 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools imp
 #inputpath = "/eos/home-a/adeiorio/Wprime/nosynch/" 
 inputpath = "/eos/home-a/apiccine/private/Wprime_BkgSample/merged/"
 
-inpfiles = ["Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8",
-            "Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
-            "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8",
+inpfiles = ["Wprimetotb_M2000W20_RH_MG",
+            "Wprimetotb_M3000W300_RH_MG",
+            "Wprimetotb_M4000W400_RH_MG",
             #'Wprime_4000_RH'
             #,"TT_Mtt-700to1000"
             #,'TT_Mtt-1000toInf_2016_1'
@@ -61,6 +61,7 @@ for inpfile in inpfiles:
     h_ele_HT_binned =  ROOT.TH1F("HT_EleTrg", "Event_HT_MuonTriggered", nbins, edges_HT)
     h_electronpt_HLT = ROOT.TH1F("Electron_pt", "Electron_pt", nbins, edges)
     h_HLT_Ele115 = ROOT.TH1F("HLT_Ele115", "HLT_Ele115", nbins, edges)
+    h_HLT_Pho175 = ROOT.TH1F("HLT_Pho175", "HLT_Pho175", nbins, edges)
 
     h_HT = ROOT.TH1F("HT", "Event_HT", nbins, edges_HT)
     h_HT_mu = ROOT.TH1F("HT_Mu", "Event_HT_Mu", nbins, edges_HT)
@@ -71,6 +72,7 @@ for inpfile in inpfiles:
     h_electronpt_mcmatched = ROOT.TH1F("Electron_pt_mcmatched", "Electron_pt_mcmatched", nbins, edges)
     h_electronpt_mcmatched_HLT_Lep_OR_HT = ROOT.TH1F("Electron_pt_mcmatched_HLT_Lep_OR_HT", "Electron_pt_mcmatched_HLT_Lep_OR_HT", nbins, edges)
     h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph = ROOT.TH1F("Electron_pt_mcmatched_HLT_Lep_OR_HT_OR_Ph", "Electron_pt_mcmatched_HLT_Lep_OR_HT_OR_Ph", nbins, edges)
+    h_electronpt_mcmatched_HLT_HT_OR_Ph = ROOT.TH1F("Electron_pt_mcmatched_HLT_HT_OR_Ph", "Electron_pt_mcmatched_HLT_HT_OR_Ph", nbins, edges)
     h_electron_trigger_den = ROOT.TH1F("HLT_ELE_OR_den", "HLT_ELE_OR", nbins, edges)
     h_electron_trigger_num = ROOT.TH1F("HLT_ELE_OR_num", "HLT_ELE_OR", nbins, edges)
     h_muon_trigger_den = ROOT.TH1F("HLT_MU_OR_den", "HLT_MU_OR", nbins, edges)
@@ -128,7 +130,7 @@ for inpfile in inpfiles:
     mumatch_iso0p1_pt_100 = 0.
     mumatch_iso0p1_pt_125 = 0.
     mumatch_iso0p2_pt_50 = 0.
-    mumatch_iso0p2_pt_75 = 0.   
+    mumatch_iso0p2_pt_75 = 0.
     mumatch_iso0p2_pt_100 = 0.    
     mumatch_iso0p2_pt_125 = 0.    
     elematch_iso0p1_pt_50 = 0.    
@@ -328,6 +330,8 @@ for inpfile in inpfiles:
                         h_electronpt_mcmatched_HLT_Lep_OR_HT.Fill(ele.pt)
                     if HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.PFHT800 or HLT.PFHT900 or HLT.Photon175:
                         h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph.Fill(ele.pt)
+                    if HLT.PFHT800 or HLT.PFHT900 or HLT.Photon175:
+                        h_electronpt_mcmatched_HLT_HT_OR_Ph.Fill(ele.pt)
 
 
         if isMu or isEle:
@@ -494,8 +498,14 @@ for inpfile in inpfiles:
     h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff.SetLineColor(ROOT.kBlue)
     save_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff)
     print_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff, 'AP')
+    h_electronpt_mcmatched_HLT_HT_OR_Ph_Eff = ROOT.TEfficiency(h_electronpt_mcmatched_HLT_HT_OR_Ph, h_electronpt_mcmatched)
+    h_electronpt_mcmatched_HLT_HT_OR_Ph_Eff.SetTitle("MCmatched_HLT_HT_OR_Ph_Eff;Electron pt [GeV];#varepsilon")
+    h_electronpt_mcmatched_HLT_HT_OR_Ph_Eff.SetName("MCmatched_HLT_HT_OR_Ph_Eff")
+    h_electronpt_mcmatched_HLT_HT_OR_Ph_Eff.SetLineColor(ROOT.kBlue)
+    save_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_HT_OR_Ph_Eff)
+    print_hist(inpfile, plotpath, h_electronpt_mcmatched_HLT_HT_OR_Ph_Eff, 'AP')
 
-    print_hist(inpfile, plotpath, [h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff, h_electronpt_mcmatched_HLT_Lep_OR_HT_Eff], 'AP')
+    print_hist(inpfile, plotpath, [h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff, h_electronpt_mcmatched_HLT_HT_OR_Ph_Eff, h_electronpt_mcmatched_HLT_Lep_OR_HT_Eff], 'AP')
 
     
 
