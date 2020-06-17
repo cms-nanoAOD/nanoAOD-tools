@@ -51,7 +51,6 @@ class preselection(Module):
             #print "No. Mu = ", len(goodMu), " No. Ele = ", len(goodEle), " veto Mu is ", not isVetoMu, " veto Ele is ", not isVetoEle, " No. barrel jets = ", len(goodJet)
         return goodEvent
 
-
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 #MySelectorModuleConstr = lambda : exampleProducer(jetetaSelection= lambda j : abs(j.eta)<2.4) 
  

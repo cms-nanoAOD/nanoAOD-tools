@@ -211,6 +211,8 @@ class jetmetUncertaintiesProducer(Module):
         
         met     = Object(event, self.metBranchName)
         rawmet  = Object(event, "RawMET")
+        if  "Puppi" in self.metBranchName :
+            rawmet  = Object(event, "RawPuppiMET")
         defmet  = Object(event, "MET")
 
         ( t1met_px,       t1met_py       ) = ( met.pt*math.cos(met.phi), met.pt*math.sin(met.phi) )
@@ -304,9 +306,9 @@ class jetmetUncertaintiesProducer(Module):
             # set the jet pt to the muon subtracted raw pt
             jet.pt = newjet.Pt()
             jet.rawFactor = 0
-            # get the proper jet pts for type-1 MET. only correct the non-mu fraction of the jet. if the corrected pt>15, use the corrected jet, otherwise use raw
-            jet_pt_noMuL1L2L3 = jet.pt*jec    if jet.pt*jec > self.unclEnThreshold else jet.pt
-            jet_pt_noMuL1     = jet.pt*jecL1  if jet.pt*jec > self.unclEnThreshold else jet.pt
+            # get the proper jet pts for type-1 MET
+            jet_pt_noMuL1L2L3 = jet.pt*jec   
+            jet_pt_noMuL1     = jet.pt*jecL1 
 
             # this step is only needed for v2 MET in 2017 when different JECs are applied compared to the nanoAOD production
             if self.jetReCalibratorProd:
@@ -408,13 +410,13 @@ class jetmetUncertaintiesProducer(Module):
                   jet_pt_jesDownT1[jesUncertainty] = jet_pt_L1L2L3*(1. - delta)
 
 
-            # progate JER and JES corrections and uncertainties to MET
-            if jet_pt_L1L2L3 > self.unclEnThreshold and (jet.neEmEF+jet.chEmEF) < 0.9:
+            # progate JER and JES corrections and uncertainties to MET. Only propagate JECs to MET if the corrected pt without the muon is above the threshold
+            if jet_pt_noMuL1L2L3 > self.unclEnThreshold and (jet.neEmEF+jet.chEmEF) < 0.9:
                 if not ( self.metBranchName == 'METFixEE2017' and 2.65<abs(jet.eta)<3.14 and jet.pt*(1-jet.rawFactor)<50 ): # do not re-correct for jets that aren't included in METv2 recipe
                     jet_cosPhi = math.cos(jet.phi)
                     jet_sinPhi = math.sin(jet.phi)
                     met_px_nom     = met_px_nom     - (jet_pt_L1L2L3  - jet_pt_L1)*jet_cosPhi 
-                    met_py_nom     = met_py_nom     - (jet_pt_L1L2L3  - jet_pt_L1)*jet_sinPhi 
+                    met_py_nom     = met_py_nom     - (jet_pt_L1L2L3  - jet_pt_L1)*jet_sinPhi
                     if not self.isData:
                       met_px_jer     = met_px_jer     - (jet_pt_L1L2L3*jet_pt_jerNomVal   - jet_pt_L1)*jet_cosPhi 
                       met_py_jer     = met_py_jer     - (jet_pt_L1L2L3*jet_pt_jerNomVal   - jet_pt_L1)*jet_sinPhi 
