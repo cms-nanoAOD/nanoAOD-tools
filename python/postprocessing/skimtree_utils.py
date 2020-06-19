@@ -555,15 +555,15 @@ class TopUtilities():
         pz.append((a - root).real)
         #pz2 = a - root
         nNuSol = 2
-        pznu = 0.0
+        #pznu = 0.0
 
         for i in range(nNuSol):
           Enu = TMath.Power((MisET2 + pz[i]**2), 0.5)
           #Enu = TMath.Power((MisET2 + pznu**2), 0.5)
           p4nu = ROOT.TLorentzVector()
-          p4nu.SetPxPyPzE(metPx, metPy, pznu, Enu)
+          p4nu.SetPxPyPzE(metPx, metPy, pz[i], Enu)
           #p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
-          p4nu_rec.append(p4nu)
+          p4nu_rec.append(copy.deepcopy(p4nu))
 
         neutrino = copy.deepcopy(p4nu_rec)
         return neutrino, IsNegative
