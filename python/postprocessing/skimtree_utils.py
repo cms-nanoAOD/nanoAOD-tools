@@ -542,20 +542,17 @@ class TopUtilities():
         p4lep_rec.SetPxPyPzE(leptonPx, leptonPy, leptonPz, leptonE)
         p40_rec = ROOT.TLorentzVector(0.0, 0.0, 0.0, 0.0)
 
-        if (a2-b) > 0:
-            
-            isNegative = False
-        else:
+        delta = a2 - b
+        if delta < 0:
             IsNegative = True
-
-        root = TMath.Power((a2-b), 0.5)
+        
+        root = cmath.sqrt((a2-b))
         pz = []
+
         pz.append((a + root).real)
-        #pz1 = a + root
         pz.append((a - root).real)
-        #pz2 = a - root
+
         nNuSol = 2
-        #pznu = 0.0
 
         for i in range(nNuSol):
           Enu = TMath.Power((MisET2 + pz[i]**2), 0.5)
@@ -652,9 +649,12 @@ class TopUtilities():
               rtop = lepton + jet + neutrino[i]
             else:
               rtop = jet + neutrino[i]
+            
             rchi = Chi_TopMass(rtop.M())
             if rchi < chi2:
               besttop = copy.deepcopy(rtop)
+              chi2 = copy.deepcopy(rchi)
+    
         elif isinstance(neutrino, ROOT.TLorentzVector):
           if dR_lepjet > 0.4:
             rtop = lepton + jet + neutrino
@@ -665,7 +665,6 @@ class TopUtilities():
         elif neutrino is None:
           besttop = None
         
-        #top = lepton + jet + neutrino
         return besttop, IsNeg, dR_lepjet
 
     def topMtw(self, lepton, jet, metPx, metPy):
