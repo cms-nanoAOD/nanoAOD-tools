@@ -8,7 +8,7 @@ import copy
 from array import array
 from skimtree_utils import *
 
-localrun = False # True #
+localrun = True # False #
 if not(localrun):
     from samples import *
 else:
@@ -18,7 +18,7 @@ part_idx = sys.argv[2]
 file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = False # True #
+Debug = True # False #
 MCReco = True
 DeltaFilter = True
 TriggerStudy = False # True #
@@ -148,7 +148,8 @@ closest_RecoTop_phi_all = array.array('f', [0.])
 closest_RecoTop_m_all = array.array('f', [0.])
 closest_RecoTop_mt_all = array.array('f', [0.])
 closest_RecoTop_isNeg_all = array.array('i', [0])
-closestRecoTop_chi2_all = array.array('i', [0])
+closest_RecoTop_chi2_all = array.array('i', [0])
+closest_RecoTop_costheta_all = array.array('f', [0.])
 chi_RecoTop_pt_all = array.array('f', [0.])
 chi_RecoTop_eta_all = array.array('f', [0.])
 chi_RecoTop_phi_all = array.array('f', [0.])
@@ -156,6 +157,7 @@ chi_RecoTop_m_all = array.array('f', [0.])
 chi_RecoTop_mt_all = array.array('f', [0.])
 chi_RecoTop_isNeg_all = array.array('i', [0])
 chi_RecoTop_chi2_all = array.array('i', [0])
+chi_RecoTop_costheta_all = array.array('f', [0.])
 sublead_RecoTop_pt_all = array.array('f', [0.])
 sublead_RecoTop_eta_all = array.array('f', [0.])
 sublead_RecoTop_phi_all = array.array('f', [0.])
@@ -163,6 +165,7 @@ sublead_RecoTop_m_all = array.array('f', [0.])
 sublead_RecoTop_mt_all = array.array('f', [0.])
 sublead_RecoTop_isNeg_all = array.array('i', [0])
 sublead_RecoTop_chi2_all = array.array('i', [0])
+sublead_RecoTop_costheta_all = array.array('f', [0.])
 best_RecoTop_pt_all = array.array('f', [0.])
 best_RecoTop_eta_all = array.array('f', [0.])
 best_RecoTop_phi_all = array.array('f', [0.])
@@ -170,6 +173,7 @@ best_RecoTop_m_all = array.array('f', [0.])
 best_RecoTop_mt_all = array.array('f', [0.])
 best_RecoTop_isNeg_all = array.array('i', [0])
 best_RecoTop_chi2_all = array.array('i', [0])
+best_RecoTop_costheta_all = array.array('f', [0.])
 
 nJet_pt25_all = array.array('i', [0])
 nJet_pt50_all = array.array('i', [0])
@@ -330,6 +334,14 @@ ovr_central_thrust = array.array('f', [0.])
 deltaR_lep_closestjet = array.array('f', [0.])
 deltaR_lep_leadingjet = array.array('f', [0.])
 deltaR_lep_subleadingjet = array.array('f', [0.])
+ptrel_leadAK4_closestAK8 = array.array('f', [0.])
+deltaR_leadAK4_closestAK8 = array.array('f', [0.])
+ptrel_subleadAK4_closestAK8 = array.array('f', [0.])
+deltaR_subleadAK4_closestAK8 = array.array('f', [0.])
+ptrel_besttopAK4_closestAK8 = array.array('f', [0.])
+deltaR_besttopAK4_closestAK8 = array.array('f', [0.])
+ptrel_bestWAK4_closestAK8 = array.array('f', [0.])
+deltaR_bestWAK4_closestAK8 = array.array('f', [0.])
 
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
@@ -394,23 +406,27 @@ systTree.branchTreesSysts(trees, "all", "closest_RecoTop_eta", outTreeFile, clos
 systTree.branchTreesSysts(trees, "all", "closest_RecoTop_phi", outTreeFile, closest_RecoTop_phi_all)
 systTree.branchTreesSysts(trees, "all", "closest_RecoTop_m", outTreeFile, closest_RecoTop_m_all)
 systTree.branchTreesSysts(trees, "all", "closest_RecoTop_mt", outTreeFile, closest_RecoTop_mt_all)
+systTree.branchTreesSysts(trees, "all", "closest_RecoTop_costheta", outTreeFile, closest_RecoTop_costheta_all)
 systTree.branchTreesSysts(trees, "all", "closest_RecoTop_isNeg", outTreeFile, closest_RecoTop_isNeg_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_pt", outTreeFile, chi_RecoTop_pt_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_eta", outTreeFile, chi_RecoTop_eta_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_phi", outTreeFile, chi_RecoTop_phi_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_m", outTreeFile, chi_RecoTop_m_all)
+systTree.branchTreesSysts(trees, "all", "chi_RecoTop_costheta", outTreeFile, chi_RecoTop_costheta_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_mt", outTreeFile, chi_RecoTop_mt_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_isNeg", outTreeFile, chi_RecoTop_isNeg_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_pt", outTreeFile, sublead_RecoTop_pt_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_eta", outTreeFile, sublead_RecoTop_eta_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_phi", outTreeFile, sublead_RecoTop_phi_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_m", outTreeFile, sublead_RecoTop_m_all)
+systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_costheta", outTreeFile, sublead_RecoTop_costheta_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_mt", outTreeFile, sublead_RecoTop_mt_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_isNeg", outTreeFile, sublead_RecoTop_isNeg_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_pt", outTreeFile, best_RecoTop_pt_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_eta", outTreeFile, best_RecoTop_eta_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_phi", outTreeFile, best_RecoTop_phi_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_m", outTreeFile, best_RecoTop_m_all)
+systTree.branchTreesSysts(trees, "all", "best_RecoTop_costheta", outTreeFile, best_RecoTop_costheta_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_mt", outTreeFile, best_RecoTop_mt_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_isNeg", outTreeFile, best_RecoTop_isNeg_all)
 
@@ -470,7 +486,6 @@ systTree.branchTreesSysts(trees, "all", "best_WpJet_eta", outTreeFile, best_WpJe
 systTree.branchTreesSysts(trees, "all", "best_WpJet_phi", outTreeFile, best_WpJet_phi_all)
 systTree.branchTreesSysts(trees, "all", "best_WpJet_m", outTreeFile, best_WpJet_m_all)
 systTree.branchTreesSysts(trees, "all", "best_WpJet_isBTagged", outTreeFile, best_WpJet_isBTagged_all)
-
 systTree.branchTreesSysts(trees, "all", "lepton_pt", outTreeFile, lepton_pt_all)
 systTree.branchTreesSysts(trees, "all", "lepton_eta", outTreeFile, lepton_eta_all)
 systTree.branchTreesSysts(trees, "all", "lepton_phi", outTreeFile, lepton_phi_all)
@@ -487,6 +502,15 @@ systTree.branchTreesSysts(trees, "all", "Event_HT", outTreeFile, Event_HT_all)
 systTree.branchTreesSysts(trees, "all", "MET_pt", outTreeFile, MET_pt_all)
 systTree.branchTreesSysts(trees, "all", "MET_phi", outTreeFile, MET_phi_all)
 systTree.branchTreesSysts(trees, "all", "mtw", outTreeFile, mtw_all)
+systTree.branchTreesSysts(trees, "all", "ptrel_leadAK4_closestAK8", outTreeFile, ptrel_leadAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "deltaR_leadAK4_closestAK8", outTreeFile, deltaR_leadAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "ptrel_subleadAK4_closestAK8", outTreeFile, ptrel_subleadAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "deltaR_subleadAK4_closestAK8", outTreeFile, deltaR_subleadAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "ptrel_besttopAK4_closestAK8", outTreeFile, ptrel_besttopAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "deltaR_besttopAK4_closestAK8", outTreeFile, deltaR_besttopAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "ptrel_bestWAK4_closestAK8", outTreeFile, ptrel_bestWAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "deltaR_bestWAK4_closestAK8", outTreeFile, deltaR_bestWAK4_closestAK8)
+
 if(TriggerStudy):
     systTree.branchTreesSysts(trees, "all", "isdileptonic", outTreeFile, isdileptonic)
     systTree.branchTreesSysts(trees, "all", "muon_pt", outTreeFile, muon_pt)
@@ -536,9 +560,12 @@ for i in xrange(0,tree.GetEntries()):
     #++++++++++++++++++++++++++++++++++
     #++        taking objects        ++
     #++++++++++++++++++++++++++++++++++
+    if Debug:
+        print "evento n. " + str(i)
+
     if Debug and i > 1000:
         break
-
+        
     event = Event(tree,i)
     electrons = Collection(event, "Electron")
     muons = Collection(event, "Muon")
@@ -592,9 +619,19 @@ for i in xrange(0,tree.GetEntries()):
     isDilepton = False
     isMuon = (len(goodMu) == 1) and (len(goodEle) == 0) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT)
     isElectron = (len(goodMu) == 0) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passEle or passHT)
+
+    print "questo script e' stronzo "
+
     #Double counting removal
     if('DataHT' in sample.label and (passMu or passEle)):
         continue
+
+    goodJets = get_Jet(jets, 30)
+    bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
+    print len(fatjets)
+    if (len(goodJets) < 2 or len(fatjets) < 2):
+        continue
+
     if(TriggerStudy):
         isdileptonic[0] = 0
         isDilepton = (len(goodMu) == 1) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT or passEle)
@@ -710,13 +747,8 @@ for i in xrange(0,tree.GetEntries()):
     lepMET_deltaPhi_all[0] = deltaPhi(tightlep_p4.Phi(), met.phi)
     mtw_all[0] = math.sqrt(2*tightlep_p4.Pt() * met.pt *(1-math.cos(abs(deltaPhi(tightlep_p4.Phi(), met.phi)))))
 
-    goodJets = get_Jet(jets, 30)
-    bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
     mcbjets = None
     mclepton = None
-
-    if len(goodJets) < 2:
-        continue
 
     if(len(bjets) >= 2):
         bjets_deltaR[0] = deltaR(bjets[0].eta, bjets[0].phi, bjets[1].eta, bjets[1].phi)
@@ -734,6 +766,7 @@ for i in xrange(0,tree.GetEntries()):
         bjets_pt[0] = -999.
 
     recotop = TopUtilities()
+
     #MCtruth event reconstruction                                                      
     if MCReco:
         mcbjets = mcbjet_filter(jets)
@@ -871,7 +904,6 @@ for i in xrange(0,tree.GetEntries()):
             MC_WpJet_phi_all[0] = -100.
 
     #DetReco(nstruction)
-
     if tightlep != None:
         ovrthrust, hadthrust = event_thrust(tightlep, jets, met)
         ovr_global_thrust[0] = copy.deepcopy(ovrthrust)
@@ -887,6 +919,12 @@ for i in xrange(0,tree.GetEntries()):
         had_central_thrust[0] = -100.
         deltaR_lep_closestjet[0] = -100.
 
+    closAK8, dR_leadAK4AK8 = closest(jets[0], fatjets)
+    ptrel_leadAK4_closestAK8[0] = jets[0].pt/closAK8.pt
+    deltaR_leadAK4_closestAK8[0] = copy.deepcopy(dR_leadAK4AK8)
+    subclosAK8, dR_subleadAK4AK8 = closest(jets[1], fatjets)
+    ptrel_subleadAK4_closestAK8[0] = jets[1].pt/subclosAK8.pt
+    deltaR_subleadAK4_closestAK8[0] = copy.deepcopy(dR_subleadAK4AK8)
     leadingjet_pt_all[0] = jets[0].pt
     subleadingjet_pt_all[0] = jets[1].pt
     leadingjets_deltaR[0] = deltaR(jets[0].eta, jets[0].phi, jets[1].eta, jets[1].phi)
@@ -967,21 +1005,20 @@ for i in xrange(0,tree.GetEntries()):
     else:
         chi_promptjet = highptJets[0]
         
+    ## Chi top reconstruction
     chi_recotop_p4, IsNeg_chi, chi_dR_lepjet = recotop.top4Momentum(tightlep_p4, chi_jet_p4, MET['metPx'], MET['metPy'])
     IsNeg_chi = IsNeg_chi * DeltaFilter
-    
     #btag_countings_chi = len(bjet_filter([chi_promptjet, chi_jet], 'DeepFlv', 'M')[0])
-    
     chi_jet_p4t = copy.deepcopy(chi_jet_p4)
     chi_jet_p4t.SetPz(0.)
     chi_recotop_p4t = tightlep_p4t + chi_jet_p4t + recomet_p4t
     chi_promptjet_p4t = copy.deepcopy(chi_promptjet.p4())
     chi_promptjet_p4t.SetPz(0.)
+    chi_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, chi_jet_p4, chi_recotop_p4) 
 
     #jet closest to MET p4                                                              
     closest_jet, detrecodR = closest(tightlep, goodJets)
     closest_jet_p4_pre = closest_jet.p4()
-    
     '''
     if deltaR(closest_jet.eta, closest_jet.phi, tightlep.eta, tightlep.phi) < 0.4:
         closest_jet_p4 = closest_jet_p4_pre - tightlep_p4
@@ -997,16 +1034,16 @@ for i in xrange(0,tree.GetEntries()):
     else:
         closest_promptjet = highptJets[0]
 
+    ## Closest top reconstruction
     closest_recotop_p4, IsNeg_closest, closest_dR_lepjet = recotop.top4Momentum(tightlep_p4, closest_jet_p4, MET['metPx'], MET['metPy'])
     IsNeg_closest = IsNeg_closest * DeltaFilter
-
     btag_countings_closest = len(bjet_filter([closest_promptjet, closest_jet], 'DeepFlv', 'M')[0])
-
     closest_jet_p4t = copy.deepcopy(closest_jet_p4)
     closest_jet_p4t.SetPz(0.)
     closest_recotop_p4t = tightlep_p4t + closest_jet_p4t + recomet_p4t
     closest_promptjet_p4t = copy.deepcopy(closest_promptjet.p4())
     closest_promptjet_p4t.SetPz(0.)
+    closest_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, closest_jet_p4, closest_recotop_p4) 
 
     #subleading jet reconstruction                                                      
     if len(highptJets) > 1:
@@ -1022,14 +1059,15 @@ for i in xrange(0,tree.GetEntries()):
     '''
     sublead_jet_p4 = sublead_jet_p4_pre
 
+    ## Subleading top reconstruction
     sublead_recotop_p4, IsNeg_sublead, sublead_dR_lepjet = recotop.top4Momentum(tightlep_p4, sublead_jet_p4, MET['metPx'], MET['metPy'])
     IsNeg_sublead = IsNeg_sublead * DeltaFilter
-
     sublead_jet_p4t = copy.deepcopy(sublead_jet_p4)
     sublead_jet_p4t.SetPz(0.)
     sublead_recotop_p4t = tightlep_p4t + sublead_jet_p4t + recomet_p4t
     sublead_promptjet_p4t = copy.deepcopy(sublead_promptjet.p4())
     sublead_promptjet_p4t.SetPz(0.)
+    sublead_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, sublead_jet_p4, sublead_recotop_p4) 
 
     btag_countings_sublead = len(bjet_filter([sublead_promptjet, sublead_jet], 'DeepFlv', 'M')[0])
     #best jet reconstruction                                                           
@@ -1051,7 +1089,6 @@ for i in xrange(0,tree.GetEntries()):
         best_jet = chi_jet
         best_promptjet = chi_promptjet
         BestFound = True
-
     if not BestFound:
         best_jet_p4 = chi_jet_p4
         best_jet = chi_jet
@@ -1066,6 +1103,10 @@ for i in xrange(0,tree.GetEntries()):
         best_recotop_p4t = tightlep_p4t + best_jet_p4t + recomet_p4t
         best_promptjet_p4t = copy.deepcopy(best_promptjet.p4())
         best_promptjet_p4t.SetPz(0.)
+        closAK8, dR_besttopAK4AK8 = closest(best_jet, fatjets)
+        ptrel_besttopAK4_closestAK8[0] = goodJets[0].pt/closAK8.pt
+        deltaR_besttopAK4_closestAK8[0] = copy.deepcopy(dR_besttopAK4AK8)
+        best_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, best_jet_p4, best_recotop_p4) 
 
         #tag_countings_best = len(bjet_filter([best_promptjet, best_jet], 'DeepFlv', 'M')[0])
 
@@ -1242,6 +1283,9 @@ for i in xrange(0,tree.GetEntries()):
         best_WpJet_eta_all[0] = best_promptjet.p4().Eta()
         best_WpJet_phi_all[0] = best_promptjet.p4().Phi()
         best_WpJet_isBTagged_all[0] = int(len(bjet_filter([best_promptjet], 'DeepFlv', 'M')[0]))
+        closAK8, dR_bestWAK4AK8 = closest(best_promptjet, fatjets) 
+        ptrel_bestWAK4_closestAK8[0] = goodJets[0].pt/closAK8.pt
+        deltaR_bestWAK4_closestAK8[0] = copy.deepcopy(dR_bestWAK4AK8)
     else:
         best_Wprime_m_all[0] = -100.
         best_Wprime_mt_all[0] = -100.

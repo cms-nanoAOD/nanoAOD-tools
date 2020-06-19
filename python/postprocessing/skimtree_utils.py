@@ -682,6 +682,15 @@ class TopUtilities():
         metPt = TMath.Power((metPx**2. + metPy**2.), 0.5)
 
         return TMath.Power((mlb2 + 2.*(etlb*metPt - pxlb*metPx - pylb*metPy)), 0.5)
+
+    def costhetapol(self, lepton, jet, top):
+      top_1 = ROOT.TLorentzVector()
+      top_1.SetPxPyPzE(-top.Px(), -top.Py(), -top.Pz(), top.E())
+      jet.Boost(top.BoostVector())
+      lepton.Boost(top_1.BoostVector())
+      costheta = (jet.Vect()*lepton.Vect())/((jet.Vect()).Mag()*(lepton.Vect()).Mag())
+      return costheta
+
 ###############################################
 ###          End of topreco_utils           ###   
 ###############################################
