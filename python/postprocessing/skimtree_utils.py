@@ -632,10 +632,12 @@ class TopUtilities():
 
     def top4Momentum(self, lepton, jet, metPx, metPy):
         #topMt = self.topMtw(lepton, jet, metPx, metPy)
-        '''if topMt == None:
+        '''
+        if topMt == None:
         self.reco_topqv = None
         self.neutrino = None
-        return None'''
+        return None
+        '''
         dR_lepjet = None
         dR_lepjet = deltaR(jet.Eta(), jet.Phi(), lepton.Eta(), lepton.Phi())
         neutrino, IsNeg  = self.NuMomentum(lepton.Px(), lepton.Py(), lepton.Pz(), lepton.Pt(), lepton.Energy(), metPx, metPy)
