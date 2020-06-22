@@ -692,6 +692,13 @@ class TopUtilities():
       costheta = (jet.Vect()*lepton.Vect())/((jet.Vect()).Mag()*(lepton.Vect()).Mag())
       return costheta
 
+    def costhetapollep(self, lepton, top):
+      top_1 = ROOT.TLorentzVector()
+      top_1.SetPxPyPzE(-top.Px(), -top.Py(), -top.Pz(), top.E())
+      lepton.Boost(top_1.BoostVector())
+      costheta = (top.Vect()*lepton.Vect())/((top.Vect()).Mag()*(lepton.Vect()).Mag())
+      return costheta
+
 ###############################################
 ###          End of topreco_utils           ###   
 ###############################################

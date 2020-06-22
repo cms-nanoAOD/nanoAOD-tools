@@ -8,7 +8,7 @@ import copy
 from array import array
 from skimtree_utils import *
 
-localrun = True # False #
+localrun = False # True #
 if not(localrun):
     from samples import *
 else:
@@ -18,7 +18,7 @@ part_idx = sys.argv[2]
 file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = True # False #
+Debug = False # True #
 MCReco = True
 DeltaFilter = True
 TriggerStudy = False # True #
@@ -150,6 +150,7 @@ closest_RecoTop_mt_all = array.array('f', [0.])
 closest_RecoTop_isNeg_all = array.array('i', [0])
 closest_RecoTop_chi2_all = array.array('i', [0])
 closest_RecoTop_costheta_all = array.array('f', [0.])
+closest_RecoTop_costhetalep_all = array.array('f', [0.])
 chi_RecoTop_pt_all = array.array('f', [0.])
 chi_RecoTop_eta_all = array.array('f', [0.])
 chi_RecoTop_phi_all = array.array('f', [0.])
@@ -158,6 +159,7 @@ chi_RecoTop_mt_all = array.array('f', [0.])
 chi_RecoTop_isNeg_all = array.array('i', [0])
 chi_RecoTop_chi2_all = array.array('i', [0])
 chi_RecoTop_costheta_all = array.array('f', [0.])
+chi_RecoTop_costhetalep_all = array.array('f', [0.])
 sublead_RecoTop_pt_all = array.array('f', [0.])
 sublead_RecoTop_eta_all = array.array('f', [0.])
 sublead_RecoTop_phi_all = array.array('f', [0.])
@@ -166,6 +168,7 @@ sublead_RecoTop_mt_all = array.array('f', [0.])
 sublead_RecoTop_isNeg_all = array.array('i', [0])
 sublead_RecoTop_chi2_all = array.array('i', [0])
 sublead_RecoTop_costheta_all = array.array('f', [0.])
+sublead_RecoTop_costhetalep_all = array.array('f', [0.])
 best_RecoTop_pt_all = array.array('f', [0.])
 best_RecoTop_eta_all = array.array('f', [0.])
 best_RecoTop_phi_all = array.array('f', [0.])
@@ -174,6 +177,7 @@ best_RecoTop_mt_all = array.array('f', [0.])
 best_RecoTop_isNeg_all = array.array('i', [0])
 best_RecoTop_chi2_all = array.array('i', [0])
 best_RecoTop_costheta_all = array.array('f', [0.])
+best_RecoTop_costhetalep_all = array.array('f', [0.])
 
 nJet_pt25_all = array.array('i', [0])
 nJet_pt50_all = array.array('i', [0])
@@ -342,7 +346,9 @@ ptrel_besttopAK4_closestAK8 = array.array('f', [0.])
 deltaR_besttopAK4_closestAK8 = array.array('f', [0.])
 ptrel_bestWAK4_closestAK8 = array.array('f', [0.])
 deltaR_bestWAK4_closestAK8 = array.array('f', [0.])
-
+topW_jets_pt = array.array('f', [0.])
+topW_jets_deltaR = array.array('f', [0.])
+topW_jets_deltaphi = array.array('f', [0.])
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
@@ -407,12 +413,14 @@ systTree.branchTreesSysts(trees, "all", "closest_RecoTop_phi", outTreeFile, clos
 systTree.branchTreesSysts(trees, "all", "closest_RecoTop_m", outTreeFile, closest_RecoTop_m_all)
 systTree.branchTreesSysts(trees, "all", "closest_RecoTop_mt", outTreeFile, closest_RecoTop_mt_all)
 systTree.branchTreesSysts(trees, "all", "closest_RecoTop_costheta", outTreeFile, closest_RecoTop_costheta_all)
+systTree.branchTreesSysts(trees, "all", "closest_RecoTop_costhetalep", outTreeFile, closest_RecoTop_costhetalep_all)
 systTree.branchTreesSysts(trees, "all", "closest_RecoTop_isNeg", outTreeFile, closest_RecoTop_isNeg_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_pt", outTreeFile, chi_RecoTop_pt_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_eta", outTreeFile, chi_RecoTop_eta_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_phi", outTreeFile, chi_RecoTop_phi_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_m", outTreeFile, chi_RecoTop_m_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_costheta", outTreeFile, chi_RecoTop_costheta_all)
+systTree.branchTreesSysts(trees, "all", "chi_RecoTop_costhetalep", outTreeFile, chi_RecoTop_costhetalep_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_mt", outTreeFile, chi_RecoTop_mt_all)
 systTree.branchTreesSysts(trees, "all", "chi_RecoTop_isNeg", outTreeFile, chi_RecoTop_isNeg_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_pt", outTreeFile, sublead_RecoTop_pt_all)
@@ -420,6 +428,7 @@ systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_eta", outTreeFile, subl
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_phi", outTreeFile, sublead_RecoTop_phi_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_m", outTreeFile, sublead_RecoTop_m_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_costheta", outTreeFile, sublead_RecoTop_costheta_all)
+systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_costhetalep", outTreeFile, sublead_RecoTop_costhetalep_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_mt", outTreeFile, sublead_RecoTop_mt_all)
 systTree.branchTreesSysts(trees, "all", "sublead_RecoTop_isNeg", outTreeFile, sublead_RecoTop_isNeg_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_pt", outTreeFile, best_RecoTop_pt_all)
@@ -427,6 +436,7 @@ systTree.branchTreesSysts(trees, "all", "best_RecoTop_eta", outTreeFile, best_Re
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_phi", outTreeFile, best_RecoTop_phi_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_m", outTreeFile, best_RecoTop_m_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_costheta", outTreeFile, best_RecoTop_costheta_all)
+systTree.branchTreesSysts(trees, "all", "best_RecoTop_costhetalep", outTreeFile, best_RecoTop_costhetalep_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_mt", outTreeFile, best_RecoTop_mt_all)
 systTree.branchTreesSysts(trees, "all", "best_RecoTop_isNeg", outTreeFile, best_RecoTop_isNeg_all)
 
@@ -510,6 +520,9 @@ systTree.branchTreesSysts(trees, "all", "ptrel_besttopAK4_closestAK8", outTreeFi
 systTree.branchTreesSysts(trees, "all", "deltaR_besttopAK4_closestAK8", outTreeFile, deltaR_besttopAK4_closestAK8)
 systTree.branchTreesSysts(trees, "all", "ptrel_bestWAK4_closestAK8", outTreeFile, ptrel_bestWAK4_closestAK8)
 systTree.branchTreesSysts(trees, "all", "deltaR_bestWAK4_closestAK8", outTreeFile, deltaR_bestWAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "topW_jets_pt", outTreeFile, topW_jets_pt)
+systTree.branchTreesSysts(trees, "all", "topW_jets_deltaR", outTreeFile, topW_jets_deltaR)
+systTree.branchTreesSysts(trees, "all", "topW_jets_deltaPhi", outTreeFile, topW_jets_deltaphi)
 
 if(TriggerStudy):
     systTree.branchTreesSysts(trees, "all", "isdileptonic", outTreeFile, isdileptonic)
@@ -619,8 +632,6 @@ for i in xrange(0,tree.GetEntries()):
     isDilepton = False
     isMuon = (len(goodMu) == 1) and (len(goodEle) == 0) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT)
     isElectron = (len(goodMu) == 0) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passEle or passHT)
-
-    print "questo script e' stronzo "
 
     #Double counting removal
     if('DataHT' in sample.label and (passMu or passEle)):
@@ -1014,7 +1025,8 @@ for i in xrange(0,tree.GetEntries()):
     chi_recotop_p4t = tightlep_p4t + chi_jet_p4t + recomet_p4t
     chi_promptjet_p4t = copy.deepcopy(chi_promptjet.p4())
     chi_promptjet_p4t.SetPz(0.)
-    chi_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, chi_jet_p4, chi_recotop_p4) 
+    chi_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, chi_promptjet.p4(), chi_recotop_p4) 
+    chi_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, chi_recotop_p4) 
 
     #jet closest to MET p4                                                              
     closest_jet, detrecodR = closest(tightlep, goodJets)
@@ -1043,7 +1055,8 @@ for i in xrange(0,tree.GetEntries()):
     closest_recotop_p4t = tightlep_p4t + closest_jet_p4t + recomet_p4t
     closest_promptjet_p4t = copy.deepcopy(closest_promptjet.p4())
     closest_promptjet_p4t.SetPz(0.)
-    closest_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, closest_jet_p4, closest_recotop_p4) 
+    closest_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, closest_promptjet.p4(), closest_recotop_p4) 
+    closest_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, closest_recotop_p4)
 
     #subleading jet reconstruction                                                      
     if len(highptJets) > 1:
@@ -1067,48 +1080,46 @@ for i in xrange(0,tree.GetEntries()):
     sublead_recotop_p4t = tightlep_p4t + sublead_jet_p4t + recomet_p4t
     sublead_promptjet_p4t = copy.deepcopy(sublead_promptjet.p4())
     sublead_promptjet_p4t.SetPz(0.)
-    sublead_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, sublead_jet_p4, sublead_recotop_p4) 
+    sublead_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, sublead_promptjet.p4(), sublead_recotop_p4) 
+    sublead_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, sublead_recotop_p4)
 
     btag_countings_sublead = len(bjet_filter([sublead_promptjet, sublead_jet], 'DeepFlv', 'M')[0])
     #best jet reconstruction                                                           
-    BestFound = False
     best_recotop_p4 = None
     IsNeg_best = None
     if sublead_jet_p4_pre == closest_jet_p4_pre:
         best_jet_p4 = sublead_jet_p4
         best_jet = sublead_jet
         best_promptjet = sublead_promptjet
-        BestFound = True
     elif sublead_jet_p4_pre == chi_jet_p4_pre:
         best_jet_p4 = sublead_jet_p4
         best_jet = sublead_jet
         best_promptjet = sublead_promptjet
-        BestFound = True
     elif chi_jet_p4_pre == closest_jet_p4_pre:
         best_jet_p4 = chi_jet_p4
         best_jet = chi_jet
         best_promptjet = chi_promptjet
-        BestFound = True
-    if not BestFound:
+    else:
         best_jet_p4 = chi_jet_p4
         best_jet = chi_jet
         best_promptjet = chi_promptjet
-        BestFound = True
-
-    if BestFound:
-        best_recotop_p4, IsNeg_best, best_dR_lepjet = recotop.top4Momentum(tightlep_p4, best_jet_p4, MET['metPx'], MET['metPy'])
-        IsNeg_best = IsNeg_best * DeltaFilter
-        best_jet_p4t = copy.deepcopy(best_jet_p4)
-        best_jet_p4t.SetPz(0.)
-        best_recotop_p4t = tightlep_p4t + best_jet_p4t + recomet_p4t
-        best_promptjet_p4t = copy.deepcopy(best_promptjet.p4())
-        best_promptjet_p4t.SetPz(0.)
-        closAK8, dR_besttopAK4AK8 = closest(best_jet, fatjets)
-        ptrel_besttopAK4_closestAK8[0] = goodJets[0].pt/closAK8.pt
-        deltaR_besttopAK4_closestAK8[0] = copy.deepcopy(dR_besttopAK4AK8)
-        best_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, best_jet_p4, best_recotop_p4) 
-
-        #tag_countings_best = len(bjet_filter([best_promptjet, best_jet], 'DeepFlv', 'M')[0])
+        
+    best_recotop_p4, IsNeg_best, best_dR_lepjet = recotop.top4Momentum(tightlep_p4, best_jet_p4, MET['metPx'], MET['metPy'])
+    print type(best_recotop_p4)
+    print best_recotop_p4.M()
+    IsNeg_best = IsNeg_best * DeltaFilter
+    best_jet_p4t = copy.deepcopy(best_jet_p4)
+    best_jet_p4t.SetPz(0.)
+    best_recotop_p4t = tightlep_p4t + best_jet_p4t + recomet_p4t
+    best_promptjet_p4t = copy.deepcopy(best_promptjet.p4())
+    best_promptjet_p4t.SetPz(0.)
+    closAK8, dR_besttopAK4AK8 = closest(best_jet, fatjets)
+    ptrel_besttopAK4_closestAK8[0] = goodJets[0].pt/closAK8.pt
+    deltaR_besttopAK4_closestAK8[0] = copy.deepcopy(dR_besttopAK4AK8)
+    best_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, best_promptjet.p4(), best_recotop_p4) 
+    best_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, best_recotop_p4)
+    
+    #tag_countings_best = len(bjet_filter([best_promptjet, best_jet], 'DeepFlv', 'M')[0])
 
     #Wprime reco                                                                        
     if closest_recotop_p4 != None and tightlep != None:
@@ -1286,6 +1297,9 @@ for i in xrange(0,tree.GetEntries()):
         closAK8, dR_bestWAK4AK8 = closest(best_promptjet, fatjets) 
         ptrel_bestWAK4_closestAK8[0] = goodJets[0].pt/closAK8.pt
         deltaR_bestWAK4_closestAK8[0] = copy.deepcopy(dR_bestWAK4AK8)
+        topW_jets_pt[0] = (best_jet_p4 + best_promptjet.p4()).Pt()
+        topW_jets_deltaR[0] = deltaR(best_jet_p4.Eta(), best_jet_p4.Phi(), best_promptjet.p4().Eta(), best_promptjet.p4().Phi())
+        topW_jets_deltaphi[0] = deltaPhi(best_jet_p4.Phi(), best_promptjet.p4().Phi())
     else:
         best_Wprime_m_all[0] = -100.
         best_Wprime_mt_all[0] = -100.

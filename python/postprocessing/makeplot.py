@@ -18,7 +18,7 @@ parser.add_option('-L', '--lep', dest='lep', type='string', default = 'muon', he
 parser.add_option('-S', '--syst', dest='syst', type='string', default = 'all', help='Default all systematics added')
 parser.add_option('-C', '--cut', dest='cut', type='string', default = 'lepton_eta>-10.', help='Default no cut')
 parser.add_option('-y', '--year', dest='year', type='string', default = 'all', help='Default 2016, 2017 and 2018 are included')
-parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v0', help='Default folder is v0')
+parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v1', help='Default folder is v0')
 #parser.add_option('-T', '--topol', dest='topol', type='string', default = 'all', help='Default all njmt')
 parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', help="")
 (opt, args) = parser.parse_args()
