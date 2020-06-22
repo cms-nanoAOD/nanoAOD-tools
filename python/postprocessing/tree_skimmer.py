@@ -18,7 +18,7 @@ part_idx = sys.argv[2]
 file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = False # True #
+Debug = False #  True #
 MCReco = True
 DeltaFilter = True
 TriggerStudy = False # True #
