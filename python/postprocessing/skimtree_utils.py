@@ -623,7 +623,7 @@ class TopUtilities():
             minPx = copy.deepcopy(zeroValue)
             minPy = copy.deepcopy(pyZeroValue)
 
-          if not leptonE == leptonPz:
+          if not abs(leptonE) == abs(leptonPz):
             mu_Minimum = mW**2./2. + minPx*leptonPx*minPy*leptonPy
             a_Minimum = (mu_Minimum*leptonPz) / (leptonE**2. - leptonPz**2.)
             pznu = a_Minimum
