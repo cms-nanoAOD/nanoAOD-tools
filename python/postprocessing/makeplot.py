@@ -12,6 +12,7 @@ parser = optparse.OptionParser(usage)
 parser.add_option('--merpart', dest='merpart', default = False, action='store_true', help='Default parts are not merged')
 parser.add_option('--mertree', dest='mertree', default = False, action='store_true', help='Default make no file is merged')
 parser.add_option('--lumi', dest='lumi', default = False, action='store_true', help='Default do not write the normalization weights')
+parser.add_option('--sel', dest='sel', default = False, action='store_true', help='Default do not apply any selection')
 parser.add_option('-p', '--plot', dest='plot', default = False, action='store_true', help='Default make no plots')
 parser.add_option('-s', '--stack', dest='stack', default = False, action='store_true', help='Default make no stacks')
 parser.add_option('-L', '--lep', dest='lep', type='string', default = 'muon', help='Default make muon analysis')
@@ -415,59 +416,22 @@ else:
      years = ['2016','2017','2018']
 print(years)
 
-leptons = map(str,opt.lep.strip('[]').split(',')) 
+leptons = map(str,opt.lep.split(',')) 
 
 cut = opt.cut #default cut must be obvious, for example lepton_eta>-10.
 if opt.cut == "lepton_eta>-10.":
+     cut_dict = {'muon':"lepton_eta>-10.", 'electron':"lepton_eta>-10."}
      cut_tag = ""
 else:
-     cut_tag = cutToTag(opt.cut)
+     if opt.sel:
+          cut_dict = {'muon':"lepton_pt>125&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 'electron':"MET_pt>125&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut}
+          cut_tag = 'selection_AND_' + cutToTag(opt.cut) 
+     else:
+          cut_dict = {'muon':cut, 'electron':cut}
+          cut_tag = cutToTag(opt.cut)
 
 lumi = {'2016': 35.89, "2017": 41.53, "2018": 59.7}
 
-variables = []
-wzero = 'w_nominal'
-#variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 1200))
-variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
-variables.append(variabile('lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
-variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
-variables.append(variabile('lepton_miniIso', 'lepton miniIso',  wzero+'*('+cut+')', 100, 0, 0.1))
-variables.append(variabile('lepMET_deltaPhi', '#Delta#phi(#ell, MET)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
-variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', 100, 0, 1000))
-variables.append(variabile('Event_HT', 'event HT [GeV]', wzero+'*('+cut+')', 70, 0, 1400))
-variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
-variables.append(variabile('best_RecoTop_pt', 'top p_{T} [GeV]',  wzero+'*(best_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
-variables.append(variabile('best_RecoTop_eta', 'top #eta', wzero+'*(best_RecoTop_eta>-10.&&'+cut+')', 48, -3., 3.))
-variables.append(variabile('best_RecoTop_phi', 'top #phi',  wzero+'*(best_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
-variables.append(variabile('best_RecoTop_m', 'top mass [GeV]',  wzero+'*(best_RecoTop_m>0&&'+cut+')',  192, 80, 2000))
-#variables.append(variabile('sublead_TopJet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 1200))
-#variables.append(variabile('sublead_TopJet_eta', 'sub leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
-#variables.append(variabile('sublead_WpJet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
-#variables.append(variabile('sublead_WpJet_eta', 'leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
-variables.append(variabile('sublead_WpJet_isBTagged', 'leading jet b tagged',  wzero+'*('+cut+')', 2, -0.5, 1.5))
-variables.append(variabile('nJet_pt25', 'no. of jets with p_{T} > 25 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
-variables.append(variabile('nJet_pt50', 'no. of jets with p_{T} > 50 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
-variables.append(variabile('nbJet_pt25', 'no. of b jets with p_{T} > 25 GeV',  wzero+'*('+cut+')', 9, -0.5, 8.5))
-variables.append(variabile('nbJet_pt50', 'no. of b jets with p_{T} > 50 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
-variables.append(variabile('leadingjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 150, 2000))
-variables.append(variabile('subleadingjet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
-variables.append(variabile('leadingjets_deltaR', 'leadings jets #DeltaR',  wzero+'*('+cut+')', 10, 0, 5))
-variables.append(variabile('leadingjets_deltaPhi', 'leadings jets #Delta#phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
-variables.append(variabile('leadingjets_deltaEta', 'leadings jets #Delta#eta',  wzero+'*('+cut+')', 48, -4.8, 4.8))
-variables.append(variabile('leadingjets_pt', 'leadings jets system p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
-variables.append(variabile('bjets_deltaR', 'b jets #DeltaR',  wzero+'*(bjets_deltaR>-50.&&'+cut+')', 10, 0, 5))
-variables.append(variabile('bjets_deltaPhi', 'b jets #Delta#phi',  wzero+'*(bjets_deltaPhi>-50.&&'+cut+')', 20, -3.14, 3.14))
-variables.append(variabile('bjets_deltaEta', 'b jets #Delta#eta',  wzero+'*(bjets_deltaEta>-50.&&'+cut+')', 48, -4.8, 4.8))
-variables.append(variabile('bjets_pt', 'b jets system p_{T} [GeV]',  wzero+'*(bjets_pt>-10.&&'+cut+')', 100, 0, 2000))
-variables.append(variabile('mtw', 'W boson transverse mass [GeV]',  wzero+'*('+cut+')', 100, 0, 500))
-variables.append(variabile('had_global_thrust', 'hadronic global thrust',  wzero+'*('+cut+')', 20, 0.5, 1))
-variables.append(variabile('had_central_thrust', 'hadronic transverse thrust',  wzero+'*('+cut+')', 20, 0, 0.5))
-variables.append(variabile('ovr_global_thrust', 'event global thrust',  wzero+'*('+cut+')', 20, 0.5, 1))
-variables.append(variabile('ovr_central_thrust', 'event transverse thrust',  wzero+'*('+cut+')', 20, 0, 0.5))
-variables.append(variabile('best_TopJet_dRLepJet', '#DeltaR lep jet (best crit)',  wzero+'*('+cut+')', 50, 0, 5))
-variables.append(variabile('closest_TopJet_dRLepJet', '#DeltaR lep jet (closest crit)',  wzero+'*('+cut+')', 50, 0, 5))
-variables.append(variabile('sublead_TopJet_dRLepJet', '#DeltaR lep jet (sublead crit)',  wzero+'*('+cut+')', 50, 0, 5))
-variables.append(variabile('chi_TopJet_dRLepJet', '#DeltaR lep jet (chi crit)',  wzero+'*('+cut+')', 50, 0, 5))
 
 for year in years:
      for sample in dataset_dict[year]:
@@ -485,6 +449,66 @@ for year in years:
                dataset_new.remove(sample_dict['DataEle_'+str(year)])
           elif lep == 'electron' and sample_dict['DataMu_'+str(year)] in dataset_new:
                dataset_new.remove(sample_dict['DataMu_'+str(year)])
+
+          variables = []
+          wzero = 'w_nominal'
+          cut = cut_dict[lep]
+          #variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 1200))
+          variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
+          variables.append(variabile('lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
+          variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('lepton_miniIso', 'lepton miniIso',  wzero+'*('+cut+')', 100, 0, 0.1))
+          variables.append(variabile('lepMET_deltaPhi', '#Delta#phi(l, MET)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('deltaR_lep_closestjet', '#DeltaR lep closest jet',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('deltaR_lep_leadingjet', '#DeltaR lep lead jet',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('deltaR_lep_subleadingjet', '#DeltaR lep sub-lead jet',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', 100, 0, 1000))
+          variables.append(variabile('Event_HT', 'event HT [GeV]', wzero+'*('+cut+')', 70, 0, 1400))
+          variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('best_RecoTop_pt', 'top p_{T} [GeV]',  wzero+'*(best_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('best_RecoTop_eta', 'top #eta', wzero+'*(best_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('best_RecoTop_phi', 'top #phi',  wzero+'*(best_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('best_RecoTop_m', 'top mass [GeV]',  wzero+'*(best_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          #variables.append(variabile('sublead_TopJet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 1200))
+          #variables.append(variabile('sublead_TopJet_eta', 'sub leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
+          #variables.append(variabile('sublead_WpJet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
+          #variables.append(variabile('sublead_WpJet_eta', 'leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
+          variables.append(variabile('sublead_WpJet_isBTagged', 'leading jet b tagged',  wzero+'*('+cut+')', 2, -0.5, 1.5))
+          variables.append(variabile('nJet_pt25', 'no. of jets with p_{T} > 25 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
+          variables.append(variabile('nJet_pt50', 'no. of jets with p_{T} > 50 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
+          variables.append(variabile('nbJet_pt25', 'no. of b jets with p_{T} > 25 GeV',  wzero+'*('+cut+')', 9, -0.5, 8.5))
+          variables.append(variabile('nbJet_pt50', 'no. of b jets with p_{T} > 50 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
+          variables.append(variabile('leadingjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 150, 2000))
+          variables.append(variabile('subleadingjet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
+          variables.append(variabile('leadingjets_deltaR', 'leadings jets #DeltaR',  wzero+'*('+cut+')', 10, 0, 5))
+          variables.append(variabile('leadingjets_deltaPhi', 'leadings jets #Delta#phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('leadingjets_deltaEta', 'leadings jets #Delta#eta',  wzero+'*('+cut+')', 48, -4.8, 4.8))
+          variables.append(variabile('leadingjets_pt', 'leadings jets system p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
+          variables.append(variabile('bjets_deltaR', 'b jets #DeltaR',  wzero+'*(bjets_deltaR>-50.&&'+cut+')', 10, 0, 5))
+          variables.append(variabile('bjets_deltaPhi', 'b jets #Delta#phi',  wzero+'*(bjets_deltaPhi>-50.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('bjets_deltaEta', 'b jets #Delta#eta',  wzero+'*(bjets_deltaEta>-50.&&'+cut+')', 48, -4.8, 4.8))
+          variables.append(variabile('bjets_pt', 'b jets system p_{T} [GeV]',  wzero+'*(bjets_pt>-10.&&'+cut+')', 100, 0, 2000))
+          variables.append(variabile('mtw', 'W boson transverse mass [GeV]',  wzero+'*('+cut+')', 100, 0, 500))
+          variables.append(variabile('had_global_thrust', 'hadronic global thrust',  wzero+'*('+cut+')', 20, 0.5, 1))
+          variables.append(variabile('had_central_thrust', 'hadronic transverse thrust',  wzero+'*('+cut+')', 20, 0, 0.5))
+          variables.append(variabile('ovr_global_thrust', 'event global thrust',  wzero+'*('+cut+')', 20, 0.5, 1))
+          variables.append(variabile('ovr_central_thrust', 'event transverse thrust',  wzero+'*('+cut+')', 20, 0, 0.5))
+          variables.append(variabile('best_TopJet_dRLepJet', '#DeltaR lep jet (best crit)',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('closest_TopJet_dRLepJet', '#DeltaR lep jet (closest crit)',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('sublead_TopJet_dRLepJet', '#DeltaR lep jet (sublead crit)',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('chi_TopJet_dRLepJet', '#DeltaR lep jet (chi crit)',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('ptrel_leadAK4_closestAK8', 'pt rel leading AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('deltaR_leadAK4_closestAK8', '#DeltaR leading AK4 closest AK8',  wzero+'*('+cut+')',  20, 0, 2))
+          variables.append(variabile('ptrel_subleadAK4_closestAK8', 'pt rel sub-leading AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('deltaR_subleadAK4_closestAK8', '#DeltaR sub-leading AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('ptrel_besttopAK4_closestAK8', 'pt rel (best)top AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('deltaR_besttopAK4_closestAK8', '#DeltaR (best)top AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('ptrel_bestWAK4_closestAK8', 'pt rel (best)W\' AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('deltaR_bestWAK4_closestAK8', '#DeltaR (best)W\' AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('topW_jets_pt', 'jets (t+W\') p_{T} [GeV]',  wzero+'*('+cut+')', 150, 0, 1500))
+          variables.append(variabile('topW_jets_deltaR', '#DeltaR jets (t+W\')',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('topW_jets_deltaPhi', '#Delta #phi jets (t+W\')',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+          
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:

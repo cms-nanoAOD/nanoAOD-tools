@@ -507,9 +507,6 @@ for inpfile in inpfiles:
 
     print_hist(inpfile, plotpath, [h_electronpt_mcmatched_HLT_Lep_OR_HT_OR_Ph_Eff, h_electronpt_mcmatched_HLT_HT_OR_Ph_Eff, h_electronpt_mcmatched_HLT_Lep_OR_HT_Eff], 'AP')
 
-    
-
-    '''
     #Lepton trigger efficiency in HT bins
     h_HLT_Muon_HTEff = ROOT.TEfficiency(h_mu_HT_binned, h_HT_mu)
     h_HLT_Muon_HTEff.SetTitle("HLT_Muon_50_HT_binned; Event HT [GeV];#epsilon")
@@ -600,6 +597,6 @@ for inpfile in inpfiles:
     save_hist(inpfile, plotpath, h_mistag_DeepFlv_T_Eff)
     print_hist(inpfile, plotpath, h_mistag_DeepFlv_T_Eff, 'AP')
     print_hist(inpfile, plotpath, [h_mistag_DeepFlv_T_Eff, h_mistag_DeepFlv_M_Eff, h_mistag_DeepFlv_L_Eff], 'AP')
-'''
+
 
 raise ValueError
