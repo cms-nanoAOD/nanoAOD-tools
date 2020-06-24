@@ -696,6 +696,16 @@ for i in xrange(0,tree.GetEntries()):
         #print('Event %i not a good' %(i))
         continue
 
+    recotop = TopUtilities()
+
+    #veto on events with "pathological" reco neutrino
+    tent_neutrino = recotop.NuMomentum(tightlep_p4.Px(), tightlep_p4.Py(), tightlep_p4.Pz(), tightlep_p4.Pt(), tightlep_p4.E(), MET['metPx'], MET['metPy'])
+
+    if tent_neutrino == None:
+        continue
+
+    print "neutrino test passed"
+
     if(isMC):
         PF_SF = chain.PrefireWeight
         PF_SFUp = chain.PrefireWeight_Up
@@ -780,8 +790,6 @@ for i in xrange(0,tree.GetEntries()):
         bjets_deltaPhi[0] = -999.
         bjets_deltaEta[0] = -999.
         bjets_pt[0] = -999.
-
-    recotop = TopUtilities()
 
     #MCtruth event reconstruction                                                      
     if MCReco:
@@ -929,11 +937,14 @@ for i in xrange(0,tree.GetEntries()):
         closj, dR_lj = closest(tightlep, goodJets)
         deltaR_lep_closestjet[0] = copy.deepcopy(dR_lj)
     else:
+        continue
+        '''
         ovr_global_thrust[0] = -100.
         had_global_thrust[0] = -100.
         ovr_central_thrust[0] = -100.
         had_central_thrust[0] = -100.
         deltaR_lep_closestjet[0] = -100.
+        '''
 
     closAK8, dR_leadAK4AK8 = closest(jets[0], fatjets)
     ptrel_leadAK4_closestAK8[0] = jets[0].pt/closAK8.pt
