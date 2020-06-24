@@ -83,16 +83,17 @@ def haddfiles(sample, size):
         pystring = "nohup python /afs/cern.ch/work/a/apiccine/CMSSW_10_5_0/src/PhysicsTools/NanoAODTools/scripts/haddnano.py "
     else:
         pystring = "nohup hadd -f "
-    sampledir = inputpath + sample[0]
+    sampledir = inputpath + sample[0] + "/merged2/"
     print sampledir
     rootfiles = getfilelist(sampledir)
     print rootfiles
-    sdir = inputpath + sample[0] + "/merged/"
+    sdir = inputpath + sample[0] + "/merged2/"
     
     print rootfiles
+    
     '''
     for t, rootfile in enumerate(rootfiles):
-        if sample[0] in rootfile:
+        if 'tree_hadd' in rootfile:
             rootfiles.pop(t)
         #if t >= 200:
             #rootfiles.pop(t)
@@ -148,7 +149,7 @@ for sample in samples:
     #else:
         #pool.apply_async(haddfiles, args=(sample, 10), callback=collect_result)
    
-    haddfiles(sample, 50)
+    haddfiles(sample, 2)
 
 
 #pool.close()

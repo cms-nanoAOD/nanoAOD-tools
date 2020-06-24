@@ -542,9 +542,8 @@ class TopUtilities():
         p4b_rec = ROOT.TLorentzVector()
         p4Top_rec = ROOT.TLorentzVector()
         p4lep_rec = ROOT.TLorentzVector()
-        #neutrino = None#ROOT.TLorentzVector()
-        #neutrino = ROOT.TLorentzVector()
-
+        neutrino = None#ROOT.TLorentzVector()
+        
         p4lep_rec.SetPxPyPzE(leptonPx, leptonPy, leptonPz, leptonE)
         p40_rec = ROOT.TLorentzVector(0.0, 0.0, 0.0, 0.0)
 
@@ -614,8 +613,9 @@ class TopUtilities():
           delta2ZeroValue = (zeroValue - metPx)**2. + (pyZeroValue - metPy)**2.
 
           if deltaMin == 14000000.**2. :
-            neutrino = copy.deepcopy(p4nu_rec)
-            print "problem with neutrino reco!"
+            #neutrino = copy.deepcopy(p4nu_rec)
+            neutrino = None
+            #print "problem with neutrino reco!"
             return neutrino, IsNegative
 
           if delta2ZeroValue < deltaMin :
@@ -631,11 +631,12 @@ class TopUtilities():
             #p4nu = ROOT.TLorentzVector()
             p4nu_rec.SetPxPyPzE(minPx, minPy, pznu, Enu)
             #p4nu.SetPxPyPzE(minPx, minPy, pznu, Enu)
-
-          neutrino = copy.deepcopy(p4nu_rec)
+          else:
+            print "leptonE == leptonZ"
+          neutrino = None#copy.deepcopy(p4nu_rec)
         
           return neutrino, IsNegative
-
+        
     def top4Momentum(self, lepton, jet, metPx, metPy):
         #topMt = self.topMtw(lepton, jet, metPx, metPy)
         '''
