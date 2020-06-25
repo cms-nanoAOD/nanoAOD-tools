@@ -34,7 +34,7 @@ class variabile(object):
         return  '\"'+str(self._name)+'\",\"'+str(self._title)+'\",'+str(self._nbins)+','+str(self._xmin)+','+str(self._xmax)
 
 def cutToTag(cut):
-    newstring = cut.replace("(Electron_effSF)*", "").replace("(Muon_effSF)*", "").replace(">=","_GE_").replace(">","_G_").replace(" ","").replace("&&","_AND_").replace("||","_OR_").replace("<=","_LE_").replace("<","_L_").replace(".","p").replace("((", "_").replace("))", "_").replace("(","").replace(")","").replace("==","_EQ_").replace("=","_EQ_").replace("*","_AND_").replace("+","_OR_").replace("-", "neg")
+    newstring = cut.replace("[", "").replace("]", "").replace("(Electron_effSF)*", "").replace("(Muon_effSF)*", "").replace(">=","_GE_").replace(">","_G_").replace(" ","").replace("&&","_AND_").replace("||","_OR_").replace("<=","_LE_").replace("<","_L_").replace(".","p").replace("((", "_").replace("))", "_").replace("(","").replace(")","").replace("==","_EQ_").replace("=","_EQ_").replace("*","_AND_").replace("+","_OR_").replace("-", "neg")
     return newstring
 
 def collect_result(result):
@@ -60,7 +60,7 @@ def getplotslist(nfile):
 def createhlist(plot):
     var = None
     hlist = None
-    name = "h_" + plot[0]
+    name = "h_" + str(cutToTag(plot[0]))
     title = plot[0]
     cut = None
     if plot[1] == 'nocut':
@@ -68,6 +68,7 @@ def createhlist(plot):
     else:
         cut = plot[1]
         name = name + "_" + cutToTag(cut)
+        print name
     nbins = int(float(plot[2]))
     nmin = float(plot[3])
     nmax = float(plot[4])
@@ -104,15 +105,16 @@ def projectperevent(sample, plot):
         exec("%s = %s" % (x, sobj))
 
     for j, rootfile in enumerate(rootfiles):
-        if sample[0] in rootfile:
+        if 'tree_hadd' in rootfile:
             rootfiles.pop(j)
+    print rootfiles
 
     for k, rootfile in enumerate(rootfiles):
-        if k != 1 and 'Data' not in sample[0]:
+        #if k != 1 and 'Data' not in sample[0]:
             continue
-        #if sample[0] in rootfile:
-            #continue
-        print "\trootfile #%i" % (k)
+        if not (sample[0] in rootfile):
+            continue
+        print "\trootfile #%i %s" % (k, rootfile)
         infile = ROOT.TFile.Open(sampledir + "/" + rootfile) 
         tree = InputTree(infile.Events)
         nentries = tree.GetEntries()
@@ -153,17 +155,19 @@ def projectperevent(sample, plot):
         print "\trootfile closed"
 
     if 'Data' not in sample[0]:
+        print "\n", sample[0]
         print "nscale tot: ", nscale
-        scalefac = 1. / nscale
-        print "scalefac: ", scalefac
+        scalefac = 1.
+        #print "scalefac: ", scalefac
         for k, v in lumi.items():
             if k in sample[0]:
                 print "lumi: ", v, " year: ", k
                 scalefac = scalefac*v
-                print "scalefac * lumi: ", scalefac
+                #print "scalefac * lumi: ", scalefac
                 break
         scalefac = scalefac * scard.sigma * 1000.
-        print "sigma: ", scard.sigma, " scalefac tot: ", scalefac
+        scalefac = scalefac / nscale
+        print "sigma: ", scard.sigma*1000., " scalefac tot: ", scalefac
         h[1].Scale(scalefac)
         print "New integral: ", h[1].Integral()
         #print scalefac, h[1].Integral()

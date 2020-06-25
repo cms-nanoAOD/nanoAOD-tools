@@ -4,8 +4,9 @@ import math
 from array import array
 from PhysicsTools.NanoAODTools.postprocessing.tools import *
 import copy
+from kFactors import *
 
-print "Agostino's tools implemented"
+print "tools implemented"
 
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch()        # don't pop up canvases                                                                                     
@@ -23,37 +24,6 @@ inpfiles = ["TT_Mtt-700to1000",
             "Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8",
             "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8"
 ]
-
-ptcuts = [#"250",
-          "350"
-]
-
-noneg = {'noneg': 'without #Delta < 0 sol.'
-}
-isneg = {'IsNeg': 'only #Delta < 0 sol.'
-}
-
-ptlabels = {'250': 'pt > 250 GeV',
-            '350': 'pt > 350 GeV'
-}
-
-masscuts = {'Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8': "5200",
-            'Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8': "3900",
-            'Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8': "2060",
-            'TT_Mtt-700to1000': "1200",
-}
-
-topmasscuts = {#'400': 'm_{top} < 400 GeV',
-               '500': 'm_{top} < 500 GeV',
-}
-
-masslabels = {'Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') > 5.2 TeV",
-              'Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') > 3.9 TeV",
-              'Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') > 2.06 TeV",
-              'TT_Mtt-700to1000': "m(W') > 1.2 TeV"
-}
-
-plotstodraw = []
 
 plotnt = [#"MC_recotop_Wprime_massesratio",
           #"DetReco_sublead_recotop_Wprime_massesratio",
@@ -88,14 +58,14 @@ plotnt = [#"MC_recotop_Wprime_massesratio",
           #"DetReco_BTagEff_best_IsNeg_0Mbtag_Lep_Wprime_transverse_mass",
           #"DetReco_BTagEff_best_IsNeg_1Mbtag_Lep_Wprime_transverse_mass",
           #"DetReco_BTagEff_best_IsNeg_2Mbtag_Lep_Wprime_transverse_mass",
-          "DetReco_BTagEff_best_2Mbtag_Lep_Wprime_mass",
+          #"DetReco_BTagEff_best_2Mbtag_Lep_Wprime_mass",
           #"DetReco_best_0Mbtag_Lep_Wprime_mass",   
           #"DetReco_best_1Mbtag_Lep_Wprime_mass",   
           #"DetReco_best_2Mbtag_Lep_Wprime_mass",   
           #"DetReco_best_IsNeg_0Mbtag_Lep_Wprime_transverse_mass",   
           #"DetReco_best_IsNeg_1Mbtag_Lep_Wprime_transverse_mass",
           #"DetReco_best_IsNeg_2Mbtag_Lep_Wprime_transverse_mass",
-          #"DetReco_btag_efficiencies_best",
+          "DetReco_btag_efficiencies_best",
           #"DetReco_best_2Mbtag_Lep_Wprime_mass",   
           #"DetReco_best_IsNeg_Lep_Wprime_mass",   
           #"MC_Ele_Wprime_mass",
@@ -113,6 +83,54 @@ plotnt = [#"MC_recotop_Wprime_massesratio",
           #"chimass_DetReco_Wjet_pt": 'TH1F',
 ]
 
+sigma = {
+    "TT_Mtt-700to1000": 80.5,
+    "WJets_2016": 0.03216 * kFacQCD["WJetsHT2500toInf"],
+    "WJets_2017": 0.03216 * kFacQCD["WJetsHT2500toInf"],
+    "Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8": 0.11459,
+    "Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8": 0.010756,
+    "Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8": 0.001425,
+}
+
+lumi = {
+    "2016": 35.9,
+    "2017": 41.53,
+    "2018": 57.3,
+}
+
+ptcuts = [#"250",
+          "350"
+]
+
+noneg = {'noneg': 'without #Delta < 0 sol.'
+}
+isneg = {'IsNeg': 'only #Delta < 0 sol.'
+}
+
+ptlabels = {'250': 'pt > 250 GeV',
+            '350': 'pt > 350 GeV'
+}
+
+masscuts = {'Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8': "5200",
+            'Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8': "3900",
+            'Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8': "2060",
+            'TT_Mtt-700to1000': "1200",
+}
+
+topmasscuts = {#'400': 'm_{top} < 400 GeV',
+               '500': 'm_{top} < 500 GeV',
+}
+
+masslabels = {'Wprimetotb_M4000W400_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') > 5.2 TeV",
+              'Wprimetotb_M3000W300_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') > 3.9 TeV",
+              'Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8': "m(W') > 2.06 TeV",
+              'TT_Mtt-700to1000': "m(W') > 1.2 TeV"
+}
+
+plotstodraw = []
+
+
+
 recocatlabels = ["MC",
                  "sublead",
                  "closest",
@@ -128,8 +146,8 @@ samplelabels = {"Wprimetotb_M4000W400_RH": "W'RH m=4TeV w=0.4TeV",
                 "WJets_2017": "W+jets (2017)"
 }
 
-btaggerlabels = {#"DeepFlv": "DeepFlv",
-                 "DeepCSV": "DeepCSV"
+btaggerlabels = {"DeepFlv": "DeepFlv",
+                 #"DeepCSV": "DeepCSV"
 }
 
 wplabels = {"L": "Loose",
@@ -172,7 +190,7 @@ BTagLabels = False
 WPLabels = False
 NBTagLabels = True
 Together = False #flag to take or not the sample with only pt cut
-toScale = True
+toScale = 2
 Stack = False
 
 for inpfile in inpfiles:
@@ -316,14 +334,29 @@ for inpfile in inpfiles:
 
             plot.SetTitle(new_title)
             plot.SetName(new_name)
-            if toScale and not (isinstance(plot, ROOT.TEfficiency) or isinstance(plot, ROOT.TGraphAsymmErrors)):
+            if toScale > 0 and not (isinstance(plot, ROOT.TEfficiency) or isinstance(plot, ROOT.TGraphAsymmErrors)):
                 key = 'DetReco_countings'
                 entries_plot = None
                 entries_plot = copy.deepcopy(ROOT.gROOT.FindObject(str(key)).Clone())
                 entries = 1./entries_plot.GetBinContent(1)
                 #print entries_plot.GetBinContent(1)
-                plot.Scale(entries)
-                plot.GetYaxis().SetTitle("#varepsilon")
+                if (toScale == 2):
+                    print entries
+                    for key, value in sigma.items():
+                        if key in infile:
+                            entries = entries * value * 1000.
+                            print value, entries
+                    if '2017' in infile:
+                        entries = entries * lumi['2017']
+                        print lumi['2017'], entries
+                    elif '2018' in infile:
+                        entries = entries * lumi['2018']
+                        print lumi['2018'], entries
+                    else:
+                        entries = entries * lumi['2016']
+                        print lumi['2016'], entries
+                    plot.Scale(entries)
+                    plot.GetYaxis().SetTitle("#varepsilon")
             plotstodraw.append(copy.deepcopy(plot))
 
 print plotstodraw

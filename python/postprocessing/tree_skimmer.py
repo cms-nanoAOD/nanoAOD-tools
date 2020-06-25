@@ -565,6 +565,8 @@ if(isMC):
         h_genweight.Add(h_genw_tmp)
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
 
+print "Total number of events: ", tree.GetEntries()
+
 #++++++++++++++++++++++++++++++++++
 #++   looping over the events    ++
 #++++++++++++++++++++++++++++++++++
@@ -579,6 +581,9 @@ for i in xrange(0,tree.GetEntries()):
     if Debug and i > 1000:
         break
         
+    if i%5000 == 0:
+        print "Event #", i+1, " out of ", tree.GetEntries()
+
     event = Event(tree,i)
     electrons = Collection(event, "Electron")
     muons = Collection(event, "Muon")
@@ -639,7 +644,7 @@ for i in xrange(0,tree.GetEntries()):
 
     goodJets = get_Jet(jets, 30)
     bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
-    print len(fatjets)
+    #print len(fatjets)
     if (len(goodJets) < 2 or len(fatjets) < 2):
         continue
 
@@ -690,6 +695,16 @@ for i in xrange(0,tree.GetEntries()):
     else:
         #print('Event %i not a good' %(i))
         continue
+
+    recotop = TopUtilities()
+
+    #veto on events with "pathological" reco neutrino
+    tent_neutrino = recotop.NuMomentum(tightlep_p4.Px(), tightlep_p4.Py(), tightlep_p4.Pz(), tightlep_p4.Pt(), tightlep_p4.E(), MET['metPx'], MET['metPy'])
+
+    if tent_neutrino == None:
+        continue
+
+    print "neutrino test passed"
 
     if(isMC):
         PF_SF = chain.PrefireWeight
@@ -775,8 +790,6 @@ for i in xrange(0,tree.GetEntries()):
         bjets_deltaPhi[0] = -999.
         bjets_deltaEta[0] = -999.
         bjets_pt[0] = -999.
-
-    recotop = TopUtilities()
 
     #MCtruth event reconstruction                                                      
     if MCReco:
@@ -924,11 +937,14 @@ for i in xrange(0,tree.GetEntries()):
         closj, dR_lj = closest(tightlep, goodJets)
         deltaR_lep_closestjet[0] = copy.deepcopy(dR_lj)
     else:
+        continue
+        '''
         ovr_global_thrust[0] = -100.
         had_global_thrust[0] = -100.
         ovr_central_thrust[0] = -100.
         had_central_thrust[0] = -100.
         deltaR_lep_closestjet[0] = -100.
+        '''
 
     closAK8, dR_leadAK4AK8 = closest(jets[0], fatjets)
     ptrel_leadAK4_closestAK8[0] = jets[0].pt/closAK8.pt
@@ -1025,8 +1041,9 @@ for i in xrange(0,tree.GetEntries()):
     chi_recotop_p4t = tightlep_p4t + chi_jet_p4t + recomet_p4t
     chi_promptjet_p4t = copy.deepcopy(chi_promptjet.p4())
     chi_promptjet_p4t.SetPz(0.)
-    chi_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, chi_promptjet.p4(), chi_recotop_p4) 
-    chi_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, chi_recotop_p4) 
+    if chi_recotop_p4 != None:
+        chi_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, chi_promptjet.p4(), chi_recotop_p4) 
+        chi_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, chi_recotop_p4) 
 
     #jet closest to MET p4                                                              
     closest_jet, detrecodR = closest(tightlep, goodJets)
@@ -1055,8 +1072,9 @@ for i in xrange(0,tree.GetEntries()):
     closest_recotop_p4t = tightlep_p4t + closest_jet_p4t + recomet_p4t
     closest_promptjet_p4t = copy.deepcopy(closest_promptjet.p4())
     closest_promptjet_p4t.SetPz(0.)
-    closest_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, closest_promptjet.p4(), closest_recotop_p4) 
-    closest_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, closest_recotop_p4)
+    if closest_recotop_p4 != None:
+        closest_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, closest_promptjet.p4(), closest_recotop_p4) 
+        closest_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, closest_recotop_p4)
 
     #subleading jet reconstruction                                                      
     if len(highptJets) > 1:
@@ -1080,8 +1098,9 @@ for i in xrange(0,tree.GetEntries()):
     sublead_recotop_p4t = tightlep_p4t + sublead_jet_p4t + recomet_p4t
     sublead_promptjet_p4t = copy.deepcopy(sublead_promptjet.p4())
     sublead_promptjet_p4t.SetPz(0.)
-    sublead_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, sublead_promptjet.p4(), sublead_recotop_p4) 
-    sublead_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, sublead_recotop_p4)
+    if sublead_recotop_p4 != None:
+        sublead_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, sublead_promptjet.p4(), sublead_recotop_p4) 
+        sublead_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, sublead_recotop_p4)
 
     btag_countings_sublead = len(bjet_filter([sublead_promptjet, sublead_jet], 'DeepFlv', 'M')[0])
     #best jet reconstruction                                                           
@@ -1105,8 +1124,8 @@ for i in xrange(0,tree.GetEntries()):
         best_promptjet = chi_promptjet
         
     best_recotop_p4, IsNeg_best, best_dR_lepjet = recotop.top4Momentum(tightlep_p4, best_jet_p4, MET['metPx'], MET['metPy'])
-    print type(best_recotop_p4)
-    print best_recotop_p4.M()
+    #print type(best_recotop_p4)
+    #print best_recotop_p4.M()
     IsNeg_best = IsNeg_best * DeltaFilter
     best_jet_p4t = copy.deepcopy(best_jet_p4)
     best_jet_p4t.SetPz(0.)
@@ -1116,8 +1135,9 @@ for i in xrange(0,tree.GetEntries()):
     closAK8, dR_besttopAK4AK8 = closest(best_jet, fatjets)
     ptrel_besttopAK4_closestAK8[0] = goodJets[0].pt/closAK8.pt
     deltaR_besttopAK4_closestAK8[0] = copy.deepcopy(dR_besttopAK4AK8)
-    best_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, best_promptjet.p4(), best_recotop_p4) 
-    best_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, best_recotop_p4)
+    if best_recotop_p4 != None:
+        best_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, best_promptjet.p4(), best_recotop_p4) 
+        best_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, best_recotop_p4)
     
     #tag_countings_best = len(bjet_filter([best_promptjet, best_jet], 'DeepFlv', 'M')[0])
 
