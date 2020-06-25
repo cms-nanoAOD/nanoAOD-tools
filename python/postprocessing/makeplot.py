@@ -12,7 +12,7 @@ parser = optparse.OptionParser(usage)
 parser.add_option('--merpart', dest='merpart', default = False, action='store_true', help='Default parts are not merged')
 parser.add_option('--mertree', dest='mertree', default = False, action='store_true', help='Default make no file is merged')
 parser.add_option('--lumi', dest='lumi', default = False, action='store_true', help='Default do not write the normalization weights')
-parser.add_option('--sel', dest='sel', default = False, action='store_true', help='Default do not apply any selection')
+parser.add_option('--sel', dest='sel', default = True, action='store_true', help='Default do not apply any selection')
 parser.add_option('-p', '--plot', dest='plot', default = False, action='store_true', help='Default make no plots')
 parser.add_option('-s', '--stack', dest='stack', default = False, action='store_true', help='Default make no stacks')
 parser.add_option('-L', '--lep', dest='lep', type='string', default = 'muon', help='Default make muon analysis')
@@ -23,6 +23,8 @@ parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v1'
 #parser.add_option('-T', '--topol', dest='topol', type='string', default = 'all', help='Default all njmt')
 parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', help="")
 (opt, args) = parser.parse_args()
+
+print "Sel: ", opt.sel
 
 folder = opt.folder
 #filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
@@ -420,7 +422,7 @@ print(years)
 leptons = map(str,opt.lep.split(',')) 
 
 cut = opt.cut #default cut must be obvious, for example lepton_eta>-10.
-if opt.cut == "lepton_eta>-10.":
+if opt.cut == "lepton_eta>-10." and not opt.sel:
      cut_dict = {'muon':"lepton_eta>-10.", 'electron':"lepton_eta>-10."}
      cut_tag = ""
 else:

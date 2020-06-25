@@ -551,7 +551,7 @@ class TopUtilities():
         if delta < 0:
             IsNegative = True
         
-        if delta >= 0:
+        if True:#delta >= 0:
           root = cmath.sqrt((a2-b))
           pz = []
 
@@ -575,6 +575,7 @@ class TopUtilities():
           neutrino = copy.deepcopy(p4nu_rec)
           return neutrino, IsNegative
         
+        '''
         elif delta < 0:
           EquationCoeff1 = [1,
                             (-3 * leptonPy * mW / leptonPt),
@@ -636,7 +637,8 @@ class TopUtilities():
           neutrino = None#copy.deepcopy(p4nu_rec)
         
           return neutrino, IsNegative
-        
+        '''
+
     def top4Momentum(self, lepton, jet, metPx, metPy):
         #topMt = self.topMtw(lepton, jet, metPx, metPy)
         '''
@@ -673,6 +675,7 @@ class TopUtilities():
             rtop = jet + neutrino
           rchi = Chi_TopMass(rtop.M())
           besttop = copy.deepcopy(rtop)
+        
         elif neutrino is None:
           besttop = None
         
