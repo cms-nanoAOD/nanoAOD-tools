@@ -24,8 +24,6 @@ parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v1'
 parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', help="")
 (opt, args) = parser.parse_args()
 
-print "Sel: ", opt.sel
-
 folder = opt.folder
 #filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
 filerepo = '/eos/user/a/apiccine/Wprime/nosynch/' + folder + '/'
