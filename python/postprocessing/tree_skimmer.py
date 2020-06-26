@@ -696,15 +696,17 @@ for i in xrange(0,tree.GetEntries()):
         #print('Event %i not a good' %(i))
         continue
 
-    recotop = TopUtilities()
+    print "lep passed"
+
+    #recotop = TopUtilities()
 
     #veto on events with "pathological" reco neutrino
     tent_neutrino = recotop.NuMomentum(tightlep_p4.Px(), tightlep_p4.Py(), tightlep_p4.Pz(), tightlep_p4.Pt(), tightlep_p4.E(), MET['metPx'], MET['metPy'])
 
-    if tent_neutrino == None:
+    if tent_neutrino[0] is None:
         continue
 
-    print "neutrino test passed"
+    #print "neutrino test passed"
 
     if(isMC):
         PF_SF = chain.PrefireWeight

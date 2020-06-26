@@ -420,7 +420,7 @@ print(years)
 leptons = map(str,opt.lep.split(',')) 
 
 cut = opt.cut #default cut must be obvious, for example lepton_eta>-10.
-if opt.cut == "lepton_eta>-10.":
+if opt.cut == "lepton_eta>-10." and not opt.sel:
      cut_dict = {'muon':"lepton_eta>-10.", 'electron':"lepton_eta>-10."}
      cut_tag = ""
 else:
