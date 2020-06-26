@@ -8,17 +8,17 @@ import copy
 from array import array
 from skimtree_utils import *
 
-localrun = False # True #
-if not(localrun):
+if sys.argv[4] == 'remote':
     from samples import *
+    Debug = False
 else:
     from samples.samples import *
+    Debug = True
 sample = sample_dict[sys.argv[1]]
 part_idx = sys.argv[2]
 file_list = map(str, sys.argv[3].strip('[]').split(','))
 print(file_list)
 
-Debug = False # True #
 MCReco = True
 DeltaFilter = True
 TriggerStudy = False # True #
