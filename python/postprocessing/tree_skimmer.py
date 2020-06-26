@@ -698,7 +698,7 @@ for i in xrange(0,tree.GetEntries()):
 
     print "lep passed"
 
-    #recotop = TopUtilities()
+    recotop = TopUtilities()
 
     #veto on events with "pathological" reco neutrino
     tent_neutrino = recotop.NuMomentum(tightlep_p4.Px(), tightlep_p4.Py(), tightlep_p4.Pz(), tightlep_p4.Pt(), tightlep_p4.E(), MET['metPx'], MET['metPy'])
