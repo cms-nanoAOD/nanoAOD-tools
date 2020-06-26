@@ -25,8 +25,8 @@ parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', hel
 (opt, args) = parser.parse_args()
 
 folder = opt.folder
-#filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
-filerepo = '/eos/user/a/apiccine/Wprime/nosynch/' + folder + '/'
+filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
+#filerepo = '/eos/user/a/apiccine/Wprime/nosynch/' + folder + '/'
 ROOT.gROOT.SetBatch() # don't pop up canvases
 if not os.path.exists(filerepo + 'plot/muon'):
      os.makedirs(filerepo + 'plot/muon')
@@ -441,7 +441,8 @@ for year in years:
           if(opt.lumi):
                lumi_writer(sample, lumi[year])
           if(opt.mertree):
-               mergetree(sample)
+               if not('WP' in sample.label):
+                    mergetree(sample)
 
 for year in years:
      for lep in leptons:
