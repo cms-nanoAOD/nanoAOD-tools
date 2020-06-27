@@ -577,14 +577,15 @@ for i in xrange(0,tree.GetEntries()):
     #++++++++++++++++++++++++++++++++++
     #++        taking objects        ++
     #++++++++++++++++++++++++++++++++++
+
     '''
     if Debug:
         print "evento n. " + str(i)
 
-    
-    if Debug and i > 1000:
-        break
     '''
+    if Debug and i > 50000:
+        break
+    
 
     if i%5000 == 0:
         print "Event #", i+1, " out of ", tree.GetEntries()
@@ -701,7 +702,7 @@ for i in xrange(0,tree.GetEntries()):
         #print('Event %i not a good' %(i))
         continue
 
-    print "lep passed"
+    #print "lep passed"
 
     recotop = TopUtilities()
 
