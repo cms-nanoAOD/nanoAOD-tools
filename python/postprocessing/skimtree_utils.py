@@ -537,7 +537,7 @@ class TopUtilities():
         
         IsNegative = False
 
-        p4nu_rec = None#ROOT.TLorentzVector()
+        p4nu_rec = []#None#ROOT.TLorentzVector()
         p4W_rec = ROOT.TLorentzVector()
         p4b_rec = ROOT.TLorentzVector()
         p4Top_rec = ROOT.TLorentzVector()
@@ -567,10 +567,10 @@ class TopUtilities():
             p4nu = ROOT.TLorentzVector()
             p4nu.SetPxPyPzE(metPx, metPy, pz[i], Enu)
             #p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
-            p4W = p4nu + p4lep_rec
-            if Chi_W(p4W.M()) < chi2w:
-              chi2w = Chi_W(p4W.M())
-              p4nu_rec = copy.deepcopy(p4nu)
+            #p4W = p4nu + p4lep_rec
+            if True:#Chi_W(p4W.M()) < chi2w:
+              #chi2w = Chi_W(p4W.M())
+              p4nu_rec.append(copy.deepcopy(p4nu))
          
           neutrino = copy.deepcopy(p4nu_rec)
           return neutrino, IsNegative
@@ -662,7 +662,7 @@ class TopUtilities():
         rtop = ROOT.TLorentzVector()
 
         if isinstance(neutrino, list):
-          chi2 = 100000000.
+          chi2 = 100000000.**2.
           for i in range(len(neutrino)):
             if dR_lepjet > 0.4:
               rtop = lepton + jet + neutrino[i]
@@ -673,7 +673,8 @@ class TopUtilities():
             if rchi < chi2:
               besttop = copy.deepcopy(rtop)
               chi2 = copy.deepcopy(rchi)
-    
+              dR_lepjet_top = copy.deepcopy(dR_lepjet)
+
         elif isinstance(neutrino, ROOT.TLorentzVector):
           if dR_lepjet > 0.4:
             rtop = lepton + jet + neutrino
@@ -681,11 +682,12 @@ class TopUtilities():
             rtop = jet + neutrino
           rchi = Chi_TopMass(rtop.M())
           besttop = copy.deepcopy(rtop)
-        
+          dR_lepjet_top = copy.deepcopy(dR_lepjet)
+
         elif neutrino is None:
           besttop = None
         
-        return besttop, IsNeg, dR_lepjet
+        return besttop, IsNeg, dR_lepjet_top
 
     def topMtw(self, lepton, jet, metPx, metPy):
         lb = lepton + jet
