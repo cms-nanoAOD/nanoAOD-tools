@@ -537,7 +537,7 @@ class TopUtilities():
         
         IsNegative = False
 
-        p4nu_rec = []#None#ROOT.TLorentzVector()
+        p4nu_rec = None#ROOT.TLorentzVector()
         p4W_rec = ROOT.TLorentzVector()
         p4b_rec = ROOT.TLorentzVector()
         p4Top_rec = ROOT.TLorentzVector()
@@ -551,7 +551,7 @@ class TopUtilities():
         if delta < 0:
             IsNegative = True
         
-        if True:#delta >= 0:
+        if delta >= 0:
           root = cmath.sqrt((a2-b))
           pz = []
 
@@ -567,16 +567,16 @@ class TopUtilities():
             p4nu = ROOT.TLorentzVector()
             p4nu.SetPxPyPzE(metPx, metPy, pz[i], Enu)
             #p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
-            #p4W = p4nu + p4lep_rec
-            if True:#Chi_W(p4W.M()) < chi2w:
-              #chi2w = Chi_W(p4W.M())
-              p4nu_rec.append(copy.deepcopy(p4nu))
+            p4W = p4nu + p4lep_rec
+            if Chi_W(p4W.M()) < chi2w:
+              chi2w = Chi_W(p4W.M())
+              p4nu_rec = copy.deepcopy(p4nu)
          
           neutrino = copy.deepcopy(p4nu_rec)
           return neutrino, IsNegative
         
         
-        elif False:#delta < 0:
+        elif delta < 0:
           #print "negative delta"
           EquationCoeff1 = [1,
                             (-3 * leptonPy * mW / leptonPt),

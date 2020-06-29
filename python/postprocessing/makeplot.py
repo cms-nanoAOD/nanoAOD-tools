@@ -100,7 +100,7 @@ def lumi_writer(dataset, lumi):
                os.popen("mv " + filerepo + sample.label + "/"  + sample.label + "_merged.root " + filerepo + sample.label + "/"  + sample.label + ".root")
 
 def cutToTag(cut):
-    newstring = cut.replace(">=","_GE_").replace(">","_G_").replace(" ","").replace("&&","_AND_").replace("||","_OR_").replace("<=","_LE_").replace("<","_L_").replace(".","p").replace("(","").replace(")","").replace("==","_EQ_").replace("!=","_NEQ_").replace("=","_EQ_").replace("*","_AND_").replace("+","_OR_")
+    newstring = cut.replace("-", "neg").replace(">=","_GE_").replace(">","_G_").replace(" ","").replace("&&","_AND_").replace("||","_OR_").replace("<=","_LE_").replace("<","_L_").replace(".","p").replace("(","").replace(")","").replace("==","_EQ_").replace("!=","_NEQ_").replace("=","_EQ_").replace("*","_AND_").replace("+","_OR_")
     return newstring
 
 def plot(lep, reg, variable, sample, cut_tag, syst):
@@ -154,6 +154,8 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      f1.Close()
 
 def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
+     os.system('set LD_PRELOAD=libtcmalloc.so')
+     infile = {}
      histo = []
      tmp = ROOT.TH1F()
      h = ROOT.TH1F()
@@ -177,7 +179,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      stack = ROOT.THStack(stackname, variabile_._name)
      leg_stack = ROOT.TLegend(0.33,0.62,0.91,0.87)
      signal = False
-     infile = {}
+
      print samples_
      for s in samples_:
           if('WP' in s.label):
@@ -189,6 +191,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
                outfile = filerepo + "stack_"+syst_+"_"+str(lep_).strip('[]')+".root"
                infile[s.label] = ROOT.TFile.Open(filerepo + "plot/" + lep + "/" + s.label + "_" + lep + "_" + syst_ + ".root")
      i = 0
+
      for s in samples_:
           infile[s.label].cd()
           print "opening file: ", infile[s.label].GetName()
@@ -381,18 +384,27 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      del histo
      tmp.Delete()
      h.Delete()
+     del tmp
+     del h
      del h_sig
      h_err.Delete()
+     del h_err
      h_bkg_err.Delete()
+     del h_bkg_err
      hratio.Delete()
+     del hratio
      stack.Delete()
+     del stack
      pad1.Delete()
+     del pad1
      pad2.Delete()
+     del pad2
      c1.Delete()
+     del c1
      for s in samples_:
           infile[s.label].Close()
           infile[s.label].Delete()
-
+          
 
 dataset_dict = {'2016':[],'2017':[],'2018':[]}
 if(opt.dat!= 'all'):
@@ -424,12 +436,19 @@ if opt.cut == "lepton_eta>-10." and not opt.sel:
      cut_dict = {'muon':"lepton_eta>-10.", 'electron':"lepton_eta>-10."}
      cut_tag = ""
 else:
+     selstring_mu = "lepton_pt>125&&leadingjet_pt>300&&subleadingjet_pt>150&&"
+     selstring_mu = selstring_mu + cut
+     selstring_ele = "MET_pt>125&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&"
+     selstring_ele = selstring_ele + cut
      if opt.sel:
-          cut_dict = {'muon':"lepton_pt>125&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 'electron':"MET_pt>125&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut}
-          cut_tag = 'selection_AND_' + cutToTag(opt.cut) 
+          cut_dict = {'muon':str(selstring_mu), 
+                      'electron':str(selstring_mu),
+          }
+          #cut_dict = {'muon':"lepton_pt>125&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 'electron':"MET_pt>125&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut}
+          cut_tag = {key: 'selection_AND_' + cutToTag(opt.cut) for key, value in cut_dict.items()} #'selection_AND_' + cutToTag(opt.cut) 
      else:
           cut_dict = {'muon':cut, 'electron':cut}
-          cut_tag = cutToTag(opt.cut)
+          cut_tag = {key: cutToTag(value) for key, value in cut_dict.items()}#cutToTag(opt.cut)
 
 lumi = {'2016': 35.89, "2017": 41.53, "2018": 59.7}
 
@@ -467,10 +486,38 @@ for year in years:
           variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', 100, 0, 1000))
           variables.append(variabile('Event_HT', 'event HT [GeV]', wzero+'*('+cut+')', 70, 0, 1400))
           variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
-          variables.append(variabile('best_RecoTop_pt', 'top p_{T} [GeV]',  wzero+'*(best_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
-          variables.append(variabile('best_RecoTop_eta', 'top #eta', wzero+'*(best_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
-          variables.append(variabile('best_RecoTop_phi', 'top #phi',  wzero+'*(best_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
-          variables.append(variabile('best_RecoTop_m', 'top mass [GeV]',  wzero+'*(best_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          variables.append(variabile('best_RecoTop_pt', 'top p_{T} [GeV] (best)',  wzero+'*(best_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('best_RecoTop_eta', 'top #eta (best)', wzero+'*(best_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('best_RecoTop_phi', 'top #phi (best)',  wzero+'*(best_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('best_RecoTop_m', 'top mass [GeV] (best)',  wzero+'*(best_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          variables.append(variabile('chi_RecoTop_pt', 'top p_{T} [GeV] (chimass)',  wzero+'*(chi_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('chi_RecoTop_eta', 'top #eta (chimass)', wzero+'*(chi_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('chi_RecoTop_phi', 'top #phi (chimass)',  wzero+'*(chi_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('chi_RecoTop_m', 'top mass [GeV] (chimass)',  wzero+'*(chi_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          variables.append(variabile('closest_RecoTop_pt', 'top p_{T} [GeV] (closest)',  wzero+'*(closest_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('closest_RecoTop_eta', 'top #eta (closest)', wzero+'*(closest_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('closest_RecoTop_phi', 'top #phi (closest)',  wzero+'*(closest_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('closest_RecoTop_m', 'top mass [GeV] (closest)',  wzero+'*(closest_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          variables.append(variabile('sublead_RecoTop_pt', 'top p_{T} [GeV] (sublead)',  wzero+'*(sublead_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('sublead_RecoTop_eta', 'top #eta (sublead)', wzero+'*(sublead_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('sublead_RecoTop_phi', 'top #phi (sublead)',  wzero+'*(sublead_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('sublead_RecoTop_m', 'top mass [GeV] (sublead)',  wzero+'*(sublead_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          variables.append(variabile('chi_Wprime_pt', 'Wprime p_{T} [GeV] (chimass)',  wzero+'*(chi_Wprime_pt>0&&'+cut+')', 350, 0, 4200))
+          variables.append(variabile('chi_Wprime_eta', 'Wprime #eta (chimass)', wzero+'*(chi_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('chi_Wprime_phi', 'Wprime #phi (chimass)',  wzero+'*(chi_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('chi_Wprime_m', 'Wprime mass [GeV] (chimass)',  wzero+'*(chi_Wprime_m>0&&'+cut+')',  588, 80, 6000))
+          variables.append(variabile('best_Wprime_pt', 'Wprime p_{T} [GeV] (best)',  wzero+'*(best_Wprime_pt>0&&'+cut+')', 350, 0, 4200))
+          variables.append(variabile('best_Wprime_eta', 'Wprime #eta (best)', wzero+'*(best_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('best_Wprime_phi', 'Wprime #phi (best)',  wzero+'*(best_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  588, 80, 6000))
+          variables.append(variabile('closest_Wprime_pt', 'Wprime p_{T} [GeV] (closest)',  wzero+'*(closest_Wprime_pt>0&&'+cut+')', 350, 0, 4200))
+          variables.append(variabile('closest_Wprime_eta', 'Wprime #eta (closest)', wzero+'*(closest_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('closest_Wprime_phi', 'Wprime #phi (closest)',  wzero+'*(closest_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('closest_Wprime_m', 'Wprime mass [GeV] (closest)',  wzero+'*(closest_Wprime_m>0&&'+cut+')',  588, 80, 6000))
+          variables.append(variabile('sublead_Wprime_pt', 'Wprime p_{T} [GeV] (sublead)',  wzero+'*(sublead_Wprime_pt>0&&'+cut+')', 350, 0, 4200))
+          variables.append(variabile('sublead_Wprime_eta', 'Wprime #eta (sublead)', wzero+'*(sublead_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('sublead_Wprime_phi', 'Wprime #phi (sublead)',  wzero+'*(sublead_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('sublead_Wprime_m', 'Wprime mass [GeV] (sublead)',  wzero+'*(sublead_Wprime_m>0&&'+cut+')',  588, 80, 6000))
           #variables.append(variabile('sublead_TopJet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 1200))
           #variables.append(variabile('sublead_TopJet_eta', 'sub leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
           #variables.append(variabile('sublead_WpJet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
@@ -510,14 +557,16 @@ for year in years:
           variables.append(variabile('topW_jets_pt', 'jets (t+W\') p_{T} [GeV]',  wzero+'*('+cut+')', 150, 0, 1500))
           variables.append(variabile('topW_jets_deltaR', '#DeltaR jets (t+W\')',  wzero+'*('+cut+')', 50, 0, 5))
           variables.append(variabile('topW_jets_deltaPhi', '#Delta #phi jets (t+W\')',  wzero+'*('+cut+')', 20, -3.14, 3.14))
-          
+          variables.append(variabile('nPV_good', 'n good PV', wzero+'*('+cut+')', 120, 0, 120))
+          variables.append(variabile('nPV_tot', 'total n PV', wzero+'*('+cut+')', 120, 0, 120))
+
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
-                         plot(lep, 'jets', var, sample, cut_tag, "")
+                         plot(lep, 'jets', var, sample, cut_tag[lep], "")
           if(opt.stack):
                for var in variables:
-                    makestack(lep, 'jets', var, dataset_new, cut_tag, "", lumi[str(year)])
+                    makestack(lep, 'jets', var, dataset_new, cut_tag[lep], "", lumi[str(year)])
 #if hasattr(dataset_dict[str(year)], 'components'): # How to check whether this exists or not
 #     samples = [sample for sample in dataset.components]# Method exists and was used.
 #else:

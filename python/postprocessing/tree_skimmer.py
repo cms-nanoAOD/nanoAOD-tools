@@ -569,6 +569,11 @@ print "Total number of events: ", tree.GetEntries()
 
 neutrino_failed = 0
 
+nrecochi = 0
+nrecoclosest = 0
+nrecosublead = 0
+nrecobest = 0
+
 #++++++++++++++++++++++++++++++++++
 #++   looping over the events    ++
 #++++++++++++++++++++++++++++++++++
@@ -1003,7 +1008,7 @@ for i in xrange(0,tree.GetEntries()):
     best_dR_lepjet = None
     DeltaR_nujet = 100.
     DeltaR_Idx = 0
-    tm_chi = 1000.
+    tm_chi = 1000000.
     tm_Idx = 0
     mtop_p4 = None
 
@@ -1025,13 +1030,9 @@ for i in xrange(0,tree.GetEntries()):
             tm_chi = chi
             tm_Idx = k
     
-    chi_jet_p4_pre = goodJets[tm_Idx].p4()
+    chi_jet_p4_pre = copy.deepcopy(goodJets[tm_Idx].p4())
     chi_jet = goodJets[tm_Idx]
-    '''
-    if deltaR(chi_jet_p4_pre.Eta(), chi_jet_p4_pre.Phi(), tightlep.eta, tightlep.phi) < 0.4:
-        chi_jet_p4 = chi_jet_p4_pre - tightlep_p4
-    else:
-    '''
+   
     chi_jet_p4 = chi_jet_p4_pre
     if tm_Idx == 0:
         if len(highptJets) > 1:
@@ -1051,17 +1052,13 @@ for i in xrange(0,tree.GetEntries()):
     chi_promptjet_p4t = copy.deepcopy(chi_promptjet.p4())
     chi_promptjet_p4t.SetPz(0.)
     if chi_recotop_p4 != None:
+        nrecochi += 1
         chi_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, chi_promptjet.p4(), chi_recotop_p4) 
         chi_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, chi_recotop_p4) 
 
     #jet closest to MET p4                                                              
     closest_jet, detrecodR = closest(tightlep, goodJets)
-    closest_jet_p4_pre = closest_jet.p4()
-    '''
-    if deltaR(closest_jet.eta, closest_jet.phi, tightlep.eta, tightlep.phi) < 0.4:
-        closest_jet_p4 = closest_jet_p4_pre - tightlep_p4
-    else:
-    '''
+    closest_jet_p4_pre = copy.deepcopy(closest_jet.p4())
     closest_jet_p4 = closest_jet_p4_pre
     
     if closest_jet == goodJets[0]:
@@ -1082,21 +1079,18 @@ for i in xrange(0,tree.GetEntries()):
     closest_promptjet_p4t = copy.deepcopy(closest_promptjet.p4())
     closest_promptjet_p4t.SetPz(0.)
     if closest_recotop_p4 != None:
+        nrecochi += 1
         closest_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, closest_promptjet.p4(), closest_recotop_p4) 
         closest_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, closest_recotop_p4)
 
     #subleading jet reconstruction                                                      
     if len(highptJets) > 1:
-        sublead_jet_p4_pre = highptJets[1].p4()
+        sublead_jet_p4_pre = copy.deepcopy(highptJets[1].p4())
         sublead_jet = highptJets[1]
     else:
-        sublead_jet_p4_pre = goodJets[1].p4()
+        sublead_jet_p4_pre = copy.deepcopy(goodJets[1].p4())
         sublead_jet = goodJets[1]
-    '''
-    if deltaR(sublead_jet_p4_pre.Eta(), sublead_jet_p4_pre.Phi(), tightlep.eta, tightlep.phi) < 0.4:
-        sublead_jet_p4 = sublead_jet_p4_pre - tightlep_p4
-    else:
-    '''
+    
     sublead_jet_p4 = sublead_jet_p4_pre
 
     ## Subleading top reconstruction
@@ -1108,6 +1102,7 @@ for i in xrange(0,tree.GetEntries()):
     sublead_promptjet_p4t = copy.deepcopy(sublead_promptjet.p4())
     sublead_promptjet_p4t.SetPz(0.)
     if sublead_recotop_p4 != None:
+        nrecochi += 1
         sublead_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, sublead_promptjet.p4(), sublead_recotop_p4) 
         sublead_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, sublead_recotop_p4)
 
@@ -1116,19 +1111,19 @@ for i in xrange(0,tree.GetEntries()):
     best_recotop_p4 = None
     IsNeg_best = None
     if sublead_jet_p4_pre == closest_jet_p4_pre:
-        best_jet_p4 = sublead_jet_p4
+        best_jet_p4 = copy.deepcopy(sublead_jet_p4)
         best_jet = sublead_jet
         best_promptjet = sublead_promptjet
     elif sublead_jet_p4_pre == chi_jet_p4_pre:
-        best_jet_p4 = sublead_jet_p4
+        best_jet_p4 = copy.deepcopy(sublead_jet_p4)
         best_jet = sublead_jet
         best_promptjet = sublead_promptjet
     elif chi_jet_p4_pre == closest_jet_p4_pre:
-        best_jet_p4 = chi_jet_p4
+        best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
     else:
-        best_jet_p4 = chi_jet_p4
+        best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
         
@@ -1145,6 +1140,7 @@ for i in xrange(0,tree.GetEntries()):
     ptrel_besttopAK4_closestAK8[0] = goodJets[0].pt/closAK8.pt
     deltaR_besttopAK4_closestAK8[0] = copy.deepcopy(dR_besttopAK4AK8)
     if best_recotop_p4 != None:
+        nrecobest += 1
         best_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, best_promptjet.p4(), best_recotop_p4) 
         best_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, best_recotop_p4)
     
