@@ -19,7 +19,7 @@ parser.add_option('-L', '--lep', dest='lep', type='string', default = 'muon', he
 parser.add_option('-S', '--syst', dest='syst', type='string', default = 'all', help='Default all systematics added')
 parser.add_option('-C', '--cut', dest='cut', type='string', default = 'lepton_eta>-10.', help='Default no cut')
 parser.add_option('-y', '--year', dest='year', type='string', default = 'all', help='Default 2016, 2017 and 2018 are included')
-parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v1', help='Default folder is v0')
+parser.add_option('-f', '--folder', dest='folder', type='string', default = 'vttstudy', help='Default folder is v0')
 #parser.add_option('-T', '--topol', dest='topol', type='string', default = 'all', help='Default all njmt')
 parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', help="")
 (opt, args) = parser.parse_args()
@@ -456,6 +456,7 @@ for year in years:
           wzero = 'w_nominal'
           cut = cut_dict[lep]
           #variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 1200))
+          '''
           variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
           variables.append(variabile('lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
@@ -510,7 +511,9 @@ for year in years:
           variables.append(variabile('topW_jets_pt', 'jets (t+W\') p_{T} [GeV]',  wzero+'*('+cut+')', 150, 0, 1500))
           variables.append(variabile('topW_jets_deltaR', '#DeltaR jets (t+W\')',  wzero+'*('+cut+')', 50, 0, 5))
           variables.append(variabile('topW_jets_deltaPhi', '#Delta #phi jets (t+W\')',  wzero+'*('+cut+')', 20, -3.14, 3.14))
-          
+          '''
+          variables.append(variabile('nlep', 'no of lepton (LHE level)',  wzero+'*('+cut+')', 3, -0.5, 2.5))
+
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:

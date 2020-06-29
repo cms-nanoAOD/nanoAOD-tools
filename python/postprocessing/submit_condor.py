@@ -9,7 +9,7 @@ parser.add_option('-d', '--dat', dest='dat', type=str, default = '', help='Pleas
 parser.add_option('-f', '--folder', dest='folder', type=str, default = '', help='Please enter a destination folder')
 (opt, args) = parser.parse_args()
 #Insert here your uid... you can see it typing echo $uid
-uid = 124949
+uid = 103214
 
 def sub_writer(sample, n, files, folder):
     f = open("condor.sub", "w")
