@@ -616,19 +616,19 @@ class TopUtilities():
 
           if deltaMin == 14000000.**2. :
             #neutrino = copy.deepcopy(p4nu_rec)
-            #print "Delta2 too high!"
+            print "\tDelta2 too high!"
             neutrino = None
             #print "problem with neutrino reco!"
             return neutrino, IsNegative
 
           if delta2ZeroValue < deltaMin :
-            #print "Delta2 not so high!"
+            print "\tDelta2 not so high!"
             deltaMin = copy.deepcopy(delta2ZeroValue)
             minPx = copy.deepcopy(zeroValue)
             minPy = copy.deepcopy(pyZeroValue)
 
           if not abs(leptonE) == abs(leptonPz):
-            #print "leptonE != leptonPz"
+            print "\tleptonE != leptonPz"
             mu_Minimum = mW**2./2. + minPx*leptonPx*minPy*leptonPy
             a_Minimum = (mu_Minimum*leptonPz) / (leptonE**2. - leptonPz**2.)
             pznu = a_Minimum
@@ -639,12 +639,11 @@ class TopUtilities():
             neutrino = copy.deepcopy(p4nu_rec)
             #p4nu.SetPxPyPzE(minPx, minPy, pznu, Enu)
           else:
-            #print "leptonE == leptonPz"
+            print "\tleptonE == leptonPz"
             neutrino = None#copy.deepcopy(p4nu_rec)
         
-          
           if neutrino is None:
-            print "neutrino is None"
+            print "\tneutrino is None"
 
           return neutrino, IsNegative
 
