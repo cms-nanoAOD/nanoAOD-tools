@@ -633,16 +633,19 @@ class TopUtilities():
             a_Minimum = (mu_Minimum*leptonPz) / (leptonE**2. - leptonPz**2.)
             pznu = a_Minimum
             Enu = TMath.Power((minPx**2. + minPy**2. + pznu**2.), 0.5)
-            #p4nu = ROOT.TLorentzVector()
-            p4nu_rec.SetPxPyPzE(minPx, minPy, pznu, Enu)
+            p4nu = ROOT.TLorentzVector()
+            p4nu.SetPxPyPzE(minPx, minPy, pznu, Enu)
+            p4nu_rec = copy.deepcopy(p4nu)
             neutrino = copy.deepcopy(p4nu_rec)
             #p4nu.SetPxPyPzE(minPx, minPy, pznu, Enu)
           else:
-            print "leptonE == leptonPz"
+            #print "leptonE == leptonPz"
             neutrino = None#copy.deepcopy(p4nu_rec)
         
+          
           if neutrino is None:
             print "neutrino is None"
+
           return neutrino, IsNegative
 
     def top4Momentum(self, lepton, jet, metPx, metPy):
@@ -686,6 +689,7 @@ class TopUtilities():
 
         elif neutrino is None:
           besttop = None
+          dR_lepjet_top = None
         
         return besttop, IsNeg, dR_lepjet_top
 

@@ -344,11 +344,18 @@ ptrel_subleadAK4_closestAK8 = array.array('f', [0.])
 deltaR_subleadAK4_closestAK8 = array.array('f', [0.])
 ptrel_besttopAK4_closestAK8 = array.array('f', [0.])
 deltaR_besttopAK4_closestAK8 = array.array('f', [0.])
+ptrel_chitopAK4_closestAK8 = array.array('f', [0.])
+deltaR_chitopAK4_closestAK8 = array.array('f', [0.])
 ptrel_bestWAK4_closestAK8 = array.array('f', [0.])
 deltaR_bestWAK4_closestAK8 = array.array('f', [0.])
-topW_jets_pt = array.array('f', [0.])
-topW_jets_deltaR = array.array('f', [0.])
-topW_jets_deltaphi = array.array('f', [0.])
+ptrel_chiWAK4_closestAK8 = array.array('f', [0.])
+deltaR_chiWAK4_closestAK8 = array.array('f', [0.])
+best_topW_jets_pt = array.array('f', [0.])
+best_topW_jets_deltaR = array.array('f', [0.])
+best_topW_jets_deltaphi = array.array('f', [0.])
+chi_topW_jets_pt = array.array('f', [0.])
+chi_topW_jets_deltaR = array.array('f', [0.])
+chi_topW_jets_deltaphi = array.array('f', [0.])
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
@@ -518,11 +525,18 @@ systTree.branchTreesSysts(trees, "all", "ptrel_subleadAK4_closestAK8", outTreeFi
 systTree.branchTreesSysts(trees, "all", "deltaR_subleadAK4_closestAK8", outTreeFile, deltaR_subleadAK4_closestAK8)
 systTree.branchTreesSysts(trees, "all", "ptrel_besttopAK4_closestAK8", outTreeFile, ptrel_besttopAK4_closestAK8)
 systTree.branchTreesSysts(trees, "all", "deltaR_besttopAK4_closestAK8", outTreeFile, deltaR_besttopAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "ptrel_chitopAK4_closestAK8", outTreeFile, ptrel_chitopAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "deltaR_chitopAK4_closestAK8", outTreeFile, deltaR_chitopAK4_closestAK8)
 systTree.branchTreesSysts(trees, "all", "ptrel_bestWAK4_closestAK8", outTreeFile, ptrel_bestWAK4_closestAK8)
 systTree.branchTreesSysts(trees, "all", "deltaR_bestWAK4_closestAK8", outTreeFile, deltaR_bestWAK4_closestAK8)
-systTree.branchTreesSysts(trees, "all", "topW_jets_pt", outTreeFile, topW_jets_pt)
-systTree.branchTreesSysts(trees, "all", "topW_jets_deltaR", outTreeFile, topW_jets_deltaR)
-systTree.branchTreesSysts(trees, "all", "topW_jets_deltaPhi", outTreeFile, topW_jets_deltaphi)
+systTree.branchTreesSysts(trees, "all", "ptrel_chiWAK4_closestAK8", outTreeFile, ptrel_chiWAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "deltaR_chiWAK4_closestAK8", outTreeFile, deltaR_chiWAK4_closestAK8)
+systTree.branchTreesSysts(trees, "all", "best_topW_jets_pt", outTreeFile, topW_jets_pt)
+systTree.branchTreesSysts(trees, "all", "best_topW_jets_deltaR", outTreeFile, topW_jets_deltaR)
+systTree.branchTreesSysts(trees, "all", "best_topW_jets_deltaPhi", outTreeFile, topW_jets_deltaphi)
+systTree.branchTreesSysts(trees, "all", "chi_topW_jets_pt", outTreeFile, topW_jets_pt)
+systTree.branchTreesSysts(trees, "all", "chi_topW_jets_deltaR", outTreeFile, topW_jets_deltaR)
+systTree.branchTreesSysts(trees, "all", "chi_topW_jets_deltaPhi", outTreeFile, topW_jets_deltaphi)
 
 if(TriggerStudy):
     systTree.branchTreesSysts(trees, "all", "isdileptonic", outTreeFile, isdileptonic)
@@ -586,12 +600,11 @@ for i in xrange(0,tree.GetEntries()):
     '''
     if Debug:
         print "evento n. " + str(i)
-
     '''
+    
     if Debug and i > 50000:
         break
     
-
     if i%5000 == 0:
         print "Event #", i+1, " out of ", tree.GetEntries()
 
@@ -714,8 +727,9 @@ for i in xrange(0,tree.GetEntries()):
     #veto on events with "pathological" reco neutrino
     tent_neutrino = recotop.NuMomentum(tightlep_p4.Px(), tightlep_p4.Py(), tightlep_p4.Pz(), tightlep_p4.Pt(), tightlep_p4.E(), MET['metPx'], MET['metPy'])
 
-    if tent_neutrino[0] is None:
+    if tent_neutrino[0] == None:
         neutrino_failed += 1
+        print "fail #" neutrino_failed
         continue
 
     #print "neutrino test passed"
@@ -961,10 +975,10 @@ for i in xrange(0,tree.GetEntries()):
         '''
 
     closAK8, dR_leadAK4AK8 = closest(jets[0], fatjets)
-    ptrel_leadAK4_closestAK8[0] = jets[0].pt/closAK8.pt
+    ptrel_leadAK4_closestAK8[0] = goodJets[0].pt/closAK8.pt
     deltaR_leadAK4_closestAK8[0] = copy.deepcopy(dR_leadAK4AK8)
     subclosAK8, dR_subleadAK4AK8 = closest(jets[1], fatjets)
-    ptrel_subleadAK4_closestAK8[0] = jets[1].pt/subclosAK8.pt
+    ptrel_subleadAK4_closestAK8[0] = goodJets[1].pt/subclosAK8.pt
     deltaR_subleadAK4_closestAK8[0] = copy.deepcopy(dR_subleadAK4AK8)
     leadingjet_pt_all[0] = jets[0].pt
     subleadingjet_pt_all[0] = jets[1].pt
@@ -1046,6 +1060,10 @@ for i in xrange(0,tree.GetEntries()):
     chi_recotop_p4, IsNeg_chi, chi_dR_lepjet = recotop.top4Momentum(tightlep_p4, chi_jet_p4, MET['metPx'], MET['metPy'])
     IsNeg_chi = IsNeg_chi * DeltaFilter
     #btag_countings_chi = len(bjet_filter([chi_promptjet, chi_jet], 'DeepFlv', 'M')[0])
+    closAK8, dR_besttopAK4AK8 = closest(chi_jet, fatjets)
+    ptrel_chitopAK4_closestAK8[0] = chi_jet.pt/closAK8.pt
+    deltaR_chitopAK4_closestAK8[0] = copy.deepcopy(dR_besttopAK4AK8)
+
     chi_jet_p4t = copy.deepcopy(chi_jet_p4)
     chi_jet_p4t.SetPz(0.)
     chi_recotop_p4t = tightlep_p4t + chi_jet_p4t + recomet_p4t
@@ -1137,7 +1155,7 @@ for i in xrange(0,tree.GetEntries()):
     best_promptjet_p4t = copy.deepcopy(best_promptjet.p4())
     best_promptjet_p4t.SetPz(0.)
     closAK8, dR_besttopAK4AK8 = closest(best_jet, fatjets)
-    ptrel_besttopAK4_closestAK8[0] = goodJets[0].pt/closAK8.pt
+    ptrel_besttopAK4_closestAK8[0] = best_jet.pt/closAK8.pt
     deltaR_besttopAK4_closestAK8[0] = copy.deepcopy(dR_besttopAK4AK8)
     if best_recotop_p4 != None:
         nrecobest += 1
@@ -1221,6 +1239,12 @@ for i in xrange(0,tree.GetEntries()):
         chi_WpJet_eta_all[0] = chi_promptjet.p4().Eta()
         chi_WpJet_phi_all[0] = chi_promptjet.p4().Phi()
         chi_WpJet_isBTagged_all[0] = int(len(bjet_filter([chi_promptjet], 'DeepFlv', 'M')[0]))
+        closAK8, dR_bestWAK4AK8 = closest(chi_promptjet, fatjets) 
+        ptrel_bestWAK4_closestAK8[0] = chi_promptjet.pt/closAK8.pt
+        deltaR_bestWAK4_closestAK8[0] = copy.deepcopy(dR_bestWAK4AK8)
+        chi_topW_jets_pt[0] = (chi_jet_p4 + chi_promptjet.p4()).Pt()
+        chi_topW_jets_deltaR[0] = deltaR(chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_promptjet.p4().Eta(), chi_promptjet.p4().Phi())
+        chi_topW_jets_deltaphi[0] = deltaPhi(chi_jet_p4.Phi(), chi_promptjet.p4().Phi())
     else:
         chi_Wprime_m_all[0] = -100.
         chi_Wprime_mt_all[0] = -100.
@@ -1320,11 +1344,11 @@ for i in xrange(0,tree.GetEntries()):
         best_WpJet_phi_all[0] = best_promptjet.p4().Phi()
         best_WpJet_isBTagged_all[0] = int(len(bjet_filter([best_promptjet], 'DeepFlv', 'M')[0]))
         closAK8, dR_bestWAK4AK8 = closest(best_promptjet, fatjets) 
-        ptrel_bestWAK4_closestAK8[0] = goodJets[0].pt/closAK8.pt
+        ptrel_bestWAK4_closestAK8[0] = best_promptjet.pt/closAK8.pt
         deltaR_bestWAK4_closestAK8[0] = copy.deepcopy(dR_bestWAK4AK8)
-        topW_jets_pt[0] = (best_jet_p4 + best_promptjet.p4()).Pt()
-        topW_jets_deltaR[0] = deltaR(best_jet_p4.Eta(), best_jet_p4.Phi(), best_promptjet.p4().Eta(), best_promptjet.p4().Phi())
-        topW_jets_deltaphi[0] = deltaPhi(best_jet_p4.Phi(), best_promptjet.p4().Phi())
+        best_topW_jets_pt[0] = (best_jet_p4 + best_promptjet.p4()).Pt()
+        best_topW_jets_deltaR[0] = deltaR(best_jet_p4.Eta(), best_jet_p4.Phi(), best_promptjet.p4().Eta(), best_promptjet.p4().Phi())
+        best_topW_jets_deltaphi[0] = deltaPhi(best_jet_p4.Phi(), best_promptjet.p4().Phi())
     else:
         best_Wprime_m_all[0] = -100.
         best_Wprime_mt_all[0] = -100.
@@ -1352,7 +1376,10 @@ for i in xrange(0,tree.GetEntries()):
     systTree.setWeightName("w_nominal",copy.deepcopy(w_nominal_all[0]))
     systTree.fillTreesSysts(trees, "all")
 
-print "Event with neutrino failed: ", neutrino_failed, " out of ", tree.GetEntries()
+if Debug:
+    print "Event with neutrino failed: ", neutrino_failed, " out of ", str(50000)
+else:
+    print "Event with neutrino failed: ", neutrino_failed, " out of ", tree.GetEntries()
 
 #trees[0].Print()
 outTreeFile.cd()
