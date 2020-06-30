@@ -531,12 +531,12 @@ systTree.branchTreesSysts(trees, "all", "ptrel_bestWAK4_closestAK8", outTreeFile
 systTree.branchTreesSysts(trees, "all", "deltaR_bestWAK4_closestAK8", outTreeFile, deltaR_bestWAK4_closestAK8)
 systTree.branchTreesSysts(trees, "all", "ptrel_chiWAK4_closestAK8", outTreeFile, ptrel_chiWAK4_closestAK8)
 systTree.branchTreesSysts(trees, "all", "deltaR_chiWAK4_closestAK8", outTreeFile, deltaR_chiWAK4_closestAK8)
-systTree.branchTreesSysts(trees, "all", "best_topW_jets_pt", outTreeFile, topW_jets_pt)
-systTree.branchTreesSysts(trees, "all", "best_topW_jets_deltaR", outTreeFile, topW_jets_deltaR)
-systTree.branchTreesSysts(trees, "all", "best_topW_jets_deltaPhi", outTreeFile, topW_jets_deltaphi)
-systTree.branchTreesSysts(trees, "all", "chi_topW_jets_pt", outTreeFile, topW_jets_pt)
-systTree.branchTreesSysts(trees, "all", "chi_topW_jets_deltaR", outTreeFile, topW_jets_deltaR)
-systTree.branchTreesSysts(trees, "all", "chi_topW_jets_deltaPhi", outTreeFile, topW_jets_deltaphi)
+systTree.branchTreesSysts(trees, "all", "best_topW_jets_pt", outTreeFile, best_topW_jets_pt)
+systTree.branchTreesSysts(trees, "all", "best_topW_jets_deltaR", outTreeFile, best_topW_jets_deltaR)
+systTree.branchTreesSysts(trees, "all", "best_topW_jets_deltaPhi", outTreeFile, best_topW_jets_deltaphi)
+systTree.branchTreesSysts(trees, "all", "chi_topW_jets_pt", outTreeFile, chi_topW_jets_pt)
+systTree.branchTreesSysts(trees, "all", "chi_topW_jets_deltaR", outTreeFile, chi_topW_jets_deltaR)
+systTree.branchTreesSysts(trees, "all", "chi_topW_jets_deltaPhi", outTreeFile, chi_topW_jets_deltaphi)
 
 if(TriggerStudy):
     systTree.branchTreesSysts(trees, "all", "isdileptonic", outTreeFile, isdileptonic)
@@ -729,7 +729,7 @@ for i in xrange(0,tree.GetEntries()):
 
     if tent_neutrino[0] == None:
         neutrino_failed += 1
-        print "fail #" neutrino_failed
+        print "fail #", neutrino_failed
         continue
 
     #print "neutrino test passed"
