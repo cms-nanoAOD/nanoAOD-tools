@@ -661,6 +661,8 @@ class TopUtilities():
         besttop = None
         #recochi = []
 
+        print "\treco neutrino", neutrino.Print()
+
         rtop = ROOT.TLorentzVector()
 
         if isinstance(neutrino, list):

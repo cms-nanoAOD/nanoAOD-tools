@@ -602,7 +602,7 @@ for i in xrange(0,tree.GetEntries()):
         print "evento n. " + str(i)
     '''
 
-    if Debug and i > 50000:
+    if Debug and i > 5000:
         break
     
     if not Debug and i%5000 == 0:
@@ -958,7 +958,9 @@ for i in xrange(0,tree.GetEntries()):
             MC_WpJet_phi_all[0] = -100.
 
     #DetReco(nstruction)
+    print "ev #", i, ": DetReco starts"
     if tightlep != None:
+        print "tightlep here: ", tightlep, " its mass: ", tightlep.p4().M()
         ovrthrust, hadthrust = event_thrust(tightlep, jets, met)
         ovr_global_thrust[0] = copy.deepcopy(ovrthrust)
         ovr_central_thrust[0] = copy.deepcopy(round((1. - ovrthrust), 5))
@@ -1038,6 +1040,7 @@ for i in xrange(0,tree.GetEntries()):
     print "finding chi jet..."
     for k in range(len(goodJets)):
         temp_dR = None
+        #print "tightlep here: ", tightlep, " its mass: ", tightlep.p4().M()
         mtop_p4, isdetrecoNeg, temp_dR = recotop.top4Momentum(tightlep_p4, goodJets[k].p4(), MET['metPx'], MET['metPy'])
         #dR_lepjet.append(copy.deepcopy(temp_dR))
         if mtop_p4 is None:
@@ -1061,6 +1064,7 @@ for i in xrange(0,tree.GetEntries()):
         
     ## Chi top reconstruction
     print "recoing chi_top"
+    #print "tightlep here: ", tightlep, " its mass: ", tightlep.p4().M()
     chi_recotop_p4, IsNeg_chi, chi_dR_lepjet = recotop.top4Momentum(tightlep_p4, chi_jet_p4, MET['metPx'], MET['metPy'])
     IsNeg_chi = IsNeg_chi * DeltaFilter
     #btag_countings_chi = len(bjet_filter([chi_promptjet, chi_jet], 'DeepFlv', 'M')[0])
@@ -1091,8 +1095,11 @@ for i in xrange(0,tree.GetEntries()):
     else:
         closest_promptjet = highptJets[0]
 
+    print "\ttop jet: ", chi_jet, " prompt jet: ", chi_promptjet, " recotop and its mass: ", chi_recotop_p4, chi_recotop_p4.M()
+
     ## Closest top reconstruction
     print "recoing closest_top"
+    #print "tightlep here: ", tightlep, " its mass: ", tightlep.p4().M()
     closest_recotop_p4, IsNeg_closest, closest_dR_lepjet = recotop.top4Momentum(tightlep_p4, closest_jet_p4, MET['metPx'], MET['metPy'])
     IsNeg_closest = IsNeg_closest * DeltaFilter
     btag_countings_closest = len(bjet_filter([closest_promptjet, closest_jet], 'DeepFlv', 'M')[0])
@@ -1106,6 +1113,8 @@ for i in xrange(0,tree.GetEntries()):
         closest_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep_p4, closest_promptjet.p4(), closest_recotop_p4) 
         closest_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, closest_recotop_p4)
 
+    print "\ttop jet: ", closest_jet, " prompt jet: ", closest_promptjet, " recotop and its mass: ", closest_recotop_p4, closest_recotop_p4.M()
+
     #subleading jet reconstruction                                                      
     if len(highptJets) > 1:
         sublead_jet_p4_pre = copy.deepcopy(highptJets[1].p4())
@@ -1118,6 +1127,7 @@ for i in xrange(0,tree.GetEntries()):
 
     ## Subleading top reconstruction
     print "recoing sublead_top"
+    #print "tightlep here: ", tightlep, " its mass: ", tightlep.p4().M()
     sublead_recotop_p4, IsNeg_sublead, sublead_dR_lepjet = recotop.top4Momentum(tightlep_p4, sublead_jet_p4, MET['metPx'], MET['metPy'])
     IsNeg_sublead = IsNeg_sublead * DeltaFilter
     sublead_jet_p4t = copy.deepcopy(sublead_jet_p4)
@@ -1131,35 +1141,49 @@ for i in xrange(0,tree.GetEntries()):
         sublead_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, sublead_recotop_p4)
 
     btag_countings_sublead = len(bjet_filter([sublead_promptjet, sublead_jet], 'DeepFlv', 'M')[0])
+
+    print "\ttop jet: ", sublead_jet, " prompt jet: ", sublead_promptjet, " recotop and its mass: ", sublead_recotop_p4, sublead_recotop_p4.M()
     #best jet reconstruction                                                           
+    print "recoing best_top"
     best_recotop_p4 = None
     IsNeg_best = None
+    best_dR_lepjet = None
+    #print "tightlep here: ", tightlep, " its mass: ", tightlep.p4().M()
+
     if chi_jet_p4_pre == closest_jet_p4_pre:
         print "\tchi == closest"
         best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
         best_recotop_p4 = chi_recotop_p4
+        IsNeg_best = IsNeg_chi
+        best_dR_lepjet = chi_dR_lepjet
     elif sublead_jet_p4_pre == chi_jet_p4_pre:
         print "\tchi == sublead"
         best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
         best_recotop_p4 = chi_recotop_p4
+        IsNeg_best = IsNeg_chi
+        best_dR_lepjet = chi_dR_lepjet
     elif sublead_jet_p4_pre == closest_jet_p4_pre:
         print "\tsublead == closest"
         best_jet_p4 = copy.deepcopy(sublead_jet_p4)
         best_jet = sublead_jet
         best_promptjet = sublead_promptjet
         best_recotop_p4 = sublead_recotop_p4
+        IsNeg_best = IsNeg_sublead
+        best_dR_lepjet = sublead_dR_lepjet
     else:
         print "\tchi != closest != sublead"
         best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
         best_recotop_p4 = chi_recotop_p4
-        
-    print "recoing best_top"
+        IsNeg_best = IsNeg_chi
+        best_dR_lepjet = chi_dR_lepjet
+
+    #print "tightlep here: ", tightlep, " its mass: ", tightlep.p4().M()
     #best_recotop_p4, IsNeg_best, best_dR_lepjet = recotop.top4Momentum(tightlep_p4, best_jet_p4, MET['metPx'], MET['metPy'])
     #print type(best_recotop_p4)
     #print best_recotop_p4.M()
@@ -1178,6 +1202,8 @@ for i in xrange(0,tree.GetEntries()):
         best_RecoTop_costhetalep_all[0] = recotop.costhetapollep(tightlep_p4, best_recotop_p4)
     
     #tag_countings_best = len(bjet_filter([best_promptjet, best_jet], 'DeepFlv', 'M')[0])
+
+    print "\ttop jet: ", best_jet, " prompt jet: ", best_promptjet, " recotop and its mass: ", best_recotop_p4, best_recotop_p4.M()
 
     #Wprime reco                                                                        
     if closest_recotop_p4 != None and tightlep != None:
@@ -1205,6 +1231,7 @@ for i in xrange(0,tree.GetEntries()):
         closest_WpJet_eta_all[0] = closest_promptjet.p4().Eta()
         closest_WpJet_phi_all[0] = closest_promptjet.p4().Phi()
         closest_WpJet_isBTagged_all[0] = int(len(bjet_filter([closest_promptjet], 'DeepFlv', 'M')[0]))
+        print "closest W' mass: ", closest_Wprime_p4.M()
     else:
         closest_Wprime_m_all[0] = -100.
         closest_Wprime_mt_all[0] = -100.
@@ -1260,6 +1287,7 @@ for i in xrange(0,tree.GetEntries()):
         chi_topW_jets_pt[0] = (chi_jet_p4 + chi_promptjet.p4()).Pt()
         chi_topW_jets_deltaR[0] = deltaR(chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_promptjet.p4().Eta(), chi_promptjet.p4().Phi())
         chi_topW_jets_deltaphi[0] = deltaPhi(chi_jet_p4.Phi(), chi_promptjet.p4().Phi())
+        print "chi W' mass: ", chi_Wprime_p4.M()
     else:
         chi_Wprime_m_all[0] = -100.
         chi_Wprime_mt_all[0] = -100.
@@ -1309,6 +1337,7 @@ for i in xrange(0,tree.GetEntries()):
         sublead_WpJet_eta_all[0] = sublead_promptjet.p4().Eta()
         sublead_WpJet_phi_all[0] = sublead_promptjet.p4().Phi()
         sublead_WpJet_isBTagged_all[0] = int(len(bjet_filter([sublead_promptjet], 'DeepFlv', 'M')[0]))
+        print "sublead W' mass: ", sublead_Wprime_p4.M()
     else:
         sublead_Wprime_m_all[0] = -100.
         sublead_Wprime_mt_all[0] = -100.
@@ -1364,6 +1393,7 @@ for i in xrange(0,tree.GetEntries()):
         best_topW_jets_pt[0] = (best_jet_p4 + best_promptjet.p4()).Pt()
         best_topW_jets_deltaR[0] = deltaR(best_jet_p4.Eta(), best_jet_p4.Phi(), best_promptjet.p4().Eta(), best_promptjet.p4().Phi())
         best_topW_jets_deltaphi[0] = deltaPhi(best_jet_p4.Phi(), best_promptjet.p4().Phi())
+        print "best W' mass: ", best_Wprime_p4.M()
     else:
         best_Wprime_m_all[0] = -100.
         best_Wprime_mt_all[0] = -100.
