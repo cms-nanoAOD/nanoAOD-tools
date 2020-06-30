@@ -1134,25 +1134,33 @@ for i in xrange(0,tree.GetEntries()):
     #best jet reconstruction                                                           
     best_recotop_p4 = None
     IsNeg_best = None
-    if sublead_jet_p4_pre == closest_jet_p4_pre:
-        best_jet_p4 = copy.deepcopy(sublead_jet_p4)
-        best_jet = sublead_jet
-        best_promptjet = sublead_promptjet
+    if chi_jet_p4_pre == closest_jet_p4_pre:
+        print "\tchi == closest"
+        best_jet_p4 = copy.deepcopy(chi_jet_p4)
+        best_jet = chi_jet
+        best_promptjet = chi_promptjet
+        best_recotop_p4 = chi_recotop_p4
     elif sublead_jet_p4_pre == chi_jet_p4_pre:
+        print "\tchi == sublead"
+        best_jet_p4 = copy.deepcopy(chi_jet_p4)
+        best_jet = chi_jet
+        best_promptjet = chi_promptjet
+        best_recotop_p4 = chi_recotop_p4
+    elif sublead_jet_p4_pre == closest_jet_p4_pre:
+        print "\tsublead == closest"
         best_jet_p4 = copy.deepcopy(sublead_jet_p4)
         best_jet = sublead_jet
         best_promptjet = sublead_promptjet
-    elif chi_jet_p4_pre == closest_jet_p4_pre:
-        best_jet_p4 = copy.deepcopy(chi_jet_p4)
-        best_jet = chi_jet
-        best_promptjet = chi_promptjet
+        best_recotop_p4 = sublead_recotop_p4
     else:
+        print "\tchi != closest != sublead"
         best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
+        best_recotop_p4 = chi_recotop_p4
         
     print "recoing best_top"
-    best_recotop_p4, IsNeg_best, best_dR_lepjet = recotop.top4Momentum(tightlep_p4, best_jet_p4, MET['metPx'], MET['metPy'])
+    #best_recotop_p4, IsNeg_best, best_dR_lepjet = recotop.top4Momentum(tightlep_p4, best_jet_p4, MET['metPx'], MET['metPy'])
     #print type(best_recotop_p4)
     #print best_recotop_p4.M()
     IsNeg_best = IsNeg_best * DeltaFilter
