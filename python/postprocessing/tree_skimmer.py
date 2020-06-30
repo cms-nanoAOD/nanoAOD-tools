@@ -571,6 +571,8 @@ if(isMC):
 
 print "Total number of events: ", tree.GetEntries()
 
+neutrino_failed = 0
+
 #++++++++++++++++++++++++++++++++++
 #++   looping over the events    ++
 #++++++++++++++++++++++++++++++++++
@@ -579,9 +581,20 @@ for i in xrange(0,tree.GetEntries()):
     #++++++++++++++++++++++++++++++++++
     #++        taking objects        ++
     #++++++++++++++++++++++++++++++++++
+<<<<<<< HEAD
     if Debug and i > 1000:
+=======
+
+    '''
+    if Debug:
+        print "evento n. " + str(i)
+
+    '''
+    if Debug and i > 50000:
+>>>>>>> 2efc55deeb57f172ffedf985ef89d030a0d3682b
         break
-        
+    
+
     if i%5000 == 0:
         print "Event #", i+1, " out of ", tree.GetEntries()
 
@@ -705,10 +718,16 @@ for i in xrange(0,tree.GetEntries()):
         #print('Event %i not a good' %(i))
         continue
 
+<<<<<<< HEAD
+=======
+    #print "lep passed"
+
+>>>>>>> 2efc55deeb57f172ffedf985ef89d030a0d3682b
     recotop = TopUtilities()
     #veto on events with "pathological" reco neutrino
     tent_neutrino = recotop.NuMomentum(tightlep_p4.Px(), tightlep_p4.Py(), tightlep_p4.Pz(), tightlep_p4.Pt(), tightlep_p4.E(), MET['metPx'], MET['metPy'])
     if tent_neutrino[0] is None:
+        neutrino_failed += 1
         continue
 
     #print "neutrino test passed"
@@ -1339,6 +1358,8 @@ for i in xrange(0,tree.GetEntries()):
         
     systTree.setWeightName("w_nominal",copy.deepcopy(w_nominal_all[0]))
     systTree.fillTreesSysts(trees, "all")
+
+print "Event with neutrino failed: ", neutrino_failed, " out of ", tree.GetEntries()
 
 #trees[0].Print()
 outTreeFile.cd()

@@ -19,7 +19,7 @@ parser.add_option('-L', '--lep', dest='lep', type='string', default = 'muon', he
 parser.add_option('-S', '--syst', dest='syst', type='string', default = 'all', help='Default all systematics added')
 parser.add_option('-C', '--cut', dest='cut', type='string', default = 'lepton_eta>-10.', help='Default no cut')
 parser.add_option('-y', '--year', dest='year', type='string', default = 'all', help='Default 2016, 2017 and 2018 are included')
-parser.add_option('-f', '--folder', dest='folder', type='string', default = 'vttstudy', help='Default folder is v0')
+parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v1', help='Default folder is v0')
 #parser.add_option('-T', '--topol', dest='topol', type='string', default = 'all', help='Default all njmt')
 parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', help="")
 (opt, args) = parser.parse_args()
@@ -154,6 +154,7 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      f1.Close()
 
 def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
+     os.system('set LD_PRELOAD=libtcmalloc.so')
      histo = []
      tmp = ROOT.TH1F()
      h = ROOT.TH1F()
@@ -251,7 +252,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      pad1.cd()
 
      maximum = max(stack.GetMaximum(),hdata.GetMaximum())
-     logscale = True # False #
+     logscale = False # True #
      if(logscale):
           pad1.SetLogy()
           stack.SetMaximum(maximum*1000)
@@ -426,7 +427,10 @@ if opt.cut == "lepton_eta>-10." and not opt.sel:
 else:
      if opt.sel:
           cut_dict = {'muon':"lepton_pt>125&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 'electron':"MET_pt>125&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut}
-          cut_tag = 'selection_AND_' + cutToTag(opt.cut) 
+          if opt.cut != "lepton_eta>-10.":
+               cut_tag = 'selection_AND_' + cutToTag(opt.cut) 
+          else:
+               cut_tag = 'selection' 
      else:
           cut_dict = {'muon':cut, 'electron':cut}
           cut_tag = cutToTag(opt.cut)
@@ -456,7 +460,6 @@ for year in years:
           wzero = 'w_nominal'
           cut = cut_dict[lep]
           #variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 1200))
-          '''
           variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
           variables.append(variabile('lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
@@ -468,10 +471,38 @@ for year in years:
           variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', 100, 0, 1000))
           variables.append(variabile('Event_HT', 'event HT [GeV]', wzero+'*('+cut+')', 70, 0, 1400))
           variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
-          variables.append(variabile('best_RecoTop_pt', 'top p_{T} [GeV]',  wzero+'*(best_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
-          variables.append(variabile('best_RecoTop_eta', 'top #eta', wzero+'*(best_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
-          variables.append(variabile('best_RecoTop_phi', 'top #phi',  wzero+'*(best_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
-          variables.append(variabile('best_RecoTop_m', 'top mass [GeV]',  wzero+'*(best_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          variables.append(variabile('best_RecoTop_pt', 'top p_{T} [GeV] (best)',  wzero+'*(best_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('best_RecoTop_eta', 'top #eta (best)', wzero+'*(best_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('best_RecoTop_phi', 'top #phi (best)',  wzero+'*(best_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('best_RecoTop_m', 'top mass [GeV] (best)',  wzero+'*(best_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          variables.append(variabile('chi_RecoTop_pt', 'top p_{T} [GeV] (chimass)',  wzero+'*(chi_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('chi_RecoTop_eta', 'top #eta (chimass)', wzero+'*(chi_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('chi_RecoTop_phi', 'top #phi (chimass)',  wzero+'*(chi_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('chi_RecoTop_m', 'top mass [GeV] (chimass)',  wzero+'*(chi_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          variables.append(variabile('closest_RecoTop_pt', 'top p_{T} [GeV] (closest)',  wzero+'*(closest_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('closest_RecoTop_eta', 'top #eta (closest)', wzero+'*(closest_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('closest_RecoTop_phi', 'top #phi (closest)',  wzero+'*(closest_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('closest_RecoTop_m', 'top mass [GeV] (closest)',  wzero+'*(closest_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          variables.append(variabile('sublead_RecoTop_pt', 'top p_{T} [GeV] (sublead)',  wzero+'*(sublead_RecoTop_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('sublead_RecoTop_eta', 'top #eta (sublead)', wzero+'*(sublead_RecoTop_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('sublead_RecoTop_phi', 'top #phi (sublead)',  wzero+'*(sublead_RecoTop_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('sublead_RecoTop_m', 'top mass [GeV] (sublead)',  wzero+'*(sublead_RecoTop_m>0&&'+cut+')',  392, 80, 4000))
+          variables.append(variabile('chi_Wprime_pt', 'Wprime p_{T} [GeV] (chimass)',  wzero+'*(chi_Wprime_pt>0&&'+cut+')', 350, 0, 4200))
+          variables.append(variabile('chi_Wprime_eta', 'Wprime #eta (chimass)', wzero+'*(chi_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('chi_Wprime_phi', 'Wprime #phi (chimass)',  wzero+'*(chi_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('chi_Wprime_m', 'Wprime mass [GeV] (chimass)',  wzero+'*(chi_Wprime_m>0&&'+cut+')',  250, 80, 6000))
+          variables.append(variabile('best_Wprime_pt', 'Wprime p_{T} [GeV] (best)',  wzero+'*(best_Wprime_pt>0&&'+cut+')', 350, 0, 4200))
+          variables.append(variabile('best_Wprime_eta', 'Wprime #eta (best)', wzero+'*(best_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('best_Wprime_phi', 'Wprime #phi (best)',  wzero+'*(best_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  250, 80, 6000))
+          variables.append(variabile('closest_Wprime_pt', 'Wprime p_{T} [GeV] (closest)',  wzero+'*(closest_Wprime_pt>0&&'+cut+')', 350, 0, 4200))
+          variables.append(variabile('closest_Wprime_eta', 'Wprime #eta (closest)', wzero+'*(closest_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('closest_Wprime_phi', 'Wprime #phi (closest)',  wzero+'*(closest_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('closest_Wprime_m', 'Wprime mass [GeV] (closest)',  wzero+'*(closest_Wprime_m>0&&'+cut+')',  250, 80, 6000))
+          variables.append(variabile('sublead_Wprime_pt', 'Wprime p_{T} [GeV] (sublead)',  wzero+'*(sublead_Wprime_pt>0&&'+cut+')', 350, 0, 4200))
+          variables.append(variabile('sublead_Wprime_eta', 'Wprime #eta (sublead)', wzero+'*(sublead_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('sublead_Wprime_phi', 'Wprime #phi (sublead)',  wzero+'*(sublead_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('sublead_Wprime_m', 'Wprime mass [GeV] (sublead)',  wzero+'*(sublead_Wprime_m>0&&'+cut+')',  250, 80, 6000))
           #variables.append(variabile('sublead_TopJet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 1200))
           #variables.append(variabile('sublead_TopJet_eta', 'sub leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
           #variables.append(variabile('sublead_WpJet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
@@ -508,12 +539,18 @@ for year in years:
           variables.append(variabile('deltaR_besttopAK4_closestAK8', '#DeltaR (best)top AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
           variables.append(variabile('ptrel_bestWAK4_closestAK8', 'pt rel (best)W\' AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
           variables.append(variabile('deltaR_bestWAK4_closestAK8', '#DeltaR (best)W\' AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
-          variables.append(variabile('topW_jets_pt', 'jets (t+W\') p_{T} [GeV]',  wzero+'*('+cut+')', 150, 0, 1500))
-          variables.append(variabile('topW_jets_deltaR', '#DeltaR jets (t+W\')',  wzero+'*('+cut+')', 50, 0, 5))
-          variables.append(variabile('topW_jets_deltaPhi', '#Delta #phi jets (t+W\')',  wzero+'*('+cut+')', 20, -3.14, 3.14))
-          '''
-          variables.append(variabile('nlep', 'no of lepton (LHE level)',  wzero+'*('+cut+')', 3, -0.5, 2.5))
-
+          variables.append(variabile('best_topW_jets_pt', 'jets (t+W\') p_{T} [GeV] (best)',  wzero+'*('+cut+')', 150, 0, 1500))
+          #variables.append(variabile('best_topW_jets_deltaR', '#DeltaR jets (t+W\') (best)',  wzero+'*('+cut+')', 50, 0, 5))
+          #variables.append(variabile('best_topW_jets_deltaPhi', '#Delta #phi jets (t+W\') (best)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+          #variables.append(variabile('ptrel_chitopAK4_closestAK8', 'pt rel (chi)top AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          #variables.append(variabile('deltaR_chitopAK4_closestAK8', '#DeltaR (chi)top AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          #variables.append(variabile('ptrel_chiWAK4_closestAK8', 'pt rel (chi)W\' AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          #variables.append(variabile('deltaR_chiWAK4_closestAK8', '#DeltaR (chi)W\' AK4 closest AK8',  wzero+'*('+cut+')', 50, 0, 5))
+          #variables.append(variabile('chi_topW_jets_pt', 'jets (t+W\') p_{T} [GeV] (chi)',  wzero+'*('+cut+')', 150, 0, 1500))
+          #variables.append(variabile('chi_topW_jets_deltaR', '#DeltaR jets (t+W\') (chi)',  wzero+'*('+cut+')', 50, 0, 5))
+          #variables.append(variabile('chi_topW_jets_deltaPhi', '#Delta #phi jets (t+W\') (chi)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+          #variables.append(variabile('nPV_good', 'n good PV', wzero+'*('+cut+')', 120, 0, 120))
+          #variables.append(variabile('nPV_tot', 'total n PV', wzero+'*('+cut+')', 120, 0, 120))
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
@@ -521,11 +558,3 @@ for year in years:
           if(opt.stack):
                for var in variables:
                     makestack(lep, 'jets', var, dataset_new, cut_tag, "", lumi[str(year)])
-#if hasattr(dataset_dict[str(year)], 'components'): # How to check whether this exists or not
-#     samples = [sample for sample in dataset.components]# Method exists and was used.
-#else:
-#     print "You are launching a single sample and not an entire bunch of samples"
-#     samples.append(dataset)
-
-#lumi_mu = {'2016': 36.47, '2017':  41.54,'2018':  59.96}
-#lumi_ele = {'2016': 36.47, '2017':  36.75,'2018':  59.96}
