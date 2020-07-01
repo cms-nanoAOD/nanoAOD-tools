@@ -551,7 +551,7 @@ class TopUtilities():
         if delta < 0:
             IsNegative = True
         
-        if delta >= 0:
+        if True:#delta >= 0:
           root = cmath.sqrt((a2-b))
           pz = []
 
@@ -576,7 +576,7 @@ class TopUtilities():
           return neutrino, IsNegative
         
         
-        elif delta < 0:
+        elif False:#delta < 0:
           #print "negative delta"
           EquationCoeff1 = [1,
                             (-3 * leptonPy * mW / leptonPt),
