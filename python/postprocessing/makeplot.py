@@ -566,7 +566,7 @@ for year in years:
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
-                         plot(lep, 'jets', var, sample, cut_tag[lep], "")
+                         plot(lep, 'jets', var, sample, cut_tag, "")
           if(opt.stack):
                for var in variables:
-                    makestack(lep, 'jets', var, dataset_new, cut_tag[lep], "", lumi[str(year)])
+                    makestack(lep, 'jets', var, dataset_new, cut_tag, "", lumi[str(year)])
