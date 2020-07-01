@@ -481,7 +481,7 @@ def EqSolv(a1, a2, a3, a4):
         r = (9.*a*b*c - 27.*a*a*d - 2.*b**3.)/(54.*a**3.)
         Delta = q**3. + r**2.
     
-        if Delta <= 0: #da testare
+        if Delta <= 0:
             rho = (-(q**(3)))**(0.5)
             theta = math.acos(r/rho)
             s = cmath.rect((-q)**(0.5), theta/3.0)
