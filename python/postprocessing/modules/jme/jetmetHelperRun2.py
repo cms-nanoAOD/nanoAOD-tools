@@ -100,7 +100,11 @@ def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total
 
     if 'AK4' in jetType:
       if isMC:
+<<<<<<< HEAD
           jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType=jetType, metBranchName=met_, applySmearing=applySmearing, applyHEMfix=applyHEMfix, splitJER=splitJER)
+=======
+          jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear,                      globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType = jetType, metBranchName=met_, applySmearing = applySmearing, useT1SmearMETforUncs=useT1SmearMETforUncs)
+>>>>>>> Add a flag to choose between T1 or T1Smear MET uncertainty calculation
       else:
           jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, archive=archiveTag_, globalTag=jecTag_, jesUncertainties=jmeUncert_, jerTag=jerTag_, jetType=jetType, metBranchName=met_, isData=True)
     # no MET variations calculated
