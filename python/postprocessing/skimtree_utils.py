@@ -475,12 +475,12 @@ def EqSolv(a1, a2, a3, a4):
         c = a3
         d = a4
         result = []
-   
+    #print " a = %f, b = %f, c = %f, d = %f " %(a, b, c, d)
     if a != 0.:
         q = (3.*a*c - b*b)/(9.*a*a)
         r = (9.*a*b*c - 27.*a*a*d - 2.*b**3.)/(54.*a**3.)
         Delta = q**3. + r**2.
-    
+        #print " q = %f, r = %f, Delta = %f " %(q, r, Delta)
         if Delta <= 0: #da testare
             rho = (-(q**(3)))**(0.5)
             theta = math.acos(r/rho)
@@ -498,7 +498,7 @@ def EqSolv(a1, a2, a3, a4):
         x1 = s + t + complex(-rpar, 0)
         x2 = (s+t)*complex(-0.5, 0) - complex(rpar, 0) + (s-t)*(1j)*complex((3.**(0.5))/2., 0)
         x3 = (s+t)*complex(-0.5, 0) - complex(rpar, 0) - (s-t)*(1j)*complex((3.**(0.5))/2., 0)
-
+        #print "  x1 = " + str(x1) + ", x2 = " + str(x2) + ", x3 =  " + str(x3)
         if abs(x1.imag)<0.0001:
             if type(a1)==dict:
                 result.update({'x1': x1.real})
@@ -514,11 +514,11 @@ def EqSolv(a1, a2, a3, a4):
                 result.update({'x3': x3.real})
             else:
                 result.append(x3.real)            
-        return result
     else:
         print 'p1'
         result = None
-        return result
+    #print result
+    return result
 
 class TopUtilities():
     def __init__(self):
@@ -526,123 +526,132 @@ class TopUtilities():
             print'ok'
 
     def NuMomentum(self,  leptonPx, leptonPy, leptonPz, leptonPt, leptonE, metPx, metPy):
-        mW = 80.379
-        #print "\tutils NuMomentum: lPx=", leptonPx, " lPy=", leptonPy, " lPz", leptonPz, " lPt", leptonPt, " lE=", leptonE, " METPx=", metPx, " METPy=", metPy
-        MisET2 = (metPx**2. + metPy**2.)
-        mu = (mW**2.)/2. + metPx*leptonPx + metPy*leptonPy
+      mW = 80.379
+      #print "\tutils NuMomentum: lPx=", leptonPx, " lPy=", leptonPy, " lPz", leptonPz, " lPt", leptonPt, " lE=", leptonE, " METPx=", metPx, " METPy=", metPy
+      MisET2 = (metPx**2. + metPy**2.)
+      mu = (mW**2.)/2. + metPx*leptonPx + metPy*leptonPy # this is the lambda factor
+      a = mu*leptonPz/leptonPt**2
+      a2 = a**2.
+      b = (leptonE**2.*MisET2 - mu**2.)/leptonPt**2
+      #print "+++++++++++++++++++++ MET2 is %f, mu is %f" %(MisET2, mu)
+      #print "+++++++++++++++++++++ a is %f, a2 is %f and b is %f "%(a, a2, b)
+      IsNegative = False
+      
+      p4nu_rec = None#ROOT.TLorentzVector()
+      p4W_rec = ROOT.TLorentzVector()
+      p4b_rec = ROOT.TLorentzVector()
+      p4Top_rec = ROOT.TLorentzVector()
+      p4lep_rec = ROOT.TLorentzVector()
+      neutrino = None#ROOT.TLorentzVector()
+      
+      p4lep_rec.SetPxPyPzE(leptonPx, leptonPy, leptonPz, leptonE)
+      p40_rec = ROOT.TLorentzVector(0.0, 0.0, 0.0, 0.0)
+      
+      delta = a2 - b
+      #print "+++++++++++++++++++++ delta is %f" %delta
+
+      if delta >= 0:
+        root = cmath.sqrt((a2-b))
+        pzs = []
+        pzs.append((a + root).real)
+        pzs.append((a - root).real)
+        chi2w = 100000000.**2.
         
-        a = mu*leptonPz/leptonPt**2
-        a2 = a**2.
-        b = (leptonE**2.*MisET2 - mu**2.)/leptonPt**2
-        
-        IsNegative = False
-
-        p4nu_rec = None#ROOT.TLorentzVector()
-        p4W_rec = ROOT.TLorentzVector()
-        p4b_rec = ROOT.TLorentzVector()
-        p4Top_rec = ROOT.TLorentzVector()
-        p4lep_rec = ROOT.TLorentzVector()
-        neutrino = None#ROOT.TLorentzVector()
-        
-        p4lep_rec.SetPxPyPzE(leptonPx, leptonPy, leptonPz, leptonE)
-        p40_rec = ROOT.TLorentzVector(0.0, 0.0, 0.0, 0.0)
-
-        delta = a2 - b
-        if delta < 0:
-            IsNegative = True
-        
-        if delta >= 0:
-          root = cmath.sqrt((a2-b))
-          pz = []
-
-          pz.append((a + root).real)
-          pz.append((a - root).real)
-
-          nNuSol = 2
-          chi2w = 100000000.**2.
-
-          for i in range(nNuSol):
-            Enu = TMath.Power((MisET2 + pz[i]**2), 0.5)
-            #Enu = TMath.Power((MisET2 + pznu**2), 0.5)
-            p4nu = ROOT.TLorentzVector()
-            p4nu.SetPxPyPzE(metPx, metPy, pz[i], Enu)
-            #p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
-            p4W = p4nu + p4lep_rec
-            if Chi_W(p4W.M()) < chi2w:
-              chi2w = Chi_W(p4W.M())
-              p4nu_rec = copy.deepcopy(p4nu)
-         
-          neutrino = copy.deepcopy(p4nu_rec)
-          return neutrino, IsNegative
-        
-        
-        elif delta < 0:
-          #print "negative delta"
-          EquationCoeff1 = [1,
-                            (-3 * leptonPy * mW / leptonPt),
-                            (((mW**2.) * (2. * leptonPy**2.) / (leptonPt**2)) + mW**2. - (4. * leptonPx**3. * metPx / leptonPt**2) - (4. * leptonPx**2. * leptonPy * metPy / leptonPt**2)),
-                            ((4. * leptonPx**2. * mW * metPy / leptonPt) - leptonPy * mW**3. / leptonPt)
-          ]
-
-          EquationCoeff2 = copy.deepcopy(EquationCoeff1)
-          EquationCoeff2[1] = - EquationCoeff2[1]
-          EquationCoeff2[3] = - EquationCoeff2[3]
-          #solutions1 = EquationSolver.EqSolv(EquationCoeff1,'','','')
-          #solutions2 = EquationSolver.EqSolv(EquationCoeff2,'','','')
-
-          solutions = [EqSolv(EquationCoeff1,'','',''), EqSolv(EquationCoeff2,'','','')]
-
-          deltaMin = 14000000.**2.
-          zeroValue = - mW**2./(4.*leptonPx)
-          minPx = 0.
-          minPy = 0.
-
-          ncoeff = ['x1', 'x2', 'x3']
-
-          for j in range(2):
-            for value in solutions[j]:
-              if value < 0.:
-                continue
-              p_x = (value**2. - mW**2.) / (4.*leptonPx)
-              p_y = ((mW**2.)*leptonPy + 2.*leptonPx*leptonPy*p_x - mW*leptonPt*value) / (2*leptonPx**2.)
-              Delta2 = (p_x - metPx)**2. + (p_y - metPy)**2.
-              if Delta2 < deltaMin and Delta2 > 0:
-                deltaMin = copy.deepcopy(Delta2)
-                minPx = copy.deepcopy(p_x)
-                minPy = copy.deepcopy(p_y)
-
-          pyZeroValue = mW**2.*leptonPx + 2.*leptonPy*zeroValue
-          delta2ZeroValue = (zeroValue - metPx)**2. + (pyZeroValue - metPy)**2.
-
-          if deltaMin == 14000000.**2. :
-            #neutrino = copy.deepcopy(p4nu_rec)
-            #print "\tDelta2 too high!"
-            neutrino = None
-            #print "problem with neutrino reco!"
-            return neutrino, IsNegative
-
-          if delta2ZeroValue < deltaMin :
-            #print "\tDelta2 not so high!"
-            deltaMin = copy.deepcopy(delta2ZeroValue)
-            minPx = copy.deepcopy(zeroValue)
-            minPy = copy.deepcopy(pyZeroValue)
-
-          if not abs(leptonE) == abs(leptonPz):
-            #print "\tleptonE != leptonPz"
-            mu_Minimum = mW**2./2. + minPx*leptonPx*minPy*leptonPy
-            a_Minimum = (mu_Minimum*leptonPz) / (leptonE**2. - leptonPz**2.)
-            pznu = a_Minimum
-            Enu = TMath.Power((minPx**2. + minPy**2. + pznu**2.), 0.5)
-            p4nu = ROOT.TLorentzVector()
-            p4nu.SetPxPyPzE(minPx, minPy, pznu, Enu)
+        for pz in pzs:
+          Enu = TMath.Power((MisET2 + pz**2), 0.5)
+          #Enu = TMath.Power((MisET2 + pznu**2), 0.5)
+          p4nu = ROOT.TLorentzVector()
+          p4nu.SetPxPyPzE(metPx, metPy, pz, Enu)
+          #p4nu_rec.SetPxPyPzE(metPx, metPy, pznu, Enu)
+          p4W = p4nu + p4lep_rec
+          if Chi_W(p4W.M()) < chi2w:
+            chi2w = Chi_W(p4W.M())
             p4nu_rec = copy.deepcopy(p4nu)
-            neutrino = copy.deepcopy(p4nu_rec)
-            #p4nu.SetPxPyPzE(minPx, minPy, pznu, Enu)
-          else:
-            #print "\tleptonE == leptonPz"
-            neutrino = None#copy.deepcopy(p4nu_rec)
+          
+        neutrino = copy.deepcopy(p4nu_rec)
         
+      elif delta < 0:
+        IsNegative = True
+        #print "negative delta"
+        EquationCoeff1 = [1,
+                          (-3 * leptonPy * mW / leptonPt),
+                          (((mW**2.) * (2. * leptonPy**2.) / (leptonPt**2)) + mW**2. - (4. * leptonPx**3. * metPx / leptonPt**2) - (4. * leptonPx**2. * leptonPy * metPy / leptonPt**2)),
+                          ((4. * leptonPx**2. * mW * metPy / leptonPt) - leptonPy * mW**3. / leptonPt)
+                        ]
+
+        EquationCoeff2 = copy.deepcopy(EquationCoeff1)
+        EquationCoeff2[1] = - EquationCoeff2[1]
+        EquationCoeff2[3] = - EquationCoeff2[3]
+        #solutions1 = EquationSolver.EqSolv(EquationCoeff1,'','','')
+        #solutions2 = EquationSolver.EqSolv(EquationCoeff2,'','','')
+        #print " EquationCoeff1 is " + str(EquationCoeff1) + " and EquationCoeff2 is " + str(EquationCoeff2)
+        solutions = [EqSolv(EquationCoeff1,'','',''), EqSolv(EquationCoeff2,'','','')]
+        #print str(solutions)
+        deltaMin = 14000.**2.
+        zeroValue = - mW**2./(4.*leptonPx)
+        minPx = 0.
+        minPy = 0.
+
+        ncoeff = ['x1', 'x2', 'x3']
+        
+        for j in range(2):
+          for value in solutions[j]:
+            if value < 0.:
+              continue
+            #usePxPlusSolutions_
+            p_x = (value**2. - mW**2.) / (4.*leptonPx)
+            p_y = ((mW**2.)*leptonPy + 2.*leptonPx*leptonPy*p_x - mW*leptonPt*value) / (2*leptonPx**2.)
+            Delta2 = (p_x - metPx)**2. + (p_y - metPy)**2.
+            if Delta2 < deltaMin and Delta2 > 0:
+              deltaMin = copy.deepcopy(Delta2)
+              minPx = copy.deepcopy(p_x)
+              minPy = copy.deepcopy(p_y)
+
+            #usePxMinusSolutions_
+            p_x = (value**2. - mW**2.) / (4.*leptonPx)
+            p_y = ((mW**2.)*leptonPy + 2.*leptonPx*leptonPy*p_x + mW*leptonPt*value) / (2*leptonPx**2.)
+            Delta2 = (p_x - metPx)**2. + (p_y - metPy)**2.
+            #print "p_x = %f, p_y = %f, Delta2 = %f" %(p_x, p_y, Delta2)
+            if Delta2 < deltaMin and Delta2 > 0:
+              deltaMin = copy.deepcopy(Delta2)
+              minPx = copy.deepcopy(p_x)
+              minPy = copy.deepcopy(p_y)
+            #print "minp_x = %f, minp_y = %f, Delta2 = %f" %(minPx, minPy, Delta2)
+        pyZeroValue = mW**2.*leptonPx + 2.*leptonPx*leptonPy*zeroValue
+        delta2ZeroValue = (zeroValue - metPx)**2. + (pyZeroValue - metPy)**2.
+
+        #print "minp_x = %f, minp_y = %f, Deltamin = %f" %(minPx, minPy, deltaMin)
+        #print " pyZeroValue = %f and delta2ZeroValue %f "%(pyZeroValue, delta2ZeroValue)
+        if deltaMin == 14000000.**2. :
+          #neutrino = copy.deepcopy(p4nu_rec)
+          #print "\tDelta2 too high!"
+          neutrino = None
+          #print "problem with neutrino reco!"
           return neutrino, IsNegative
+          
+        elif delta2ZeroValue < deltaMin :
+              #print "\tDelta2 not so high!"
+              deltaMin = copy.deepcopy(delta2ZeroValue)
+              minPx = copy.deepcopy(zeroValue)
+              minPy = copy.deepcopy(pyZeroValue)
+
+        if not abs(leptonE) == abs(leptonPz):
+          #print "\tleptonE != leptonPz"
+          mu_Minimum = mW**2./2. + minPx*leptonPx + minPy*leptonPy
+          a_Minimum = (mu_Minimum*leptonPz) / (leptonE**2. - leptonPz**2.)
+          pznu = a_Minimum
+          Enu = TMath.Power((minPx**2. + minPy**2. + pznu**2.), 0.5)
+          p4nu = ROOT.TLorentzVector()
+          #print " mu_Minimum = %f, a_Minimum = %f, pznu = %f, Enu= %f" %(mu_Minimum, a_Minimum, pznu, Enu )
+          p4nu.SetPxPyPzE(minPx, minPy, pznu, Enu)
+          p4nu_rec = copy.deepcopy(p4nu)
+          neutrino = copy.deepcopy(p4nu_rec)
+          #p4nu.SetPxPyPzE(minPx, minPy, pznu, Enu)
+        else:
+          #print "\tleptonE == leptonPz"
+          neutrino = None#copy.deepcopy(p4nu_rec)
+      #print " ********************* neutrino 4-momentum is (%f,%f,%f,%f) " %(neutrino.Pt(), neutrino.Eta(), neutrino.Phi(), neutrino.E())
+      return neutrino, IsNegative
 
     def top4Momentum(self, lepton, jet, metPx, metPy):
         #topMt = self.topMtw(lepton, jet, metPx, metPy)
@@ -655,7 +664,7 @@ class TopUtilities():
         dR_lepjet = None
         dR_lepjet = deltaR(jet.Eta(), jet.Phi(), lepton.Eta(), lepton.Phi())
         #print "lepton inside top4momentum(begin) is (%f,%f,%f,%f) " %(lepton.Pt(),lepton.Eta(),lepton.Phi(),lepton.Energy())
-        neutrino, IsNeg  = self.NuMomentum(lepton.Px(), lepton.Py(), lepton.Pz(), lepton.Pt(), lepton.Energy(), metPx, metPy)
+        neutrino, IsNeg = self.NuMomentum(lepton.Px(), lepton.Py(), lepton.Pz(), lepton.Pt(), lepton.E(), metPx, metPy)
         besttop = None
         #recochi = []
         rtop = ROOT.TLorentzVector()

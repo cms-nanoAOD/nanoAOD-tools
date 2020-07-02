@@ -358,6 +358,46 @@ best_topW_jets_deltaphi = array.array('f', [0.])
 chi_topW_jets_pt = array.array('f', [0.])
 chi_topW_jets_deltaR = array.array('f', [0.])
 chi_topW_jets_deltaphi = array.array('f', [0.])
+
+#FatJet
+topAK8_area = array.array('f', [0.])
+topAK8_btag = array.array('f', [0.])
+topAK8_ttagMD = array.array('f', [0.])
+topAK8_ttag = array.array('f', [0.])
+topAK8_eta = array.array('f', [0.])
+topAK8_m = array.array('f', [0.])
+topAK8_mSD = array.array('f', [0.])
+topAK8_phi = array.array('f', [0.])
+topAK8_pt = array.array('f', [0.])
+topAK8_tau1 = array.array('f', [0.])
+topAK8_tau2 = array.array('f', [0.])
+topAK8_tau3 = array.array('f', [0.])
+topAK8_tau4 = array.array('f', [0.])
+
+WprAK8_area = array.array('f', [0.])
+WprAK8_btag = array.array('f', [0.])
+WprAK8_ttagMD = array.array('f', [0.])
+WprAK8_ttag = array.array('f', [0.])
+WprAK8_eta = array.array('f', [0.])
+WprAK8_m = array.array('f', [0.])
+WprAK8_mSD = array.array('f', [0.])
+WprAK8_phi = array.array('f', [0.])
+WprAK8_pt = array.array('f', [0.])
+WprAK8_tau1 = array.array('f', [0.])
+WprAK8_tau2 = array.array('f', [0.])
+WprAK8_tau3 = array.array('f', [0.])
+WprAK8_tau4 = array.array('f', [0.])
+#FatJet_electronIdx3SJ
+#FatJet_genJetAK8Idx
+#FatJet_hadronFlavour
+#FatJet_jetId Int_tJet ID flags bit1 is loose (always false in 2017 since it does not exist), bit2 is tight, bit3 is tightLepVeto
+#FatJet_lsf3 Float_tLepton Subjet Fraction (3 subjets)
+#FatJet_muonIdx3SJ
+#FatJet_n2b1 Float_tN2 with beta=1
+#FatJet_n3b1 Float_tN3 with beta=1
+#FatJet_nBHadrons UChar_tnumber of b-hadrons
+#FatJet_nCHadrons UChar_tnumber of c-hadrons
+
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
@@ -541,6 +581,35 @@ systTree.branchTreesSysts(trees, "all", "chi_topW_jets_pt", outTreeFile, chi_top
 systTree.branchTreesSysts(trees, "all", "chi_topW_jets_deltaR", outTreeFile, chi_topW_jets_deltaR)
 systTree.branchTreesSysts(trees, "all", "chi_topW_jets_deltaPhi", outTreeFile, chi_topW_jets_deltaphi)
 
+#Fat jet
+systTree.branchTreesSysts(trees, "all", "topAK8_area", outTreeFile, topAK8_area)
+systTree.branchTreesSysts(trees, "all", "topAK8_btag", outTreeFile, topAK8_btag)
+systTree.branchTreesSysts(trees, "all", "topAK8_ttagMD", outTreeFile, topAK8_ttagMD)
+systTree.branchTreesSysts(trees, "all", "topAK8_ttag", outTreeFile, topAK8_ttag)
+systTree.branchTreesSysts(trees, "all", "topAK8_eta", outTreeFile, topAK8_eta)
+systTree.branchTreesSysts(trees, "all", "topAK8_m", outTreeFile, topAK8_m)
+systTree.branchTreesSysts(trees, "all", "topAK8_mSD", outTreeFile, topAK8_mSD)
+systTree.branchTreesSysts(trees, "all", "topAK8_phi", outTreeFile, topAK8_phi)
+systTree.branchTreesSysts(trees, "all", "topAK8_pt", outTreeFile, topAK8_pt)
+systTree.branchTreesSysts(trees, "all", "topAK8_tau1", outTreeFile, topAK8_tau1)
+systTree.branchTreesSysts(trees, "all", "topAK8_tau2", outTreeFile, topAK8_tau2)
+systTree.branchTreesSysts(trees, "all", "topAK8_tau3", outTreeFile, topAK8_tau3)
+systTree.branchTreesSysts(trees, "all", "topAK8_tau4", outTreeFile, topAK8_tau4)
+
+systTree.branchTreesSysts(trees, "all", "WprAK8_area", outTreeFile, WprAK8_area)
+systTree.branchTreesSysts(trees, "all", "WprAK8_btag", outTreeFile, WprAK8_btag)
+systTree.branchTreesSysts(trees, "all", "WprAK8_ttagMD", outTreeFile, WprAK8_ttagMD)
+systTree.branchTreesSysts(trees, "all", "WprAK8_ttag", outTreeFile, WprAK8_ttag)
+systTree.branchTreesSysts(trees, "all", "WprAK8_eta", outTreeFile, WprAK8_eta)
+systTree.branchTreesSysts(trees, "all", "WprAK8_m", outTreeFile, WprAK8_m)
+systTree.branchTreesSysts(trees, "all", "WprAK8_mSD", outTreeFile, WprAK8_mSD)
+systTree.branchTreesSysts(trees, "all", "WprAK8_phi", outTreeFile, WprAK8_phi)
+systTree.branchTreesSysts(trees, "all", "WprAK8_pt", outTreeFile, WprAK8_pt)
+systTree.branchTreesSysts(trees, "all", "WprAK8_tau1", outTreeFile, WprAK8_tau1)
+systTree.branchTreesSysts(trees, "all", "WprAK8_tau2", outTreeFile, WprAK8_tau2)
+systTree.branchTreesSysts(trees, "all", "WprAK8_tau3", outTreeFile, WprAK8_tau3)
+systTree.branchTreesSysts(trees, "all", "WprAK8_tau4", outTreeFile, WprAK8_tau4)
+
 if(TriggerStudy):
     systTree.branchTreesSysts(trees, "all", "isdileptonic", outTreeFile, isdileptonic)
     systTree.branchTreesSysts(trees, "all", "muon_pt", outTreeFile, muon_pt)
@@ -603,7 +672,7 @@ for i in xrange(0,tree.GetEntries()):
     if Debug:
         print "evento n. " + str(i)
 
-    if Debug and i > 5000:
+    if Debug and i > 200:
         break
     
     if not Debug and i%5000 == 0:
@@ -732,7 +801,7 @@ for i in xrange(0,tree.GetEntries()):
     recotop = TopUtilities()
     #veto on events with "pathological" reco neutrino
     tent_neutrino = recotop.NuMomentum(tightlep.p4().Px(), tightlep.p4().Py(), tightlep.p4().Pz(), tightlep.p4().Pt(), tightlep.p4().E(), MET['metPx'], MET['metPy'])
-
+    print " <<<<<<<<<<<<<<<<<<<<<<<< lepton is %f " %tightlep.p4().M()
     if tent_neutrino[0] == None:
         neutrino_failed += 1
         continue
@@ -1070,7 +1139,11 @@ for i in xrange(0,tree.GetEntries()):
     chi_recotop_p4t = tightlep_p4t + chi_jet_p4t + recomet_p4t
     chi_promptjet_p4t = copy.deepcopy(chi_promptjet.p4())
     chi_promptjet_p4t.SetPz(0.)
-
+    #print " ================= lep 4-vector is (%f, %f, %f ,%f) " %(tightlep.p4().Pt(), tightlep.p4().Eta(), tightlep.p4().Phi(), tightlep.p4().E() )
+    #print " ================= chi jet 4-vector is (%f, %f, %f ,%f) " %(chi_jet_p4.Pt(), chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_jet_p4.E() )
+    #print " ================= chi top 4-vector is (%f, %f, %f ,%f) " %(chi_recotop_p4.Pt(), chi_recotop_p4.Eta(), chi_recotop_p4.Phi(), chi_recotop_p4.E() )
+    #print " ================= MET vector is (%f, %f) " %(MET['metPx'], MET['metPy'])
+    #print " ================= Chi top mass is %f " %chi_recotop_p4.M() 
     if chi_recotop_p4 != None:
         nrecochi += 1
         chi_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep.p4(), chi_promptjet.p4(), chi_recotop_p4) 
@@ -1165,6 +1238,7 @@ for i in xrange(0,tree.GetEntries()):
         best_recotop_p4 = chi_recotop_p4
         IsNeg_best = IsNeg_chi
         best_dR_lepjet = chi_dR_lepjet
+    print " ================= best top mass is %f " %best_recotop_p4.M() 
 
     IsNeg_best = IsNeg_best * DeltaFilter
     best_jet_p4t = copy.deepcopy(best_jet_p4)
@@ -1175,6 +1249,21 @@ for i in xrange(0,tree.GetEntries()):
     closAK8, dR_besttopAK4AK8 = closest(best_jet, fatjets)
     ptrel_besttopAK4_closestAK8[0] = best_jet.pt/closAK8.pt
     deltaR_besttopAK4_closestAK8[0] = copy.deepcopy(dR_besttopAK4AK8)
+
+    topAK8_area[0] = closAK8.area
+    topAK8_btag[0] = closAK8.btagDeepB
+    topAK8_ttagMD[0] = closAK8.deepTagMD_TvsQCD
+    topAK8_ttag[0] = closAK8.deepTag_TvsQCD
+    topAK8_eta[0] = closAK8.eta
+    topAK8_m[0] = closAK8.mass
+    topAK8_mSD[0] = closAK8.msoftdrop
+    topAK8_phi[0] = closAK8.phi
+    topAK8_pt[0] = closAK8.pt
+    topAK8_tau1[0] = closAK8.tau1
+    topAK8_tau2[0] = closAK8.tau2
+    topAK8_tau3[0] = closAK8.tau3
+    topAK8_tau4[0] = closAK8.tau4
+
     if best_recotop_p4 != None:
         nrecobest += 1
         best_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep.p4(), best_promptjet.p4(), best_recotop_p4) 
@@ -1370,6 +1459,19 @@ for i in xrange(0,tree.GetEntries()):
         best_topW_jets_pt[0] = (best_jet_p4 + best_promptjet.p4()).Pt()
         best_topW_jets_deltaR[0] = deltaR(best_jet_p4.Eta(), best_jet_p4.Phi(), best_promptjet.p4().Eta(), best_promptjet.p4().Phi())
         best_topW_jets_deltaphi[0] = deltaPhi(best_jet_p4.Phi(), best_promptjet.p4().Phi())
+        WprAK8_area[0] = closAK8.area
+        WprAK8_btag[0] = closAK8.btagDeepB
+        WprAK8_ttagMD[0] = closAK8.deepTagMD_TvsQCD
+        WprAK8_ttag[0] = closAK8.deepTag_TvsQCD
+        WprAK8_eta[0] = closAK8.eta
+        WprAK8_m[0] = closAK8.mass
+        WprAK8_mSD[0] = closAK8.msoftdrop
+        WprAK8_phi[0] = closAK8.phi
+        WprAK8_pt[0] = closAK8.pt
+        WprAK8_tau1[0] = closAK8.tau1
+        WprAK8_tau2[0] = closAK8.tau2
+        WprAK8_tau3[0] = closAK8.tau3
+        WprAK8_tau4[0] = closAK8.tau4
         print "best W' mass: ", best_Wprime_p4.M()
     else:
         best_Wprime_m_all[0] = -100.
