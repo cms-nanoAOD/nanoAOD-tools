@@ -404,7 +404,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      for s in samples_:
           infile[s.label].Close()
           infile[s.label].Delete()
-          
+     os.system('set LD_PRELOAD=libtcmalloc.so')
 
 dataset_dict = {'2016':[],'2017':[],'2018':[]}
 if(opt.dat!= 'all'):
@@ -569,4 +569,6 @@ for year in years:
                          plot(lep, 'jets', var, sample, cut_tag, "")
           if(opt.stack):
                for var in variables:
+                    os.system('set LD_PRELOAD=libtcmalloc.so')
                     makestack(lep, 'jets', var, dataset_new, cut_tag, "", lumi[str(year)])
+                    os.system('set LD_PRELOAD=libtcmalloc.so')
