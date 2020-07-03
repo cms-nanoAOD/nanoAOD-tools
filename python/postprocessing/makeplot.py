@@ -254,7 +254,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      pad1.cd()
 
      maximum = max(stack.GetMaximum(),hdata.GetMaximum())
-     logscale = False # True #
+     logscale = True # False #
      if(logscale):
           pad1.SetLogy()
           stack.SetMaximum(maximum*1000)
