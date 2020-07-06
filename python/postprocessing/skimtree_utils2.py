@@ -584,8 +584,6 @@ class TopUtilities():
         EquationCoeff2 = copy.deepcopy(EquationCoeff1)
         EquationCoeff2[1] = - EquationCoeff2[1]
         EquationCoeff2[3] = - EquationCoeff2[3]
-        #solutions1 = EquationSolver.EqSolv(EquationCoeff1,'','','')
-        #solutions2 = EquationSolver.EqSolv(EquationCoeff2,'','','')
         #print " EquationCoeff1 is " + str(EquationCoeff1) + " and EquationCoeff2 is " + str(EquationCoeff2)
         solutions = [EqSolv(EquationCoeff1,'','',''), EqSolv(EquationCoeff2,'','','')]
         #print str(solutions)
@@ -604,6 +602,7 @@ class TopUtilities():
             p_x = (value**2. - mW**2.) / (4.*leptonPx)
             p_y = ((mW**2.)*leptonPy + 2.*leptonPx*leptonPy*p_x - mW*leptonPt*value) / (2*leptonPx**2.)
             Delta2 = (p_x - metPx)**2. + (p_y - metPy)**2.
+            #print "Solutions 1 p_x = %f, p_y = %f, Delta2 = %f" %(p_x, p_y, Delta2)
             if Delta2 < deltaMin and Delta2 > 0:
               deltaMin = copy.deepcopy(Delta2)
               minPx = copy.deepcopy(p_x)
@@ -613,12 +612,12 @@ class TopUtilities():
             p_x = (value**2. - mW**2.) / (4.*leptonPx)
             p_y = ((mW**2.)*leptonPy + 2.*leptonPx*leptonPy*p_x + mW*leptonPt*value) / (2*leptonPx**2.)
             Delta2 = (p_x - metPx)**2. + (p_y - metPy)**2.
-            #print "p_x = %f, p_y = %f, Delta2 = %f" %(p_x, p_y, Delta2)
+            #print "Solutions 2 p_x = %f, p_y = %f, Delta2 = %f" %(p_x, p_y, Delta2)
             if Delta2 < deltaMin and Delta2 > 0:
               deltaMin = copy.deepcopy(Delta2)
               minPx = copy.deepcopy(p_x)
               minPy = copy.deepcopy(p_y)
-            #print "minp_x = %f, minp_y = %f, Delta2 = %f" %(minPx, minPy, Delta2)
+            #print " Used solutions minp_x = %f, minp_y = %f, Delta2 = %f" %(minPx, minPy, deltaMin)
         pyZeroValue = mW**2.*leptonPx + 2.*leptonPx*leptonPy*zeroValue
         delta2ZeroValue = (zeroValue - metPx)**2. + (pyZeroValue - metPy)**2.
 
@@ -688,8 +687,10 @@ class TopUtilities():
         elif isinstance(neutrino, ROOT.TLorentzVector):
           if dR_lepjet > 0.4:
             rtop = lepton + jet + neutrino
+            #print " lepton outside the jet!!!! its mass is %f" %rtop.M()
           else:
             rtop = jet + neutrino
+            #print " lepton inside the jet!!!! its mass is %f" %rtop.M()
           rchi = Chi_TopMass(rtop.M())
           besttop = copy.deepcopy(rtop)
           dR_lepjet_top = copy.deepcopy(dR_lepjet)
