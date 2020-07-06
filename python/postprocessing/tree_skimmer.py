@@ -432,7 +432,7 @@ systTree.branchTreesSysts(trees, "all", "njet_lowpt", outTreeFile, nJet_lowpt_al
 systTree.branchTreesSysts(trees, "all", "njet_pt100", outTreeFile, nJet_pt100_all)
 systTree.branchTreesSysts(trees, "all", "nfatjet", outTreeFile, nfatJet_all)
 systTree.branchTreesSysts(trees, "all", "nbjet_lowpt", outTreeFile, nbJet_lowpt_all)
-systTree.branchTreesSysts(trees, "all", "nbJet_pt100", outTreeFile, nbJet_pt100_all)
+systTree.branchTreesSysts(trees, "all", "nbjet_pt100", outTreeFile, nbJet_pt100_all)
 systTree.branchTreesSysts(trees, "all", "leadingjet_pt", outTreeFile, leadingjet_pt_all)
 systTree.branchTreesSysts(trees, "all", "subleadingjet_pt", outTreeFile, subleadingjet_pt_all)
 systTree.branchTreesSysts(trees, "all", "leadingjets_deltaR", outTreeFile, leadingjets_deltaR)
@@ -875,6 +875,14 @@ for i in xrange(0,tree.GetEntries()):
                 lhe_mu += 1
         nlep_all[0] = lhe_ele + lhe_mu
 
+    # checking the top 4-vector at LHE level 
+    if Debug:
+        for genp in genpart:
+            if(abs(genp.pdgId) == 6):
+                top_q4 = ROOT.TLorentzVector()
+                top_q4.SetPtEtaPhiM(genp.pt, genp.eta, genp.phi, genp.mass)
+                print " top 4-vector at GEN level is (%f, %f, %f, %f) and mass %f "%(genp.pt, genp.eta, genp.phi, top_q4.E(), top_q4.M())
+
     lepMET_deltaPhi_all[0] = deltaPhi(tightlep_p4.Phi(), met.phi)
     mtw_all[0] = math.sqrt(2*tightlep_p4.Pt() * met.pt *(1-math.cos(abs(deltaPhi(tightlep_p4.Phi(), met.phi)))))
 
@@ -896,7 +904,7 @@ for i in xrange(0,tree.GetEntries()):
         bjets_deltaEta[0] = -999.
         bjets_pt[0] = -999.
 
-    #MCtruth event reconstruction                                                      
+    #MCtruth event reconstruction
     if MCReco:
         mcbjets = mcbjet_filter(jets)
         mctfound = False
@@ -916,77 +924,74 @@ for i in xrange(0,tree.GetEntries()):
                     if mclepton.genPartIdx == -1:
                         print 'MCTruth reconstruction not properly working - lepton step'
                         continue
-        if mclepton is None:
-            continue
+        else:
+            mclepton = None
+        if mclepton != None:
+            mctop_p4 = None
+            mctop_p4t = None
+            IsmcNeg = False
+            mcdR_lepjet = None
+            Mcpromptbjet_p4 = None
+            mctopbjet_p4 = None
+            mctopbjet_p4_pre = None
+            mcpromptbjet_p4t = None
+            bjetcheck = True
+            mcbjets = mcbjet_filter(jets)
+            
+            if len(mcbjets)>2:
+                bjetcheck = False
 
-        mctop_p4 = None
-        mctop_p4t = None
-        IsmcNeg = False
-        mcdR_lepjet = None
-        Mcpromptbjet_p4 = None
-        mctopbjet_p4 = None
-        mctopbjet_p4_pre = None
-        mcpromptbjet_p4t = None
-        bjetcheck = True
-        mcbjets = mcbjet_filter(jets)
-        
-        if len(mcbjets)>2:
-            bjetcheck = False
+            mcWprime_p4 = ROOT.TLorentzVector()
+            mcWprime_p4t = ROOT.TLorentzVector()
+            mclepton_p4 = ROOT.TLorentzVector()
+            topgot_ak4 = False
+            Wpgot_ak4 = False
+            mclepton_p4.SetPtEtaPhiM(mclepton.pt, mclepton.eta, mclepton.phi, mclepton.mass)
+            bottjets = sameflav_filter(mcbjets, 5)
+            abottjets = sameflav_filter(mcbjets, -5)
+            
+            for bjet in mcbjets:
+                bjet_p4 = ROOT.TLorentzVector()
+                bjet_p4.SetPtEtaPhiM(bjet.pt, bjet.eta, bjet.phi, bjet.mass)
 
-        mclepton_p4 = ROOT.TLorentzVector()
-        mclepton_p4.SetPtEtaPhiM(mclepton.pt, mclepton.eta, mclepton.phi, mclepton.mass)
+                if abs(bjet.partonFlavour)!=5:
+                    print 'bfilter not properly working'
+                    continue
 
-        mcWprime_p4 = ROOT.TLorentzVector()
-        mcWprime_p4t = ROOT.TLorentzVector()
+                blepflav = genpart[mclepton.genPartIdx].pdgId*bjet.partonFlavour
 
-        topgot_ak4 = False
-        Wpgot_ak4 = False
-
-        bottjets = sameflav_filter(mcbjets, 5)
-        abottjets = sameflav_filter(mcbjets, -5)
-
-        for bjet in mcbjets:
-            bjet_p4 = ROOT.TLorentzVector()
-            bjet_p4.SetPtEtaPhiM(bjet.pt, bjet.eta, bjet.phi, bjet.mass)
-
-            if abs(bjet.partonFlavour)!=5:
-                print 'bfilter not properly working'
-                continue
-
-            blepflav = genpart[mclepton.genPartIdx].pdgId*bjet.partonFlavour
-
-            if bjet.hadronFlavour == 5:
-                if blepflav < 0 and not topgot_ak4:
-                    mctopbjet_p4_pre = copy.deepcopy(bjet_p4)
-                    '''
-                    if deltaR(bjet_p4.Eta(), bjet_p4.Phi(), mclepton_p4.Eta(), mclepton_p4.Phi()) < 0.4:
+                if bjet.hadronFlavour == 5:
+                    if blepflav < 0 and not topgot_ak4:
+                        mctopbjet_p4_pre = copy.deepcopy(bjet_p4)
+                        '''
+                        if deltaR(bjet_p4.Eta(), bjet_p4.Phi(), mclepton_p4.Eta(), mclepton_p4.Phi()) < 0.4:
                         bjet_p4 -= mclepton_p4
-                    '''
-                    mctopbjet_p4 = bjet_p4
-                    mctop_p4, IsmcNeg, mcdR_lepjet = recotop.top4Momentum(mclepton_p4, bjet_p4, MET['metPx'], MET['metPy'])
-                    IsmcNeg = IsmcNeg*DeltaFilter
-
-                    if mctop_p4 is None:
-                        continue
+                        '''
+                        mctopbjet_p4 = bjet_p4
+                        mctop_p4, IsmcNeg, mcdR_lepjet = recotop.top4Momentum(mclepton_p4, bjet_p4, MET['metPx'], MET['metPy'])
+                        IsmcNeg = IsmcNeg*DeltaFilter
+                        print "MC top mass is %f " %mctop_p4.M()
+                        if mctop_p4 is None:
+                            continue
                         
-                    mclepton_p4t = copy.deepcopy(mclepton_p4)
-                    mclepton_p4t.SetPz(0.)
-                    bjet_p4t = copy.deepcopy(bjet_p4)
-                    bjet_p4t.SetPz(0.)
-                    met_p4t = ROOT.TLorentzVector()
-                    met_p4t.SetPtEtaPhiM(met.pt, 0., met.phi, 0)
-                    mctop_p4t = mclepton_p4t + bjet_p4t + met_p4t
-                    if mctop_p4t.Pz() !=0:
-                        mctop_p4t.SetPz(0.)
-                    topgot_ak4 = True
+                        mclepton_p4t = copy.deepcopy(mclepton_p4)
+                        mclepton_p4t.SetPz(0.)
+                        bjet_p4t = copy.deepcopy(bjet_p4)
+                        bjet_p4t.SetPz(0.)
+                        met_p4t = ROOT.TLorentzVector()
+                        met_p4t.SetPtEtaPhiM(met.pt, 0., met.phi, 0)
+                        mctop_p4t = mclepton_p4t + bjet_p4t + met_p4t
+                        if mctop_p4t.Pz() !=0:
+                            mctop_p4t.SetPz(0.)
+                        topgot_ak4 = True
 
-                elif blepflav > 0 and not Wpgot_ak4:
-                    mcpromptbjet_p4 = bjet_p4
-                    mcpromptbjet_p4t = copy.deepcopy(bjet_p4)
-                    mcpromptbjet_p4t.SetPz(0.)
-                    Wpgot_ak4 = True
+                    elif blepflav > 0 and not Wpgot_ak4:
+                        mcpromptbjet_p4 = bjet_p4
+                        mcpromptbjet_p4t = copy.deepcopy(bjet_p4)
+                        mcpromptbjet_p4t.SetPz(0.)
+                        Wpgot_ak4 = True
 
-        if topgot_ak4 and Wpgot_ak4 and tightlep != None:
+        if topgot_ak4 and Wpgot_ak4 and mclepton != None:
             mcWprime_p4 = mctop_p4 + mcpromptbjet_p4
             mcWprime_p4t = mctop_p4t + mcpromptbjet_p4t
             mcChi2_topmass = Chi_TopMass(mctop_p4.M())
@@ -1139,11 +1144,12 @@ for i in xrange(0,tree.GetEntries()):
     chi_recotop_p4t = tightlep_p4t + chi_jet_p4t + recomet_p4t
     chi_promptjet_p4t = copy.deepcopy(chi_promptjet.p4())
     chi_promptjet_p4t.SetPz(0.)
-    #print " ================= lep 4-vector is (%f, %f, %f ,%f) " %(tightlep.p4().Pt(), tightlep.p4().Eta(), tightlep.p4().Phi(), tightlep.p4().E() )
-    #print " ================= chi jet 4-vector is (%f, %f, %f ,%f) " %(chi_jet_p4.Pt(), chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_jet_p4.E() )
-    #print " ================= chi top 4-vector is (%f, %f, %f ,%f) " %(chi_recotop_p4.Pt(), chi_recotop_p4.Eta(), chi_recotop_p4.Phi(), chi_recotop_p4.E() )
-    #print " ================= MET vector is (%f, %f) " %(MET['metPx'], MET['metPy'])
-    #print " ================= Chi top mass is %f " %chi_recotop_p4.M() 
+    print "  Is Neg chi " + str(IsNeg_chi) 
+    print " ================= lep 4-vector is (%f, %f, %f ,%f) " %(tightlep.p4().Pt(), tightlep.p4().Eta(), tightlep.p4().Phi(), tightlep.p4().E() )
+    print " ================= chi jet 4-vector is (%f, %f, %f ,%f) " %(chi_jet_p4.Pt(), chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_jet_p4.E() )
+    print " ================= chi top 4-vector is (%f, %f, %f ,%f) " %(chi_recotop_p4.Pt(), chi_recotop_p4.Eta(), chi_recotop_p4.Phi(), chi_recotop_p4.E() )
+    print " ================= MET vector is (%f, %f) " %(MET['metPx'], MET['metPy'])
+    print " ================= Chi top mass is %f " %chi_recotop_p4.M() 
     if chi_recotop_p4 != None:
         nrecochi += 1
         chi_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep.p4(), chi_promptjet.p4(), chi_recotop_p4) 
