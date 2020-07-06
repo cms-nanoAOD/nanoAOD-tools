@@ -369,11 +369,15 @@ class jetmetUncertaintiesProducer(Module):
             # evaluate JER scale factors and uncertainties
             # (cf. https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution )
             if not self.isData:
-              # Get the smearing factors for T1 MET correction
-              ( jet_pt_jerNomVal_T1, jet_pt_jerUpVal_T1, jet_pt_jerDownVal_T1 ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
+            #   ( jet_pt_jerNomVal_T1, jet_pt_jerUpVal_T1, jet_pt_jerDownVal_T1 ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
               # Get the smearing factors for T1Smear MET correction
-              ( jet_pt_jerNomVal_T1Smear, jet_pt_jerUpVal_T1Smear, jet_pt_jerDownVal_T1Smear ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho, t1Smear=True)
+              ( jet_pt_jerNomVal_T1Smear, jet_pt_jerUpVal_T1Smear, jet_pt_jerDownVal_T1Smear ) = self.jetSmearer.getSmearValsPt(jet, genJet, rho)
               ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = ( jet_pt_jerNomVal_T1Smear, jet_pt_jerUpVal_T1Smear, jet_pt_jerDownVal_T1Smear )
+              # Get the smearing factors for T1 MET correction from the T1Smear smearing factors
+              jet_pt_jerNomVal_T1  = jet_pt_jerNomVal_T1Smear
+              jet_pt_jerUpVal_T1   = jet_pt_jerNomVal_T1
+              jet_pt_jerDownVal_T1 = 2 - jet_pt_jerNomVal_T1
+
             else:
               # if you want to do something with JER in data, please add it here.
               ( jet_pt_jerNomVal, jet_pt_jerUpVal, jet_pt_jerDownVal ) = (1,1,1)
