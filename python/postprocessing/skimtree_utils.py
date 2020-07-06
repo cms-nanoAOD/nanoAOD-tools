@@ -623,7 +623,7 @@ class TopUtilities():
 
         #print "minp_x = %f, minp_y = %f, Deltamin = %f" %(minPx, minPy, deltaMin)
         #print " pyZeroValue = %f and delta2ZeroValue %f "%(pyZeroValue, delta2ZeroValue)
-        if deltaMin == 14000000.**2. :
+        if deltaMin == 14000.**2. :
           #neutrino = copy.deepcopy(p4nu_rec)
           #print "\tDelta2 too high!"
           neutrino = None
