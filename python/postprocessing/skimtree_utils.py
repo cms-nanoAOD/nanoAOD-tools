@@ -480,7 +480,9 @@ def EqSolv(a1, a2, a3, a4):
         q = (3.*a*c - b*b)/(9.*a*a)
         r = (9.*a*b*c - 27.*a*a*d - 2.*b**3.)/(54.*a**3.)
         Delta = q**3. + r**2.
+    
         #print " q = %f, r = %f, Delta = %f " %(q, r, Delta)
+          
         if Delta <= 0: #da testare
             rho = (-(q**(3)))**(0.5)
             theta = math.acos(r/rho)
@@ -976,8 +978,6 @@ class Collection:
 ###############################################
 ###        End of framework/datamodel       ###
 ###############################################
-
-
 
 ###############################################
 ###       Begin of tree_skimmer_utlis       ###
