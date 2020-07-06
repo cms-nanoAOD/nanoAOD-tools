@@ -924,37 +924,9 @@ for i in xrange(0,tree.GetEntries()):
                     if mclepton.genPartIdx == -1:
                         print 'MCTruth reconstruction not properly working - lepton step'
                         continue
-
-        mctop_p4 = None
-        mctop_p4t = None
-        IsmcNeg = False
-        mcdR_lepjet = None
-        Mcpromptbjet_p4 = None
-        mctopbjet_p4 = None
-        mctopbjet_p4_pre = None
-        mcpromptbjet_p4t = None
-        bjetcheck = True
-        mcbjets = mcbjet_filter(jets)
-        
-        if mclepton != None:
-            if len(mcbjets)>2:
-                bjetcheck = False
-
-            mclepton_p4 = ROOT.TLorentzVector()
-            mclepton_p4.SetPtEtaPhiM(mclepton.pt, mclepton.eta, mclepton.phi, mclepton.mass)
-
-            mcWprime_p4 = ROOT.TLorentzVector()
-            mcWprime_p4t = ROOT.TLorentzVector()
-
-            topgot_ak4 = False
-            Wpgot_ak4 = False
-            
-            bottjets = sameflav_filter(mcbjets, 5)
-            abottjets = sameflav_filter(mcbjets, -5)
-
         else:
             mclepton = None
-        
+
         if mclepton != None:
             mctop_p4 = None
             mctop_p4t = None
@@ -1000,7 +972,6 @@ for i in xrange(0,tree.GetEntries()):
                         mctop_p4, IsmcNeg, mcdR_lepjet = recotop.top4Momentum(mclepton_p4, bjet_p4, MET['metPx'], MET['metPy'])
                         IsmcNeg = IsmcNeg*DeltaFilter
                         print "MC top mass is %f " %mctop_p4.M()
-
                         if mctop_p4 is None:
                             continue
                         
@@ -1021,52 +992,52 @@ for i in xrange(0,tree.GetEntries()):
                         mcpromptbjet_p4t.SetPz(0.)
                         Wpgot_ak4 = True
 
-            if topgot_ak4 and Wpgot_ak4 and mclepton != None:
-                mcWprime_p4 = mctop_p4 + mcpromptbjet_p4
-                mcWprime_p4t = mctop_p4t + mcpromptbjet_p4t
-                mcChi2_topmass = Chi_TopMass(mctop_p4.M())
-                MC_Wprime_m_all[0] = mcWprime_p4.M()
-                MC_Wprime_m_all[0] = mcWprime_p4.M()
-                MC_Wprime_mt_all[0] = mcWprime_p4t.M()
-                MC_Wprime_pt_all[0] = mcWprime_p4.Pt()
-                MC_Wprime_eta_all[0] = mcWprime_p4.Eta()
-                MC_Wprime_phi_all[0] = mcWprime_p4.Phi()
-                MC_RecoTop_m_all[0] = mctop_p4.M()
-                MC_RecoTop_mt_all[0] = mctop_p4t.M()
-                MC_RecoTop_pt_all[0] = mctop_p4.Pt()
-                MC_RecoTop_eta_all[0] = mctop_p4.Eta()
-                MC_RecoTop_phi_all[0] = mctop_p4.Phi()
-                MC_RecoTop_isNeg_all[0] = int(IsmcNeg)
-                MC_TopJet_m_all[0] = mctopbjet_p4.M()
-                MC_TopJet_pt_all[0] = mctopbjet_p4.Pt()
-                MC_TopJet_eta_all[0] = mctopbjet_p4.Eta()
-                MC_TopJet_phi_all[0] = mctopbjet_p4.Phi()
-                MC_TopJet_dRLepJet_all[0] = copy.deepcopy(mcdR_lepjet)
-                MC_WpJet_m_all[0] = mcpromptbjet_p4.M()
-                MC_WpJet_pt_all[0] = mcpromptbjet_p4.Pt()
-                MC_WpJet_eta_all[0] = mcpromptbjet_p4.Eta()
-                MC_WpJet_phi_all[0] = mcpromptbjet_p4.Phi()
-            else:
-                MC_Wprime_m_all[0] = -100.
-                MC_Wprime_mt_all[0] = -100.
-                MC_Wprime_pt_all[0] = -100.
-                MC_Wprime_eta_all[0] = -100.
-                MC_Wprime_phi_all[0] = -100.
-                MC_RecoTop_m_all[0] = -100.
-                MC_RecoTop_mt_all[0] = -100.
-                MC_RecoTop_pt_all[0] = -100.
-                MC_RecoTop_eta_all[0] = -100.
-                MC_RecoTop_phi_all[0] = -100.
-                MC_RecoTop_isNeg_all[0] = -1
-                MC_TopJet_m_all[0] = -100.
-                MC_TopJet_pt_all[0] = -100.
-                MC_TopJet_eta_all[0] = -100.
-                MC_TopJet_phi_all[0] = -100.
-                MC_TopJet_dRLepJet_all[0] = -100.
-                MC_WpJet_m_all[0] = -100.
-                MC_WpJet_pt_all[0] = -100.
-                MC_WpJet_eta_all[0] = -100.
-                MC_WpJet_phi_all[0] = -100.
+        if topgot_ak4 and Wpgot_ak4 and mclepton != None:
+            mcWprime_p4 = mctop_p4 + mcpromptbjet_p4
+            mcWprime_p4t = mctop_p4t + mcpromptbjet_p4t
+            mcChi2_topmass = Chi_TopMass(mctop_p4.M())
+            MC_Wprime_m_all[0] = mcWprime_p4.M()
+            MC_Wprime_m_all[0] = mcWprime_p4.M()
+            MC_Wprime_mt_all[0] = mcWprime_p4t.M()
+            MC_Wprime_pt_all[0] = mcWprime_p4.Pt()
+            MC_Wprime_eta_all[0] = mcWprime_p4.Eta()
+            MC_Wprime_phi_all[0] = mcWprime_p4.Phi()
+            MC_RecoTop_m_all[0] = mctop_p4.M()
+            MC_RecoTop_mt_all[0] = mctop_p4t.M()
+            MC_RecoTop_pt_all[0] = mctop_p4.Pt()
+            MC_RecoTop_eta_all[0] = mctop_p4.Eta()
+            MC_RecoTop_phi_all[0] = mctop_p4.Phi()
+            MC_RecoTop_isNeg_all[0] = int(IsmcNeg)
+            MC_TopJet_m_all[0] = mctopbjet_p4.M()
+            MC_TopJet_pt_all[0] = mctopbjet_p4.Pt()
+            MC_TopJet_eta_all[0] = mctopbjet_p4.Eta()
+            MC_TopJet_phi_all[0] = mctopbjet_p4.Phi()
+            MC_TopJet_dRLepJet_all[0] = copy.deepcopy(mcdR_lepjet)
+            MC_WpJet_m_all[0] = mcpromptbjet_p4.M()
+            MC_WpJet_pt_all[0] = mcpromptbjet_p4.Pt()
+            MC_WpJet_eta_all[0] = mcpromptbjet_p4.Eta()
+            MC_WpJet_phi_all[0] = mcpromptbjet_p4.Phi()
+        else:
+            MC_Wprime_m_all[0] = -100.
+            MC_Wprime_mt_all[0] = -100.
+            MC_Wprime_pt_all[0] = -100.
+            MC_Wprime_eta_all[0] = -100.
+            MC_Wprime_phi_all[0] = -100.
+            MC_RecoTop_m_all[0] = -100.
+            MC_RecoTop_mt_all[0] = -100.
+            MC_RecoTop_pt_all[0] = -100.
+            MC_RecoTop_eta_all[0] = -100.
+            MC_RecoTop_phi_all[0] = -100.
+            MC_RecoTop_isNeg_all[0] = -1
+            MC_TopJet_m_all[0] = -100.
+            MC_TopJet_pt_all[0] = -100.
+            MC_TopJet_eta_all[0] = -100.
+            MC_TopJet_phi_all[0] = -100.
+            MC_TopJet_dRLepJet_all[0] = -100.
+            MC_WpJet_m_all[0] = -100.
+            MC_WpJet_pt_all[0] = -100.
+            MC_WpJet_eta_all[0] = -100.
+            MC_WpJet_phi_all[0] = -100.
 
     #DetReco(nstruction)
     if tightlep != None:
