@@ -915,7 +915,6 @@ for i in xrange(0,tree.GetEntries()):
                     mctfound = True
                     if mclepton.genPartIdx == -1:
                         print 'MCTruth reconstruction not properly working - lepton step'
-                        continue
         elif isElectron:
             for ele in goodEle:
                 if (ele.genPartFlav == 1 or ele.genPartFlav == 15) and not mctfound:
@@ -923,7 +922,6 @@ for i in xrange(0,tree.GetEntries()):
                     mctfound = True
                     if mclepton.genPartIdx == -1:
                         print 'MCTruth reconstruction not properly working - lepton step'
-                        continue
         else:
             mclepton = None
 

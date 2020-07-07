@@ -27,13 +27,14 @@ parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', hel
 folder = opt.folder
 #filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
 filerepo = '/eos/user/a/apiccine/Wprime/nosynch/' + folder + '/'
+plotrepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '_an/'
 ROOT.gROOT.SetBatch() # don't pop up canvases
-if not os.path.exists(filerepo + 'plot/muon'):
-     os.makedirs(filerepo + 'plot/muon')
-if not os.path.exists(filerepo + 'plot/electron'):
-     os.makedirs(filerepo + 'plot/electron')
-if not os.path.exists(filerepo + 'stack'):
-     os.makedirs(filerepo + 'stack')
+if not os.path.exists(plotrepo + 'plot/muon'):
+     os.makedirs(plotrepo + 'plot/muon')
+if not os.path.exists(plotrepo + 'plot/electron'):
+     os.makedirs(plotrepo + 'plot/electron')
+if not os.path.exists(plotrepo + 'stack'):
+     os.makedirs(plotrepo + 'stack')
 
 def mergepart(dataset):
      samples = []
@@ -87,10 +88,7 @@ def lumi_writer(dataset, lumi):
                     tree.GetEntry(event)
                     if event%10000==1:
                          print("Processing event %s     complete %s percent" %(event, 100*event/tree.GetEntries()))
-                    if not (tree.w_nominal==0):
-                         w_nom[0] = tree.w_nominal * sample.sigma * lumi * 1000./float(h_genw_tmp.GetBinContent(1))
-                    else:
-                         w_nom[0] = sample.sigma * lumi * 1000./float(h_genw_tmp.GetBinContent(1))
+                    w_nom[0] = tree.w_nominal * sample.sigma * lumi * 1000./float(h_genw_tmp.GetBinContent(1))
                     for i in xrange(1, nbins):
                          w_PDF[i] = h_pdfw_tmp.GetBinContent(i+1)/h_genw_tmp.GetBinContent(2) 
                     tree_new.Fill()
@@ -124,7 +122,7 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
           #if not 'Data' in sample.label:
                #cut += '*passed_ele'
      print str(cut)
-     foutput = filerepo + "plot/" + lep + "/" + sample.label + "_" + lep+".root"
+     foutput = plotrepo + "plot/" + lep + "/" + sample.label + "_" + lep+".root"
      '''
      else:
           if(syst==""):
@@ -185,11 +183,11 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           if('WP' in s.label):
                signal = True
           if(syst_ == ""):
-               outfile = filerepo + "stack_" + str(lep_).strip('[]') + ".root"
-               infile[s.label] = ROOT.TFile.Open(filerepo + "plot/" + lep + "/" + s.label + "_" + lep + ".root")
+               outfile = plotrepo + "stack_" + str(lep_).strip('[]') + ".root"
+               infile[s.label] = ROOT.TFile.Open(plotrepo + "plot/" + lep + "/" + s.label + "_" + lep + ".root")
           else:
-               outfile = filerepo + "stack_"+syst_+"_"+str(lep_).strip('[]')+".root"
-               infile[s.label] = ROOT.TFile.Open(filerepo + "plot/" + lep + "/" + s.label + "_" + lep + "_" + syst_ + ".root")
+               outfile = plotrepo + "stack_"+syst_+"_"+str(lep_).strip('[]')+".root"
+               infile[s.label] = ROOT.TFile.Open(plotrepo + "plot/" + lep + "/" + s.label + "_" + lep + "_" + syst_ + ".root")
      i = 0
 
      for s in samples_:
@@ -380,7 +378,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      pad2.RedrawAxis()
      c1.Update()
      #c1.Print("stack/"+canvasname+".pdf")
-     c1.Print(filerepo + "stack/"+canvasname+".png")
+     c1.Print(plotrepo + "stack/"+canvasname+".png")
      del histo
      tmp.Delete()
      h.Delete()
@@ -417,7 +415,7 @@ if(opt.dat!= 'all'):
      [dataset_dict[str(sample.year)].append(sample) for sample in samples]
 else:
      dataset_dict = {
-          '2016':[DataMu_2016, DataEle_2016, DataHT_2016, ST_2016, QCD_2016, TT_Mtt_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
+          '2016':[DataMu_2016, DataEle_2016, DataHT_2016, ST_2016, QCD_2016, TT_incl_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
           '2017':[DataMu_2017, DataEle_2017, TT_Mtt_2017, WJets_2017],
           '2018':[DataMu_2018, DataEle_2018, TT_Mtt_2018, WJets_2018]}
 #print(dataset_dict.keys())
@@ -437,7 +435,7 @@ if opt.cut == "lepton_eta>-10." and not opt.sel:
      cut_tag = ""
 else:
      if opt.sel:
-          cut_dict = {'muon':"lepton_pt>125&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 'electron':"MET_pt>125&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut}
+          cut_dict = {'muon':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 'electron':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut}
           if opt.cut != "lepton_eta>-10.":
                cut_tag = 'selection_AND_' + cutToTag(opt.cut) 
           else:
@@ -472,18 +470,40 @@ for year in years:
           cut = cut_dict[lep]
           #variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 1200))
           #'''
-          variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')',  92, 80, 1000))
           variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
           variables.append(variabile('lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('lepton_miniIso', 'lepton miniIso',  wzero+'*('+cut+')', 100, 0, 0.1))
-          variables.append(variabile('lepMET_deltaphi', '#Delta#phi(l, MET)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
-          variables.append(variabile('deltaR_lep_closestjet', '#DeltaR lep closest jet',  wzero+'*('+cut+')', 50, 0, 5))
-          variables.append(variabile('deltaR_lep_leadingjet', '#DeltaR lep lead jet',  wzero+'*('+cut+')', 50, 0, 5))
-          variables.append(variabile('deltaR_lep_subleadingjet', '#DeltaR lep sub-lead jet',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')',  92, 80, 1000))
           variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', 100, 0, 1000))
           variables.append(variabile('Event_HT', 'event HT [GeV]', wzero+'*('+cut+')', 70, 0, 1400))
           variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('njet_lowpt', 'no. of jets with 25 < p_{T} < 100 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
+          variables.append(variabile('njet_pt100', 'no. of jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
+          variables.append(variabile('nbjet_lowpt', 'no. of b jets with 25 < p_{T} < 100 GeV',  wzero+'*('+cut+')', 9, -0.5, 8.5))
+          variables.append(variabile('nbJet_pt100', 'no. of b jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
+          variables.append(variabile('mtw', 'W boson transverse mass [GeV]',  wzero+'*('+cut+')', 100, 0, 500))
+          variables.append(variabile('nfatjet', 'no. of AK8 jets',  wzero+'*('+cut+')', 5, 1.5, 6.5))
+          variables.append(variabile('lepMET_deltaphi', '#Delta#phi(l, MET)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('leadingjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 150, 2000))
+          variables.append(variabile('subleadingjet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
+          variables.append(variabile('topAK8_area', 'topAK8 area', wzero+'*('+cut+')', 30, 1.5, 3.0))
+          variables.append(variabile('topAK8_btag', 'topAK8 b tag ', wzero+'*(topAK8_btag>-1&&'+cut+')', 20, 0, 1.0))
+          variables.append(variabile('topAK8_ttagMD', 'topAK8 t tag MD', wzero+'*(topAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
+          variables.append(variabile('topAK8_ttag', 'topAK8 t tag', wzero+'*(topAK8_ttag>-1&&'+cut+')', 20, 0, 1.0))
+          variables.append(variabile('topAK8_eta', 'topAK8 #eta', wzero+'*('+cut+')', 48, -4.8, 4.8)) 
+          variables.append(variabile('topAK8_m', 'topAK8 mass [GeV]', wzero+'*('+cut+')', 40, 0, 400))
+          variables.append(variabile('topAK8_mSD', 'topAK8 soft drop mass [GeV]', wzero+'*('+cut+')', 40, 0, 400))
+          variables.append(variabile('topAK8_phi', 'topAK8 #phi', wzero+'*('+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('topAK8_pt', 'topAK8 p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 2000))
+          variables.append(variabile('topAK8_tau1', 'topAK8 tau 1', wzero+'*('+cut+')', 80, 0, .8))
+          variables.append(variabile('topAK8_tau2', 'topAK8 tau 2', wzero+'*('+cut+')', 60, 0, .6))
+          variables.append(variabile('topAK8_tau3', 'topAK8 tau 3', wzero+'*('+cut+')', 40, 0, .4))
+          variables.append(variabile('topAK8_tau4', 'topAK8 tau 4', wzero+'*('+cut+')', 20, 0, .2))
+          '''
+          variables.append(variabile('deltaR_lep_closestjet', '#DeltaR lep closest jet',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('deltaR_lep_leadingjet', '#DeltaR lep lead jet',  wzero+'*('+cut+')', 50, 0, 5))
+          variables.append(variabile('deltaR_lep_subleadingjet', '#DeltaR lep sub-lead jet',  wzero+'*('+cut+')', 50, 0, 5))
           variables.append(variabile('best_top_pt', 'top p_{T} [GeV] (best)',  wzero+'*(best_top_pt>0&&'+cut+')', 100, 0, 1200))
           variables.append(variabile('best_top_eta', 'top #eta (best)', wzero+'*(best_top_eta>-10.&&'+cut+')', 48, -4., 4.))
           variables.append(variabile('best_top_phi', 'top #phi (best)',  wzero+'*(best_top_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
@@ -521,15 +541,8 @@ for year in years:
           variables.append(variabile('sublead_Wpjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
           variables.append(variabile('sublead_Wpjet_eta', 'leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('sublead_Wpjet_isbtag', 'leading jet b tagged',  wzero+'*('+cut+')', 2, -0.5, 1.5))
-          variables.append(variabile('njet_lowpt', 'no. of jets with 25 < p_{T} < 100 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
-          #'''
-          variables.append(variabile('njet_pt100', 'no. of jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
-          variables.append(variabile('nbjet_lowpt', 'no. of b jets with 25 < p_{T} < 100 GeV',  wzero+'*('+cut+')', 9, -0.5, 8.5))
-          variables.append(variabile('nbJet_pt100', 'no. of b jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
+
           #variables.append(variabile('nbjet_pt100', 'no. of b jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
-          variables.append(variabile('nfatjet', 'no. of AK8 jets',  wzero+'*('+cut+')', 7, -0.5, 6.5))
-          variables.append(variabile('leadingjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 150, 2000))
-          variables.append(variabile('subleadingjet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
           variables.append(variabile('leadingjets_deltaR', 'leadings jets #DeltaR',  wzero+'*('+cut+')', 10, 0, 5))
           variables.append(variabile('leadingjets_deltaPhi', 'leadings jets #Delta#phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('leadingjets_deltaEta', 'leadings jets #Delta#eta',  wzero+'*('+cut+')', 48, -4.8, 4.8))
@@ -538,7 +551,6 @@ for year in years:
           variables.append(variabile('bjets_deltaPhi', 'b jets #Delta#phi',  wzero+'*(bjets_deltaPhi>-50.&&'+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('bjets_deltaEta', 'b jets #Delta#eta',  wzero+'*(bjets_deltaEta>-50.&&'+cut+')', 48, -4.8, 4.8))
           variables.append(variabile('bjets_pt', 'b jets system p_{T} [GeV]',  wzero+'*(bjets_pt>-10.&&'+cut+')', 100, 0, 2000))
-          variables.append(variabile('mtw', 'W boson transverse mass [GeV]',  wzero+'*('+cut+')', 100, 0, 500))
           variables.append(variabile('had_global_thrust', 'hadronic global thrust',  wzero+'*('+cut+')', 20, 0.5, 1))
           variables.append(variabile('had_central_thrust', 'hadronic transverse thrust',  wzero+'*('+cut+')', 20, 0, 0.5))
           variables.append(variabile('ovr_global_thrust', 'event global thrust',  wzero+'*('+cut+')', 20, 0.5, 1))
@@ -567,19 +579,6 @@ for year in years:
           variables.append(variabile('chi_topW_jets_deltaPhi', '#Delta #phi jets (t+W\') (chi)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('nPV_good', 'n good PV', wzero+'*('+cut+')', 120, 0, 120))
           variables.append(variabile('nPV_tot', 'total n PV', wzero+'*('+cut+')', 120, 0, 120))
-          variables.append(variabile('topAK8_area', 'topAK8 area', wzero+'*('+cut+')', 30, 1.5, 3.0))
-          variables.append(variabile('topAK8_btag', 'topAK8 b tag ', wzero+'*(topAK8_btag>-1&&'+cut+')', 20, 0, 1.0))
-          variables.append(variabile('topAK8_ttagMD', 'topAK8 t tag MD', wzero+'*(topAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
-          variables.append(variabile('topAK8_ttag', 'topAK8 t tag', wzero+'*(topAK8_ttag>-1&&'+cut+')', 20, 0, 1.0))
-          variables.append(variabile('topAK8_eta', 'topAK8 #eta', wzero+'*('+cut+')', 48, -4.8, 4.8)) 
-          variables.append(variabile('topAK8_m', 'topAK8 mass [GeV]', wzero+'*('+cut+')', 40, 0, 400))
-          variables.append(variabile('topAK8_mSD', 'topAK8 soft drop mass [GeV]', wzero+'*('+cut+')', 40, 0, 400))
-          variables.append(variabile('topAK8_phi', 'topAK8 #phi', wzero+'*('+cut+')', 20, -3.14, 3.14))
-          variables.append(variabile('topAK8_pt', 'topAK8 p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 2000))
-          variables.append(variabile('topAK8_tau1', 'topAK8 tau 1', wzero+'*('+cut+')', 80, 0, .8))
-          variables.append(variabile('topAK8_tau2', 'topAK8 tau 2', wzero+'*('+cut+')', 60, 0, .6))
-          variables.append(variabile('topAK8_tau3', 'topAK8 tau 3', wzero+'*('+cut+')', 40, 0, .4))
-          variables.append(variabile('topAK8_tau4', 'topAK8 tau 4', wzero+'*('+cut+')', 20, 0, .2))
 
           variables.append(variabile('WprAK8_area',  'W^{#prime} AK8 area', wzero+'*('+cut+')', 30, 1.5, 3.0))
           variables.append(variabile('WprAK8_btag', 'WprAK8 b tag ', wzero+'*(WprAK8_btag>-1&&'+cut+')', 20, 0, 1.0))
@@ -594,6 +593,7 @@ for year in years:
           variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 60, 0, .6))
           variables.append(variabile('WprAK8_tau3', 'WprAK8 tau 3', wzero+'*('+cut+')', 40, 0, .4))
           variables.append(variabile('WprAK8_tau4', 'WprAK8 tau 4', wzero+'*('+cut+')', 20, 0, .2))
+          #'''
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
