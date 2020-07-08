@@ -735,6 +735,10 @@ for i in xrange(0,tree.GetEntries()):
     #Double counting removal
     if('DataHT' in sample.label and (passMu or passEle)):
         continue
+    if('DataEle' in sample.label and (passMu)):
+        continue
+    if('DataMu' in sample.label and (passEle)):
+        continue
 
     ######################################
     ## Selecting only jets with pt>100  ##
@@ -925,16 +929,19 @@ for i in xrange(0,tree.GetEntries()):
         else:
             mclepton = None
 
+        mctop_p4 = None
+        mctop_p4t = None
+        IsmcNeg = False
+        mcdR_lepjet = None
+        Mcpromptbjet_p4 = None
+        mctopbjet_p4 = None
+        mctopbjet_p4_pre = None
+        mcpromptbjet_p4t = None
+        bjetcheck = True
+        topgot_ak4 = False
+        Wpgot_ak4 = False
+
         if mclepton != None:
-            mctop_p4 = None
-            mctop_p4t = None
-            IsmcNeg = False
-            mcdR_lepjet = None
-            Mcpromptbjet_p4 = None
-            mctopbjet_p4 = None
-            mctopbjet_p4_pre = None
-            mcpromptbjet_p4t = None
-            bjetcheck = True
             mcbjets = mcbjet_filter(jets)
             
             if len(mcbjets)>2:
@@ -943,8 +950,6 @@ for i in xrange(0,tree.GetEntries()):
             mcWprime_p4 = ROOT.TLorentzVector()
             mcWprime_p4t = ROOT.TLorentzVector()
             mclepton_p4 = ROOT.TLorentzVector()
-            topgot_ak4 = False
-            Wpgot_ak4 = False
             mclepton_p4.SetPtEtaPhiM(mclepton.pt, mclepton.eta, mclepton.phi, mclepton.mass)
             bottjets = sameflav_filter(mcbjets, 5)
             abottjets = sameflav_filter(mcbjets, -5)

@@ -19,15 +19,16 @@ parser.add_option('-L', '--lep', dest='lep', type='string', default = 'muon', he
 parser.add_option('-S', '--syst', dest='syst', type='string', default = 'all', help='Default all systematics added')
 parser.add_option('-C', '--cut', dest='cut', type='string', default = 'lepton_eta>-10.', help='Default no cut')
 parser.add_option('-y', '--year', dest='year', type='string', default = 'all', help='Default 2016, 2017 and 2018 are included')
-parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v5', help='Default folder is v0')
+parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v6', help='Default folder is v0')
 #parser.add_option('-T', '--topol', dest='topol', type='string', default = 'all', help='Default all njmt')
 parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', help="")
 (opt, args) = parser.parse_args()
 
 folder = opt.folder
-#filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
-filerepo = '/eos/user/a/apiccine/Wprime/nosynch/' + folder + '/'
-plotrepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '_an/'
+filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
+#filerepo = '/eos/user/a/apiccine/Wprime/nosynch/' + folder + '/'
+plotrepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
+#plotrepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '_an/'
 ROOT.gROOT.SetBatch() # don't pop up canvases
 if not os.path.exists(plotrepo + 'plot/muon'):
      os.makedirs(plotrepo + 'plot/muon')
@@ -116,11 +117,12 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      if 'muon' in lep: 
           cut  = variable._taglio+ '*isMu'
           #if not 'Data' in sample.label:
-               #cut += '*passed_mu'
+          #cut += '*passed_mu'
+          #cut += '*passed_ht'
      elif 'electron' in lep:
           cut  = variable._taglio + '*isEle'
           #if not 'Data' in sample.label:
-               #cut += '*passed_ele'
+          #cut += '*passed_ht'
      print str(cut)
      foutput = plotrepo + "plot/" + lep + "/" + sample.label + "_" + lep+".root"
      '''
@@ -481,7 +483,7 @@ for year in years:
           variables.append(variabile('njet_lowpt', 'no. of jets with 25 < p_{T} < 100 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
           variables.append(variabile('njet_pt100', 'no. of jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
           variables.append(variabile('nbjet_lowpt', 'no. of b jets with 25 < p_{T} < 100 GeV',  wzero+'*('+cut+')', 9, -0.5, 8.5))
-          variables.append(variabile('nbJet_pt100', 'no. of b jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
+          variables.append(variabile('nbjet_pt100', 'no. of b jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
           variables.append(variabile('mtw', 'W boson transverse mass [GeV]',  wzero+'*('+cut+')', 100, 0, 500))
           variables.append(variabile('nfatjet', 'no. of AK8 jets',  wzero+'*('+cut+')', 5, 1.5, 6.5))
           variables.append(variabile('lepMET_deltaphi', '#Delta#phi(l, MET)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
@@ -542,7 +544,6 @@ for year in years:
           variables.append(variabile('sublead_Wpjet_eta', 'leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('sublead_Wpjet_isbtag', 'leading jet b tagged',  wzero+'*('+cut+')', 2, -0.5, 1.5))
 
-          #variables.append(variabile('nbjet_pt100', 'no. of b jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
           variables.append(variabile('leadingjets_deltaR', 'leadings jets #DeltaR',  wzero+'*('+cut+')', 10, 0, 5))
           variables.append(variabile('leadingjets_deltaPhi', 'leadings jets #Delta#phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('leadingjets_deltaEta', 'leadings jets #Delta#eta',  wzero+'*('+cut+')', 48, -4.8, 4.8))
