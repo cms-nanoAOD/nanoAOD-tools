@@ -18,8 +18,8 @@ gStyle.SetOptStat(0)
 gROOT.SetBatch()        # don't pop up canvases
 
 leptons = {
-     "muon":["h_jets_lepton_pt"],
-     "electron":["h_jets_lepton_pt"]
+     #"muon":["h_jets_lepton_pt"],
+     "electron":["h_jets_lepton_pt_lepton_pt_L_150"]
 }
 
 integrals = []
