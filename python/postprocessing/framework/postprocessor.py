@@ -202,7 +202,7 @@ class PostProcessor :
 		
 	for m in self.modules: m.endJob()
 	
-	print  totEntriesRead/(time.time()-t0), "Hz"
+	print "Total time %.1f sec. to process %i events. Rate = %.1f Hz." %((time.time()-t0), totEntriesRead, totEntriesRead/(time.time()-t0))
 
 
 	if self.haddFileName :
