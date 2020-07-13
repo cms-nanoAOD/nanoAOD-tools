@@ -108,7 +108,7 @@ class PostProcessor :
 
 	fullClone = (len(self.modules) == 0)
 	outFileNames=[]
-        t0 = time.clock()
+        t0 = time.time()
 	totEntriesRead=0
 	for fname in self.inputFiles:
 	    ffnames = []
@@ -202,7 +202,7 @@ class PostProcessor :
 		
 	for m in self.modules: m.endJob()
 	
-	print  totEntriesRead/(time.clock()-t0), "Hz"
+	print  totEntriesRead/(time.time()-t0), "Hz"
 
 
 	if self.haddFileName :
