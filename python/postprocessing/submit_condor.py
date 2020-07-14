@@ -7,10 +7,16 @@ usage = 'python submit_condor.py -d dataset_name -f destination_folder'
 parser = optparse.OptionParser(usage)
 parser.add_option('-d', '--dat', dest='dat', type=str, default = '', help='Please enter a dataset name')
 parser.add_option('-f', '--folder', dest='folder', type=str, default = '', help='Please enter a destination folder')
+#parser.add_option('-u', '--user', dest='us', type='string', default = 'ade', help="")
 (opt, args) = parser.parse_args()
 #Insert here your uid... you can see it typing echo $uid
-uid = 103214
-#uid = 124949
+
+username = str(os.environ.get('USER'))
+
+if username == 'adeiorio':
+    uid = 103214
+elif username == 'apiccine':
+    uid = 124949
 
 def sub_writer(sample, n, files, folder):
     f = open("condor.sub", "w")
