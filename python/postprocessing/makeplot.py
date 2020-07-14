@@ -117,12 +117,19 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      if 'muon' in lep: 
           cut  = variable._taglio+ '*isMu'
           #if not 'Data' in sample.label:
-          #cut += '*passed_mu'
-          #cut += '*passed_ht'
+          #cut += '*passed_mu*(1-passed_ht)'
+          #cut += '*passed_ht*(1-passed_mu)*(1-passed_ele)'
+          if 'DataMu' in sample.label:
+               cut += '*passed_ht*(passed_mu)'
+          elif 'DataHT' in sample.label:
+               cut += '*passed_ht*(1-passed_mu)'
+          else:
+               cut += '*passed_ht'
      elif 'electron' in lep:
           cut  = variable._taglio + '*isEle'
-          #if not 'Data' in sample.label:
-          #cut += '*passed_ht'
+          #if not 'Data' in sample.label: 
+          cut += '*passed_ht*(1-passed_ele)'
+          #cut += '*passed_ele'
      print str(cut)
      foutput = plotrepo + "plot/" + lep + "/" + sample.label + "_" + lep+".root"
      '''
@@ -139,6 +146,8 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      '''
      #print treename
      f1.Get(treename).Project(histoname,variable._name,cut)
+     #if not 'Data' in sample.label:
+     #     h1.Scale((7.5)/35.89)
      h1.SetBinContent(1, h1.GetBinContent(0) + h1.GetBinContent(1))
      h1.SetBinError(1, math.sqrt(pow(h1.GetBinError(0),2) + pow(h1.GetBinError(1),2)))
      h1.SetBinContent(nbins, h1.GetBinContent(nbins) + h1.GetBinContent(nbins+1))
@@ -380,7 +389,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      pad2.RedrawAxis()
      c1.Update()
      #c1.Print("stack/"+canvasname+".pdf")
-     c1.Print(plotrepo + "stack/"+canvasname+".png")
+     c1.Print(plotrepo + "stack/"+canvasname+"_htHLT.png")
      del histo
      tmp.Delete()
      h.Delete()
@@ -418,6 +427,7 @@ if(opt.dat!= 'all'):
 else:
      dataset_dict = {
           '2016':[DataMu_2016, DataEle_2016, DataHT_2016, ST_2016, QCD_2016, TT_Mtt_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
+          #'2016':[DataHTG_2016, DataMuG_2016, ST_2016, QCD_2016, TT_Mtt_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
           '2017':[DataMu_2017, DataEle_2017, TT_Mtt_2017, WJets_2017],
           '2018':[DataMu_2018, DataEle_2018, TT_Mtt_2018, WJets_2018]}
 #print(dataset_dict.keys())
@@ -447,7 +457,6 @@ else:
           cut_tag = cutToTag(opt.cut)
 
 lumi = {'2016': 35.89, "2017": 41.53, "2018": 59.7}
-
 
 for year in years:
      for sample in dataset_dict[year]:
@@ -485,10 +494,11 @@ for year in years:
           variables.append(variabile('nbjet_lowpt', 'no. of b jets with 25 < p_{T} < 100 GeV',  wzero+'*('+cut+')', 9, -0.5, 8.5))
           variables.append(variabile('nbjet_pt100', 'no. of b jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
           variables.append(variabile('mtw', 'W boson transverse mass [GeV]',  wzero+'*('+cut+')', 100, 0, 500))
-          variables.append(variabile('nfatjet', 'no. of AK8 jets',  wzero+'*('+cut+')', 5, 1.5, 6.5))
-          variables.append(variabile('lepMET_deltaphi', '#Delta#phi(l, MET)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('leadingjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 150, 2000))
           variables.append(variabile('subleadingjet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
+          '''
+          variables.append(variabile('nfatjet', 'no. of AK8 jets',  wzero+'*('+cut+')', 5, 1.5, 6.5))
+          variables.append(variabile('lepMET_deltaphi', '#Delta#phi(l, MET)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('topAK8_area', 'topAK8 area', wzero+'*('+cut+')', 30, 1.5, 3.0))
           variables.append(variabile('topAK8_btag', 'topAK8 b tag ', wzero+'*(topAK8_btag>-1&&'+cut+')', 20, 0, 1.0))
           variables.append(variabile('topAK8_ttagMD', 'topAK8 t tag MD', wzero+'*(topAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
@@ -580,6 +590,9 @@ for year in years:
           variables.append(variabile('chi_topW_jets_deltaPhi', '#Delta #phi jets (t+W\') (chi)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('nPV_good', 'n good PV', wzero+'*('+cut+')', 120, 0, 120))
           variables.append(variabile('nPV_tot', 'total n PV', wzero+'*('+cut+')', 120, 0, 120))
+          
+          variables.append(variabile('best_top_costhetalep', 'cos #theta (lepton)', wzero+'*('+cut+')', 50, 0, 1))
+          variables.append(variabile('best_top_costheta', 'cos #theta', wzero+'*('+cut+')', 50, 0, 1))
 
           variables.append(variabile('WprAK8_area',  'W^{#prime} AK8 area', wzero+'*('+cut+')', 30, 1.5, 3.0))
           variables.append(variabile('WprAK8_btag', 'WprAK8 b tag ', wzero+'*(WprAK8_btag>-1&&'+cut+')', 20, 0, 1.0))

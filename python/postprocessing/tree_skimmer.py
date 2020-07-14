@@ -735,9 +735,9 @@ for i in xrange(0,tree.GetEntries()):
     #Double counting removal
     if('DataHT' in sample.label and (passMu or passEle)):
         continue
-    if('DataEle' in sample.label and (passMu)):
+    if('DataEle' in sample.label and (passMu or not passEle)):
         continue
-    if('DataMu' in sample.label and (passEle)):
+    if('DataMu' in sample.label and (passEle or not passMu)):
         continue
 
     ######################################
