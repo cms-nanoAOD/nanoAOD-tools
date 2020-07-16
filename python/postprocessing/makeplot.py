@@ -121,16 +121,18 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
           #if not 'Data' in sample.label:
           #cut += '*passed_mu*(1-passed_ht)'
           #cut += '*passed_ht*(1-passed_mu)*(1-passed_ele)'
+          '''
           if 'DataMu' in sample.label:
                cut += '*passed_ht*(passed_mu)'
           elif 'DataHT' in sample.label:
                cut += '*passed_ht*(1-passed_mu)'
           else:
                cut += '*passed_ht'
+          '''
      elif 'electron' in lep:
           cut  = variable._taglio + '*isEle'
           #if not 'Data' in sample.label: 
-          cut += '*passed_ht*(1-passed_ele)'
+          #cut += '*passed_ht*(1-passed_ele)'
           #cut += '*passed_ele'
      print str(cut)
      foutput = plotrepo + "plot/" + lep + "/" + sample.label + "_" + lep+".root"
@@ -166,6 +168,7 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
 
 def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      os.system('set LD_PRELOAD=libtcmalloc.so')
+     blind = False
      infile = {}
      histo = []
      tmp = ROOT.TH1F()
@@ -187,6 +190,8 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           histoname = "h_"+reg_+"_"+variabile_._name+"_"+cut_tag_
           stackname = "stack_"+reg_+"_"+variabile_._name+"_"+cut_tag_
           canvasname = "stack_"+reg_+"_"+variabile_._name+"_"+cut_tag_+"_"+lep_
+     if("selection_AND_best_Wpjet_isbtag_AND_best_topjet_isbtag" in cut_tag_ ):
+          blind = True
      stack = ROOT.THStack(stackname, variabile_._name)
      leg_stack = ROOT.TLegend(0.33,0.62,0.91,0.87)
      signal = False
@@ -209,11 +214,13 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           tmp = (ROOT.TH1F)(infile[s.label].Get(histoname))
           tmp.SetLineColor(ROOT.kBlack)
           tmp.SetName(s.leglabel)
+          print s.label 
+          print blind
           if('Data' in s.label):
                hdata.Add(ROOT.TH1F(tmp.Clone("")))
                hdata.SetMarkerStyle(20)
                hdata.SetMarkerSize(0.9)
-               if(i == 0): # trick to add Data flag to legend only once
+               if(i == 0 and not blind): # trick to add Data flag to legend only once
                     leg_stack.AddEntry(hdata, "Data", "ep")
                i += 1
           elif('WP' in s.label):
@@ -263,8 +270,10 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      pad1.SetTicky(1)
      pad1.Draw()
      pad1.cd()
-
-     maximum = max(stack.GetMaximum(),hdata.GetMaximum())
+     if not blind:
+          maximum = max(stack.GetMaximum(),hdata.GetMaximum())
+     else:
+          maximum = stack.GetMaximum()
      logscale = True # False #
      if(logscale):
           pad1.SetLogy()
@@ -305,8 +314,11 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      h_err.SetFillColor(ROOT.kGray+2)
      h_err.Draw("e2same0")
      leg_stack.AddEntry(h_err, "Stat. Unc.", "f")
-     print(hdata.Integral())
-     hdata.Draw("eSAMEpx0")
+     if not blind: 
+          print(hdata.Integral())
+          hdata.Draw("eSAMEpx0")
+     else:
+          hdata = stack.GetStack().Last().Clone("h_data")
      leg_stack.Draw("same")
 
      CMS_lumi.writeExtraText = 1
@@ -321,7 +333,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      iPeriod = 0
      iPos = 11
      CMS_lumi(pad1, lumi_sqrtS, iPos, lep_tag+str(reg_))
-     hratio=stack.GetStack().Last()
+     hratio = stack.GetStack().Last()
      
      c1.cd()
      pad2= ROOT.TPad("pad2", "pad2", 0, 0.01 , 1, 0.30)
@@ -391,7 +403,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      pad2.RedrawAxis()
      c1.Update()
      #c1.Print("stack/"+canvasname+".pdf")
-     c1.Print(plotrepo + "stack/"+canvasname+"_htHLT.png")
+     c1.Print(plotrepo + "stack/"+canvasname+".png")
      del histo
      tmp.Delete()
      h.Delete()
@@ -458,7 +470,7 @@ else:
           cut_dict = {'muon':cut, 'electron':cut}
           cut_tag = cutToTag(opt.cut)
 
-lumi = {'2016': 35.89, "2017": 41.53, "2018": 59.7}
+lumi = {'2016': 35.9, "2017": 41.53, "2018": 59.7}
 
 for year in years:
      for sample in dataset_dict[year]:
@@ -482,7 +494,7 @@ for year in years:
           wzero = 'w_nominal'
           cut = cut_dict[lep]
           #variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 1200))
-          #'''
+          '''
           variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
           variables.append(variabile('lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
@@ -498,6 +510,11 @@ for year in years:
           variables.append(variabile('mtw', 'W boson transverse mass [GeV]',  wzero+'*('+cut+')', 100, 0, 500))
           variables.append(variabile('leadingjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 150, 2000))
           variables.append(variabile('subleadingjet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
+          variables.append(variabile('best_topjet_isbtag', 'top jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
+          variables.append(variabile('best_Wpjet_isbtag', 'W' jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
+          '''
+          variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')',  46, 80, 1000))
+          variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  123, 80, 5000))
           '''
           variables.append(variabile('nfatjet', 'no. of AK8 jets',  wzero+'*('+cut+')', 5, 1.5, 6.5))
           variables.append(variabile('lepMET_deltaphi', '#Delta#phi(l, MET)',  wzero+'*('+cut+')', 20, -3.14, 3.14))
@@ -521,7 +538,6 @@ for year in years:
           variables.append(variabile('best_top_pt', 'top p_{T} [GeV] (best)',  wzero+'*(best_top_pt>0&&'+cut+')', 100, 0, 1200))
           variables.append(variabile('best_top_eta', 'top #eta (best)', wzero+'*(best_top_eta>-10.&&'+cut+')', 48, -4., 4.))
           variables.append(variabile('best_top_phi', 'top #phi (best)',  wzero+'*(best_top_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
-          variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')',  92, 80, 1000))
           variables.append(variabile('chi_top_pt', 'top p_{T} [GeV] (chimass)',  wzero+'*(chi_top_pt>0&&'+cut+')', 100, 0, 1200))
           variables.append(variabile('chi_top_eta', 'top #eta (chimass)', wzero+'*(chi_top_eta>-10.&&'+cut+')', 48, -4., 4.))
           variables.append(variabile('chi_top_phi', 'top #phi (chimass)',  wzero+'*(chi_top_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
@@ -541,7 +557,6 @@ for year in years:
           variables.append(variabile('best_Wprime_pt', 'Wprime p_{T} [GeV] (best)',  wzero+'*(best_Wprime_pt>0&&'+cut+')', 220, 0, 2200))
           variables.append(variabile('best_Wprime_eta', 'Wprime #eta (best)', wzero+'*(best_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
           variables.append(variabile('best_Wprime_phi', 'Wprime #phi (best)',  wzero+'*(best_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
-          variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  250, 80, 5000))
           variables.append(variabile('closest_Wprime_pt', 'Wprime p_{T} [GeV] (closest)',  wzero+'*(closest_Wprime_pt>0&&'+cut+')', 220, 0, 2200))
           variables.append(variabile('closest_Wprime_eta', 'Wprime #eta (closest)', wzero+'*(closest_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
           variables.append(variabile('closest_Wprime_phi', 'Wprime #phi (closest)',  wzero+'*(closest_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
@@ -596,7 +611,7 @@ for year in years:
           variables.append(variabile('best_top_costhetalep', 'cos #theta (lepton)', wzero+'*('+cut+')', 50, 0, 1))
           variables.append(variabile('best_top_costheta', 'cos #theta', wzero+'*('+cut+')', 50, 0, 1))
 
-          variables.append(variabile('WprAK8_area',  'W^{#prime} AK8 area', wzero+'*('+cut+')', 30, 1.5, 3.0))
+          variables.append(variabile('WprAK8_area',  'W' AK8 area', wzero+'*('+cut+')', 30, 1.5, 3.0))
           variables.append(variabile('WprAK8_btag', 'WprAK8 b tag ', wzero+'*(WprAK8_btag>-1&&'+cut+')', 20, 0, 1.0))
           variables.append(variabile('WprAK8_ttagMD', 'WprAK8 t tag MD', wzero+'*(WprAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
           variables.append(variabile('WprAK8_ttag', 'WprAK8 t tag', wzero+'*(WprAK8_ttag>-1&&'+cut+')', 20, 0, 1.0))
@@ -619,3 +634,7 @@ for year in years:
                     os.system('set LD_PRELOAD=libtcmalloc.so')
                     makestack(lep, 'jets', var, dataset_new, cut_tag, "", lumi[str(year)])
                     os.system('set LD_PRELOAD=libtcmalloc.so')
+          if lep == 'muon':
+               dataset_new.append(sample_dict['DataEle_'+str(year)])
+          elif lep == 'electron':
+               dataset_new.append(sample_dict['DataMu_'+str(year)])
