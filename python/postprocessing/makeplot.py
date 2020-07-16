@@ -23,13 +23,22 @@ parser.add_option('-y', '--year', dest='year', type='string', default = 'all', h
 parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v6', help='Default folder is v0')
 #parser.add_option('-T', '--topol', dest='topol', type='string', default = 'all', help='Default all njmt')
 parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', help="")
+#parser.add_option('-u', '--user', dest='us', type='string', default = 'ade', help="")
 (opt, args) = parser.parse_args()
 
 folder = opt.folder
-filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
-#filerepo = '/eos/user/a/apiccine/Wprime/nosynch/' + folder + '/'
-plotrepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
-#plotrepo = '/eos/user/a/apiccine/Wprime/nosynch/' + folder + '/'
+
+username = str(os.environ.get('USER'))
+filerepo = ''
+plotrepo = ''
+
+if username == 'adeiorio':
+     filerepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
+     plotrepo = '/eos/user/a/adeiorio/Wprime/nosynch/' + folder + '/'
+elif username == 'apiccine':
+     filerepo = '/eos/user/a/apiccine/Wprime/nosynch/' + folder + '/'
+     plotrepo = '/eos/user/a/apiccine/Wprime/nosynch/' + folder + '/'
+
 ROOT.gROOT.SetBatch() # don't pop up canvases
 if not os.path.exists(plotrepo + 'plot/muon'):
      os.makedirs(plotrepo + 'plot/muon')
