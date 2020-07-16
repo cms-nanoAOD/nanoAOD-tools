@@ -398,6 +398,7 @@ DataHTH_2016.year = 2016
 DataHTH_2016.dataset = '/JetHT/Run2016H-'+tag_data + '-v1/NANOAOD'
 DataHT_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataHT_2016")
 DataHT_2016.year = 2016
+#DataHT_2016.components = [DataHTB_2016, DataHTC_2016, DataHTD_2016, DataHTE_2016, DataHTF_2016, DataHTG_2016]#, DataHTH_2016]
 DataHT_2016.components = [DataHTB_2016, DataHTC_2016, DataHTD_2016, DataHTE_2016, DataHTF_2016, DataHTG_2016, DataHTH_2016]
 
 DataMuB_2017 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuB_2017")
