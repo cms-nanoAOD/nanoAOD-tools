@@ -11,7 +11,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetS
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 
 class jetmetUncertaintiesProducer(Module):
-    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], archive=None, globalTagProd=None, jetType = "AK4PFchs", metBranchName="MET", jerTag="", isData=False, applySmearing=True, applyHEMfix=False, splitJER=False):
+    def __init__(self, era, globalTag, jesUncertainties = [ "Total" ], archive=None, globalTagProd=None, jetType = "AK4PFchs", metBranchName="MET", jerTag="", isData=False, applySmearing=True, applyHEMfix=False, splitJER=False, saveMETUncs=['T1','T1Smear']):
 
         # globalTagProd only needs to be defined if METFixEE2017 is to be recorrected, and should be the GT that was used for the production of the nanoAOD files
         self.era = era
@@ -35,7 +35,7 @@ class jetmetUncertaintiesProducer(Module):
 
         # Calculate and save uncertainties on T1Smear MET if this flag is set to True
         # Otherwise calculate and save uncertainties on T1 MET
-        self.useT1SmearMETforUncs = useT1SmearMETforUncs
+        self.saveMETUncs = saveMETUncs
 
         # smear jet pT to account for measured difference in JER between data and simulation.
         if jerTag != "":
@@ -601,13 +601,13 @@ class jetmetUncertaintiesProducer(Module):
               self.out.fillBranch("%s_pt_jes%sUp" % (self.jetBranchName, jesUncertainty), jets_pt_jesUp[jesUncertainty])
               self.out.fillBranch("%s_pt_jes%sDown" % (self.jetBranchName, jesUncertainty), jets_pt_jesDown[jesUncertainty])
               
-              if not self.useT1SmearMETforUncs:
+              if 'T1' in self.saveMETUncs:
                   self.out.fillBranch("%s_T1_pt_jes%sUp" % (self.metBranchName, jesUncertainty), math.sqrt(met_T1_px_jesUp[jesUncertainty]**2 + met_T1_py_jesUp[jesUncertainty]**2))
                   self.out.fillBranch("%s_T1_phi_jes%sUp" % (self.metBranchName, jesUncertainty), math.atan2(met_T1_py_jesUp[jesUncertainty], met_T1_px_jesUp[jesUncertainty]))
                   self.out.fillBranch("%s_T1_pt_jes%sDown" % (self.metBranchName, jesUncertainty), math.sqrt(met_T1_px_jesDown[jesUncertainty]**2 + met_T1_py_jesDown[jesUncertainty]**2))
                   self.out.fillBranch("%s_T1_phi_jes%sDown" % (self.metBranchName, jesUncertainty), math.atan2(met_T1_py_jesDown[jesUncertainty], met_T1_px_jesDown[jesUncertainty]))
 
-              else:
+              if 'T1Smear' in self.saveMETUncs:
                   self.out.fillBranch("%s_T1Smear_pt_jes%sUp" % (self.metBranchName, jesUncertainty), math.sqrt(met_T1Smear_px_jesUp[jesUncertainty]**2 + met_T1Smear_py_jesUp[jesUncertainty]**2))
                   self.out.fillBranch("%s_T1Smear_phi_jes%sUp" % (self.metBranchName, jesUncertainty), math.atan2(met_T1Smear_py_jesUp[jesUncertainty], met_T1Smear_px_jesUp[jesUncertainty]))
                   self.out.fillBranch("%s_T1Smear_pt_jes%sDown" % (self.metBranchName, jesUncertainty), math.sqrt(met_T1Smear_px_jesDown[jesUncertainty]**2 + met_T1Smear_py_jesDown[jesUncertainty]**2))
