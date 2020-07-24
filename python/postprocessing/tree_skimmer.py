@@ -100,6 +100,11 @@ if MCReco:
     MC_Wprime_phi_all = array.array('f', [0.])
     MC_Wprime_m_all = array.array('f', [0.])
     MC_Wprime_mt_all = array.array('f', [0.])
+    GenPart_Wprime_pt_all = array.array('f', [0.])
+    GenPart_Wprime_eta_all = array.array('f', [0.])
+    GenPart_Wprime_phi_all = array.array('f', [0.])
+    GenPart_Wprime_m_all = array.array('f', [0.])
+    GenPart_Wprime_mt_all = array.array('f', [0.])
 closest_Wprime_pt_all = array.array('f', [0.])
 closest_Wprime_eta_all = array.array('f', [0.])
 closest_Wprime_phi_all = array.array('f', [0.])
@@ -128,6 +133,11 @@ if MCReco:
     MC_RecoTop_phi_all = array.array('f', [0.])
     MC_RecoTop_m_all = array.array('f', [0.])
     MC_RecoTop_mt_all = array.array('f', [0.])
+    GenPart_Top_pt_all = array.array('f', [0.])
+    GenPart_Top_eta_all = array.array('f', [0.])
+    GenPart_Top_phi_all = array.array('f', [0.])
+    GenPart_Top_m_all = array.array('f', [0.])
+    GenPart_Top_mt_all = array.array('f', [0.])
     MC_RecoTop_isNeg_all = array.array('i', [0])
     MC_RecoTop_chi2_all = array.array('i', [0])
     if(TriggerStudy):
@@ -253,6 +263,10 @@ if MCReco:
     MC_WpJet_eta_all = array.array('f', [0.])
     MC_WpJet_phi_all = array.array('f', [0.])
     MC_WpJet_m_all = array.array('f', [0.])
+    GenPart_Bottom_pt_all = array.array('f', [0.])
+    GenPart_Bottom_eta_all = array.array('f', [0.])
+    GenPart_Bottom_phi_all = array.array('f', [0.])
+    GenPart_Bottom_m_all = array.array('f', [0.])
 closest_WpJet_pt_all = array.array('f', [0.])
 closest_WpJet_eta_all = array.array('f', [0.])
 closest_WpJet_phi_all = array.array('f', [0.])
@@ -407,6 +421,11 @@ if MCReco:
     systTree.branchTreesSysts(trees, "all", "MC_Wprime_phi", outTreeFile, MC_Wprime_phi_all)
     systTree.branchTreesSysts(trees, "all", "MC_Wprime_m", outTreeFile, MC_Wprime_m_all)
     systTree.branchTreesSysts(trees, "all", "MC_Wprime_mt", outTreeFile, MC_Wprime_mt_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_Wprime_pt", outTreeFile, GenPart_Wprime_pt_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_Wprime_eta", outTreeFile, GenPart_Wprime_eta_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_Wprime_phi", outTreeFile, GenPart_Wprime_phi_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_Wprime_m", outTreeFile, GenPart_Wprime_m_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_Wprime_mt", outTreeFile, GenPart_Wprime_mt_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wprime_pt", outTreeFile, closest_Wprime_pt_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wprime_eta", outTreeFile, closest_Wprime_eta_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wprime_phi", outTreeFile, closest_Wprime_phi_all)
@@ -456,6 +475,11 @@ if MCReco:
     systTree.branchTreesSysts(trees, "all", "MC_top_phi", outTreeFile, MC_RecoTop_phi_all)
     systTree.branchTreesSysts(trees, "all", "MC_top_m", outTreeFile, MC_RecoTop_m_all)
     systTree.branchTreesSysts(trees, "all", "MC_top_mt", outTreeFile, MC_RecoTop_mt_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_top_pt", outTreeFile, GenPart_Top_pt_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_top_eta", outTreeFile, GenPart_Top_eta_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_top_phi", outTreeFile, GenPart_Top_phi_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_top_m", outTreeFile, GenPart_Top_m_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_top_mt", outTreeFile, GenPart_Top_mt_all)
     systTree.branchTreesSysts(trees, "all", "MC_top_isNeg", outTreeFile, MC_RecoTop_isNeg_all)
 systTree.branchTreesSysts(trees, "all", "closest_top_pt", outTreeFile, closest_RecoTop_pt_all)
 systTree.branchTreesSysts(trees, "all", "closest_top_eta", outTreeFile, closest_RecoTop_eta_all)
@@ -526,6 +550,10 @@ if MCReco:
     systTree.branchTreesSysts(trees, "all", "MC_Wpjet_eta", outTreeFile, MC_WpJet_eta_all)
     systTree.branchTreesSysts(trees, "all", "MC_Wpjet_phi", outTreeFile, MC_WpJet_phi_all)
     systTree.branchTreesSysts(trees, "all", "MC_Wpjet_m", outTreeFile, MC_WpJet_m_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_bottom_pt", outTreeFile, GenPart_Bottom_pt_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_bottom_eta", outTreeFile, GenPart_Bottom_eta_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_bottom_phi", outTreeFile, GenPart_Bottom_phi_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_bottom_m", outTreeFile, GenPart_Bottom_m_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wpjet_pt", outTreeFile, closest_WpJet_pt_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wpjet_eta", outTreeFile, closest_WpJet_eta_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wpjet_phi", outTreeFile, closest_WpJet_phi_all)
@@ -910,6 +938,57 @@ for i in xrange(0,tree.GetEntries()):
 
     #MCtruth event reconstruction
     if MCReco:
+
+        #GenParticles
+        gentopFound = False
+        genbottFound = False
+        gentop = None
+        genbott = None
+        for genp in genpart:
+            if gentopFound == True and genbottFound == True:
+                break
+            if genp.genPartIdxMother == 0:
+                if abs(genp.pdgId) == 6:
+                    gentop = genp
+                    gentopFound = True
+                elif abs(genp.pdgId) == 5:
+                    genbott = genp
+                    genbottFound = True
+            else:
+                continue
+
+        if gentopFound and genbottFound:
+            genWprime_p4 = gentop.p4() + genbott.p4()
+            GenPart_Wprime_m_all[0] = genWprime_p4.M()
+            GenPart_Wprime_mt_all[0] = genWprime_p4.Mt()
+            GenPart_Wprime_pt_all[0] = genWprime_p4.Pt()
+            GenPart_Wprime_eta_all[0] = genWprime_p4.Eta()
+            GenPart_Wprime_phi_all[0] = genWprime_p4.Phi()
+            GenPart_Top_m_all[0] = gentop.p4().M()
+            GenPart_Top_mt_all[0] = gentop.p4().Mt()
+            GenPart_Top_pt_all[0] = gentop.p4().Pt()
+            GenPart_Top_eta_all[0] = gentop.p4().Eta()
+            GenPart_Top_phi_all[0] = gentop.p4().Phi()
+            GenPart_Bottom_m_all[0] = genbott.p4().M()
+            GenPart_Bottom_pt_all[0] = genbott.p4().Pt()
+            GenPart_Bottom_eta_all[0] = genbott.p4().Eta()
+            GenPart_Bottom_phi_all[0] = genbott.p4().Phi()
+        else:
+            GenPart_Wprime_m_all[0] = -100.
+            GenPart_Wprime_mt_all[0] = -100.
+            GenPart_Wprime_pt_all[0] = -100.
+            GenPart_Wprime_eta_all[0] = -100.
+            GenPart_Wprime_phi_all[0] = -100.
+            GenPart_Top_m_all[0] = -100.
+            GenPart_Top_mt_all[0] = -100.
+            GenPart_Top_pt_all[0] = -100.
+            GenPart_Top_eta_all[0] = -100.
+            GenPart_Top_phi_all[0] = -100.
+            GenPart_Bottom_m_all[0] = -100.
+            GenPart_Bottom_pt_all[0] = -100.
+            GenPart_Bottom_eta_all[0] = -100.
+            GenPart_Bottom_phi_all[0] = -100.
+        
         mcbjets = mcbjet_filter(jets)
         mctfound = False
         if isMuon:
