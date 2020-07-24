@@ -652,6 +652,11 @@ if(isMC):
         h_genweight.Add(h_genw_tmp)
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
 
+#++++++++++++++++++++++++++++++++++
+#++      taking MC weights       ++
+#++++++++++++++++++++++++++++++++++
+
+
 print "Total number of events: ", tree.GetEntries()
 
 neutrino_failed = 0
