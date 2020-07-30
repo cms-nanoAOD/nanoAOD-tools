@@ -37,7 +37,7 @@ for infile in file_list:
 
 tree = InputTree(chain)
 print("Number of entries: " +str(tree.GetEntries()))
-
+print "tree: ", tree
 isMC = True
 if ('Data' in sample.label):
     isMC = False
@@ -949,10 +949,10 @@ for i in xrange(0,tree.GetEntries()):
                 break
             if genp.genPartIdxMother == 0:
                 if abs(genp.pdgId) == 6:
-                    gentop = genp
+                    gentop = copy.deepcopy(genp)
                     gentopFound = True
                 elif abs(genp.pdgId) == 5:
-                    genbott = genp
+                    genbott = copy.deepcopy(genp)
                     genbottFound = True
             else:
                 continue
