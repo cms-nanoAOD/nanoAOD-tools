@@ -465,7 +465,7 @@ if opt.cut == "lepton_eta>-10." and not opt.sel:
      cut_tag = ""
 else:
      if opt.sel:
-          cut_dict = {'muon':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 'electron':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut}
+          cut_dict = {'muon':"(MC_Wprime_m==-100)*MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 'electron':"(MC_Wprime_m==-100)*MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut}
           if opt.cut != "lepton_eta>-10.":
                cut_tag = 'selection_AND_' + cutToTag(opt.cut) 
           else:
@@ -500,7 +500,6 @@ for year in years:
           #variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 1200))
           variables.append(variabile('leadingjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 150, 2000))
           variables.append(variabile('subleadingjet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
-
           variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
           variables.append(variabile('lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
@@ -522,14 +521,10 @@ for year in years:
           variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  123, 80, 5000))
           variables.append(variabile('WprAK8_ttagMD', 'WprAK8 t tag MD', wzero+'*(WprAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
           variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 20, 0, .4))
-
-          variables.append(variabile('leadingjet_pt', '(prereco) leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
-          variables.append(variabile('subleadingjet_pt', '(prereco) sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
           #variables.append(variabile('best_topjet_isbtag', 'top jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
           #variables.append(variabile('best_Wpjet_isbtag', "W' jet b tagged (best)",  wzero+'*('+cut+')', 2, -0.5, 1.5))
           variables.append(variabile('MC_Wpjet_pt', "MCtruth W' jet p_{T} [GeV]",  wzero+'*('+cut+')', 100, 0, 2000))
           variables.append(variabile('bjets_pt', 'leading bjets system p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
-
           variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')',  46, 80, 1000))
           variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  123, 80, 5000))
           variables.append(variabile('nfatjet', 'no. of AK8 jets',  wzero+'*('+cut+')', 5, 1.5, 6.5))
@@ -583,12 +578,10 @@ for year in years:
           variables.append(variabile('sublead_Wprime_m', 'Wprime mass [GeV] (sublead)',  wzero+'*(sublead_Wprime_m>0&&'+cut+')',  250, 80, 5000))
           variables.append(variabile('sublead_topjet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 1200))
           variables.append(variabile('sublead_topjet_eta', 'sub leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
-
           variables.append(variabile('sublead_Wpjet_pt', '(sublead) leading jet p_{T} [GeV] ',  wzero+'*('+cut+')', 100, 0, 2000))
           variables.append(variabile('closest_Wpjet_pt', '(closest) leading jet p_{T} [GeV] ',  wzero+'*('+cut+')', 100, 0, 2000))
           variables.append(variabile('best_Wpjet_pt', '(best) leading jet p_{T} [GeV] ',  wzero+'*('+cut+')', 100, 0, 2000))
           variables.append(variabile('chi_Wpjet_pt', '(chimass) leading jet p_{T} [GeV] ',  wzero+'*('+cut+')', 100, 0, 2000))
-
           variables.append(variabile('sublead_Wpjet_eta', 'leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('sublead_Wpjet_isbtag', 'leading jet b tagged',  wzero+'*('+cut+')', 2, -0.5, 1.5))
 
@@ -632,7 +625,7 @@ for year in years:
           variables.append(variabile('best_top_costhetalep', 'cos #theta (lepton)', wzero+'*('+cut+')', 50, 0, 1))
           variables.append(variabile('best_top_costheta', 'cos #theta', wzero+'*('+cut+')', 50, 0, 1))
 
-          variables.append(variabile('WprAK8_area',  'W' AK8 area', wzero+'*('+cut+')', 30, 1.5, 3.0))
+          variables.append(variabile('WprAK8_area',  "W' AK8 area", wzero+'*('+cut+')', 30, 1.5, 3.0))
           variables.append(variabile('WprAK8_btag', 'WprAK8 b tag ', wzero+'*(WprAK8_btag>-1&&'+cut+')', 20, 0, 1.0))
           variables.append(variabile('WprAK8_ttag', 'WprAK8 t tag', wzero+'*(WprAK8_ttag>-1&&'+cut+')', 20, 0, 1.0))
           variables.append(variabile('WprAK8_eta', 'WprAK8 #eta', wzero+'*('+cut+')', 48, -4.8, 4.8)) 
@@ -643,7 +636,7 @@ for year in years:
           variables.append(variabile('WprAK8_tau1', 'WprAK8 tau 1', wzero+'*('+cut+')', 80, 0, .8))
           variables.append(variabile('WprAK8_tau3', 'WprAK8 tau 3', wzero+'*('+cut+')', 40, 0, .4))
           variables.append(variabile('WprAK8_tau4', 'WprAK8 tau 4', wzero+'*('+cut+')', 20, 0, .2))
-          '''
+          
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
@@ -657,3 +650,4 @@ for year in years:
                dataset_new.append(sample_dict['DataEle_'+str(year)])
           elif lep == 'electron':
                dataset_new.append(sample_dict['DataMu_'+str(year)])
+          
