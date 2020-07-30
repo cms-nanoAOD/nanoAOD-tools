@@ -100,6 +100,11 @@ if MCReco:
     MC_Wprime_phi_all = array.array('f', [0.])
     MC_Wprime_m_all = array.array('f', [0.])
     MC_Wprime_mt_all = array.array('f', [0.])
+    GenPart_Wprime_pt_all = array.array('f', [0.])
+    GenPart_Wprime_eta_all = array.array('f', [0.])
+    GenPart_Wprime_phi_all = array.array('f', [0.])
+    GenPart_Wprime_m_all = array.array('f', [0.])
+    GenPart_Wprime_mt_all = array.array('f', [0.])
 closest_Wprime_pt_all = array.array('f', [0.])
 closest_Wprime_eta_all = array.array('f', [0.])
 closest_Wprime_phi_all = array.array('f', [0.])
@@ -128,6 +133,11 @@ if MCReco:
     MC_RecoTop_phi_all = array.array('f', [0.])
     MC_RecoTop_m_all = array.array('f', [0.])
     MC_RecoTop_mt_all = array.array('f', [0.])
+    GenPart_Top_pt_all = array.array('f', [0.])
+    GenPart_Top_eta_all = array.array('f', [0.])
+    GenPart_Top_phi_all = array.array('f', [0.])
+    GenPart_Top_m_all = array.array('f', [0.])
+    GenPart_Top_mt_all = array.array('f', [0.])
     MC_RecoTop_isNeg_all = array.array('i', [0])
     MC_RecoTop_chi2_all = array.array('i', [0])
     if(TriggerStudy):
@@ -253,6 +263,10 @@ if MCReco:
     MC_WpJet_eta_all = array.array('f', [0.])
     MC_WpJet_phi_all = array.array('f', [0.])
     MC_WpJet_m_all = array.array('f', [0.])
+    GenPart_Bottom_pt_all = array.array('f', [0.])
+    GenPart_Bottom_eta_all = array.array('f', [0.])
+    GenPart_Bottom_phi_all = array.array('f', [0.])
+    GenPart_Bottom_m_all = array.array('f', [0.])
 closest_WpJet_pt_all = array.array('f', [0.])
 closest_WpJet_eta_all = array.array('f', [0.])
 closest_WpJet_phi_all = array.array('f', [0.])
@@ -305,6 +319,7 @@ lepton_pt_all = array.array('f', [0.])
 lepton_eta_all = array.array('f', [0.])
 lepton_phi_all = array.array('f', [0.])
 lepton_miniIso_all = array.array('f', [0.])
+lepton_stdIso_all = array.array('f', [0.])
 lepMET_deltaPhi_all = array.array('f', [0.])
 isEle_all = array.array('i', [0])
 isMu_all = array.array('i', [0])
@@ -407,6 +422,11 @@ if MCReco:
     systTree.branchTreesSysts(trees, "all", "MC_Wprime_phi", outTreeFile, MC_Wprime_phi_all)
     systTree.branchTreesSysts(trees, "all", "MC_Wprime_m", outTreeFile, MC_Wprime_m_all)
     systTree.branchTreesSysts(trees, "all", "MC_Wprime_mt", outTreeFile, MC_Wprime_mt_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_Wprime_pt", outTreeFile, GenPart_Wprime_pt_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_Wprime_eta", outTreeFile, GenPart_Wprime_eta_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_Wprime_phi", outTreeFile, GenPart_Wprime_phi_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_Wprime_m", outTreeFile, GenPart_Wprime_m_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_Wprime_mt", outTreeFile, GenPart_Wprime_mt_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wprime_pt", outTreeFile, closest_Wprime_pt_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wprime_eta", outTreeFile, closest_Wprime_eta_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wprime_phi", outTreeFile, closest_Wprime_phi_all)
@@ -456,6 +476,11 @@ if MCReco:
     systTree.branchTreesSysts(trees, "all", "MC_top_phi", outTreeFile, MC_RecoTop_phi_all)
     systTree.branchTreesSysts(trees, "all", "MC_top_m", outTreeFile, MC_RecoTop_m_all)
     systTree.branchTreesSysts(trees, "all", "MC_top_mt", outTreeFile, MC_RecoTop_mt_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_top_pt", outTreeFile, GenPart_Top_pt_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_top_eta", outTreeFile, GenPart_Top_eta_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_top_phi", outTreeFile, GenPart_Top_phi_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_top_m", outTreeFile, GenPart_Top_m_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_top_mt", outTreeFile, GenPart_Top_mt_all)
     systTree.branchTreesSysts(trees, "all", "MC_top_isNeg", outTreeFile, MC_RecoTop_isNeg_all)
 systTree.branchTreesSysts(trees, "all", "closest_top_pt", outTreeFile, closest_RecoTop_pt_all)
 systTree.branchTreesSysts(trees, "all", "closest_top_eta", outTreeFile, closest_RecoTop_eta_all)
@@ -526,6 +551,10 @@ if MCReco:
     systTree.branchTreesSysts(trees, "all", "MC_Wpjet_eta", outTreeFile, MC_WpJet_eta_all)
     systTree.branchTreesSysts(trees, "all", "MC_Wpjet_phi", outTreeFile, MC_WpJet_phi_all)
     systTree.branchTreesSysts(trees, "all", "MC_Wpjet_m", outTreeFile, MC_WpJet_m_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_bottom_pt", outTreeFile, GenPart_Bottom_pt_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_bottom_eta", outTreeFile, GenPart_Bottom_eta_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_bottom_phi", outTreeFile, GenPart_Bottom_phi_all)
+    systTree.branchTreesSysts(trees, "all", "GenPart_bottom_m", outTreeFile, GenPart_Bottom_m_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wpjet_pt", outTreeFile, closest_WpJet_pt_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wpjet_eta", outTreeFile, closest_WpJet_eta_all)
 systTree.branchTreesSysts(trees, "all", "closest_Wpjet_phi", outTreeFile, closest_WpJet_phi_all)
@@ -550,6 +579,7 @@ systTree.branchTreesSysts(trees, "all", "lepton_pt", outTreeFile, lepton_pt_all)
 systTree.branchTreesSysts(trees, "all", "lepton_eta", outTreeFile, lepton_eta_all)
 systTree.branchTreesSysts(trees, "all", "lepton_phi", outTreeFile, lepton_phi_all)
 systTree.branchTreesSysts(trees, "all", "lepton_miniIso", outTreeFile, lepton_miniIso_all)
+systTree.branchTreesSysts(trees, "all", "lepton_stdIso", outTreeFile, lepton_stdIso_all)
 systTree.branchTreesSysts(trees, "all", "lepMET_deltaphi", outTreeFile, lepMET_deltaPhi_all)
 systTree.branchTreesSysts(trees, "all", "passed_mu", outTreeFile, passed_mu_all)
 systTree.branchTreesSysts(trees, "all", "passed_ele", outTreeFile, passed_ele_all)
@@ -653,19 +683,20 @@ if(isMC):
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
 
 #++++++++++++++++++++++++++++++++++
-#++      taking MC weights       ++
+#++      Efficiency studies      ++
 #++++++++++++++++++++++++++++++++++
 
 
 print "Total number of events: ", tree.GetEntries()
 
 neutrino_failed = 0
-
 nrecochi = 0
 nrecoclosest = 0
 nrecosublead = 0
 nrecobest = 0
-
+nbinseff = 10
+h_eff_mu = ROOT.TH1D("h_eff_mu", "h_eff_mu", nbinseff, 0, nbinseff)
+h_eff_ele = ROOT.TH1D("h_eff_ele", "h_eff_ele", nbinseff, 0, nbinseff)
 #++++++++++++++++++++++++++++++++++
 #++   looping over the events    ++
 #++++++++++++++++++++++++++++++++++
@@ -677,12 +708,11 @@ for i in xrange(0,tree.GetEntries()):
     if Debug:
         print "evento n. " + str(i)
 
-    if Debug and i > 200:
+    if Debug and i > 5000:
         break
     
     if not Debug and i%5000 == 0:
         print "Event #", i+1, " out of ", tree.GetEntries()
-
     event = Event(tree,i)
     electrons = Collection(event, "Electron")
     muons = Collection(event, "Muon")
@@ -696,7 +726,9 @@ for i in xrange(0,tree.GetEntries()):
     met = Object(event, "MET")
     MET = {'metPx': met.pt*ROOT.TMath.Cos(met.phi), 'metPy': met.pt*ROOT.TMath.Sin(met.phi)}
     genpart = None
-
+    
+    h_eff_mu.Fill('Total', 1)
+    h_eff_ele.Fill('Total', 1)
     if isMC:
         genpart = Collection(event, "GenPart")
         LHE = Collection(event, "LHEPart")
@@ -745,6 +777,23 @@ for i in xrange(0,tree.GetEntries()):
     if('DataMu' in sample.label and (passEle or not passMu)):
         continue
 
+    if len(goodMu) == 1:
+        h_eff_mu.Fill('Good Mu', 1)
+        if len(goodEle) == 0:
+            h_eff_mu.Fill('Good Ele', 1)
+        if len(VetoMu) == 0:
+            h_eff_mu.Fill('Veto Mu', 1)
+        if len(VetoEle) == 0:
+            h_eff_mu.Fill('Veto Ele', 1)
+    if len(goodEle) == 1:
+        h_eff_ele.Fill('Good Ele', 1)
+        if len(goodMu) == 0:
+            h_eff_ele.Fill('Good Mu', 1)
+        if len(VetoMu) == 0:
+            h_eff_ele.Fill('Veto Mu', 1)
+        if len(VetoEle) == 0:
+            h_eff_ele.Fill('Veto Ele', 1)
+
     ######################################
     ## Selecting only jets with pt>100  ##
     ######################################
@@ -756,8 +805,31 @@ for i in xrange(0,tree.GetEntries()):
     nJet_lowpt_all[0] = len(jets) - len(goodJets)
     nbJet_lowpt_all[0] = len(bjet_filter(jets, 'DeepFlv', 'M')[0]) - len(bjets)
     #print len(fatjets)
+    #++++++++++++++++++++++++++++++++++
+    #++    plots for lep-jet dis     ++
+    #++++++++++++++++++++++++++++++++++
+    #lepjet,drmin = closest(tightlep, get_Jet(jets, 15))
+    #ptrel = get_ptrel(tightlep, lepjet)
+    #if(isMuon):
+    #    h_drmin_ptrel_mu.Fill(drmin,ptrel)
+    if(len(goodJets) >= 2):
+        if isMuon:
+            h_eff_mu.Fill('good jets >2', int(isMuon))
+        elif isElectron:
+            h_eff_ele.Fill('good jets >2', int(isElectron))
+    if(len(fatjets) >= 2):
+        if isMuon:
+            h_eff_mu.Fill('fat jets >2', int(isMuon))
+        elif isElectron:
+            h_eff_ele.Fill('fat jets >2', int(isElectron))
+
     if (len(goodJets) < 2 or len(fatjets) < 2):
         continue
+
+    if isMuon:
+        h_eff_mu.Fill('passMu+jetsel', int(isMuon))
+    elif isElectron:
+        h_eff_ele.Fill('passEle+jetsel', int(isElectron))
 
     if(TriggerStudy):
         isdileptonic[0] = 0
@@ -842,6 +914,8 @@ for i in xrange(0,tree.GetEntries()):
         lepton_eta_all[0] = tightlep_p4.Eta()
         lepton_phi_all[0] = tightlep_p4.Phi()
         lepton_miniIso_all[0] = tightlep.miniPFRelIso_all
+        if(isMuon):
+            lepton_stdIso_all[0] = tightlep.pfIsoId
         MET_pt_all[0] = met.pt
         MET_phi_all[0] = met.phi
         Event_HT_all[0] = HT.eventHT
@@ -876,13 +950,21 @@ for i in xrange(0,tree.GetEntries()):
     if('TT_' in sample.label):
         lhe_ele = 0
         lhe_mu = 0
+        lhe_tau = 0
         nlep_all[0] = 0
         for lhep in LHE:
             if(abs(lhep.pdgId) == 11):
                 lhe_ele += 1
             elif(abs(lhep.pdgId) == 13):
                 lhe_mu += 1
-        nlep_all[0] = lhe_ele + lhe_mu
+            elif(abs(lhep.pdgId) == 15):
+               for genp in genpart:
+                   print "pdg id " + str(genp.pdgId) + " and mother is " + str(genp.genPartIdxMother)
+                   if((abs(genp.pdgId) == 11 or abs(genp.pdgId) == 13) and genp.genPartIdxMother > 0):
+                       print  " with pdg id " + str(genpart[int(genp.genPartIdxMother)].pdgId)
+                       abs(genpart[genp.genPartIdxMother].pdgId) == 15
+                       lhe_tau += 1 #inventare un modo per contare eventi leptonici da tau
+        nlep_all[0] = lhe_ele + lhe_mu + lhe_tau
 
     # checking the top 4-vector at LHE level 
     if Debug:
@@ -915,6 +997,57 @@ for i in xrange(0,tree.GetEntries()):
 
     #MCtruth event reconstruction
     if MCReco:
+
+        #GenParticles
+        gentopFound = False
+        genbottFound = False
+        gentop = None
+        genbott = None
+        for genp in genpart:
+            if gentopFound == True and genbottFound == True:
+                break
+            if genp.genPartIdxMother == 0:
+                if abs(genp.pdgId) == 6:
+                    gentop = genp
+                    gentopFound = True
+                elif abs(genp.pdgId) == 5:
+                    genbott = genp
+                    genbottFound = True
+            else:
+                continue
+
+        if gentopFound and genbottFound:
+            genWprime_p4 = gentop.p4() + genbott.p4()
+            GenPart_Wprime_m_all[0] = genWprime_p4.M()
+            GenPart_Wprime_mt_all[0] = genWprime_p4.Mt()
+            GenPart_Wprime_pt_all[0] = genWprime_p4.Pt()
+            GenPart_Wprime_eta_all[0] = genWprime_p4.Eta()
+            GenPart_Wprime_phi_all[0] = genWprime_p4.Phi()
+            GenPart_Top_m_all[0] = gentop.p4().M()
+            GenPart_Top_mt_all[0] = gentop.p4().Mt()
+            GenPart_Top_pt_all[0] = gentop.p4().Pt()
+            GenPart_Top_eta_all[0] = gentop.p4().Eta()
+            GenPart_Top_phi_all[0] = gentop.p4().Phi()
+            GenPart_Bottom_m_all[0] = genbott.p4().M()
+            GenPart_Bottom_pt_all[0] = genbott.p4().Pt()
+            GenPart_Bottom_eta_all[0] = genbott.p4().Eta()
+            GenPart_Bottom_phi_all[0] = genbott.p4().Phi()
+        else:
+            GenPart_Wprime_m_all[0] = -100.
+            GenPart_Wprime_mt_all[0] = -100.
+            GenPart_Wprime_pt_all[0] = -100.
+            GenPart_Wprime_eta_all[0] = -100.
+            GenPart_Wprime_phi_all[0] = -100.
+            GenPart_Top_m_all[0] = -100.
+            GenPart_Top_mt_all[0] = -100.
+            GenPart_Top_pt_all[0] = -100.
+            GenPart_Top_eta_all[0] = -100.
+            GenPart_Top_phi_all[0] = -100.
+            GenPart_Bottom_m_all[0] = -100.
+            GenPart_Bottom_pt_all[0] = -100.
+            GenPart_Bottom_eta_all[0] = -100.
+            GenPart_Bottom_phi_all[0] = -100.
+        
         mcbjets = mcbjet_filter(jets)
         mctfound = False
         if isMuon:
@@ -1526,6 +1659,8 @@ if(isMC):
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
     h_genweight.Write()
     h_PDFweight.Write()
+    h_eff_mu.Write()
+    h_eff_ele.Write()
 systTree.writeTreesSysts(trees, outTreeFile)
 
 endTime = datetime.datetime.now()
