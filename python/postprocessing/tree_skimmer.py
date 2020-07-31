@@ -708,18 +708,15 @@ for i in xrange(0,tree.GetEntries()):
     if Debug:
         print "evento n. " + str(i)
 
-<<<<<<< HEAD
     '''
     if Debug:
         if i > 2000:
             break
     '''
 
-=======
     if Debug and i > 5000:
         break
     
->>>>>>> 29699312f1ff1bedac796645c4f7bd29ab341bba
     if not Debug and i%5000 == 0:
         print "Event #", i+1, " out of ", tree.GetEntries()
     event = Event(tree,i)
