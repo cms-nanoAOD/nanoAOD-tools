@@ -26,8 +26,8 @@ parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', hel
 (opt, args) = parser.parse_args()
 
 folder = opt.folder
-
-filerepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
+filerepo = '/eos/user/a/apiccine/Wprime/nosynch/v7_apc/'
+#filerepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
 plotrepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'#Wpjet_nosel/'
 
 ROOT.gROOT.SetBatch() # don't pop up canvases
@@ -465,7 +465,7 @@ if opt.cut == "lepton_eta>-10." and not opt.sel:
      cut_tag = ""
 else:
      if opt.sel:
-          cut_dict = {'muon':"(MC_Wprime_m==-100)*MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 'electron':"(MC_Wprime_m==-100)*MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut}
+          cut_dict = {'muon':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 'electron':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut}
           if opt.cut != "lepton_eta>-10.":
                cut_tag = 'selection_AND_' + cutToTag(opt.cut) 
           else:
@@ -636,7 +636,7 @@ for year in years:
           variables.append(variabile('WprAK8_tau1', 'WprAK8 tau 1', wzero+'*('+cut+')', 80, 0, .8))
           variables.append(variabile('WprAK8_tau3', 'WprAK8 tau 3', wzero+'*('+cut+')', 40, 0, .4))
           variables.append(variabile('WprAK8_tau4', 'WprAK8 tau 4', wzero+'*('+cut+')', 20, 0, .2))
-          
+          '''
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
