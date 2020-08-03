@@ -215,12 +215,13 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      for s in samples_:
           infile[s.label].cd()
           print "opening file: ", infile[s.label].GetName()
-          tmp = (ROOT.TH1F)(infile[s.label].Get(histoname))
           tmp.SetLineColor(ROOT.kBlack)
           tmp.SetName(s.leglabel)
           print s.label 
           print blind
           if('Data' in s.label):
+               if "GenPart" in variabile_._name:
+                    continue
                hdata.Add(ROOT.TH1F(tmp.Clone("")))
                hdata.SetMarkerStyle(20)
                hdata.SetMarkerSize(0.9)
@@ -516,7 +517,6 @@ for year in years:
           variables.append(variabile('mtw', 'W boson transverse mass [GeV]',  wzero+'*('+cut+')', 100, 0, 500))
           variables.append(variabile('best_topjet_isbtag', 'top jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
           variables.append(variabile('best_Wpjet_isbtag', 'W\' jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
-          '''
           variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')',  46, 80, 1000))
           variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  123, 80, 5000))
           variables.append(variabile('WprAK8_ttagMD', 'WprAK8 t tag MD', wzero+'*(WprAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
@@ -561,6 +561,14 @@ for year in years:
           variables.append(variabile('sublead_top_eta', 'top #eta (sublead)', wzero+'*(sublead_top_eta>-10.&&'+cut+')', 48, -4., 4.))
           variables.append(variabile('sublead_top_phi', 'top #phi (sublead)',  wzero+'*(sublead_top_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('sublead_top_m', 'top mass [GeV] (sublead)',  wzero+'*(sublead_top_m>0&&'+cut+')',  92, 80, 1000))
+          variables.append(variabile('GenPart_top_pt', 'top p_{T} [GeV] (GenPart)',  wzero+'*(GenPart_top_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('GenPart_top_eta', 'top #eta (GenPart)', wzero+'*(GenPart_top_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('GenPart_top_phi', 'top #phi (GenPart)',  wzero+'*(GenPart_top_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('GenPart_top_m', 'top mass [GeV] (GenPart)',  wzero+'*(GenPart_top_m>0&&'+cut+')',  92, 80, 1000))
+          variables.append(variabile('GenPart_bottom_pt', 'bottom p_{T} [GeV] (GenPart)',  wzero+'*(GenPart_bottom_pt>0&&'+cut+')', 100, 0, 1200))
+          variables.append(variabile('GenPart_bottom_eta', 'bottom #eta (GenPart)', wzero+'*(GenPart_bottom_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('GenPart_bottom_phi', 'bottom #phi (GenPart)',  wzero+'*(GenPart_bottom_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('GenPart_bottom_m', 'bottom mass [GeV] (GenPart)',  wzero+'*(GenPart_bottom_m>0&&'+cut+')',  92, 80, 1000))
           variables.append(variabile('chi_Wprime_pt', 'Wprime p_{T} [GeV] (chimass)',  wzero+'*(chi_Wprime_pt>0&&'+cut+')', 220, 0, 2200))
           variables.append(variabile('chi_Wprime_eta', 'Wprime #eta (chimass)', wzero+'*(chi_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
           variables.append(variabile('chi_Wprime_phi', 'Wprime #phi (chimass)',  wzero+'*(chi_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
@@ -576,6 +584,10 @@ for year in years:
           variables.append(variabile('sublead_Wprime_eta', 'Wprime #eta (sublead)', wzero+'*(sublead_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
           variables.append(variabile('sublead_Wprime_phi', 'Wprime #phi (sublead)',  wzero+'*(sublead_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('sublead_Wprime_m', 'Wprime mass [GeV] (sublead)',  wzero+'*(sublead_Wprime_m>0&&'+cut+')',  250, 80, 5000))
+          variables.append(variabile('GenPart_Wprime_pt', 'Wprime p_{T} [GeV] (GenPart)',  wzero+'*(GenPart_Wprime_pt>0&&'+cut+')', 220, 0, 2200))
+          variables.append(variabile('GenPart_Wprime_eta', 'Wprime #eta (GenPart)', wzero+'*(GenPart_Wprime_eta>-10.&&'+cut+')', 48, -4., 4.))
+          variables.append(variabile('GenPart_Wprime_phi', 'Wprime #phi (GenPart)',  wzero+'*(GenPart_Wprime_phi>-4.&&'+cut+')', 20, -3.14, 3.14))
+          variables.append(variabile('GenPart_Wprime_m', 'Wprime mass [GeV] (GenPart)',  wzero+'*(GenPart_Wprime_m>0&&'+cut+')',  250, 80, 5000))
           variables.append(variabile('sublead_topjet_pt', 'sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 1200))
           variables.append(variabile('sublead_topjet_eta', 'sub leading jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('sublead_Wpjet_pt', '(sublead) leading jet p_{T} [GeV] ',  wzero+'*('+cut+')', 100, 0, 2000))
@@ -640,6 +652,8 @@ for year in years:
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
+                         if "GenPart" in var._name and "Data" in sample.label:
+                              continue
                          plot(lep, 'jets', var, sample, cut_tag, "")
           if(opt.stack):
                for var in variables:
