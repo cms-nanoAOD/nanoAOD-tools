@@ -712,6 +712,12 @@ for i in xrange(0,tree.GetEntries()):
     if Debug:
         print "evento n. " + str(i)
 
+    '''
+    if Debug:
+        if i > 2000:
+            break
+    '''
+
     if Debug and i > 5000:
         break
     
@@ -1005,38 +1011,44 @@ for i in xrange(0,tree.GetEntries()):
         #GenParticles
         gentopFound = False
         genbottFound = False
-        gentop = None
-        genbott = None
+        gentop_p4 = ROOT.TLorentzVector()
+        genbott_p4 = ROOT.TLorentzVector()
         for genp in genpart:
             if gentopFound == True and genbottFound == True:
                 break
             if genp.genPartIdxMother == 0:
-                if abs(genp.pdgId) == 6:
-                    gentop = copy.deepcopy(genp)
+                if abs(genp.pdgId) == 6 and gentopFound == False:
+                    gentop_p4.SetPtEtaPhiM(genp.pt, genp.eta, genp.phi, genp.mass)
+                    if Debug:
+                        print "top genp: ", genp.pt, genp.phi, genp.eta, genp.mass, genp.pdgId
+                        print "(loop) gentop: ", gentop_p4.Pt(), gentop_p4.Phi(), gentop_p4.Eta(), gentop_p4.M()
                     gentopFound = True
-                elif abs(genp.pdgId) == 5:
-                    genbott = copy.deepcopy(genp)
+                elif abs(genp.pdgId) == 5 and genbottFound == False:
+                    genbott_p4.SetPtEtaPhiM(genp.pt, genp.eta, genp.phi, genp.mass)
+                    if Debug:
+                        print "bott genp: ", genp.pt, genp.phi, genp.eta, genp.mass, genp.pdgId
+                        print "(loop) genbott: ", genbott_p4.Pt(), genbott_p4.Phi(), genbott_p4.Eta(), genbott_p4.M()
                     genbottFound = True
             else:
                 continue
-
+        
+        #print gentop, genbott
         if gentopFound and genbottFound:
-            print gentop.pt
-            genWprime_p4 = gentop.p4() + genbott.p4()
+            genWprime_p4 = gentop_p4 + genbott_p4
             GenPart_Wprime_m_all[0] = genWprime_p4.M()
             GenPart_Wprime_mt_all[0] = genWprime_p4.Mt()
             GenPart_Wprime_pt_all[0] = genWprime_p4.Pt()
             GenPart_Wprime_eta_all[0] = genWprime_p4.Eta()
             GenPart_Wprime_phi_all[0] = genWprime_p4.Phi()
-            GenPart_Top_m_all[0] = gentop.p4().M()
-            GenPart_Top_mt_all[0] = gentop.p4().Mt()
-            GenPart_Top_pt_all[0] = gentop.p4().Pt()
-            GenPart_Top_eta_all[0] = gentop.p4().Eta()
-            GenPart_Top_phi_all[0] = gentop.p4().Phi()
-            GenPart_Bottom_m_all[0] = genbott.p4().M()
-            GenPart_Bottom_pt_all[0] = genbott.p4().Pt()
-            GenPart_Bottom_eta_all[0] = genbott.p4().Eta()
-            GenPart_Bottom_phi_all[0] = genbott.p4().Phi()
+            GenPart_Top_m_all[0] = gentop_p4.M()
+            GenPart_Top_mt_all[0] = gentop_p4.Mt()
+            GenPart_Top_pt_all[0] = gentop_p4.Pt()
+            GenPart_Top_eta_all[0] = gentop_p4.Eta()
+            GenPart_Top_phi_all[0] = gentop_p4.Phi()
+            GenPart_Bottom_m_all[0] = genbott_p4.M()
+            GenPart_Bottom_pt_all[0] = genbott_p4.Pt()
+            GenPart_Bottom_eta_all[0] = genbott_p4.Eta()
+            GenPart_Bottom_phi_all[0] = genbott_p4.Phi()
         else:
             GenPart_Wprime_m_all[0] = -100.
             GenPart_Wprime_mt_all[0] = -100.
