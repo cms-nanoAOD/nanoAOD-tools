@@ -226,6 +226,7 @@ best_TopJet_eta_all = array.array('f', [0.])
 best_TopJet_phi_all = array.array('f', [0.])
 best_TopJet_m_all = array.array('f', [0.])
 best_TopJet_isBTagged_all = array.array('i', [0])
+best_TopJet_btagscore_all = array.array('i', [0])
 best_TopJet_dRLepJet_all = array.array('f', [0])
 
 Event_HT_all = array.array('f', [0.])
@@ -287,6 +288,7 @@ best_WpJet_eta_all = array.array('f', [0.])
 best_WpJet_phi_all = array.array('f', [0.])
 best_WpJet_m_all = array.array('f', [0.])
 best_WpJet_isBTagged_all = array.array('i', [0])
+best_WpJet_btagscore_all = array.array('i', [0])
 '''
 closest_WpJet_isDFL_all = array.array('i', [0])
 closest_WpJet_isDFM_all = array.array('i', [0])
@@ -548,6 +550,7 @@ systTree.branchTreesSysts(trees, "all", "best_topjet_eta", outTreeFile, best_Top
 systTree.branchTreesSysts(trees, "all", "best_topjet_phi", outTreeFile, best_TopJet_phi_all)
 systTree.branchTreesSysts(trees, "all", "best_topjet_m", outTreeFile, best_TopJet_m_all)
 systTree.branchTreesSysts(trees, "all", "best_topjet_isbtag", outTreeFile, best_TopJet_isBTagged_all)
+systTree.branchTreesSysts(trees, "all", "best_topjet_btagscore", outTreeFile, best_TopJet_btagscore_all)
 systTree.branchTreesSysts(trees, "all", "best_topjet_dRLepJet", outTreeFile, best_TopJet_dRLepJet_all)
 
 if MCReco:
@@ -579,6 +582,7 @@ systTree.branchTreesSysts(trees, "all", "best_Wpjet_eta", outTreeFile, best_WpJe
 systTree.branchTreesSysts(trees, "all", "best_Wpjet_phi", outTreeFile, best_WpJet_phi_all)
 systTree.branchTreesSysts(trees, "all", "best_Wpjet_m", outTreeFile, best_WpJet_m_all)
 systTree.branchTreesSysts(trees, "all", "best_Wpjet_isbtag", outTreeFile, best_WpJet_isBTagged_all)
+systTree.branchTreesSysts(trees, "all", "best_Wpjet_btagscore", outTreeFile, best_WpJet_btagscore_all)
 systTree.branchTreesSysts(trees, "all", "lepton_pt", outTreeFile, lepton_pt_all)
 systTree.branchTreesSysts(trees, "all", "lepton_eta", outTreeFile, lepton_eta_all)
 systTree.branchTreesSysts(trees, "all", "lepton_phi", outTreeFile, lepton_phi_all)
@@ -1616,12 +1620,14 @@ for i in xrange(0,tree.GetEntries()):
         best_TopJet_eta_all[0] = best_jet_p4.Eta()
         best_TopJet_phi_all[0] = best_jet_p4.Phi()
         best_TopJet_isBTagged_all[0] = int(len(bjet_filter([best_jet], 'DeepFlv', 'M')[0]))
+        best_TopJet_btagscore_all[0] = best_jet.btagDeepFlavB
         best_TopJet_dRLepJet_all[0] = copy.deepcopy(best_dR_lepjet)
         best_WpJet_m_all[0] = best_promptjet.p4().M()
         best_WpJet_pt_all[0] = best_promptjet.p4().Pt()
         best_WpJet_eta_all[0] = best_promptjet.p4().Eta()
         best_WpJet_phi_all[0] = best_promptjet.p4().Phi()
         best_WpJet_isBTagged_all[0] = int(len(bjet_filter([best_promptjet], 'DeepFlv', 'M')[0]))
+        best_WpJet_btagscore_all[0] = best_promptjet.btagDeepFlavB
         closAK8, dR_bestWAK4AK8 = closest(best_promptjet, fatjets) 
         ptrel_bestWAK4_closestAK8[0] = best_promptjet.pt/closAK8.pt
         deltaR_bestWAK4_closestAK8[0] = copy.deepcopy(dR_bestWAK4AK8)

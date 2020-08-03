@@ -27,11 +27,9 @@ parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', hel
 
 folder = opt.folder
 
-filerepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
-plotrepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'#MCtruth/'
-
-print "filedir: ", filerepo
-print "plotdir: ", plotrepo
+filerepo = '/eos/user/a/apiccine/Wprime/nosynch/v7_apc/'
+#filerepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
+plotrepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'#Wpjet_nosel/'
 
 ROOT.gROOT.SetBatch() # don't pop up canvases
 if not os.path.exists(plotrepo + 'plot/muon'):
@@ -525,9 +523,8 @@ for year in years:
           variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')',  46, 80, 1000))
           variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  123, 80, 5000))
           variables.append(variabile('WprAK8_ttagMD', 'WprAK8 t tag MD', wzero+'*(WprAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
-          variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 20, 0, .4))   
-          variables.append(variabile('leadingjet_pt', '(prereco) leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
-          variables.append(variabile('subleadingjet_pt', '(prereco) sub leading jet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
+          variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 20, 0, .4))
+          '''
           #variables.append(variabile('best_topjet_isbtag', 'top jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
           #variables.append(variabile('best_Wpjet_isbtag', "W' jet b tagged (best)",  wzero+'*('+cut+')', 2, -0.5, 1.5))
           variables.append(variabile('MC_Wpjet_pt', "MCtruth W' jet p_{T} [GeV]",  wzero+'*('+cut+')', 100, 0, 2000))
@@ -662,7 +659,7 @@ for year in years:
           variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 60, 0, .6))
           variables.append(variabile('WprAK8_tau3', 'WprAK8 tau 3', wzero+'*('+cut+')', 40, 0, .4))
           variables.append(variabile('WprAK8_tau4', 'WprAK8 tau 4', wzero+'*('+cut+')', 20, 0, .2))
-          
+          '''
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
