@@ -339,6 +339,8 @@ passed_ele_all = array.array('f', [0.])
 passed_ht_all = array.array('f', [0.])
 leadingjet_pt_all = array.array('f', [0.])
 subleadingjet_pt_all = array.array('f', [0.])
+leadingbjet_pt_all = array.array('f', [0.])
+subleadingbjet_pt_all = array.array('f', [0.])
 
 leadingjets_deltaPhi = array.array('f', [0.])
 leadingjets_deltaEta = array.array('f', [0.])
@@ -455,6 +457,8 @@ systTree.branchTreesSysts(trees, "all", "nbjet_lowpt", outTreeFile, nbJet_lowpt_
 systTree.branchTreesSysts(trees, "all", "nbjet_pt100", outTreeFile, nbJet_pt100_all)
 systTree.branchTreesSysts(trees, "all", "leadingjet_pt", outTreeFile, leadingjet_pt_all)
 systTree.branchTreesSysts(trees, "all", "subleadingjet_pt", outTreeFile, subleadingjet_pt_all)
+systTree.branchTreesSysts(trees, "all", "leadingbjet_pt", outTreeFile, leadingbjet_pt_all)
+systTree.branchTreesSysts(trees, "all", "subleadingbjet_pt", outTreeFile, subleadingbjet_pt_all)
 systTree.branchTreesSysts(trees, "all", "leadingjets_deltaR", outTreeFile, leadingjets_deltaR)
 systTree.branchTreesSysts(trees, "all", "leadingjets_deltaPhi", outTreeFile, leadingjets_deltaPhi)
 systTree.branchTreesSysts(trees, "all", "leadingjets_deltaEta", outTreeFile, leadingjets_deltaEta)
@@ -1211,6 +1215,10 @@ for i in xrange(0,tree.GetEntries()):
     deltaR_subleadAK4_closestAK8[0] = copy.deepcopy(dR_subleadAK4AK8)
     leadingjet_pt_all[0] = jets[0].pt
     subleadingjet_pt_all[0] = jets[1].pt
+    if len(bjets) != 0:
+        leadingbjet_pt_all[0] = bjets[0].pt
+    if len(bjets) > 1:
+        subleadingbjet_pt_all[0] = bjets[1].pt
     leadingjets_deltaR[0] = deltaR(jets[0].eta, jets[0].phi, jets[1].eta, jets[1].phi)
     leadingjets_deltaPhi[0] = deltaPhi(jets[0].phi, jets[1].phi)
     leadingjets_deltaEta[0] = jets[0].eta - jets[1].eta
