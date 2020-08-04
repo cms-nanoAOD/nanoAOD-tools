@@ -226,7 +226,7 @@ best_TopJet_eta_all = array.array('f', [0.])
 best_TopJet_phi_all = array.array('f', [0.])
 best_TopJet_m_all = array.array('f', [0.])
 best_TopJet_isBTagged_all = array.array('i', [0])
-best_TopJet_btagscore_all = array.array('i', [0])
+best_TopJet_btagscore_all = array.array('f', [0])
 best_TopJet_dRLepJet_all = array.array('f', [0])
 
 Event_HT_all = array.array('f', [0.])
@@ -288,7 +288,7 @@ best_WpJet_eta_all = array.array('f', [0.])
 best_WpJet_phi_all = array.array('f', [0.])
 best_WpJet_m_all = array.array('f', [0.])
 best_WpJet_isBTagged_all = array.array('i', [0])
-best_WpJet_btagscore_all = array.array('i', [0])
+best_WpJet_btagscore_all = array.array('f', [0])
 '''
 closest_WpJet_isDFL_all = array.array('i', [0])
 closest_WpJet_isDFM_all = array.array('i', [0])
@@ -1665,6 +1665,7 @@ for i in xrange(0,tree.GetEntries()):
         best_TopJet_eta_all[0] = -100.
         best_TopJet_phi_all[0] = -100.
         best_TopJet_isBTagged_all[0] = -1
+        print type(best_TopJet_btagscore_all[0])
         best_TopJet_dRLepJet_all[0] = -100.
         best_WpJet_m_all[0] = -100.
         best_WpJet_pt_all[0] = -100.
