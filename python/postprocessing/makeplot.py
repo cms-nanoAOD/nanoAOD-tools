@@ -238,7 +238,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
                i += 1
           elif('WP' in s.label):
                #tmp.SetLineStyle(9)
-               tmp.SetLineColor(s.color)
+               tmp.SetFillColor(s.color)
                #tmp.SetLineWidth(3)
                tmp.SetMarkerSize(0.)
                tmp.SetMarkerColor(s.color)
@@ -246,7 +246,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           else:
                tmp.SetOption("HIST SAME")
                tmp.SetTitle("")
-               tmp.SetLineColor(s.color)
+               tmp.SetFillColor(s.color)
                histo.append(tmp.Clone(""))
                stack.Add(tmp.Clone(""))
           tmp.Reset("ICES")
@@ -294,7 +294,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      else:
           stack.SetMaximum(maximum*1.6)
      stack.SetMinimum(0.01)
-     stack.Draw("HIST NOSTACK")
+     stack.Draw("HIST")
      step = float(variabile_._xmax - variabile_._xmin)/float(variabile_._nbins)
      print str(step)
      if "GeV" in variabile_._title:
