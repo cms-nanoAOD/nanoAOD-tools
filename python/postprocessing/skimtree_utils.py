@@ -94,9 +94,9 @@ def hemisphere_pt(objs):
     thrust_py = thrust_py / mod
     for obj in objs:
         num += math.fabs(thrust_px*obj[0] + thrust_py*obj[1])
-    #print "num: ", num
+    #print("num: ", num)
     thrust = * num / den
-    #print "thrust: ", thrust
+    #print( "thrust: ", thrust)
     return thrust
     '''
 
@@ -177,10 +177,10 @@ def event_thrust(lep, jets, met):
     had_pt = 0.
     for jet in jets:
         had_pt += math.fabs(jet.pt)
-    #print "had_pt: ", had_pt
+    #print( "had_pt: ", had_pt)
     ovr_pt = copy.deepcopy(had_pt)
     ovr_pt += math.fabs(lep.pt) + math.fabs(met.pt)
-    #print "ovr_pt: ", ovr_pt
+    #print( "ovr_pt: ", ovr_pt)
     for i, seljet in enumerate(jets): #build hemispheres for every jet
         neg_ovr = []
         neg_had = []
@@ -355,7 +355,7 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
                 h.SetLineColor(colors[i])
                 mg.Add(h)
                 i += 1
-            print mg
+            print( mg)
             
             #cap = hist[0].GetXaxis().GetTitle()
             mg.SetMinimum(0.001)
@@ -374,7 +374,7 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
             mg = ROOT.TMultiGraph('mg', hist[0].GetTitle()+';'+hist[0].CreateGraph().GetXaxis().GetTitle()+';'+hist[0].CreateGraph().GetYaxis().GetTitle())
 
             for h in hist:
-                print h
+                print( h)
                 h.SetLineColor(colors[i])
                 mg.Add(h.CreateGraph())
                 i += 1
@@ -517,7 +517,7 @@ def EqSolv(a1, a2, a3, a4):
             else:
                 result.append(x3.real)            
     else:
-        print 'p1'
+        print( 'p1')
         result = None
     #print result
     return result
@@ -525,7 +525,7 @@ def EqSolv(a1, a2, a3, a4):
 class TopUtilities():
     def __init__(self):
         if False:
-            print'ok'
+            print('ok')
 
     def NuMomentum(self,  leptonPx, leptonPy, leptonPz, leptonPt, leptonE, metPx, metPy):
       mW = 80.379
@@ -748,7 +748,7 @@ class TopUtilities():
 ###############################################
 ### Begin of framework/treeReaderArrayTools ###   
 ###############################################
-def InputTree(tree,entrylist=None):
+def InputTree(tree,entrylist=ROOT.nullptr):
     """add to the PyROOT wrapper of a TTree a TTreeReader and methods readBranch, arrayReader, valueReader""" 
     if hasattr(tree, '_ttreereader'): return tree # don't initialize twice
     tree.entry = -1
@@ -771,9 +771,9 @@ def InputTree(tree,entrylist=None):
 def getArrayReader(tree, branchName):
     """Make a reader for branch branchName containing a variable-length value array."""
     if branchName not in tree._ttras:
-       if not tree.GetBranch(branchName): raise RuntimeError, "Can't find branch '%s'" % branchName
+       if not tree.GetBranch(branchName): raise RuntimeError("Can't find branch '%s'" % branchName)
        leaf = tree.GetBranch(branchName).GetLeaf(branchName)
-       if not bool(leaf.GetLeafCount()): raise RuntimeError, "Branch %s is not a variable-length value array" % branchName
+       if not bool(leaf.GetLeafCount()): raise RuntimeError("Branch %s is not a variable-length value array" % branchName)
        typ = leaf.GetTypeName()
        tree._ttras[branchName] = _makeArrayReader(tree, typ, branchName)
     return tree._ttras[branchName]
@@ -781,9 +781,9 @@ def getArrayReader(tree, branchName):
 def getValueReader(tree, branchName):
     """Make a reader for branch branchName containing a single value."""
     if branchName not in tree._ttrvs:
-       if not tree.GetBranch(branchName): raise RuntimeError, "Can't find branch '%s'" % branchName
+       if not tree.GetBranch(branchName): raise RuntimeError("Can't find branch '%s'" % branchName)
        leaf = tree.GetBranch(branchName).GetLeaf(branchName)
-       if bool(leaf.GetLeafCount()) or leaf.GetLen()!=1 : raise RuntimeError, "Branch %s is not a value" % branchName
+       if bool(leaf.GetLeafCount()) or leaf.GetLen()!=1 : raise RuntimeError("Branch %s is not a value" % branchName)
        typ = leaf.GetTypeName()
        tree._ttrvs[branchName] = _makeValueReader(tree, typ, branchName)
     return tree._ttrvs[branchName]
@@ -796,7 +796,7 @@ def setExtraBranch(tree,name,val):
 
 def readBranch(tree, branchName):
     """Return the branch value if the branch is a value, and a TreeReaderArray if the branch is an array"""
-    if tree._ttreereader._isClean: raise RuntimeError, "readBranch must not be called before calling gotoEntry"
+    if tree._ttreereader._isClean: raise RuntimeError("readBranch must not be called before calling gotoEntry")
     if branchName in tree._extrabranches:
         return tree._extrabranches[branchName]
     elif branchName in tree._ttras:
@@ -806,7 +806,7 @@ def readBranch(tree, branchName):
         return ord(ret) if type(ret)==str else ret
     else:
         branch = tree.GetBranch(branchName)
-        if not branch: raise RuntimeError, "Unknown branch %s" % branchName
+        if not branch: raise RuntimeError("Unknown branch %s" % branchName)
         leaf = branch.GetLeaf(branchName)
         typ = leaf.GetTypeName()
         if leaf.GetLen() == 1 and not bool(leaf.GetLeafCount()): 
@@ -839,10 +839,10 @@ def _remakeAllReaders(tree):
     _ttreereader = ROOT.TTreeReader(tree, getattr(tree, '_entrylist', None))
     _ttreereader._isClean = True
     _ttrvs = {}
-    for k in tree._ttrvs.iterkeys():
+    for k in tree._ttrvs.keys():
         _ttrvs[k] = ROOT.TTreeReaderValue(tree._leafTypes[k])(_ttreereader,k)
     _ttras = {}
-    for k in tree._ttras.iterkeys():
+    for k in tree._ttras.keys():
         _ttras[k] = ROOT.TTreeReaderArray(tree._leafTypes[k])(_ttreereader,k)
     tree._ttrvs = _ttrvs
     tree._ttras = _ttras
@@ -969,7 +969,7 @@ class Collection:
         self._cache = {}
     def __getitem__(self,index):
         if type(index) == int and index in self._cache: return self._cache[index]
-        if index >= self._len: raise IndexError, "Invalid index %r (len is %r) at %s" % (index,self._len,self._prefix)
+        if index >= self._len: raise IndexError("Invalid index %r (len is %r) at %s" % (index,self._len,self._prefix))
         ret = Object(self._event,self._prefix,index=index)
         if type(index) == int: self._cache[index] = ret
         return ret
@@ -1328,14 +1328,14 @@ class systWeights(object):
 
     def getPDFValue(self, numPDF):
         if not self.addPDF:
-            print "error! No PDF used, this will do nothing."
+            print ("error! No PDF used, this will do nothing.")
             return 0.
         MIN = self.maxSystsNonPDF
         return float(self.weightedSysts[numPDF+MIN][0])
 
     def setPDFValue(self, numPDF, w):
         if not self.addPDF:
-            print "error! No PDF used, this will do nothing."
+            print( "error! No PDF used, this will do nothing.")
             return
         MIN = self.maxSystsNonPDF
         self.weightedSysts[numPDF+MIN][0] = w
@@ -1344,7 +1344,7 @@ class systWeights(object):
     def calcPDFHisto(self, histo, singleHisto, scalefactor=1.0, c=0):
         #EXPERIMENTAL                                                                     
         if not addPDF:
-            print "error! No PDF used, this will do nothing."
+            print( "error! No PDF used, this will do nothing.")
             return
         MAX = self.maxSysts
         MIN = self.maxSystsNonPDF + (MAX+1)*c
@@ -1428,19 +1428,19 @@ class systWeights(object):
                 cname = "_" + cname
             for sy in range(MAX):
                 ns = str(self.weightedNames[sy])
-                print " creating file for syst ", ns
+                print( " creating file for syst ", ns)
 
                 if c != 0:
-                    print " category is ", str(c)
-                    print "onlynominal is ", useOnlyNominal
+                    print( " category is ", str(c))
+                    print( "onlynominal is ", useOnlyNominal)
                 
                 if sy == 0:
                     allFiles[sy+(MAX+1)*c] = ROOT.TFile.Open((basename+ns+cname+".root"), opt)
                 else:
                     if not useOnlyNominal:
-                        print " filename is ", basename, ns, cname, ".root"
+                        print( " filename is ", basename, ns, cname, ".root")
                         allFiles[sy+(MAX+1)*c] = ROOT.TFile.Open((basename+"_"+ns+cname+".root"), opt)
-                        print "ESCO dal create Sys "
+                        print( "ESCO dal create Sys ")
 
             if self.addPDF:
                 if not useOnlyNominal:
