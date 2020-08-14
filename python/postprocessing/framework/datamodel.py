@@ -64,9 +64,12 @@ class Object:
         return val
     def __getitem__(self,attr):
         return self.__getattr__(attr)
-    def p4(self):
+    def p4(self, corr_pt=None):
         ret = ROOT.TLorentzVector()
-        ret.SetPtEtaPhiM(self.pt,self.eta,self.phi,self.mass)
+        if corr_pt == None:
+            ret.SetPtEtaPhiM(self.pt,self.eta,self.phi,self.mass)
+        else:
+            ret.SetPtEtaPhiM(corr_pt,self.eta,self.phi,self.mass)
         return ret
     def DeltaR(self,other):
         if isinstance(other,ROOT.TLorentzVector):

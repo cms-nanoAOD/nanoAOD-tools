@@ -25,8 +25,21 @@ class collectionMerger(Module):
         pass
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        _brlist = inputTree.GetListOfBranches()
-        branches = [_brlist.At(i) for i in xrange(_brlist.GetEntries())]
+
+        # Find list of activated branches in input tree
+        _brlist_in = inputTree.GetListOfBranches()
+        branches_in = set([_brlist_in.At(i) for i in xrange(_brlist_in.GetEntries())])
+        branches_in = filter(lambda x: inputTree.GetBranchStatus(x.GetName()), branches_in)
+
+        # Find list of activated branches in output tree
+        _brlist_out = wrappedOutputTree._tree.GetListOfBranches()
+        branches_out = set([_brlist_out.At(i) for i in xrange(_brlist_out.GetEntries())])
+        branches_out = filter(lambda x: wrappedOutputTree._tree.GetBranchStatus(x.GetName()), branches_out)
+
+        # Use both
+        branches = branches_in + branches_out
+
+        # Only keep branches with right collection name
         self.brlist_sep = [self.filterBranchNames(branches,x) for x in self.input]
         self.brlist_all = set(itertools.chain(*(self.brlist_sep)))
 
@@ -35,6 +48,7 @@ class collectionMerger(Module):
             for j in xrange(self.nInputs):
                 if br in self.brlist_sep[j]: self.is_there[bridx][j]=True
 
+        # Create output branches
         self.out = wrappedOutputTree
         for br in self.brlist_all:
             self.out.branch("%s_%s"%(self.output,br), _rootLeafType2rootBranchType[self.branchType[br]], lenVar="n%s"%self.output)
