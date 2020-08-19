@@ -1,7 +1,19 @@
-#!/usr/bin/env python
+#!/bin/env python3
 import os
+print(os.environ)
+print("**********************************************************************")
+print("**********************************************************************")
+print("**********************************************************************")
+print(str(os.environ.get('PYTHONPATH')))
+print(str(os.environ.get('PYTHON3PATH')))
 import sys
+print("*************** This is system version info ***************************")
+print(sys.version_info)
+import platform
+print("*************** This is python version info ***************************")
+print(platform.python_version())
 import ROOT
+print("Succesfully imported ROOT")
 import math
 import datetime
 import copy
@@ -35,9 +47,13 @@ for infile in file_list:
     print("Adding %s to the chain" %(infile))
     chain.Add(infile)
 
+print("Number of events in chain " + str(chain.GetEntries()))
+print("Number of events in tree from chain " + str((chain.GetTree()).GetEntries()))
+print("Type of tree from chain " + str(type(chain.GetTree())))
+#treechain = (ROOT.TTree)(chain.GetTree())
 tree = InputTree(chain)
 print("Number of entries: " +str(tree.GetEntries()))
-print "tree: ", tree
+print("tree: ", tree)
 isMC = True
 if ('Data' in sample.label):
     isMC = False
@@ -660,7 +676,7 @@ if(TriggerStudy):
     systTree.branchTreesSysts(trees, "all", "electron_phi", outTreeFile, electron_phi)
     systTree.branchTreesSysts(trees, "all", "electron_m", outTreeFile, electron_m)
     systTree.branchTreesSysts(trees, "all", "electron_SF", outTreeFile, electron_SF)
-print "Is MC: " + str(isMC) + "      option addPDF: " + str(addPDF)
+print("Is MC: " + str(isMC) + "      option addPDF: " + str(addPDF))
 if(isMC and addPDF):
     systTree.branchTreesSysts(trees, "all", "w_PDF", outTreeFile, w_PDF_all)
 if('TT_' in sample.label): 
@@ -695,7 +711,7 @@ if(isMC):
 #++++++++++++++++++++++++++++++++++
 
 
-print "Total number of events: ", tree.GetEntries()
+print("Total number of events: ", tree.GetEntries())
 
 neutrino_failed = 0
 nrecochi = 0
@@ -708,13 +724,13 @@ h_eff_ele = ROOT.TH1D("h_eff_ele", "h_eff_ele", nbinseff, 0, nbinseff)
 #++++++++++++++++++++++++++++++++++
 #++   looping over the events    ++
 #++++++++++++++++++++++++++++++++++
-for i in xrange(0,tree.GetEntries()):
+for i in range(tree.GetEntries()):
     w_nominal_all[0] = 1.
     #++++++++++++++++++++++++++++++++++
     #++        taking objects        ++
     #++++++++++++++++++++++++++++++++++
     if Debug:
-        print "evento n. " + str(i)
+        print("evento n. " + str(i))
 
     '''
     if Debug:
@@ -726,7 +742,7 @@ for i in xrange(0,tree.GetEntries()):
         break
     
     if not Debug and i%5000 == 0:
-        print "Event #", i+1, " out of ", tree.GetEntries()
+        print("Event #", i+1, " out of ", tree.GetEntries())
     event = Event(tree,i)
     electrons = Collection(event, "Electron")
     muons = Collection(event, "Muon")
@@ -818,7 +834,7 @@ for i in xrange(0,tree.GetEntries()):
     nfatJet_all[0] = len(fatjets)
     nJet_lowpt_all[0] = len(jets) - len(goodJets)
     nbJet_lowpt_all[0] = len(bjet_filter(jets, 'DeepFlv', 'M')[0]) - len(bjets)
-    #print len(fatjets)
+    #print(len(fatjets))
     #++++++++++++++++++++++++++++++++++
     #++    plots for lep-jet dis     ++
     #++++++++++++++++++++++++++++++++++
@@ -896,7 +912,7 @@ for i in xrange(0,tree.GetEntries()):
     recotop = TopUtilities()
     #veto on events with "pathological" reco neutrino
     tent_neutrino = recotop.NuMomentum(tightlep.p4().Px(), tightlep.p4().Py(), tightlep.p4().Pz(), tightlep.p4().Pt(), tightlep.p4().E(), MET['metPx'], MET['metPy'])
-    print " <<<<<<<<<<<<<<<<<<<<<<<< lepton is %f " %tightlep.p4().M()
+    print(" <<<<<<<<<<<<<<<<<<<<<<<< lepton is %f " %tightlep.p4().M())
     if tent_neutrino[0] == None:
         neutrino_failed += 1
         continue
@@ -923,7 +939,7 @@ for i in xrange(0,tree.GetEntries()):
     nPV_tot_all[0] = PV.npvs
 
     if tightlep != None:
-        #print "ev #", i, ": tightlep exists"
+        #print("ev #", i, ": tightlep exists")
         lepton_pt_all[0] = tightlep_p4.Pt()
         lepton_eta_all[0] = tightlep_p4.Eta()
         lepton_phi_all[0] = tightlep_p4.Phi()
@@ -973,9 +989,9 @@ for i in xrange(0,tree.GetEntries()):
                 lhe_mu += 1
             elif(abs(lhep.pdgId) == 15):
                for genp in genpart:
-                   print "pdg id " + str(genp.pdgId) + " and mother is " + str(genp.genPartIdxMother)
+                   print("pdg id " + str(genp.pdgId) + " and mother is " + str(genp.genPartIdxMother))
                    if((abs(genp.pdgId) == 11 or abs(genp.pdgId) == 13) and genp.genPartIdxMother > 0):
-                       print  " with pdg id " + str(genpart[int(genp.genPartIdxMother)].pdgId)
+                       print(" with pdg id " + str(genpart[int(genp.genPartIdxMother)].pdgId))
                        abs(genpart[genp.genPartIdxMother].pdgId) == 15
                        lhe_tau += 1 #inventare un modo per contare eventi leptonici da tau
         nlep_all[0] = lhe_ele + lhe_mu + lhe_tau
@@ -986,7 +1002,7 @@ for i in xrange(0,tree.GetEntries()):
             if(abs(genp.pdgId) == 6):
                 top_q4 = ROOT.TLorentzVector()
                 top_q4.SetPtEtaPhiM(genp.pt, genp.eta, genp.phi, genp.mass)
-                print " top 4-vector at GEN level is (%f, %f, %f, %f) and mass %f "%(genp.pt, genp.eta, genp.phi, top_q4.E(), top_q4.M())
+                print( " top 4-vector at GEN level is (%f, %f, %f, %f) and mass %f "%(genp.pt, genp.eta, genp.phi, top_q4.E(), top_q4.M()))
 
     lepMET_deltaPhi_all[0] = deltaPhi(tightlep_p4.Phi(), met.phi)
     mtw_all[0] = math.sqrt(2*tightlep_p4.Pt() * met.pt *(1-math.cos(abs(deltaPhi(tightlep_p4.Phi(), met.phi)))))
@@ -1024,14 +1040,14 @@ for i in xrange(0,tree.GetEntries()):
                 if abs(genp.pdgId) == 6 and gentopFound == False:
                     gentop_p4.SetPtEtaPhiM(genp.pt, genp.eta, genp.phi, genp.mass)
                     if Debug:
-                        print "top genp: ", genp.pt, genp.phi, genp.eta, genp.mass, genp.pdgId
-                        print "(loop) gentop: ", gentop_p4.Pt(), gentop_p4.Phi(), gentop_p4.Eta(), gentop_p4.M()
+                        print( "top genp: ", genp.pt, genp.phi, genp.eta, genp.mass, genp.pdgId)
+                        print( "(loop) gentop: ", gentop_p4.Pt(), gentop_p4.Phi(), gentop_p4.Eta(), gentop_p4.M())
                     gentopFound = True
                 elif abs(genp.pdgId) == 5 and genbottFound == False:
                     genbott_p4.SetPtEtaPhiM(genp.pt, genp.eta, genp.phi, genp.mass)
                     if Debug:
-                        print "bott genp: ", genp.pt, genp.phi, genp.eta, genp.mass, genp.pdgId
-                        print "(loop) genbott: ", genbott_p4.Pt(), genbott_p4.Phi(), genbott_p4.Eta(), genbott_p4.M()
+                        print( "bott genp: ", genp.pt, genp.phi, genp.eta, genp.mass, genp.pdgId)
+                        print( "(loop) genbott: ", genbott_p4.Pt(), genbott_p4.Phi(), genbott_p4.Eta(), genbott_p4.M())
                     genbottFound = True
             else:
                 continue
@@ -1077,14 +1093,14 @@ for i in xrange(0,tree.GetEntries()):
                     mclepton = muon
                     mctfound = True
                     if mclepton.genPartIdx == -1:
-                        print 'MCTruth reconstruction not properly working - lepton step'
+                        print( 'MCTruth reconstruction not properly working - lepton step')
         elif isElectron:
             for ele in goodEle:
                 if (ele.genPartFlav == 1 or ele.genPartFlav == 15) and not mctfound:
                     mclepton = ele
                     mctfound = True
                     if mclepton.genPartIdx == -1:
-                        print 'MCTruth reconstruction not properly working - lepton step'
+                        print( 'MCTruth reconstruction not properly working - lepton step')
         else:
             mclepton = None
 
@@ -1118,7 +1134,7 @@ for i in xrange(0,tree.GetEntries()):
                 bjet_p4.SetPtEtaPhiM(bjet.pt, bjet.eta, bjet.phi, bjet.mass)
 
                 if abs(bjet.partonFlavour)!=5:
-                    print 'bfilter not properly working'
+                    print( 'bfilter not properly working')
                     continue
 
                 blepflav = genpart[mclepton.genPartIdx].pdgId*bjet.partonFlavour
@@ -1133,7 +1149,7 @@ for i in xrange(0,tree.GetEntries()):
                         mctopbjet_p4 = bjet_p4
                         mctop_p4, IsmcNeg, mcdR_lepjet = recotop.top4Momentum(mclepton_p4, bjet_p4, MET['metPx'], MET['metPy'])
                         IsmcNeg = IsmcNeg*DeltaFilter
-                        print "MC top mass is %f " %mctop_p4.M()
+                        print( "MC top mass is %f " %mctop_p4.M())
                         if mctop_p4 is None:
                             continue
                         
@@ -1311,12 +1327,12 @@ for i in xrange(0,tree.GetEntries()):
     chi_recotop_p4t = tightlep_p4t + chi_jet_p4t + recomet_p4t
     chi_promptjet_p4t = copy.deepcopy(chi_promptjet.p4())
     chi_promptjet_p4t.SetPz(0.)
-    print "  Is Neg chi " + str(IsNeg_chi) 
-    print " ================= lep 4-vector is (%f, %f, %f ,%f) " %(tightlep.p4().Pt(), tightlep.p4().Eta(), tightlep.p4().Phi(), tightlep.p4().E() )
-    print " ================= chi jet 4-vector is (%f, %f, %f ,%f) " %(chi_jet_p4.Pt(), chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_jet_p4.E() )
-    print " ================= chi top 4-vector is (%f, %f, %f ,%f) " %(chi_recotop_p4.Pt(), chi_recotop_p4.Eta(), chi_recotop_p4.Phi(), chi_recotop_p4.E() )
-    print " ================= MET vector is (%f, %f) " %(MET['metPx'], MET['metPy'])
-    print " ================= Chi top mass is %f " %chi_recotop_p4.M() 
+    print( "  Is Neg chi " + str(IsNeg_chi) )
+    print( " ================= lep 4-vector is (%f, %f, %f ,%f) " %(tightlep.p4().Pt(), tightlep.p4().Eta(), tightlep.p4().Phi(), tightlep.p4().E() ))
+    print( " ================= chi jet 4-vector is (%f, %f, %f ,%f) " %(chi_jet_p4.Pt(), chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_jet_p4.E() ))
+    print( " ================= chi top 4-vector is (%f, %f, %f ,%f) " %(chi_recotop_p4.Pt(), chi_recotop_p4.Eta(), chi_recotop_p4.Phi(), chi_recotop_p4.E() ))
+    print( " ================= MET vector is (%f, %f) " %(MET['metPx'], MET['metPy']))
+    print( " ================= Chi top mass is %f " %chi_recotop_p4.M())
     if chi_recotop_p4 != None:
         nrecochi += 1
         chi_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep.p4(), chi_promptjet.p4(), chi_recotop_p4) 
@@ -1380,7 +1396,7 @@ for i in xrange(0,tree.GetEntries()):
     best_dR_lepjet = None
 
     if chi_jet_p4_pre == closest_jet_p4_pre:
-        print "\tchi == closest"
+        print("\tchi == closest")
         best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
@@ -1388,7 +1404,7 @@ for i in xrange(0,tree.GetEntries()):
         IsNeg_best = IsNeg_chi
         best_dR_lepjet = chi_dR_lepjet
     elif sublead_jet_p4_pre == chi_jet_p4_pre:
-        print "\tchi == sublead"
+        print("\tchi == sublead")
         best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
@@ -1396,7 +1412,7 @@ for i in xrange(0,tree.GetEntries()):
         IsNeg_best = IsNeg_chi
         best_dR_lepjet = chi_dR_lepjet
     elif sublead_jet_p4_pre == closest_jet_p4_pre:
-        print "\tsublead == closest"
+        print("\tsublead == closest")
         best_jet_p4 = copy.deepcopy(sublead_jet_p4)
         best_jet = sublead_jet
         best_promptjet = sublead_promptjet
@@ -1404,14 +1420,14 @@ for i in xrange(0,tree.GetEntries()):
         IsNeg_best = IsNeg_sublead
         best_dR_lepjet = sublead_dR_lepjet
     else:
-        print "\tchi != closest != sublead"
+        print("\tchi != closest != sublead")
         best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
         best_recotop_p4 = chi_recotop_p4
         IsNeg_best = IsNeg_chi
         best_dR_lepjet = chi_dR_lepjet
-    print " ================= best top mass is %f " %best_recotop_p4.M() 
+    print( " ================= best top mass is %f " %best_recotop_p4.M())
 
     IsNeg_best = IsNeg_best * DeltaFilter
     best_jet_p4t = copy.deepcopy(best_jet_p4)
@@ -1470,7 +1486,7 @@ for i in xrange(0,tree.GetEntries()):
         closest_WpJet_eta_all[0] = closest_promptjet.p4().Eta()
         closest_WpJet_phi_all[0] = closest_promptjet.p4().Phi()
         closest_WpJet_isBTagged_all[0] = int(len(bjet_filter([closest_promptjet], 'DeepFlv', 'M')[0]))
-        print "closest W' mass: ", closest_Wprime_p4.M()
+        print( "closest W' mass: ", closest_Wprime_p4.M())
     else:
         closest_Wprime_m_all[0] = -100.
         closest_Wprime_mt_all[0] = -100.
@@ -1526,7 +1542,7 @@ for i in xrange(0,tree.GetEntries()):
         chi_topW_jets_pt[0] = (chi_jet_p4 + chi_promptjet.p4()).Pt()
         chi_topW_jets_deltaR[0] = deltaR(chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_promptjet.p4().Eta(), chi_promptjet.p4().Phi())
         chi_topW_jets_deltaphi[0] = deltaPhi(chi_jet_p4.Phi(), chi_promptjet.p4().Phi())
-        print "chi W' mass: ", chi_Wprime_p4.M()
+        print("chi W' mass: ", chi_Wprime_p4.M())
     else:
         chi_Wprime_m_all[0] = -100.
         chi_Wprime_mt_all[0] = -100.
@@ -1576,7 +1592,7 @@ for i in xrange(0,tree.GetEntries()):
         sublead_WpJet_eta_all[0] = sublead_promptjet.p4().Eta()
         sublead_WpJet_phi_all[0] = sublead_promptjet.p4().Phi()
         sublead_WpJet_isBTagged_all[0] = int(len(bjet_filter([sublead_promptjet], 'DeepFlv', 'M')[0]))
-        print "sublead W' mass: ", sublead_Wprime_p4.M()
+        print( "sublead W' mass: ", sublead_Wprime_p4.M())
     else:
         sublead_Wprime_m_all[0] = -100.
         sublead_Wprime_mt_all[0] = -100.
@@ -1647,7 +1663,7 @@ for i in xrange(0,tree.GetEntries()):
         WprAK8_tau2[0] = closAK8.tau2
         WprAK8_tau3[0] = closAK8.tau3
         WprAK8_tau4[0] = closAK8.tau4
-        print "best W' mass: ", best_Wprime_p4.M()
+        print( "best W' mass: ", best_Wprime_p4.M())
     else:
         best_Wprime_m_all[0] = -100.
         best_Wprime_mt_all[0] = -100.
@@ -1665,21 +1681,23 @@ for i in xrange(0,tree.GetEntries()):
         best_TopJet_eta_all[0] = -100.
         best_TopJet_phi_all[0] = -100.
         best_TopJet_isBTagged_all[0] = -1
-        print type(best_TopJet_btagscore_all[0])
+        best_TopJet_btagscore_all[0] = -100.
+        print(type(best_TopJet_btagscore_all[0]))
         best_TopJet_dRLepJet_all[0] = -100.
         best_WpJet_m_all[0] = -100.
         best_WpJet_pt_all[0] = -100.
         best_WpJet_eta_all[0] = -100.
         best_WpJet_phi_all[0] = -100.                    
         best_WpJet_isBTagged_all[0] = -1
+        best_WpJet_btagscore_all[0] = -100.
         
     systTree.setWeightName("w_nominal",copy.deepcopy(w_nominal_all[0]))
     systTree.fillTreesSysts(trees, "all")
 
 if Debug:
-    print "Event with neutrino failed: ", neutrino_failed, " out of ", str(50000)
+    print("Event with neutrino failed: ", neutrino_failed, " out of ", str(50000))
 else:
-    print "Event with neutrino failed: ", neutrino_failed, " out of ", tree.GetEntries()
+    print("Event with neutrino failed: ", neutrino_failed, " out of ", tree.GetEntries())
 
 #trees[0].Print()
 outTreeFile.cd()
