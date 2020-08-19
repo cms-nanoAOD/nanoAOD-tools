@@ -110,10 +110,12 @@ def projectperevent(sample, plot):
     print rootfiles
 
     for k, rootfile in enumerate(rootfiles):
-        #if k != 1 and 'Data' not in sample[0]:
+        '''
+        if k != 1 and 'Data' not in sample[0]:
             continue
         if not (sample[0] in rootfile):
             continue
+        '''
         print "\trootfile #%i %s" % (k, rootfile)
         infile = ROOT.TFile.Open(sampledir + "/" + rootfile) 
         tree = InputTree(infile.Events)
