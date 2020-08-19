@@ -386,7 +386,7 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
         elif isinstance(hist[0], ROOT.TH1F):
             mg = ROOT.THStack()
             i = 0
-            print hist[0].GetTitle(), hist[0].GetXaxis().GetTitle(), hist[0].GetYaxis().GetTitle()
+            print(hist[0].GetTitle(), hist[0].GetXaxis().GetTitle(), hist[0].GetYaxis().GetTitle())
             for h in hist:
                 #h.SetLineColor(colors[i])
                 if stack:
@@ -1330,7 +1330,7 @@ class systWeights(object):
 
     def getPDFValue(self, numPDF):
         if not self.addPDF:
-            print ("error! No PDF used, this will do nothing.")
+            print("error! No PDF used, this will do nothing.")
             return 0.
         MIN = self.maxSystsNonPDF
         return float(self.weightedSysts[numPDF+MIN][0])
