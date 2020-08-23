@@ -28,7 +28,8 @@ else:
     Debug = True
 sample = sample_dict[sys.argv[1]]
 part_idx = sys.argv[2]
-file_list = map(str, sys.argv[3].strip('[]').split(','))
+file_list = list(map(str, sys.argv[3].strip('[]').split(',')))
+print("file_list: ", file_list, "\nloop #1 over it")
 for infile in file_list:
     print(infile)
 
@@ -44,6 +45,7 @@ leadingjet_ptcut = 150.
 
 chain = ROOT.TChain('Events')
 print(chain)
+print("loop #2 over file_list")
 for infile in file_list: 
     print("Adding %s to the chain" %(infile))
     chain.Add(infile)
@@ -693,10 +695,10 @@ if(isMC):
     h_PDFweight = ROOT.TH1F()
     h_PDFweight.SetNameTitle("h_PDFweight","h_PDFweight")
     print(file_list)
-    print("before looping file_list")
+    print("loop #3 over file_list")
     for infile in file_list: 
         print(infile)
-        print("entered filelist loop")    
+        print("entered file_list loop #3")    
         print("Getting the histos from %s" %(infile))
         newfile = ROOT.TFile.Open(infile)
         dirc = ROOT.TDirectory()
@@ -751,16 +753,8 @@ for i in range(tree.GetEntries()):
     #++++++++++++++++++++++++++++++++++
     if Debug:
         print("evento n. " + str(i))
-
-
-    '''
-    if Debug:
         if i > 2000:
             break
-    '''
-
-    if Debug and i > 5000:
-        break
     
     if not Debug and i%5000 == 0:
         print("Event #", i+1, " out of ", tree.GetEntries())
