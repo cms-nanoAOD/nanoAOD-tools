@@ -514,8 +514,7 @@ for year in years:
           variables = []
           wzero = 'w_nominal'
           cut = cut_dict[lep]
-          #variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 200, 0, 1200))
-          
+                    
           variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
           variables.append(variabile('lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
@@ -535,12 +534,12 @@ for year in years:
           variables.append(variabile('WprAK8_ttagMD', 'WprAK8 t tag MD', wzero+'*(WprAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
           variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 20, 0, .4))
           
-          #variables.append(variabile('best_topjet_isbtag', 'top jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
-          #variables.append(variabile('best_Wpjet_isbtag', "W' jet b tagged (best)",  wzero+'*('+cut+')', 2, -0.5, 1.5))
+          variables.append(variabile('best_topjet_isbtag', 'top jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
+          variables.append(variabile('best_Wpjet_isbtag', "W' jet b tagged (best)",  wzero+'*('+cut+')', 2, -0.5, 1.5))
           variables.append(variabile('MC_Wpjet_pt', "MCtruth W' jet p_{T} [GeV]",  wzero+'*('+cut+')', 100, 0, 2000))
           variables.append(variabile('bjets_pt', 'leading bjets system p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
-          #variables.append(variabile('leadingbjet_pt', 'leading bjet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
-          #variables.append(variabile('subleadingbjet_pt', 'subleading bjet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
+          variables.append(variabile('leadingbjet_pt', 'leading bjet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
+          variables.append(variabile('subleadingbjet_pt', 'subleading bjet p_{T} [GeV]',  wzero+'*('+cut+')', 100, 0, 2000))
           
           variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')',  46, 80, 1000))
           variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  123, 80, 5000))
