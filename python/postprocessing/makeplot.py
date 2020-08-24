@@ -536,7 +536,7 @@ for year in years:
           
           variables.append(variabile('best_topjet_isbtag', 'top jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
           variables.append(variabile('best_Wpjet_isbtag', "W' jet b tagged (best)",  wzero+'*('+cut+')', 2, -0.5, 1.5))
-          variables.append(variabile('MC_Wpjet_pt', "MCtruth W' jet p_{T} [GeV]",  wzero+'*('+cut+')', , 150, 0, 3000))
+          variables.append(variabile('MC_Wpjet_pt', "MCtruth W' jet p_{T} [GeV]",  wzero+'*('+cut+')', 150, 0, 3000))
           variables.append(variabile('MC_topjet_pt', "MCtruth top jet p_{T} [GeV]",  wzero+'*('+cut+')', 150, 0, 3000))
           variables.append(variabile('MC_top_pt', "MCtruth top p_{T} [GeV]",  wzero+'*('+cut+')', 150, 0, 3000))
           variables.append(variabile('bjets_pt', 'leading bjets system p_{T} [GeV]',  wzero+'*('+cut+')', 150, 0, 3000))
