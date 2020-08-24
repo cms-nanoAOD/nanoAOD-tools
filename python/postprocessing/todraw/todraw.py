@@ -29,20 +29,26 @@ plotnt = {'recotop': ["h_jets_best_top_pt",
                       "h_jets_chi_top_pt",
                       "h_jets_closest_top_pt",
                       "h_jets_sublead_top_pt",
+                      "h_jets_leadingbjet_pt",
+                      "h_jets_subleadingbjet_pt",
                       "h_jets_MC_top_pt",
                       "h_jets_GenPart_top_pt",
                   ],
-          'Wpjet': ["h_jets_sublead_Wpjet_pt",
-                    "h_jets_best_Wpjet_pt",
+          'Wpjet': ["h_jets_best_Wpjet_pt",
                     "h_jets_chi_Wpjet_pt",
                     "h_jets_closest_Wpjet_pt",
+                    "h_jets_sublead_Wpjet_pt",
+                    "h_jets_leadingbjet_pt",
+                    "h_jets_subleadingbjet_pt",
                     "h_jets_MC_Wpjet_pt",
                     "h_jets_GenPart_bottom_pt",
                 ],
           'topjet': ["h_jets_best_topjet_pt",
-                     "h_jets_closest_topjet_pt",
                      "h_jets_chi_topjet_pt",
+                     "h_jets_closest_topjet_pt",
                      "h_jets_sublead_topjet_pt",
+                     "h_jets_leadingbjet_pt",
+                     "h_jets_subleadingbjet_pt",
                      "h_jets_MC_topjet_pt",
                      "h_jets_GenPart_top_pt",
                  ],
@@ -58,6 +64,8 @@ recocolor = {'GenPart': ROOT.kBlack,
              'chi': ROOT.kViolet-1,
              'sublead': ROOT.kGray,
              'best': ROOT.kRed,
+             'leadingbjet': ROOT.kOrange-3,
+             'subleadingbjet': ROOT.kGray+2,
 }
 
 sigma = {
@@ -217,7 +225,9 @@ for lep in lepton:
             inputf = ROOT.TFile.Open(infile)
 
             for quant, plots in plotnt.items():#2tab
-                for key in plots:
+                for idx, key in enumerate(plots):
+                    if idx > 4:
+                        break
                     try:
                         plot = copy.deepcopy(ROOT.gROOT.FindObject(str(key)).Clone())
                     except:

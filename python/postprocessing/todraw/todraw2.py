@@ -14,43 +14,49 @@ ROOT.gROOT.SetBatch()        # don't pop up canvases
 ROOT.TH1.SetDefaultSumw2()
 ROOT.TGaxis.SetMaxDigits(3)
 
-inputpath = "/eos/user/a/apiccine/Wprime/nosynch/v7_apc/plot/"
-outputpath = "/eos/user/a/apiccine/Wprime/nosynch/v7_apc/comparison/"
-inpfiles = [#"TT_Mtt_2016",
-            #"WJets_2016",  
+inputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/plot/"
+outputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/comparison/"
+inpfiles = ["TT_Mtt_2016",
+            "WJets_2016",  
             #"WJets_2017",  
-            #"QCD_2016",
-            #"WP_M2000W20_RH_2016",
-            #"WP_M3000W30_RH_2016",
-            #"WP_M4000W40_RH_2016",
+            "QCD_2016",
+            "WP_M2000W20_RH_2016",
+            "WP_M3000W30_RH_2016",
+            "WP_M4000W40_RH_2016",
             "WP_M4000W400_RH_2016",
 ]
 
 plotnt = {('recotop', 'Reco Top p_{T} [GeV]'): ["h_jets_best_top_pt",
-                                                "h_jets_chi_top_pt",
-                                                "h_jets_closest_top_pt",
-                                                "h_jets_sublead_top_pt",
+                                                #"h_jets_chi_top_pt",
+                                                #"h_jets_closest_top_pt",
+                                                #"h_jets_sublead_top_pt",
+                                                "h_jets_leadingbjet_pt",
+                                                "h_jets_subleadingbjet_pt",
                                                 "h_jets_MC_top_pt",
                                                 "h_jets_GenPart_top_pt",
                   ],
           ('Wpjet', "W' bjet p_{T} [GeV]"): ["h_jets_best_Wpjet_pt",
-                                             "h_jets_chi_Wpjet_pt",
-                                             "h_jets_closest_Wpjet_pt",
-                                             "h_jets_sublead_Wpjet_pt",
+                                             #"h_jets_chi_Wpjet_pt",
+                                             #"h_jets_closest_Wpjet_pt",
+                                             #"h_jets_sublead_Wpjet_pt",
+                                             "h_jets_leadingbjet_pt",
+                                             "h_jets_subleadingbjet_pt",
                                              "h_jets_MC_Wpjet_pt",
                                              "h_jets_GenPart_bottom_pt",
                 ],
           ('topjet', "Top jet p_{T} [GeV]"): ["h_jets_best_topjet_pt",
-                                              "h_jets_chi_topjet_pt",
-                                              "h_jets_closest_topjet_pt",
-                                              "h_jets_sublead_topjet_pt",
+                                              #"h_jets_chi_topjet_pt",
+                                              #"h_jets_closest_topjet_pt",
+                                              #"h_jets_sublead_topjet_pt",
+                                              "h_jets_leadingbjet_pt",
+                                              "h_jets_subleadingbjet_pt",
                                               "h_jets_MC_topjet_pt",
                                               "h_jets_GenPart_top_pt",
                  ],
 }
 
 lepton = ['electron',
-          'muon',
+          #'muon',
       ]
 
 recocolor = {'GenPart': ROOT.kBlack,
@@ -59,6 +65,9 @@ recocolor = {'GenPart': ROOT.kBlack,
              'chi': ROOT.kViolet-1,
              'sublead': ROOT.kGray,
              'best': ROOT.kRed,
+             'leadingbjet': ROOT.kOrange-3,
+             'subleadingbjet': ROOT.kGray+2,
+
 }
 
 sigma = {
