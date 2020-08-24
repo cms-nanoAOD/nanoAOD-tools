@@ -16,6 +16,7 @@ parser.add_option('--lumi', dest='lumi', default = False, action='store_true', h
 parser.add_option('--sel', dest='sel', default = False, action='store_true', help='Default do not apply any selection')
 parser.add_option('-p', '--plot', dest='plot', default = False, action='store_true', help='Default make no plots')
 parser.add_option('-s', '--stack', dest='stack', default = False, action='store_true', help='Default make no stacks')
+parser.add_option('-N', '--notstacked', dest='tostack', default = True, action='store_fals', help='Default make plots stacked')
 parser.add_option('-L', '--lep', dest='lep', type='string', default = 'muon', help='Default make muon analysis')
 parser.add_option('-S', '--syst', dest='syst', type='string', default = 'all', help='Default all systematics added')
 parser.add_option('-C', '--cut', dest='cut', type='string', default = 'lepton_eta>-10.', help='Default no cut')
@@ -236,7 +237,10 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
                i += 1
           elif('WP' in s.label):
                #tmp.SetLineStyle(9)
-               tmp.SetLineColor(s.color)
+               if opt.tostack:
+                    tmp.SetFillColor(s.color)
+               else:
+                    tmp.SetLineColor(s.color)
                #tmp.SetLineWidth(3)
                tmp.SetMarkerSize(0.)
                tmp.SetMarkerColor(s.color)
@@ -244,7 +248,10 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           else:
                tmp.SetOption("HIST SAME")
                tmp.SetTitle("")
-               tmp.SetLineColor(s.color)
+               if opt.tostack:
+                    tmp.SetFillColor(s.color)
+               else:
+                    tmp.SetLineColor(s.color)
                histo.append(tmp.Clone(""))
                stack.Add(tmp.Clone(""))
           tmp.Reset("ICES")
@@ -292,7 +299,10 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      else:
           stack.SetMaximum(maximum*1.6)
      stack.SetMinimum(0.01)
-     stack.Draw("HIST NOSTACK")
+     if opt.tostack:
+          stack.Draw("HIST")
+     else:
+          stack.Draw("HIST NOSTACK")
      step = float(variabile_._xmax - variabile_._xmin)/float(variabile_._nbins)
      print str(step)
      if "GeV" in variabile_._title:
@@ -524,7 +534,7 @@ for year in years:
           variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  123, 80, 5000))
           variables.append(variabile('WprAK8_ttagMD', 'WprAK8 t tag MD', wzero+'*(WprAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
           variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 20, 0, .4))
-          '''
+          
           #variables.append(variabile('best_topjet_isbtag', 'top jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
           #variables.append(variabile('best_Wpjet_isbtag', "W' jet b tagged (best)",  wzero+'*('+cut+')', 2, -0.5, 1.5))
           variables.append(variabile('MC_Wpjet_pt', "MCtruth W' jet p_{T} [GeV]",  wzero+'*('+cut+')', 100, 0, 2000))
@@ -659,7 +669,7 @@ for year in years:
           variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 60, 0, .6))
           variables.append(variabile('WprAK8_tau3', 'WprAK8 tau 3', wzero+'*('+cut+')', 40, 0, .4))
           variables.append(variabile('WprAK8_tau4', 'WprAK8 tau 4', wzero+'*('+cut+')', 20, 0, .2))
-          '''
+
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
