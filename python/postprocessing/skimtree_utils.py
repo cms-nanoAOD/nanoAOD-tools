@@ -345,8 +345,9 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
         c1 = ROOT.TCanvas(infile + "_" + hist[0].GetName(), "c1", 50,50,700,600)
         if not (infile == "") or len(hist) > 1:
             c1 = ROOT.TCanvas(infile + "_" + hist[0].GetName() + '_comparison', "c1", 50,50,700,600)
-         #else:
-            #c1 = ROOT.TCanvas('comparison', "c1", 50,50,700,600)
+        else:
+            c1_name = str(hist[0].GetName) + "_comparison"
+            c1 = ROOT.TCanvas('comparison', "c1", 50,50,700,600)
 
         if isinstance(hist[0], ROOT.TGraph) or isinstance(hist[0], ROOT.TGraphAsymmErrors):
             i = 0
@@ -385,10 +386,11 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
         elif isinstance(hist[0], ROOT.TH1F):
             mg = ROOT.THStack()
             i = 0
+            print(hist[0].GetTitle(), hist[0].GetXaxis().GetTitle(), hist[0].GetYaxis().GetTitle())
             for h in hist:
-                h.SetLineColor(colors[i])
+                #h.SetLineColor(colors[i])
                 if stack:
-                    h.SetFillColor(colors[i])
+                    #h.SetFillColor(colors[i])
                     mg.Add(h)
                     i += 1
                     mg.Draw(option)
@@ -414,8 +416,8 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
             c1.Print(plotpath + "/" + infile + "_" + hist[0].GetName() + '_comparison.png')
             c1.Print(plotpath + "/" + infile + "_" + hist[0].GetName() + '_comparison.root')
         else:
-            c1.Print(plotpath + "/" + 'comparison.png')
-            c1.Print(plotpath + "/" + 'comparison.root')
+            c1.Print(plotpath + "/" + str(hist[0].GetName()) + '_comparison.png')
+            c1.Print(plotpath + "/" + str(hist[0].GetName()) + '_comparison.root')
 
 def save_hist(infile, plotpath, hist, option = "HIST"):
      fout = ROOT.TFile.Open(plotpath + "/" + infile +".root", "UPDATE")
@@ -1328,7 +1330,7 @@ class systWeights(object):
 
     def getPDFValue(self, numPDF):
         if not self.addPDF:
-            print ("error! No PDF used, this will do nothing.")
+            print("error! No PDF used, this will do nothing.")
             return 0.
         MIN = self.maxSystsNonPDF
         return float(self.weightedSysts[numPDF+MIN][0])

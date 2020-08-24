@@ -28,8 +28,10 @@ else:
     Debug = True
 sample = sample_dict[sys.argv[1]]
 part_idx = sys.argv[2]
-file_list = map(str, sys.argv[3].strip('[]').split(','))
-print(file_list)
+file_list = list(map(str, sys.argv[3].strip('[]').split(',')))
+print("file_list: ", file_list, "\nloop #1 over it")
+for infile in file_list:
+    print(infile)
 
 MCReco = True
 DeltaFilter = True
@@ -43,6 +45,7 @@ leadingjet_ptcut = 150.
 
 chain = ROOT.TChain('Events')
 print(chain)
+print("loop #2 over file_list")
 for infile in file_list: 
     print("Adding %s to the chain" %(infile))
     chain.Add(infile)
@@ -686,25 +689,44 @@ if('TT_' in sample.label):
 #++++++++++++++++++++++++++++++++++
 #++      taking MC weights       ++
 #++++++++++++++++++++++++++++++++++
+print("isMC: ", isMC)
 if(isMC):
     h_genweight = ROOT.TH1F('h_genweight', 'h_genweight', 10, 0, 10)
     h_PDFweight = ROOT.TH1F()
     h_PDFweight.SetNameTitle("h_PDFweight","h_PDFweight")
+    print(file_list)
+    print("loop #3 over file_list")
     for infile in file_list: 
+        print(infile)
+        print("entered file_list loop #3")    
         print("Getting the histos from %s" %(infile))
-        newfile  = ROOT.TFile.Open(infile)
-        h_genw_tmp = ROOT.TH1F(newfile.Get("plots/h_genweight"))
-        if(newfile.GetListOfKeys().Contains("plots/h_PDFweight")):
-            h_pdfw_tmp = ROOT.TH1F(newfile.Get("plots/h_PDFweight"))
-            print(ROOT.TH1F(h_PDFweight).Integral())
+        newfile = ROOT.TFile.Open(infile)
+        dirc = ROOT.TDirectory()
+        dirc = newfile.Get("plots")
+        #h_genw_tmp = ROOT.TH1F(newfile.Get("plots/h_genweight"))
+        h_genw_tmp = ROOT.TH1F(dirc.Get("h_genweight"))
+        print("in newfile: ")
+        dirc.Get("h_genweight").Print()
+        print("in macro: ")
+        h_genw_tmp.Print()
+        
+        if(dirc.GetListOfKeys().Contains("h_PDFweight")):
+            #h_pdfw_tmp = ROOT.TH1F(newfile.Get("plots/h_PDFweight"))
+            h_pdfw_tmp = ROOT.TH1F(dirc.Get("h_PDFweight"))
+            print("in newfile: ")
+            dirc.Get("h_PDFweight").Print()
+            print("in macro: ")
+            h_pdfw_tmp.Print()
+
             if(ROOT.TH1F(h_PDFweight).Integral() < 1.):
                 h_PDFweight.SetBins(h_pdfw_tmp.GetXaxis().GetNbins(), h_pdfw_tmp.GetXaxis().GetXmin(), h_pdfw_tmp.GetXaxis().GetXmax())
-                print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(newfile.Get("plots/h_genweight")).GetBinContent(1), ROOT.TH1F(newfile.Get("plots/h_PDFweight")).GetNbinsX()))
+                print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(dirc.Get("h_genweight")).GetBinContent(1), ROOT.TH1F(dirc.Get("h_PDFweight")).GetNbinsX()))
             h_PDFweight.Add(h_pdfw_tmp)
         else:
             addPDF = False
         h_genweight.Add(h_genw_tmp)
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
+
 
 #++++++++++++++++++++++++++++++++++
 #++      Efficiency studies      ++
@@ -731,15 +753,8 @@ for i in range(tree.GetEntries()):
     #++++++++++++++++++++++++++++++++++
     if Debug:
         print("evento n. " + str(i))
-
-    '''
-    if Debug:
         if i > 2000:
             break
-    '''
-
-    if Debug and i > 5000:
-        break
     
     if not Debug and i%5000 == 0:
         print("Event #", i+1, " out of ", tree.GetEntries())
@@ -924,6 +939,7 @@ for i in range(tree.GetEntries()):
         systTree.setWeightName("PFSF", copy.deepcopy(PF_SF))
         systTree.setWeightName("PFUp", copy.deepcopy(PF_SFUp))
         systTree.setWeightName("PFDown", copy.deepcopy(PF_SFDown))
+
         '''
         PU_SF = chain.PrefireWeight
         PU_SFUp = chain.PrefireWeight_Up
@@ -932,6 +948,7 @@ for i in range(tree.GetEntries()):
         systTree.setWeightName("puUp", copy.deepcopy(PU_SFUp))
         systTree.setWeightName("puDown", copy.deepcopy(PU_SFDown))
         '''
+
     recomet_p4t = ROOT.TLorentzVector()
     recomet_p4t.SetPtEtaPhiM(met.pt, 0., met.phi, 0)
 
@@ -1146,6 +1163,7 @@ for i in range(tree.GetEntries()):
                         if deltaR(bjet_p4.Eta(), bjet_p4.Phi(), mclepton_p4.Eta(), mclepton_p4.Phi()) < 0.4:
                         bjet_p4 -= mclepton_p4
                         '''
+
                         mctopbjet_p4 = bjet_p4
                         mctop_p4, IsmcNeg, mcdR_lepjet = recotop.top4Momentum(mclepton_p4, bjet_p4, MET['metPx'], MET['metPy'])
                         IsmcNeg = IsmcNeg*DeltaFilter
