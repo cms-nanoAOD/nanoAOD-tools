@@ -16,7 +16,7 @@ parser.add_option('--lumi', dest='lumi', default = False, action='store_true', h
 parser.add_option('--sel', dest='sel', default = False, action='store_true', help='Default do not apply any selection')
 parser.add_option('-p', '--plot', dest='plot', default = False, action='store_true', help='Default make no plots')
 parser.add_option('-s', '--stack', dest='stack', default = False, action='store_true', help='Default make no stacks')
-parser.add_option('-N', '--notstacked', dest='tostack', default = True, action='store_fals', help='Default make plots stacked')
+parser.add_option('-N', '--notstacked', dest='tostack', default = True, action='store_false', help='Default make plots stacked')
 parser.add_option('-L', '--lep', dest='lep', type='string', default = 'muon', help='Default make muon analysis')
 parser.add_option('-S', '--syst', dest='syst', type='string', default = 'all', help='Default all systematics added')
 parser.add_option('-C', '--cut', dest='cut', type='string', default = 'lepton_eta>-10.', help='Default no cut')
