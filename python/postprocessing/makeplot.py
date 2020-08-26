@@ -478,7 +478,9 @@ leptons = map(str,opt.lep.split(','))
 
 cut = opt.cut #default cut must be obvious, for example lepton_eta>-10.
 if opt.cut == "lepton_eta>-10." and not opt.sel:
-     cut_dict = {'muon':"lepton_eta>-10.&&best_topjet_isbtag==0&&best_Wpjet_isbtag==1&&nbjet_pt100>1", 'electron':"lepton_eta>-10.&&best_topjet_isbtag==0&&best_Wpjet_isbtag==1&&nbjet_pt100>1"}
+     cut_dict = {'muon':"lepton_eta>-10.",#&&best_topjet_isbtag==0&&best_Wpjet_isbtag==1&&nbjet_pt100>1", 
+                 'electron':"lepton_eta>-10.",#&&best_topjet_isbtag==0&&best_Wpjet_isbtag==1&&nbjet_pt100>1"
+     }
      cut_tag = ""
 else:
      if opt.sel:
