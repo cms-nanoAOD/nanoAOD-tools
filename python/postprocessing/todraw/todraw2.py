@@ -6,18 +6,24 @@ from PhysicsTools.NanoAODTools.postprocessing.tools import *
 from PhysicsTools.NanoAODTools.postprocessing.skimtree_utils import *
 import copy
 from kFactors import *
+import optparse
 
 print "tools implemented"
 
 ROOT.gStyle.SetOptStat(0)
-ROOT.gROOT.SetBatch()        # don't pop up canvases                                                                                     
+ROOT.gROOT.SetBatch()        # don't pop up canvases                                              
 ROOT.TH1.SetDefaultSumw2()
 ROOT.TGaxis.SetMaxDigits(3)
 
-crit = 'sublead'
+usage = 'python todraw2.py'
+parser = optparse.OptionParser(usage)
+parser.add_option('-c', '--crit', dest='crit', type = 'string', default = 'best', help='Default criterion is best')
+(opt, args) = parser.parse_args()
 
-inputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/plot/"
-outputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/comparison/"
+crit = opt.crit
+
+inputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/only_Wpjetbtag_ev2pbtag/plot/"
+outputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/only_Wpjetbtag_ev2pbtag/comparison/"
 inpfiles = ["TT_Mtt_2016",
             "WJets_2016",  
             #"WJets_2017",  

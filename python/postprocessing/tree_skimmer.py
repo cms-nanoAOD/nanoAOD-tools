@@ -1253,6 +1253,8 @@ for i in range(tree.GetEntries()):
     deltaR_subleadAK4_closestAK8[0] = copy.deepcopy(dR_subleadAK4AK8)
     leadingjet_pt_all[0] = jets[0].pt
     subleadingjet_pt_all[0] = jets[1].pt
+    leadingbjet_pt_all[0] = 0.
+    subleadingbjet_pt_all[0] = 0.
     if len(bjets) != 0:
         leadingbjet_pt_all[0] = bjets[0].pt
     if len(bjets) > 1:
