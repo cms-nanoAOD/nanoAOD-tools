@@ -846,6 +846,7 @@ for i in range(tree.GetEntries()):
     bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
     nJet_pt100_all[0] = len(goodJets)
     nbJet_pt100_all[0] = len(bjets)
+    print("len bjets: ", len(bjets), "nbJet_pt100_all: ", nbJet_pt100_all[0])
     nfatJet_all[0] = len(fatjets)
     nJet_lowpt_all[0] = len(jets) - len(goodJets)
     nbJet_lowpt_all[0] = len(bjet_filter(jets, 'DeepFlv', 'M')[0]) - len(bjets)
@@ -1253,10 +1254,14 @@ for i in range(tree.GetEntries()):
     deltaR_subleadAK4_closestAK8[0] = copy.deepcopy(dR_subleadAK4AK8)
     leadingjet_pt_all[0] = jets[0].pt
     subleadingjet_pt_all[0] = jets[1].pt
+    leadingbjet_pt_all[0] = 0.
+    subleadingbjet_pt_all[0] = 0.
+    
     if len(bjets) != 0:
         leadingbjet_pt_all[0] = bjets[0].pt
     if len(bjets) > 1:
         subleadingbjet_pt_all[0] = bjets[1].pt
+
     leadingjets_deltaR[0] = deltaR(jets[0].eta, jets[0].phi, jets[1].eta, jets[1].phi)
     leadingjets_deltaPhi[0] = deltaPhi(jets[0].phi, jets[1].phi)
     leadingjets_deltaEta[0] = jets[0].eta - jets[1].eta

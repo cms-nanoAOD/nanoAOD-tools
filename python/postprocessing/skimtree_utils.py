@@ -335,7 +335,7 @@ def presel(PV, muons, electrons, jets): #returns three booleans: goodEvent assur
     goodEleEvt = isGoodPV and isElectron
     return goodEvent, goodMuEvt, goodEleEvt
  
-def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = False):
+def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = False, title = ""):
     if not(isinstance(hist, list)):
         c1 = ROOT.TCanvas(infile + "_" + hist.GetName(), "c1", 50,50,700,600)
         hist.Draw(option)            
@@ -393,20 +393,24 @@ def print_hist(infile, plotpath, hist, option = "HIST", log = False, stack = Fal
                     #h.SetFillColor(colors[i])
                     mg.Add(h)
                     i += 1
-                    mg.Draw(option)
-                    mg.GetXaxis().SetTitle(hist[0].GetXaxis().GetTitle())
-                    mg.GetYaxis().SetTitle(hist[0].GetYaxis().GetTitle())
                 else:
                   for h in hist:
                     h.Draw(option+'SAME')
-
+            mg.Draw(option)
+            mg.GetXaxis().SetTitle(hist[0].GetXaxis().GetTitle())
+            mg.GetYaxis().SetTitle(hist[0].GetYaxis().GetTitle())
+            if title == "":
+                mg.SetTitle(hist[0].GetTitle()) 
+            else:
+                mg.SetTitle(title)
+                
         #c1.Modified()
         #c1.Update()
         if log:
             c1.SetLogy(1)
         c1.Pad().Modified()
         c1.Pad().Update()
-        c1.BuildLegend()
+        c1.BuildLegend(0.7, 0.65, 0.95, 0.9)
         #c1.Modified()
         #c1.Update()
         c1.Pad().Modified()

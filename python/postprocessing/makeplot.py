@@ -30,7 +30,7 @@ folder = opt.folder
 
 #filerepo = '/eos/user/a/apiccine/Wprime/nosynch/v7_apc/'
 filerepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
-plotrepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'#Wpjet_nosel/'
+plotrepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'#only_Wpjetbtag_ev2pbtag/'
 
 ROOT.gROOT.SetBatch() # don't pop up canvases
 if not os.path.exists(plotrepo + 'plot/muon'):
@@ -478,7 +478,9 @@ leptons = map(str,opt.lep.split(','))
 
 cut = opt.cut #default cut must be obvious, for example lepton_eta>-10.
 if opt.cut == "lepton_eta>-10." and not opt.sel:
-     cut_dict = {'muon':"lepton_eta>-10.", 'electron':"lepton_eta>-10."}
+     cut_dict = {'muon':"lepton_eta>-10.",#&&best_topjet_isbtag==0&&best_Wpjet_isbtag==1&&nbjet_pt100>1", 
+                 'electron':"lepton_eta>-10.",#&&best_topjet_isbtag==0&&best_Wpjet_isbtag==1&&nbjet_pt100>1"
+     }
      cut_tag = ""
 else:
      if opt.sel:
@@ -613,7 +615,7 @@ for year in years:
           variables.append(variabile('chi_topjet_pt', 'chi top jet p_{T} [GeV]',  wzero+'*('+cut+')', 150, 0, 3000))
           variables.append(variabile('best_topjet_eta', 'best top jet #eta',  wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('best_topjet_pt', 'best top jet p_{T} [GeV]',  wzero+'*('+cut+')', 150, 0, 3000))
-          variables.append(variabile('sublead_Wpjet_pt', '(sublead) leading jet p_{T} [GeV] ',  wzero+'*('+cut+')', 100, 0, 2000))
+          variables.append(variabile('sublead_Wpjet_pt', '(sublead) leading jet p_{T} [GeV] ',  wzero+'*('+cut+')', 150, 0, 3000))
           variables.append(variabile('closest_Wpjet_pt', '(closest) leading jet p_{T} [GeV] ',  wzero+'*('+cut+')', 150, 0, 3000))
           variables.append(variabile('best_Wpjet_pt', '(best) leading jet p_{T} [GeV] ',  wzero+'*('+cut+')', 150, 0, 3000))
           variables.append(variabile('chi_Wpjet_pt', '(chimass) leading jet p_{T} [GeV] ',  wzero+'*('+cut+')', 150, 0, 3000))

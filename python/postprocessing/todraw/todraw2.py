@@ -6,16 +6,24 @@ from PhysicsTools.NanoAODTools.postprocessing.tools import *
 from PhysicsTools.NanoAODTools.postprocessing.skimtree_utils import *
 import copy
 from kFactors import *
+import optparse
 
 print "tools implemented"
 
 ROOT.gStyle.SetOptStat(0)
-ROOT.gROOT.SetBatch()        # don't pop up canvases                                                                                     
+ROOT.gROOT.SetBatch()        # don't pop up canvases                                              
 ROOT.TH1.SetDefaultSumw2()
 ROOT.TGaxis.SetMaxDigits(3)
 
-inputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/plot/"
-outputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/comparison/"
+usage = 'python todraw2.py'
+parser = optparse.OptionParser(usage)
+parser.add_option('-c', '--crit', dest='crit', type = 'string', default = 'best', help='Default criterion is best')
+(opt, args) = parser.parse_args()
+
+crit = opt.crit
+
+inputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/only_Wpjetbtag_ev2pbtag/plot/"
+outputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/only_Wpjetbtag_ev2pbtag/comparison/"
 inpfiles = ["TT_Mtt_2016",
             "WJets_2016",  
             #"WJets_2017",  
@@ -27,27 +35,27 @@ inpfiles = ["TT_Mtt_2016",
 ]
 
 plotnt = {('recotop', 'Reco Top p_{T} [GeV]'): ["h_jets_best_top_pt",
-                                                #"h_jets_chi_top_pt",
-                                                #"h_jets_closest_top_pt",
-                                                #"h_jets_sublead_top_pt",
+                                                "h_jets_chi_top_pt",
+                                                "h_jets_closest_top_pt",
+                                                "h_jets_sublead_top_pt",
                                                 "h_jets_leadingbjet_pt",
                                                 "h_jets_subleadingbjet_pt",
                                                 "h_jets_MC_top_pt",
                                                 "h_jets_GenPart_top_pt",
                   ],
           ('Wpjet', "W' bjet p_{T} [GeV]"): ["h_jets_best_Wpjet_pt",
-                                             #"h_jets_chi_Wpjet_pt",
-                                             #"h_jets_closest_Wpjet_pt",
-                                             #"h_jets_sublead_Wpjet_pt",
+                                             "h_jets_chi_Wpjet_pt",
+                                             "h_jets_closest_Wpjet_pt",
+                                             "h_jets_sublead_Wpjet_pt",
                                              "h_jets_leadingbjet_pt",
                                              "h_jets_subleadingbjet_pt",
                                              "h_jets_MC_Wpjet_pt",
                                              "h_jets_GenPart_bottom_pt",
                 ],
           ('topjet', "Top jet p_{T} [GeV]"): ["h_jets_best_topjet_pt",
-                                              #"h_jets_chi_topjet_pt",
-                                              #"h_jets_closest_topjet_pt",
-                                              #"h_jets_sublead_topjet_pt",
+                                              "h_jets_chi_topjet_pt",
+                                              "h_jets_closest_topjet_pt",
+                                              "h_jets_sublead_topjet_pt",
                                               "h_jets_leadingbjet_pt",
                                               "h_jets_subleadingbjet_pt",
                                               "h_jets_MC_topjet_pt",
@@ -56,7 +64,7 @@ plotnt = {('recotop', 'Reco Top p_{T} [GeV]'): ["h_jets_best_top_pt",
 }
 
 lepton = ['electron',
-          #'muon',
+          'muon',
       ]
 
 recocolor = {'GenPart': ROOT.kBlack,
@@ -94,7 +102,7 @@ samplelabels = {"TT_Mtt_2016": "ttbar",
                 "WP_M4000W400_RH_2016": "W'_{RH} m=4TeV w=400GeV",
 }
 
-LogSc = False #True #
+LogSc = True #False #
 
 CompPlot = True
 SampleLabels = False
@@ -124,7 +132,10 @@ for lep in lepton:
         for quant, plots in plotnt.items():#2tab
 
             plotstodraw = []
-            for key in plots:
+            for pi, key in enumerate(plots):
+                if pi < 4:
+                    if not crit in key:
+                        continue
                 try:
                     plot = copy.deepcopy(ROOT.gROOT.FindObject(str(key)).Clone())
                 except:
@@ -142,10 +153,13 @@ for lep in lepton:
                 if CompPlot:
                     for reco in recocolor.keys():
                         if reco in str(plot.GetName()):
+                            if reco == 'leadingbjet' and 'subleadingb' in str(plot.GetName()):
+                                continue
                             new_title = copy.deepcopy(reco) + ";" + quant[1] +";Countings"
                             new_name = inpfile + "_" + quant[0] + "_" + reco
                             print new_name, new_title
                             color = recocolor[reco]
+                            break
 
                 plot.SetTitle(new_title)
                 plot.SetName(new_name)
@@ -157,8 +171,8 @@ for lep in lepton:
             outp = outputpath + str(lep)
         
             if isinstance(plotstodraw[0], ROOT.TH1F):
-                print_hist("", outp, plotstodraw, optstack, LogSc, AllPlot)
+                print_hist("", outp, plotstodraw, optstack, LogSc, AllPlot, inpfile)
             else:
-                print_hist("", outp, plotstodraw, "AP", LogSc)
+                print_hist("", outp, plotstodraw, "AP", LogSc, inpfile)
 
         inputf.Close()
