@@ -22,8 +22,8 @@ parser.add_option('-c', '--crit', dest='crit', type = 'string', default = 'best'
 
 crit = opt.crit
 
-inputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/only_Wpjetbtag_ev2pbtag/plot/"
-outputpath = "/eos/user/a/apiccine/Wprime/nosynch/v8/only_Wpjetbtag_ev2pbtag/comparison/"
+inputpath = "/eos/user/a/apiccine/Wprime/nosynch/v9/only_Wpjetbtag_ev2pbtag/plot/"
+outputpath = "/eos/user/a/apiccine/Wprime/nosynch/v9/only_Wpjetbtag_ev2pbtag/comparison/"
 inpfiles = ["TT_Mtt_2016",
             "WJets_2016",  
             #"WJets_2017",  
@@ -41,6 +41,15 @@ plotnt = {('recotop', 'Reco Top p_{T} [GeV]'): ["h_jets_best_top_pt",
                                                 "h_jets_leadingbjet_pt",
                                                 "h_jets_subleadingbjet_pt",
                                                 "h_jets_MC_top_pt",
+                                                "h_jets_GenPart_top_pt",
+                  ],
+          ('recotop', 'Reco Top mass [GeV]'): ["h_jets_best_top_m",
+                                                "h_jets_chi_top_m",
+                                                "h_jets_closest_top_m",
+                                                "h_jets_sublead_top_m",
+                                                #"h_jets_leadingbjet_pt",
+                                                #"h_jets_subleadingbjet_pt",
+                                                "h_jets_MC_top_m",
                                                 "h_jets_GenPart_top_pt",
                   ],
           ('Wpjet', "W' bjet p_{T} [GeV]"): ["h_jets_best_Wpjet_pt",
