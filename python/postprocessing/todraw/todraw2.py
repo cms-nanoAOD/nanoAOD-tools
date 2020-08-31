@@ -22,8 +22,8 @@ parser.add_option('-c', '--crit', dest='crit', type = 'string', default = 'best'
 
 crit = opt.crit
 
-inputpath = "/eos/user/a/apiccine/Wprime/nosynch/v9/only_Wpjetbtag_ev2pbtag/plot/"
-outputpath = "/eos/user/a/apiccine/Wprime/nosynch/v9/only_Wpjetbtag_ev2pbtag/comparison/"
+inputpath = "/eos/user/a/apiccine/Wprime/nosynch/v9/only_Wpjetbtag_ev1btag/plot/"
+outputpath = "/eos/user/a/apiccine/Wprime/nosynch/v9/only_Wpjetbtag_ev1btag/comparison/"
 inpfiles = ["TT_Mtt_2016",
             "WJets_2016",  
             #"WJets_2017",  
@@ -34,7 +34,7 @@ inpfiles = ["TT_Mtt_2016",
             "WP_M4000W400_RH_2016",
 ]
 
-plotnt = {('recotop', 'Reco Top p_{T} [GeV]'): ["h_jets_best_top_pt",
+plotnt = {('recotop_pt', 'Reco Top p_{T} [GeV]'): ["h_jets_best_top_pt",
                                                 "h_jets_chi_top_pt",
                                                 "h_jets_closest_top_pt",
                                                 "h_jets_sublead_top_pt",
@@ -43,16 +43,16 @@ plotnt = {('recotop', 'Reco Top p_{T} [GeV]'): ["h_jets_best_top_pt",
                                                 "h_jets_MC_top_pt",
                                                 "h_jets_GenPart_top_pt",
                   ],
-          ('recotop', 'Reco Top mass [GeV]'): ["h_jets_best_top_m",
+          ('recotop_mass', 'Reco Top mass [GeV]'): ["h_jets_best_top_m",
                                                 "h_jets_chi_top_m",
                                                 "h_jets_closest_top_m",
                                                 "h_jets_sublead_top_m",
                                                 #"h_jets_leadingbjet_pt",
                                                 #"h_jets_subleadingbjet_pt",
                                                 "h_jets_MC_top_m",
-                                                "h_jets_GenPart_top_pt",
+                                                "h_jets_GenPart_top_m",
                   ],
-          ('Wpjet', "W' bjet p_{T} [GeV]"): ["h_jets_best_Wpjet_pt",
+          ('Wpjet_pt', "W' bjet p_{T} [GeV]"): ["h_jets_best_Wpjet_pt",
                                              "h_jets_chi_Wpjet_pt",
                                              "h_jets_closest_Wpjet_pt",
                                              "h_jets_sublead_Wpjet_pt",
@@ -61,14 +61,14 @@ plotnt = {('recotop', 'Reco Top p_{T} [GeV]'): ["h_jets_best_top_pt",
                                              "h_jets_MC_Wpjet_pt",
                                              "h_jets_GenPart_bottom_pt",
                 ],
-          ('topjet', "Top jet p_{T} [GeV]"): ["h_jets_best_topjet_pt",
+          ('topjet_pt', "Top jet p_{T} [GeV]"): ["h_jets_best_topjet_pt",
                                               "h_jets_chi_topjet_pt",
                                               "h_jets_closest_topjet_pt",
                                               "h_jets_sublead_topjet_pt",
                                               "h_jets_leadingbjet_pt",
                                               "h_jets_subleadingbjet_pt",
                                               "h_jets_MC_topjet_pt",
-                                              "h_jets_GenPart_top_pt",
+                                              #"h_jets_GenPart_top_pt",
                  ],
 }
 

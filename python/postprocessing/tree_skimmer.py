@@ -1336,7 +1336,14 @@ for i in range(tree.GetEntries()):
             chi_promptjet = goodJets[1]
     else:
         chi_promptjet = highptJets[0]
-        
+
+    #Switching jets if Wpjet is btagged and topbjet isn't
+    if int(len(bjet_filter([chi_jet], 'DeepFlv', 'M')[0])) == 0 and int(len(bjet_filter([chi_promptjet], 'DeepFlv', 'M')[0])) == 1:
+        bjet = copy.deepcopy(chi_promptjet)
+        nobjet = copy.deepcopy(chi_jet)
+        chi_jet = copy.deepcopy(bjet)
+        chi_promptjet = copy.deepcopy(nobjet)
+
     ## Chi top reconstruction
     chi_recotop_p4, IsNeg_chi, chi_dR_lepjet = recotop.top4Momentum(tightlep.p4(), chi_jet_p4, MET['metPx'], MET['metPy'])
     IsNeg_chi = IsNeg_chi * DeltaFilter
@@ -1374,6 +1381,13 @@ for i in range(tree.GetEntries()):
     else:
         closest_promptjet = highptJets[0]
 
+    #Switching jets if Wpjet is btagged and topbjet isn't
+    if int(len(bjet_filter([closest_jet], 'DeepFlv', 'M')[0])) == 0 and int(len(bjet_filter([closest_promptjet], 'DeepFlv', 'M')[0])) == 1:
+        bjet = copy.deepcopy(closest_promptjet)
+        nobjet = copy.deepcopy(closest_jet)
+        closest_jet = copy.deepcopy(bjet)
+        closest_promptjet = copy.deepcopy(nobjet)
+
     ## Closest top reconstruction
     closest_recotop_p4, IsNeg_closest, closest_dR_lepjet = recotop.top4Momentum(tightlep.p4(), closest_jet_p4, MET['metPx'], MET['metPy'])
     IsNeg_closest = IsNeg_closest * DeltaFilter
@@ -1397,6 +1411,13 @@ for i in range(tree.GetEntries()):
         sublead_jet = goodJets[1]
     
     sublead_jet_p4 = sublead_jet_p4_pre
+
+    #Switching jets if Wpjet is btagged and topbjet isn't
+    if int(len(bjet_filter([sublead_jet], 'DeepFlv', 'M')[0])) == 0 and int(len(bjet_filter([sublead_promptjet], 'DeepFlv', 'M')[0])) == 1:
+        bjet = copy.deepcopy(sublead_promptjet)
+        nobjet = copy.deepcopy(sublead_jet)
+        sublead_jet = copy.deepcopy(bjet)
+        sublead_promptjet = copy.deepcopy(nobjet)
 
     ## Subleading top reconstruction
     sublead_recotop_p4, IsNeg_sublead, sublead_dR_lepjet = recotop.top4Momentum(tightlep.p4(), sublead_jet_p4, MET['metPx'], MET['metPy'])
@@ -1451,6 +1472,13 @@ for i in range(tree.GetEntries()):
         IsNeg_best = IsNeg_chi
         best_dR_lepjet = chi_dR_lepjet
     print( " ================= best top mass is %f " %best_recotop_p4.M())
+
+    #Switching jets if Wpjet is btagged and topbjet isn't
+    if int(len(bjet_filter([best_jet], 'DeepFlv', 'M')[0])) == 0 and int(len(bjet_filter([best_promptjet], 'DeepFlv', 'M')[0])) == 1:
+        bjet = copy.deepcopy(best_promptjet)
+        nobjet = copy.deepcopy(best_jet)
+        best_jet = copy.deepcopy(bjet)
+        best_promptjet = copy.deepcopy(nobjet)
 
     IsNeg_best = IsNeg_best * DeltaFilter
     best_jet_p4t = copy.deepcopy(best_jet_p4)
