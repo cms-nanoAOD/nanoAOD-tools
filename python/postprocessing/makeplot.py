@@ -30,7 +30,7 @@ folder = opt.folder
 
 #filerepo = '/eos/user/a/apiccine/Wprime/nosynch/v7_apc/'
 filerepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
-plotrepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '_reco1btag_topjet/'#/only_Wpjetbtag_ev1btag/'
+plotrepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '_Wpbtag/'#_topjet/'#/only_Wpjetbtag_ev1btag/'
 
 ROOT.gROOT.SetBatch() # don't pop up canvases
 if not os.path.exists(plotrepo + 'plot/muon'):
@@ -484,8 +484,8 @@ if opt.cut == "lepton_eta>-10." and not opt.sel:
      cut_tag = ""
 else:
      if opt.sel:
-          cut_dict = {'muon':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&best_topjet_isbtag==1&&best_Wpjet_isbtag==0&&" + cut, 
-                      'electron':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&best_topjet_isbtag==1&&best_Wpjet_isbtag==0&&" + cut
+          cut_dict = {'muon':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&best_topjet_isbtag==0&&best_Wpjet_isbtag==1&&" + cut, 
+                      'electron':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&best_topjet_isbtag==0&&best_Wpjet_isbtag==1&&" + cut
           }
           if opt.cut != "lepton_eta>-10.":
                cut_tag = 'selection_AND_' + cutToTag(opt.cut) 
