@@ -36,7 +36,7 @@ for infile in file_list:
 MCReco = True
 DeltaFilter = True
 TriggerStudy = False # True #
-bjetSwitch = True # False #
+bjetSwitch = False # True #
 startTime = datetime.datetime.now()
 print("Starting running at " + str(startTime))
 
