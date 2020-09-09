@@ -25,17 +25,16 @@ for sample in samples:
     if not os.path.exists("./files/"):
         os.makedirs("./files/")
     f = open("./files/"+str(sample.label)+".txt", "w")
-    '''
     url = os.popen('crab getoutput --xrootd --jobids=1 -d ' + path + '/crab_' + str(sample.label) + '/').readlines()[0]
     print(url)
     s1=url.split(str(os.environ.get('USER')))
     print(s1[1])
     s2=s1[1].split('0000')
-    '''
-    #path_xrd = 'root://cms-xrd-global.cern.ch//store/user/' + str(os.environ.get('USER')) + s2[0]
-    #newurl = 'srm://stormfe1.pi.infn.it/cms/store/user/' + str(os.environ.get('USER')) + s2[0]
-    path_xrd = 'root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/JetHT/DataHTB_2016/200511_122826/'
-    newurl = 'srm://stormfe1.pi.infn.it/cms/store/user/adeiorio/OutDir/JetHT/DataHTB_2016/200511_122826/'
+
+    path_xrd = 'root://cms-xrd-global.cern.ch//store/user/' + str(os.environ.get('USER')) + s2[0]
+    newurl = 'srm://stormfe1.pi.infn.it/cms/store/user/' + str(os.environ.get('USER')) + s2[0]
+    #path_xrd = 'root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/JetHT/DataHTB_2016/200511_122826/'
+    #newurl = 'srm://stormfe1.pi.infn.it/cms/store/user/adeiorio/OutDir/JetHT/DataHTB_2016/200511_122826/'
 
     print(newurl)
     

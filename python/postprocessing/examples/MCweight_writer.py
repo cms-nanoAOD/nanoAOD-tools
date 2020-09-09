@@ -40,11 +40,16 @@ class MCweight_writer(Module):
             self.h_q2weight.Fill('muR=2 muF=0.5', LHEScaleWeight[6].__getattr__(""))
             self.h_q2weight.Fill('muR=2 muF=1', LHEScaleWeight[7].__getattr__(""))
             self.h_q2weight.Fill('muR=2 muF=2', LHEScaleWeight[8].__getattr__(""))
-        if not len(PSWeight) == 0: #PS weights (w_var / w_nominal); [0] is ISR=0.5 FSR=1; [1] is ISR=1 FSR=0.5; [2] is ISR=2 FSR=1; [3] is ISR=1 FSR=2
+        if len(PSWeight) > 1: #PS weights (w_var / w_nominal); [0] is ISR=0.5 FSR=1; [1] is ISR=1 FSR=0.5; [2] is ISR=2 FSR=1; [3] is ISR=1 FSR=2
             self.h_psweight.Fill('ISRdown', PSWeight[0].__getattr__(""))
             self.h_psweight.Fill('FSRdown', PSWeight[1].__getattr__(""))
             self.h_psweight.Fill('ISRup', PSWeight[2].__getattr__(""))
             self.h_psweight.Fill('FSRup', PSWeight[3].__getattr__(""))
+        else:
+            self.h_psweight.Fill('ISRdown', PSWeight[0].__getattr__(""))
+            self.h_psweight.Fill('FSRdown', PSWeight[0].__getattr__(""))
+            self.h_psweight.Fill('ISRup', PSWeight[0].__getattr__(""))
+            self.h_psweight.Fill('FSRup', PSWeight[0].__getattr__(""))
         self.h_genweight.Fill("SumEvents", 1)
         self.h_genweight.Fill("GenWeights", Generator.weight)
 
