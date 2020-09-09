@@ -1,0 +1,2 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M3200W320_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W320_RH_2017/200904_092818/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M3200W320_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W320_RH_2017/200904_092818/0000/tree_hadd_1.root
