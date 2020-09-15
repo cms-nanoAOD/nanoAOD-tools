@@ -5,7 +5,7 @@ from ROOT import *
 
 usage = 'python nevents.py'
 parser = optparse.OptionParser(usage)
-parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v6', help='Default folder is v0')
+parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v11', help='Default folder is v0')
 #parser.add_option('-L', '--lep', dest='lep', type='string', default='muon', help='Default checks integrals of muon systematics')
 (opt, args) = parser.parse_args()
 
@@ -18,15 +18,16 @@ gStyle.SetOptStat(0)
 gROOT.SetBatch()        # don't pop up canvases
 
 leptons = {
-     #"muon":["h_jets_lepton_pt"],
-     "electron":["h_jets_lepton_pt_lepton_pt_L_150"]
+     "muon":["h_jets_lepton_pt_selection"],
+     "electron":["h_jets_lepton_pt_selection"]
 }
 
 integrals = []
 errors = []
 
 samples = {
-     'DataMu_2016':'DataMuon', 'DataEle_2016':'DataElectron', 'DataHT_2016':'DataHT', 'ST_2016':'Single top', 'QCD_2016':'QCD', 'TT_Mtt_2016':'\\ttbar', 'WJets_2016':'\\wjets', 'WP_M2000W20_RH_2016':'\\PWpr 2\\tev(1\%)', 'WP_M3000W30_RH_2016':'\\PWpr 3\\tev(1\%)', 'WP_M4000W40_RH_2016':'\\PWpr 4\\tev(1\%)', 'WP_M4000W400_RH_2016':'\\PWpr 4\\tev(10\%)'
+#     'DataMu_2016':'DataMuon', 'DataEle_2016':'DataElectron', 'DataHT_2016':'DataHT', 'ST_2016':'Single top', 'QCD_2016':'QCD', 'TT_Mtt_2016':'\\ttbar', 'WJets_2016':'\\wjets', 'WP_M2000W20_RH_2016':'\\PWpr 2\\tev(1\%)', 'WP_M3000W30_RH_2016':'\\PWpr 3\\tev(1\%)', 'WP_M4000W40_RH_2016':'\\PWpr 4\\tev(1\%)', 'WP_M4000W400_RH_2016':'\\PWpr 4\\tev(10\%)'
+     'DataMu_2017':'DataMuon', 'DataEle_2017':'DataElectron', 'DataHT_2017':'DataHT', 'ST_2017':'Single top', 'QCD_2017':'QCD', 'TT_Mtt_2017':'\\ttbar', 'WJets_2017':'\\wjets', 'WP_M2000W20_RH_2017':'\\PWpr 2\\tev(1\%)', 'WP_M3000W30_RH_2017':'\\PWpr 3\\tev(1\%)', 'WP_M4000W40_RH_2017':'\\PWpr 4\\tev(1\%)', 'WP_M4000W400_RH_2017':'\\PWpr 4\\tev(10\%)'
      }
 
 def getSumError(_list):
