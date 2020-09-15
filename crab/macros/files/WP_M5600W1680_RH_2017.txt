@@ -1,1 +1,16 @@
-Cannot find .requestcache file in CRAB project directory /afs/cern.ch/work/a/adeiorio/CMSSW_10_5_0/src/PhysicsTools/NanoAODTools/crab/crab_WP_M2400W240_LH_2017
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_10.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_5.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_13.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_6.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_9.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_14.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_12.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_7.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_11.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_4.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_8.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_16.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M5600W1680_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M5600W1680_RH_2017/200904_104745/0000/tree_hadd_15.root

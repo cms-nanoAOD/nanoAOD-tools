@@ -523,7 +523,7 @@ def EqSolv(a1, a2, a3, a4):
             else:
                 result.append(x3.real)            
     else:
-        print( 'p1')
+        #print( 'p1')
         result = None
     #print result
     return result

@@ -1,19 +1,19 @@
 #!/bin/env python3
 import os
-print(os.environ)
-print("**********************************************************************")
-print("**********************************************************************")
-print("**********************************************************************")
-print(str(os.environ.get('PYTHONPATH')))
-print(str(os.environ.get('PYTHON3PATH')))
+#print(os.environ)
+#print("**********************************************************************")
+#print("**********************************************************************")
+#print("**********************************************************************")
+#print(str(os.environ.get('PYTHONPATH')))
+#print(str(os.environ.get('PYTHON3PATH')))
 import sys
-print("*************** This is system version info ***************************")
-print(sys.version_info)
-import platform
-print("*************** This is python version info ***************************")
-print(platform.python_version())
+#print("*************** This is system version info ***************************")
+#print(sys.version_info)
+#import platform
+#print("*************** This is python version info ***************************")
+#print(platform.python_version())
 import ROOT
-print("Succesfully imported ROOT")
+#print("Succesfully imported ROOT")
 import math
 import datetime
 import copy
@@ -690,26 +690,29 @@ if('TT_' in sample.label):
 #++++++++++++++++++++++++++++++++++
 #++      taking MC weights       ++
 #++++++++++++++++++++++++++++++++++
-print("isMC: ", isMC)
+#print("isMC: ", isMC)
 if(isMC):
-    h_genweight = ROOT.TH1F('h_genweight', 'h_genweight', 10, 0, 10)
+    h_genweight = ROOT.TH1F()
+    h_genweight.SetNameTitle('h_genweight', 'h_genweight')
     h_PDFweight = ROOT.TH1F()
     h_PDFweight.SetNameTitle("h_PDFweight","h_PDFweight")
     print(file_list)
     print("loop #3 over file_list")
     for infile in file_list: 
-        print(infile)
-        print("entered file_list loop #3")    
-        print("Getting the histos from %s" %(infile))
+        if Debug:
+            print(infile)
+            print("entered file_list loop #3")    
+            print("Getting the histos from %s" %(infile))
         newfile = ROOT.TFile.Open(infile)
         dirc = ROOT.TDirectory()
         dirc = newfile.Get("plots")
         #h_genw_tmp = ROOT.TH1F(newfile.Get("plots/h_genweight"))
         h_genw_tmp = ROOT.TH1F(dirc.Get("h_genweight"))
-        print("in newfile: ")
-        dirc.Get("h_genweight").Print()
-        print("in macro: ")
-        h_genw_tmp.Print()
+        if Debug:
+            print("in newfile: ")
+            dirc.Get("h_genweight").Print()
+            print("in macro: ")
+            h_genw_tmp.Print()
         
         if(dirc.GetListOfKeys().Contains("h_PDFweight")):
             #h_pdfw_tmp = ROOT.TH1F(newfile.Get("plots/h_PDFweight"))
@@ -725,6 +728,8 @@ if(isMC):
             h_PDFweight.Add(h_pdfw_tmp)
         else:
             addPDF = False
+        if(ROOT.TH1F(h_genweight).Integral() < 1.):
+            h_genweight.SetBins(h_genw_tmp.GetXaxis().GetNbins(), h_genw_tmp.GetXaxis().GetXmin(), h_genw_tmp.GetXaxis().GetXmax())
         h_genweight.Add(h_genw_tmp)
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
 
@@ -850,7 +855,8 @@ for i in range(tree.GetEntries()):
         btagreco = True
     nJet_pt100_all[0] = len(goodJets)
     nbJet_pt100_all[0] = len(bjets)
-    print("len bjets: ", len(bjets), "nbJet_pt100_all: ", nbJet_pt100_all[0])
+    if Debug:
+        print("len bjets: ", len(bjets), "nbJet_pt100_all: ", nbJet_pt100_all[0])
     nfatJet_all[0] = len(fatjets)
     nJet_lowpt_all[0] = len(jets) - len(goodJets)
     nbJet_lowpt_all[0] = len(bjet_filter(jets, 'DeepFlv', 'M')[0]) - len(bjets)
@@ -932,7 +938,7 @@ for i in range(tree.GetEntries()):
     recotop = TopUtilities()
     #veto on events with "pathological" reco neutrino
     tent_neutrino = recotop.NuMomentum(tightlep.p4().Px(), tightlep.p4().Py(), tightlep.p4().Pz(), tightlep.p4().Pt(), tightlep.p4().E(), MET['metPx'], MET['metPy'])
-    print(" <<<<<<<<<<<<<<<<<<<<<<<< lepton is %f " %tightlep.p4().M())
+    #print(" <<<<<<<<<<<<<<<<<<<<<<<< lepton is %f " %tightlep.p4().M())
     if tent_neutrino[0] == None:
         neutrino_failed += 1
         continue
@@ -1011,9 +1017,9 @@ for i in range(tree.GetEntries()):
                 lhe_mu += 1
             elif(abs(lhep.pdgId) == 15):
                for genp in genpart:
-                   print("pdg id " + str(genp.pdgId) + " and mother is " + str(genp.genPartIdxMother))
+                   #print("pdg id " + str(genp.pdgId) + " and mother is " + str(genp.genPartIdxMother))
                    if((abs(genp.pdgId) == 11 or abs(genp.pdgId) == 13) and genp.genPartIdxMother > 0):
-                       print(" with pdg id " + str(genpart[int(genp.genPartIdxMother)].pdgId))
+                       #print(" with pdg id " + str(genpart[int(genp.genPartIdxMother)].pdgId))
                        abs(genpart[genp.genPartIdxMother].pdgId) == 15
                        lhe_tau += 1 #inventare un modo per contare eventi leptonici da tau
         nlep_all[0] = lhe_ele + lhe_mu + lhe_tau
@@ -1024,7 +1030,7 @@ for i in range(tree.GetEntries()):
             if(abs(genp.pdgId) == 6):
                 top_q4 = ROOT.TLorentzVector()
                 top_q4.SetPtEtaPhiM(genp.pt, genp.eta, genp.phi, genp.mass)
-                print( " top 4-vector at GEN level is (%f, %f, %f, %f) and mass %f "%(genp.pt, genp.eta, genp.phi, top_q4.E(), top_q4.M()))
+                #print( " top 4-vector at GEN level is (%f, %f, %f, %f) and mass %f "%(genp.pt, genp.eta, genp.phi, top_q4.E(), top_q4.M()))
 
     lepMET_deltaPhi_all[0] = deltaPhi(tightlep_p4.Phi(), met.phi)
     mtw_all[0] = math.sqrt(2*tightlep_p4.Pt() * met.pt *(1-math.cos(abs(deltaPhi(tightlep_p4.Phi(), met.phi)))))
@@ -1114,14 +1120,14 @@ for i in range(tree.GetEntries()):
                 if (muon.genPartFlav == 1 or muon.genPartFlav == 15) and not mctfound:
                     mclepton = muon
                     mctfound = True
-                    if mclepton.genPartIdx == -1:
+                    if mclepton.genPartIdx == -1 and Debug:
                         print( 'MCTruth reconstruction not properly working - lepton step')
         elif isElectron:
             for ele in goodEle:
                 if (ele.genPartFlav == 1 or ele.genPartFlav == 15) and not mctfound:
                     mclepton = ele
                     mctfound = True
-                    if mclepton.genPartIdx == -1:
+                    if mclepton.genPartIdx == -1 and Debug:
                         print( 'MCTruth reconstruction not properly working - lepton step')
         else:
             mclepton = None
@@ -1172,7 +1178,7 @@ for i in range(tree.GetEntries()):
                         mctopbjet_p4 = bjet_p4
                         mctop_p4, IsmcNeg, mcdR_lepjet = recotop.top4Momentum(mclepton_p4, bjet_p4, MET['metPx'], MET['metPy'])
                         IsmcNeg = IsmcNeg*DeltaFilter
-                        print( "MC top mass is %f " %mctop_p4.M())
+                        #print( "MC top mass is %f " %mctop_p4.M())
                         if mctop_p4 is None:
                             continue
                         
@@ -1356,25 +1362,25 @@ for i in range(tree.GetEntries()):
     is_chi_topjet_btag = int(len(bjet_filter([chi_jet], 'DeepFlv', 'M')[0]))
     is_chi_Wpjet_btag = int(len(bjet_filter([chi_promptjet], 'DeepFlv', 'M')[0]))
     if is_chi_topjet_btag == 0 and is_chi_Wpjet_btag == 1 and bjetSwitch:
-        print("is topjet btag: ", is_chi_topjet_btag, "is Wpjet btag: ", is_chi_Wpjet_btag)
-        print("chi_topjet: ", chi_jet, "chi_promptjet", chi_promptjet)
+        #print("is topjet btag: ", is_chi_topjet_btag, "is Wpjet btag: ", is_chi_Wpjet_btag)
+        #print("chi_topjet: ", chi_jet, "chi_promptjet", chi_promptjet)
         bjet = copy.copy(chi_promptjet)
         nobjet = copy.copy(chi_jet)
         #bjet_p4 = chi_promptjet.p4()
         #nobjet_p4 = chi_jet.p4()
         #chi_jet_p4 = copy.deepcopy(bjet_p4)
         #chi_promptjet_p4 = copy.deepcopy(nobjet_p4)
-        print("bjet: ", bjet, "nobjet: ", nobjet)
-        print(chi_jet_p4.Print())
-        print(chi_promptjet.p4().Print())
+        #print("bjet: ", bjet, "nobjet: ", nobjet)
+        #print(chi_jet_p4.Print())
+        #print(chi_promptjet.p4().Print())
         chi_jet = copy.copy(bjet)
         chi_promptjet = copy.copy(nobjet)
-        print("chi_topjet: ", chi_jet, "chi_promptjet", chi_promptjet)
-        print("bjet: ", bjet, "nobjet: ", nobjet)
+        #print("chi_topjet: ", chi_jet, "chi_promptjet", chi_promptjet)
+        #print("bjet: ", bjet, "nobjet: ", nobjet)
         chi_jet_p4 = chi_jet.p4()
         chi_promptjet_p4 = chi_promptjet.p4()
-        print(chi_jet_p4.Print())
-        print(chi_promptjet_p4.Print())
+        #print(chi_jet_p4.Print())
+        #print(chi_promptjet_p4.Print())
 
     ## Chi top reconstruction
     chi_recotop_p4, IsNeg_chi, chi_dR_lepjet = recotop.top4Momentum(tightlep.p4(), chi_jet_p4, MET['metPx'], MET['metPy'])
@@ -1389,12 +1395,13 @@ for i in range(tree.GetEntries()):
     chi_recotop_p4t = tightlep_p4t + chi_jet_p4t + recomet_p4t
     chi_promptjet_p4t = copy.deepcopy(chi_promptjet.p4())
     chi_promptjet_p4t.SetPz(0.)
-    print( "  Is Neg chi " + str(IsNeg_chi) )
-    print( " ================= lep 4-vector is (%f, %f, %f ,%f) " %(tightlep.p4().Pt(), tightlep.p4().Eta(), tightlep.p4().Phi(), tightlep.p4().E() ))
-    print( " ================= chi jet 4-vector is (%f, %f, %f ,%f) " %(chi_jet_p4.Pt(), chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_jet_p4.E() ))
-    print( " ================= chi top 4-vector is (%f, %f, %f ,%f) " %(chi_recotop_p4.Pt(), chi_recotop_p4.Eta(), chi_recotop_p4.Phi(), chi_recotop_p4.E() ))
-    print( " ================= MET vector is (%f, %f) " %(MET['metPx'], MET['metPy']))
-    print( " ================= Chi top mass is %f " %chi_recotop_p4.M())
+    if Debug:
+        print( "  Is Neg chi " + str(IsNeg_chi) )
+        print( " ================= lep 4-vector is (%f, %f, %f ,%f) " %(tightlep.p4().Pt(), tightlep.p4().Eta(), tightlep.p4().Phi(), tightlep.p4().E() ))
+        print( " ================= chi jet 4-vector is (%f, %f, %f ,%f) " %(chi_jet_p4.Pt(), chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_jet_p4.E() ))
+        print( " ================= chi top 4-vector is (%f, %f, %f ,%f) " %(chi_recotop_p4.Pt(), chi_recotop_p4.Eta(), chi_recotop_p4.Phi(), chi_recotop_p4.E() ))
+        print( " ================= MET vector is (%f, %f) " %(MET['metPx'], MET['metPy']))
+        print( " ================= Chi top mass is %f " %chi_recotop_p4.M())
     if chi_recotop_p4 != None:
         nrecochi += 1
         chi_RecoTop_costheta_all[0] = recotop.costhetapol(tightlep.p4(), chi_promptjet.p4(), chi_recotop_p4) 
@@ -1423,25 +1430,25 @@ for i in range(tree.GetEntries()):
     is_closest_topjet_btag = int(len(bjet_filter([closest_jet], 'DeepFlv', 'M')[0]))
     is_closest_Wpjet_btag = int(len(bjet_filter([closest_promptjet], 'DeepFlv', 'M')[0]))
     if is_closest_topjet_btag == 0 and is_closest_Wpjet_btag == 1 and bjetSwitch:
-        print("is topjet btag: ", is_closest_topjet_btag, "is Wpjet btag: ", is_closest_Wpjet_btag)
-        print("closest_topjet: ", closest_jet, "closest_promptjet", closest_promptjet)
+        #print("is topjet btag: ", is_closest_topjet_btag, "is Wpjet btag: ", is_closest_Wpjet_btag)
+        #print("closest_topjet: ", closest_jet, "closest_promptjet", closest_promptjet)
         bjet = copy.copy(closest_promptjet)
         nobjet = copy.copy(closest_jet)
         #bjet_p4 = closest_promptjet.p4()
         #nobjet_p4 = closest_jet.p4()
         #closest_jet_p4 = copy.deepcopy(bjet_p4)
         #closest_promptjet_p4 = copy.deepcopy(nobjet_p4)
-        print("bjet: ", bjet, "nobjet: ", nobjet)
-        print(closest_jet_p4.Print())
-        print(closest_promptjet.p4().Print())
+        #print("bjet: ", bjet, "nobjet: ", nobjet)
+        #print(closest_jet_p4.Print())
+        #print(closest_promptjet.p4().Print())
         closest_jet = copy.copy(bjet)
         closest_promptjet = copy.copy(nobjet)
-        print("closest_topjet: ", closest_jet, "closest_promptjet", closest_promptjet)
-        print("bjet: ", bjet, "nobjet: ", nobjet)
+        #print("closest_topjet: ", closest_jet, "closest_promptjet", closest_promptjet)
+        #print("bjet: ", bjet, "nobjet: ", nobjet)
         closest_jet_p4 = closest_jet.p4()
         closest_promptjet_p4 = closest_promptjet.p4()
-        print(closest_jet_p4.Print())
-        print(closest_promptjet_p4.Print())
+        #print(closest_jet_p4.Print())
+        #print(closest_promptjet_p4.Print())
     
     ## Closest top reconstruction
     closest_recotop_p4, IsNeg_closest, closest_dR_lepjet = recotop.top4Momentum(tightlep.p4(), closest_jet_p4, MET['metPx'], MET['metPy'])
@@ -1476,25 +1483,25 @@ for i in range(tree.GetEntries()):
     is_sublead_topjet_btag = int(len(bjet_filter([sublead_jet], 'DeepFlv', 'M')[0]))
     is_sublead_Wpjet_btag = int(len(bjet_filter([sublead_promptjet], 'DeepFlv', 'M')[0]))
     if is_sublead_topjet_btag == 0 and is_sublead_Wpjet_btag == 1 and bjetSwitch:
-        print("is topjet btag: ", is_sublead_topjet_btag, "is Wpjet btag: ", is_sublead_Wpjet_btag)
-        print("sublead_topjet: ", sublead_jet, "sublead_promptjet", sublead_promptjet)
+        #print("is topjet btag: ", is_sublead_topjet_btag, "is Wpjet btag: ", is_sublead_Wpjet_btag)
+        #print("sublead_topjet: ", sublead_jet, "sublead_promptjet", sublead_promptjet)
         bjet = copy.copy(sublead_promptjet)
         nobjet = copy.copy(sublead_jet)
         #bjet_p4 = sublead_promptjet.p4()
         #nobjet_p4 = sublead_jet.p4()
         #sublead_jet_p4 = copy.deepcopy(bjet_p4)
         #sublead_promptjet_p4 = copy.deepcopy(nobjet_p4)
-        print("bjet: ", bjet, "nobjet: ", nobjet)
-        print(sublead_jet_p4.Print())
-        print(sublead_promptjet.p4().Print())
+        #print("bjet: ", bjet, "nobjet: ", nobjet)
+        #print(sublead_jet_p4.Print())
+        #print(sublead_promptjet.p4().Print())
         sublead_jet = copy.copy(bjet)
         sublead_promptjet = copy.copy(nobjet)
-        print("sublead_topjet: ", sublead_jet, "sublead_promptjet", sublead_promptjet)
-        print("bjet: ", bjet, "nobjet: ", nobjet)
+        #print("sublead_topjet: ", sublead_jet, "sublead_promptjet", sublead_promptjet)
+        #print("bjet: ", bjet, "nobjet: ", nobjet)
         sublead_jet_p4 = sublead_jet.p4()
         sublead_promptjet_p4 = sublead_promptjet.p4()
-        print(sublead_jet_p4.Print())
-        print(sublead_promptjet_p4.Print())
+        #print(sublead_jet_p4.Print())
+        #print(sublead_promptjet_p4.Print())
    
 
     ## Subleading top reconstruction
@@ -1520,7 +1527,7 @@ for i in range(tree.GetEntries()):
     is_best_Wpjet_btag = None
 
     if chi_jet_p4_pre == closest_jet_p4_pre:
-        print("\tchi == closest")
+        #print("\tchi == closest")
         best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
@@ -1530,7 +1537,7 @@ for i in range(tree.GetEntries()):
         is_best_topjet_btag = copy.deepcopy(is_chi_topjet_btag)
         is_best_Wpjet_btag = copy.deepcopy(is_chi_Wpjet_btag)
     elif sublead_jet_p4_pre == chi_jet_p4_pre:
-        print("\tchi == sublead")
+        #print("\tchi == sublead")
         best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
@@ -1540,7 +1547,7 @@ for i in range(tree.GetEntries()):
         is_best_topjet_btag = copy.deepcopy(is_chi_topjet_btag)
         is_best_Wpjet_btag = copy.deepcopy(is_chi_Wpjet_btag)
     elif sublead_jet_p4_pre == closest_jet_p4_pre:
-        print("\tsublead == closest")
+        #print("\tsublead == closest")
         best_jet_p4 = copy.deepcopy(sublead_jet_p4)
         best_jet = sublead_jet
         best_promptjet = sublead_promptjet
@@ -1550,7 +1557,7 @@ for i in range(tree.GetEntries()):
         is_best_topjet_btag = copy.deepcopy(is_sublead_topjet_btag)
         is_best_Wpjet_btag = copy.deepcopy(is_sublead_Wpjet_btag)
     else:
-        print("\tchi != closest != sublead")
+        #print("\tchi != closest != sublead")
         best_jet_p4 = copy.deepcopy(chi_jet_p4)
         best_jet = chi_jet
         best_promptjet = chi_promptjet
@@ -1559,9 +1566,9 @@ for i in range(tree.GetEntries()):
         best_dR_lepjet = chi_dR_lepjet
         is_best_topjet_btag = copy.deepcopy(is_chi_topjet_btag)
         is_best_Wpjet_btag = copy.deepcopy(is_chi_Wpjet_btag)
-    print( " ================= best top mass is %f " %best_recotop_p4.M())
+    #print( " ================= best top mass is %f " %best_recotop_p4.M())
 
-    print("best_topjet: ", best_jet, "best_promptjet", best_promptjet)
+    #print("best_topjet: ", best_jet, "best_promptjet", best_promptjet)
 
     '''
     #Switching jets if Wpjet is btagged and topbjet isn't
@@ -1639,15 +1646,15 @@ for i in range(tree.GetEntries()):
         closest_TopJet_eta_all[0] = closest_jet_p4.Eta()
         closest_TopJet_phi_all[0] = closest_jet_p4.Phi()
         closest_TopJet_isBTagged_all[0] = copy.deepcopy(is_closest_topjet_btag) #int(len(bjet_filter([closest_jet], 'DeepFlv', 'M')[0]))
-        print("closest_TopJet_isBTagged: ", closest_TopJet_isBTagged_all[0])
+        #print("closest_TopJet_isBTagged: ", closest_TopJet_isBTagged_all[0])
         closest_TopJet_dRLepJet_all[0] = copy.deepcopy(closest_dR_lepjet)
         closest_WpJet_m_all[0] = closest_promptjet.p4().M()
         closest_WpJet_pt_all[0] = closest_promptjet.p4().Pt()
         closest_WpJet_eta_all[0] = closest_promptjet.p4().Eta()
         closest_WpJet_phi_all[0] = closest_promptjet.p4().Phi()
         closest_WpJet_isBTagged_all[0] = copy.deepcopy(is_closest_Wpjet_btag) #int(len(bjet_filter([closest_promptjet], 'DeepFlv', 'M')[0]))
-        print("closest_WpJet_isBTagged: ", closest_WpJet_isBTagged_all[0])
-        print( "closest W' mass: ", closest_Wprime_p4.M())
+        #print("closest_WpJet_isBTagged: ", closest_WpJet_isBTagged_all[0])
+        #print( "closest W' mass: ", closest_Wprime_p4.M())
     else:
         closest_Wprime_m_all[0] = -100.
         closest_Wprime_mt_all[0] = -100.
@@ -1691,21 +1698,21 @@ for i in range(tree.GetEntries()):
         chi_TopJet_eta_all[0] = chi_jet_p4.Eta()
         chi_TopJet_phi_all[0] = chi_jet_p4.Phi()
         chi_TopJet_isBTagged_all[0] = copy.deepcopy(is_chi_topjet_btag) #int(len(bjet_filter([chi_jet], 'DeepFlv', 'M')[0]))
-        print("chi_TopJet_isBTagged: ", chi_TopJet_isBTagged_all[0])
+        #print("chi_TopJet_isBTagged: ", chi_TopJet_isBTagged_all[0])
         chi_TopJet_dRLepJet_all[0] = copy.deepcopy(chi_dR_lepjet)
         chi_WpJet_m_all[0] = chi_promptjet.p4().M()
         chi_WpJet_pt_all[0] = chi_promptjet.p4().Pt()
         chi_WpJet_eta_all[0] = chi_promptjet.p4().Eta()
         chi_WpJet_phi_all[0] = chi_promptjet.p4().Phi()
         chi_WpJet_isBTagged_all[0] = copy.deepcopy(is_chi_Wpjet_btag) #int(len(bjet_filter([chi_promptjet], 'DeepFlv', 'M')[0]))
-        print("chi_WpJet_isBTagged: ", chi_WpJet_isBTagged_all[0])
+        #print("chi_WpJet_isBTagged: ", chi_WpJet_isBTagged_all[0])
         closAK8, dR_bestWAK4AK8 = closest(chi_promptjet, fatjets) 
         ptrel_bestWAK4_closestAK8[0] = chi_promptjet.pt/closAK8.pt
         deltaR_bestWAK4_closestAK8[0] = copy.deepcopy(dR_bestWAK4AK8)
         chi_topW_jets_pt[0] = (chi_jet_p4 + chi_promptjet.p4()).Pt()
         chi_topW_jets_deltaR[0] = deltaR(chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_promptjet.p4().Eta(), chi_promptjet.p4().Phi())
         chi_topW_jets_deltaphi[0] = deltaPhi(chi_jet_p4.Phi(), chi_promptjet.p4().Phi())
-        print("chi W' mass: ", chi_Wprime_p4.M())
+        #print("chi W' mass: ", chi_Wprime_p4.M())
     else:
         chi_Wprime_m_all[0] = -100.
         chi_Wprime_mt_all[0] = -100.
@@ -1749,15 +1756,15 @@ for i in range(tree.GetEntries()):
         sublead_TopJet_eta_all[0] = sublead_jet_p4.Eta()
         sublead_TopJet_phi_all[0] = sublead_jet_p4.Phi()
         sublead_TopJet_isBTagged_all[0] = copy.deepcopy(is_sublead_topjet_btag) #int(len(bjet_filter([sublead_jet], 'DeepFlv', 'M')[0]))
-        print("sublead_TopJet_isBTagged: ", sublead_TopJet_isBTagged_all[0])
+        #print("sublead_TopJet_isBTagged: ", sublead_TopJet_isBTagged_all[0])
         sublead_TopJet_dRLepJet_all[0] = copy.deepcopy(sublead_dR_lepjet)
         sublead_WpJet_m_all[0] = sublead_promptjet.p4().M()
         sublead_WpJet_pt_all[0] = sublead_promptjet.p4().Pt()
         sublead_WpJet_eta_all[0] = sublead_promptjet.p4().Eta()
         sublead_WpJet_phi_all[0] = sublead_promptjet.p4().Phi()
         sublead_WpJet_isBTagged_all[0] = copy.deepcopy(is_sublead_Wpjet_btag) #int(len(bjet_filter([sublead_promptjet], 'DeepFlv', 'M')[0]))
-        print("sublead_WpJet_isBTagged: ", sublead_WpJet_isBTagged_all[0])
-        print( "sublead W' mass: ", sublead_Wprime_p4.M())
+        #print("sublead_WpJet_isBTagged: ", sublead_WpJet_isBTagged_all[0])
+        #print( "sublead W' mass: ", sublead_Wprime_p4.M())
     else:
         sublead_Wprime_m_all[0] = -100.
         sublead_Wprime_mt_all[0] = -100.
@@ -1801,7 +1808,7 @@ for i in range(tree.GetEntries()):
         best_TopJet_eta_all[0] = best_jet_p4.Eta()
         best_TopJet_phi_all[0] = best_jet_p4.Phi()
         best_TopJet_isBTagged_all[0] = copy.deepcopy(is_best_topjet_btag) #int(len(bjet_filter([best_jet], 'DeepFlv', 'M')[0]))
-        print("best_TopJet_isBTagged: ", best_TopJet_isBTagged_all[0])
+        #print("best_TopJet_isBTagged: ", best_TopJet_isBTagged_all[0])
         best_TopJet_btagscore_all[0] = best_jet.btagDeepFlavB
         best_TopJet_dRLepJet_all[0] = copy.deepcopy(best_dR_lepjet)
         best_WpJet_m_all[0] = best_promptjet.p4().M()
@@ -1809,7 +1816,7 @@ for i in range(tree.GetEntries()):
         best_WpJet_eta_all[0] = best_promptjet.p4().Eta()
         best_WpJet_phi_all[0] = best_promptjet.p4().Phi()
         best_WpJet_isBTagged_all[0] = copy.deepcopy(is_best_Wpjet_btag) #int(len(bjet_filter([best_promptjet], 'DeepFlv', 'M')[0]))
-        print("best_WpJet_isBTagged: ", best_WpJet_isBTagged_all[0])
+        #print("best_WpJet_isBTagged: ", best_WpJet_isBTagged_all[0])
         best_WpJet_btagscore_all[0] = best_promptjet.btagDeepFlavB
         closAK8, dR_bestWAK4AK8 = closest(best_promptjet, fatjets) 
         ptrel_bestWAK4_closestAK8[0] = best_promptjet.pt/closAK8.pt
@@ -1830,7 +1837,7 @@ for i in range(tree.GetEntries()):
         WprAK8_tau2[0] = closAK8.tau2
         WprAK8_tau3[0] = closAK8.tau3
         WprAK8_tau4[0] = closAK8.tau4
-        print( "best W' mass: ", best_Wprime_p4.M())
+        #print( "best W' mass: ", best_Wprime_p4.M())
     else:
         best_Wprime_m_all[0] = -100.
         best_Wprime_mt_all[0] = -100.
@@ -1849,7 +1856,7 @@ for i in range(tree.GetEntries()):
         best_TopJet_phi_all[0] = -100.
         best_TopJet_isBTagged_all[0] = -1
         best_TopJet_btagscore_all[0] = -100.
-        print(type(best_TopJet_btagscore_all[0]))
+        #print(type(best_TopJet_btagscore_all[0]))
         best_TopJet_dRLepJet_all[0] = -100.
         best_WpJet_m_all[0] = -100.
         best_WpJet_pt_all[0] = -100.
