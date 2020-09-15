@@ -8,30 +8,30 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 class lepSFProducer(Module):
     def __init__(self, muonSelectionTag, electronSelectionTag):
-        if muonSelectionTag=="TightWP_2016":
+        if muonSelectionTag == "TightWP_2016":
             mu_f = ["Mu_RunBCDEFGH_SF_ID_2016_syst.root", "Mu_MiniIso.root"]
             mu_h = ["NUM_TightID_DEN_genTracks_eta_pt",
                     "LooseISO_TightID_pt_eta/pt_abseta_ratio"] # Check the histogram name
 
-        if electronSelectionTag=="NoIsoMVA90_2016":
+        if electronSelectionTag == "NoIsoMVA90_2016":
             el_f = ["EGM2D_RECO_SF_2016.root", "2016LegacyReReco_ElectronMVA90noiso_Fall17V2.root", "EGM2D_MiniIso_SF_2017.root"]
             el_h = ["EGamma_SF2D", "EGamma_SF2D", "EGamma_SF2D"]
 
-        if muonSelectionTag=="TightWP_2017":
-            mu_f=["Mu_RunBCDEF_SF_ID_2017_syst.root", "Mu_RunBCDEF_SF_MiniIso_2017.root"]
-            mu_h = ["NUM_TightID_DEN_genTracks_pt_abseta",
-                    "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio"] # Check the histogram name
+        if muonSelectionTag == "TightWP_2017":
+            mu_f = ["Mu_RunBCDEF_SF_ID_2017_syst.root", "Mu_RunBCDEF_SF_MiniIso_2017.root"]
+            mu_h = ["NUM_TightID_DEN_genTracks_pt_abseta_syst",
+                    "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio"]
 
-        if electronSelectionTag=="NoIsoMVA90_2017":
+        if electronSelectionTag == "NoIsoMVA90_2017":
             el_f = ["EGM2D_RECO_SF_2017.root", "2017_ElectronMVA90noiso.root", "EGM2D_MiniIso_SF_2017.root"]
             el_h = ["EGamma_SF2D", "EGamma_SF2D", "EGamma_SF2D"]
 
-        if muonSelectionTag=="TightWP_2018":
-            mu_f=["Mu_RunABCD_SF_ID_2018_syst.root", "Mu_RunABCD_SF_MiniIso_2018.root"]
-            mu_h = ["NUM_TightID_DEN_TrackerMuons_pt_abseta",
-                    "LooseISO_TightID_pt_eta/pt_abseta_ratio"] # Check the histogram name
+        if muonSelectionTag == "TightWP_2018":
+            mu_f = ["Mu_RunABCD_SF_ID_2018_syst.root", "Mu_RunABCD_SF_MiniIso_2018.root"]
+            mu_h = ["NUM_TightID_DEN_TrackerMuons_pt_abseta_syst", 
+                    "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio"]
 
-        if electronSelectionTag=="NoIsoMVA90_2018":
+        if electronSelectionTag == "NoIsoMVA90_2018":
             el_f = ["EGM2D_RECO_SF_2018.root", "2018_ElectronMVA90noiso.root", "EGM2D_MiniIso_SF_2018.root"]
             el_h = ["EGamma_SF2D", "EGamma_SF2D", "EGamma_SF2D"]
 

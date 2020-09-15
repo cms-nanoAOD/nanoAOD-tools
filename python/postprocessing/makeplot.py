@@ -21,7 +21,7 @@ parser.add_option('-L', '--lep', dest='lep', type='string', default = 'muon', he
 parser.add_option('-S', '--syst', dest='syst', type='string', default = 'all', help='Default all systematics added')
 parser.add_option('-C', '--cut', dest='cut', type='string', default = 'lepton_eta>-10.', help='Default no cut')
 parser.add_option('-y', '--year', dest='year', type='string', default = 'all', help='Default 2016, 2017 and 2018 are included')
-parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v6', help='Default folder is v0')
+parser.add_option('-f', '--folder', dest='folder', type='string', default = 'v11', help='Default folder is v0')
 #parser.add_option('-T', '--topol', dest='topol', type='string', default = 'all', help='Default all njmt')
 parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', help="")
 (opt, args) = parser.parse_args()
@@ -30,7 +30,7 @@ folder = opt.folder
 
 #filerepo = '/eos/user/a/apiccine/Wprime/nosynch/v7_apc/'
 filerepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
-plotrepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/nosel/inclusive/'
+plotrepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'#_topjet/'#/only_Wpjetbtag_ev1btag/'
 
 ROOT.gROOT.SetBatch() # don't pop up canvases
 if not os.path.exists(plotrepo + 'plot/muon'):
@@ -99,6 +99,7 @@ def lumi_writer(dataset, lumi):
                     tree_new.Fill()
                tree_new.Write()
                outfile.Close()
+               print('\n')
           else:
                os.popen("mv " + filerepo + sample.label + "/"  + sample.label + "_merged.root " + filerepo + sample.label + "/"  + sample.label + ".root")
 
@@ -197,7 +198,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           histoname = "h_"+reg_+"_"+variabile_._name+"_"+cut_tag_
           stackname = "stack_"+reg_+"_"+variabile_._name+"_"+cut_tag_
           canvasname = "stack_"+reg_+"_"+variabile_._name+"_"+cut_tag_+"_"+lep_
-     if("selection_AND_best_Wpjet_isbtag_AND_best_topjet_isbtag" in cut_tag_ ):
+     if("selection_AND_best_Wpjet_isbtag_AND_best_topjet_isbtag" in cut_tag_ ) or ("selection_AND_best_topjet_isbtag_AND_best_Wpjet_isbtag" in cut_tag_ ):
           blind = True
      stack = ROOT.THStack(stackname, variabile_._name)
      leg_stack = ROOT.TLegend(0.33,0.62,0.91,0.87)
@@ -463,7 +464,7 @@ else:
      dataset_dict = {
           '2016':[DataMu_2016, DataEle_2016, DataHT_2016, ST_2016, QCD_2016, TT_Mtt_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
           #'2016':[DataHTG_2016, DataMuG_2016, ST_2016, QCD_2016, TT_Mtt_2016, WJets_2016, WP_M2000W20_RH_2016, WP_M3000W30_RH_2016, WP_M4000W40_RH_2016, WP_M4000W400_RH_2016],
-          '2017':[DataMu_2017, DataEle_2017, TT_Mtt_2017, WJets_2017],
+          '2017':[DataMu_2017, DataEle_2017, DataHT_2017, ST_2017, QCD_2017, TT_Mtt_2017, WJets_2017, WP_M2000W20_RH_2017, WP_M3000W30_RH_2017, WP_M4000W40_RH_2017, WP_M4000W400_RH_2017],
           '2018':[DataMu_2018, DataEle_2018, TT_Mtt_2018, WJets_2018]}
 #print(dataset_dict.keys())
 
@@ -524,7 +525,7 @@ for year in years:
           variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('lepton_miniIso', 'lepton miniIso',  wzero+'*('+cut+')', 100, 0, 0.1))
           #variables.append(variabile('lepton_stdIso', 'lepton std Iso',  wzero+'*('+cut+')', 5, -0.5, 4.5))
-          #variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')', 46, 80, 1000))
+          variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')', 46, 80, 1000))
           variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', 100, 0, 1000))
           variables.append(variabile('Event_HT', 'event HT [GeV]', wzero+'*('+cut+')', 70, 0, 1400))
           variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
@@ -537,7 +538,7 @@ for year in years:
           variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')',  61, 80, 5000))
           variables.append(variabile('WprAK8_ttagMD', 'WprAK8 t tag MD', wzero+'*(WprAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
           variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 20, 0, .4))
-          
+          '''
           variables.append(variabile('best_topjet_isbtag', 'top jet b tagged (best)',  wzero+'*('+cut+')', 2, -0.5, 1.5))
           variables.append(variabile('best_Wpjet_isbtag', "W' jet b tagged (best)",  wzero+'*('+cut+')', 2, -0.5, 1.5))
           variables.append(variabile('MC_Wpjet_pt', "MCtruth W' jet p_{T} [GeV]",  wzero+'*('+cut+')', 150, 0, 3000))
@@ -682,7 +683,7 @@ for year in years:
           variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 60, 0, .6))
           variables.append(variabile('WprAK8_tau3', 'WprAK8 tau 3', wzero+'*('+cut+')', 40, 0, .4))
           variables.append(variabile('WprAK8_tau4', 'WprAK8 tau 4', wzero+'*('+cut+')', 20, 0, .2))
-
+          '''
           for sample in dataset_new:
                if(opt.plot):
                     for var in variables:
