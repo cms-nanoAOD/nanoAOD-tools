@@ -848,8 +848,11 @@ for i in range(tree.GetEntries()):
     ######################################
     ## Selecting only jets with pt>100  ##
     ######################################
+    btagreco = False
     goodJets = get_Jet(jets, 100)
     bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
+    if(len(bjets) > 1):
+        btagreco = True
     nJet_pt100_all[0] = len(goodJets)
     nbJet_pt100_all[0] = len(bjets)
     if Debug:
@@ -1284,6 +1287,10 @@ for i in range(tree.GetEntries()):
     if len(highptJets) < 1:
         continue
 
+    if btagreco:
+        goodJets = copy.copy(bjets)
+        highptJets = get_Jet(goodJets, leadingjet_ptcut)
+
     closest_promptjet = None
     closest_promptjet_p4t = None
     closest_jet_p4 = None
@@ -1296,7 +1303,7 @@ for i in range(tree.GetEntries()):
     chi_jet_p4t = None
     chi_jet_p4_pre = None
     chi_dR_lepjet = None
-    sublead_promptjet = highptJets[0]
+    sublead_promptjet = goodJets[0]
     sublead_promptjet_p4t = None
     sublead_jet_p4 = None
     sublead_jet_p4t = None
@@ -1342,7 +1349,7 @@ for i in range(tree.GetEntries()):
         else:
             chi_promptjet = goodJets[1]
     else:
-        chi_promptjet = highptJets[0]
+        chi_promptjet = goodJets[0]
 
     #Switching jets if Wpjet is btagged and topbjet isn't    
     #bjet_p4 = ROOT.TLorentzVector()
@@ -1411,7 +1418,7 @@ for i in range(tree.GetEntries()):
         else:
             closest_promptjet = goodJets[1]
     else:
-        closest_promptjet = highptJets[0]
+        closest_promptjet = goodJets[0]
 
     
     #Switching jets if Wpjet is btagged and topbjet isn't
@@ -1466,7 +1473,6 @@ for i in range(tree.GetEntries()):
         sublead_jet = goodJets[1]
     
     sublead_jet_p4 = sublead_jet_p4_pre
-
     
     #Switching jets if Wpjet is btagged and topbjet isn't
     bjet = None
