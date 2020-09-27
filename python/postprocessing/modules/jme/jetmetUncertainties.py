@@ -513,9 +513,8 @@ class jetmetUncertaintiesProducer(Module):
                       # Variations of T1 MET
                       if 'T1' in self.saveMETUncs: 
                         for jerID in self.splitJERIDs:
+                            # For uncertainties on T1 MET, the up/down variations are just the centrally smeared MET values
                             jerUpVal, jerDownVal = jet_pt_jerNomVal, jet_pt_jerNomVal
-                            if jerID == self.getJERsplitID(jet_pt_nom, jet.eta):
-                                jerUpVal, jerDownVal = jet_pt_jerUpVal, jet_pt_jerDownVal
                             met_T1_px_jerUp[jerID]   = met_T1_px_jerUp[jerID]   - (jet_pt_L1L2L3*jerUpVal    - jet_pt_L1)*jet_cosPhi
                             met_T1_py_jerUp[jerID]   = met_T1_py_jerUp[jerID]   - (jet_pt_L1L2L3*jerUpVal    - jet_pt_L1)*jet_sinPhi
                             met_T1_px_jerDown[jerID] = met_T1_px_jerDown[jerID] - (jet_pt_L1L2L3*jerDownVal  - jet_pt_L1)*jet_cosPhi
