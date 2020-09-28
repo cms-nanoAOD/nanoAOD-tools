@@ -181,13 +181,17 @@ for sample in samples:
         print 'The flag isMC is: ' + str(isMC)
 
         print "Producing crab configuration file"
-        cfg_writer(sample, isMC, "OutDir")
-        
+        cfg_writer(sample, isMC, "Trigger")
+        for_trigger = False
         
         if isMC:
             modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), " + lep_mod + ", " + pu_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
+            if for_trigger:
+                modules = met_hlt_mod + ", trigger_preselection(), " + lep_mod  # Put here all the modules you want to be runned by crab
         else:
             modules = "preselection(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
+            if for_trigger:
+                modules = "trigger_preselection()"
             
         print "Producing crab script"
         crab_script_writer(sample,'/eos/user/'+str(os.environ.get('USER')[0]) + '/'+str(os.environ.get('USER'))+'/Wprime/nosynch/', isMC, modules, presel)
