@@ -1,0 +1,13 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_9.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_5.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_4.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_6.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_13.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_12.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_14.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_16.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_17.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/WJetsToLNu_HT-800To1200_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsHT800to1200_2018/200914_180524/0000/tree_hadd_11.root
