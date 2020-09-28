@@ -612,12 +612,8 @@ class jetmetUncertaintiesProducer(Module):
                 self.out.fillBranch("%s_pt_jer%sUp" % (self.jetBranchName, jerID), jets_pt_jerUp[jerID])
                 self.out.fillBranch("%s_pt_jer%sDown" % (self.jetBranchName, jerID), jets_pt_jerDown[jerID])
         
-        if 'T1' in self.saveMETUncs:
-            self.out.fillBranch("%s_T1_pt" % self.metBranchName, math.sqrt(met_T1_px**2 + met_T1_py**2))
-            self.out.fillBranch("%s_T1_phi" % self.metBranchName, math.atan2(met_T1_py, met_T1_px))        
-        if 'T1Smear' in self.saveMETUncs:
-            self.out.fillBranch("%s_T1Smear_pt" % self.metBranchName, math.sqrt(met_T1_px**2 + met_T1_py**2))
-            self.out.fillBranch("%s_T1Smear_phi" % self.metBranchName, math.atan2(met_T1_py, met_T1_px))        
+        self.out.fillBranch("%s_T1_pt" % self.metBranchName, math.sqrt(met_T1_px**2 + met_T1_py**2))
+        self.out.fillBranch("%s_T1_phi" % self.metBranchName, math.atan2(met_T1_py, met_T1_px))        
 
         self.out.fillBranch("%s_mass_raw" % self.jetBranchName, jets_mass_raw)
         self.out.fillBranch("%s_mass_nom" % self.jetBranchName, jets_mass_nom)
