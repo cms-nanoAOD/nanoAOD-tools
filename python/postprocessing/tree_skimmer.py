@@ -90,9 +90,30 @@ systTree.addSelection("all")
 systTree.initTreesSysts(trees, outTreeFile)
 
 systTree.setWeightName("w_nominal",1.)
+systTree.setWeightName("btagSF", 1.)
+systTree.setWeightName("btagUp", 1.)
+systTree.setWeightName("btagDown", 1.)
+systTree.setWeightName("btagShape", 1.)
+systTree.setWeightName("btagShapeUpCferr1", 1.)
+systTree.setWeightName("btagShapeUpCferr2", 1.)
+systTree.setWeightName("btagShapeUpJes", 1.)
+systTree.setWeightName("btagShapeUpLf", 1.)
+systTree.setWeightName("btagShapeUpLfStats1", 1.)
+systTree.setWeightName("btagShapeUpLfStats2", 1.)
+systTree.setWeightName("btagShapeUpHf", 1.)
+systTree.setWeightName("btagShapeUpHfStats1", 1.)
+systTree.setWeightName("btagShapeUpHfStats2", 1.)
+systTree.setWeightName("btagShapeDownCferr1", 1.)
+systTree.setWeightName("btagShapeDownCferr2", 1.)
+systTree.setWeightName("btagShapeDownJes", 1.)
+systTree.setWeightName("btagShapeDownLf", 1.)
+systTree.setWeightName("btagShapeDownLfStats1", 1.)
+systTree.setWeightName("btagShapeDownLfStats2", 1.)
+systTree.setWeightName("btagShapeDownHf", 1.)
+systTree.setWeightName("btagShapeDownHfStats1", 1.)
+systTree.setWeightName("btagShapeDownHfStats2", 1.)
+
 '''
-systTree.setWeightName("btagUp",1.)
-systTree.setWeightName("btagDown",1.)
 systTree.setWeightName("mistagUp",1.)
 systTree.setWeightName("mistagDown",1.)
 '''
@@ -952,16 +973,38 @@ for i in range(tree.GetEntries()):
         systTree.setWeightName("PFUp", copy.deepcopy(PF_SFUp))
         systTree.setWeightName("PFDown", copy.deepcopy(PF_SFDown))
 
-        '''
-        PU_SF = chain.PrefireWeight
-        PU_SFUp = chain.PrefireWeight_Up
-        PU_SFDown = chain.PrefireWeight_Down
-        '''
+        if(year == 2017 or year == 2018): 
+            PU_SF = chain.puWeight
+            PU_SFUp = chain.puWeightUp
+            PU_SFDown = chain.puWeightDown
         
-        systTree.setWeightName("puSF", copy.deepcopy(PU_SF))
-        systTree.setWeightName("puUp", copy.deepcopy(PU_SFUp))
-        systTree.setWeightName("puDown", copy.deepcopy(PU_SFDown))
+            systTree.setWeightName("puSF", copy.deepcopy(PU_SF))
+            systTree.setWeightName("puUp", copy.deepcopy(PU_SFUp))
+            systTree.setWeightName("puDown", copy.deepcopy(PU_SFDown))
         
+        systTree.setWeightName("btagSF", copy.deepcopy(chain.Jet_btagSF_deepjet_M))
+        systTree.setWeightName("btagUp", copy.deepcopy(chain.Jet_btagSF_deepjet_M_up))
+        systTree.setWeightName("btagDown", copy.deepcopy(chain.Jet_btagSF_deepjet_M_down))
+        systTree.setWeightName("btagShape", copy.deepcopy(chain.Jet_btagSF_deepjet_shape))
+        systTree.setWeightName("btagShapeUpCferr1", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_up_cferr1))
+        systTree.setWeightName("btagShapeUpCferr2", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_up_cferr2))
+        systTree.setWeightName("btagShapeUpJes", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_up_jes))
+        systTree.setWeightName("btagShapeUpLf", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_up_lf))
+        systTree.setWeightName("btagShapeUpLfStats1", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_up_lfstats1))
+        systTree.setWeightName("btagShapeUpLfStats2", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_up_lfstats2))
+        systTree.setWeightName("btagShapeUpHf", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_up_hf))
+        systTree.setWeightName("btagShapeUpHfStats1", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_up_hfstats1))
+        systTree.setWeightName("btagShapeUpHfStats2", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_up_hfstats2))
+        systTree.setWeightName("btagShapeDownCferr1", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_down_cferr1))
+        systTree.setWeightName("btagShapeDownCferr2", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_down_cferr2))
+        systTree.setWeightName("btagShapeDownJes", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_down_jes))
+        systTree.setWeightName("btagShapeDownLf", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_down_lf))
+        systTree.setWeightName("btagShapeDownLfStats1", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_down_lfstats1))
+        systTree.setWeightName("btagShapeDownLfStats2", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_down_lfstats2))
+        systTree.setWeightName("btagShapeDownHf", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_down_hf))
+        systTree.setWeightName("btagShapeDownHfStats1", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_down_hfstats1))
+        systTree.setWeightName("btagShapeDownHfStats2", copy.deepcopy(chain.Jet_btagSF_deepjet_shape_down_hfstats2))
+
 
     recomet_p4t = ROOT.TLorentzVector()
     recomet_p4t.SetPtEtaPhiM(met.pt, 0., met.phi, 0)
