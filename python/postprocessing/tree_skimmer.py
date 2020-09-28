@@ -95,9 +95,10 @@ systTree.setWeightName("btagUp",1.)
 systTree.setWeightName("btagDown",1.)
 systTree.setWeightName("mistagUp",1.)
 systTree.setWeightName("mistagDown",1.)
+'''
+systTree.setWeightName("puSF",1.)
 systTree.setWeightName("puUp",1.)
 systTree.setWeightName("puDown",1.)
-'''
 systTree.setWeightName("lepSF",1.)
 systTree.setWeightName("lepUp",1.)
 systTree.setWeightName("lepDown",1.)
@@ -955,10 +956,12 @@ for i in range(tree.GetEntries()):
         PU_SF = chain.PrefireWeight
         PU_SFUp = chain.PrefireWeight_Up
         PU_SFDown = chain.PrefireWeight_Down
-        systTree.setWeightName("PUSF", copy.deepcopy(PU_SF))
+        '''
+        
+        systTree.setWeightName("puSF", copy.deepcopy(PU_SF))
         systTree.setWeightName("puUp", copy.deepcopy(PU_SFUp))
         systTree.setWeightName("puDown", copy.deepcopy(PU_SFDown))
-        '''
+        
 
     recomet_p4t = ROOT.TLorentzVector()
     recomet_p4t.SetPtEtaPhiM(met.pt, 0., met.phi, 0)
