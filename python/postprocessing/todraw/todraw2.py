@@ -20,7 +20,7 @@ usage = 'python todraw2.py'
 parser = optparse.OptionParser(usage)
 parser.add_option('-c', '--crit', dest='crit', type = 'string', default = 'best', help='Default criterion is best')
 parser.add_option('-r', '--reg', dest='region', type = 'string', default = 'incl', help='Default region is inclusive')
-parser.add_option('-f', '--folder', dest='fold', type = 'string', default = 'v10', help='Default folder is v10')
+parser.add_option('-f', '--folder', dest='fold', type = 'string', default = 'v12', help='Default folder is v12')
 parser.add_option('--sel', dest='sel', default = False, action='store_true', help='Default do not apply any selection') 
 (opt, args) = parser.parse_args()
 
