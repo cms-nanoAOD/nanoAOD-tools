@@ -783,7 +783,7 @@ for i in range(tree.GetEntries()):
     if isMC:
         genpart = Collection(event, "GenPart")
         LHE = Collection(event, "LHEPart")
-        chain.GetEntry(i)
+    chain.GetEntry(i)
     #++++++++++++++++++++++++++++++++++
     #++      defining variables      ++
     #++++++++++++++++++++++++++++++++++
@@ -827,6 +827,16 @@ for i in range(tree.GetEntries()):
         continue
     if('DataMu' in sample.label and (passEle or not passMu)):
         continue
+
+    #######################################
+    ## Removing events with HEM problem  ##
+    #######################################
+    passesMETHEMVeto = HEMveto(jets, electrons)
+    if(sample.year == "2018" and not passesMETHEMVeto):
+        if(not isMC and chain.runNumber > 319077.):
+            continue
+        elif(isMC):
+            w_nominal_all[0] *= 0.354
 
     if len(goodMu) == 1:
         h_eff_mu.Fill('Good Mu', 1)
@@ -1001,8 +1011,6 @@ for i in range(tree.GetEntries()):
         #mtt[0] = tt_q4.M()
         if(tt_q4.M() > 700.):
             w_nominal_all[0] *= 0 #trick to make the events with mtt > 700 count zero
-        else:
-            w_nominal_all[0] = 1.
 
     # trying to understand the composition of the ttbar background
     if('TT_' in sample.label):

@@ -454,6 +454,24 @@ def miniisoscan(isMu,threshold, lepton):
                 if (lepton.pt > 125):
                     lepnomatch_iso0p1_pt_125 += 1.
     return totalMClep,lepmatch_iso0p1_pt_50,lepmatch_iso0p1_pt_75,lepmatch_iso0p1_pt_100,lepmatch_iso0p1_pt_125,totalnoMClep,lepnomatch_iso0p1_pt_50,lepnomatch_iso0p1_pt_75,lepnomatch_iso0p1_pt_100,lepnomatch_iso0p1_pt_125
+
+def HEMveto(jets, electrons):
+  hemvetoetaup = -3.05
+  hemvetoetadown = -1.35
+  hemvetophiup = -1.62
+  hemvetophidown = -0.82;
+  passesMETHEMVeto = True
+
+  for jet in jets:
+    if(jet.eta>hemvetoetaup and jet.eta<hemvetoetadown and jet.phi>hemvetophiup and jet.phi<hemvetophidown):
+      passesMETHEMVeto = False
+
+  for ele in electrons:
+    if(ele.eta>hemvetoetaup and ele.eta<hemvetoetadown and ele.phi>hemvetophiup and ele.phi<hemvetophidown):
+      passesMETHEMVeto = False
+ 
+  return passesMETHEMVeto
+
 ###############################################
 ###          End of generic utils           ###   
 ###############################################
