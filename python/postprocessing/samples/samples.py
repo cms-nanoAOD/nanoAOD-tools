@@ -44,6 +44,11 @@ TT_Mtt_2016 = sample(ROOT.kRed, 1, 1001, "t#bar{t}", "TT_Mtt_2016")
 TT_Mtt_2016.year = 2016
 TT_Mtt_2016.components = [TT_incl_2016, TT_Mtt700to1000_2016, TT_Mtt1000toInf_2016]
 
+TT_dilep_2016 = sample(ROOT.kRed, 1, 1001, "t#bar{t}", "TT_dilep_2016")
+TT_dilep_2016.sigma = 831.76 #pb
+TT_dilep_2016.year = 2016
+TT_dilep_2016.dataset = "/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/"+tag_2016+"-v2/NANOAODSIM"
+
 ################################ QCD ################################
 QCDHT_300to500_2016 = sample(ROOT.kGray, 1, 1001, "QCD", "QCDHT_300to500_2016")
 QCDHT_300to500_2016.sigma = 347700 #pb
@@ -732,8 +737,9 @@ TT_Mtt_2017.components = [TT_semilep_2017] #[TT_Mtt700to1000_2017, TT_Mtt1000toI
 TT_dilep_2017 = sample(ROOT.kRed, 1, 1001, "t#bar{t}", "TT_dilep_2017")
 TT_dilep_2017.sigma =  831.76 * 0.10 #pb
 TT_dilep_2017.year = 2017
-TT_dilep_2017.dataset = "/TT_DiLept_TuneCP5_13TeV-powheg-pythia8/"+tag_2017+"-v1/NANOAODSIM"
+TT_dilep_2017.dataset = "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/"+tag2_2017+"-v1/NANOAODSIM"
 
+################################ WJets ################################
 WJetsHT200to400_2017 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT200to400_2017")
 WJetsHT200to400_2017.sigma = 359.7 * 1.21 #pb
 WJetsHT200to400_2017.year = 2017
@@ -1415,7 +1421,7 @@ TT_Mtt_2018.components = [TT_semilep_2018]
 TT_dilep_2018 = sample(ROOT.kRed, 1, 1001, "t#bar{t}", "TT_dilep_2018")
 TT_dilep_2018.sigma =  831.76 * 0.10 #pb
 TT_dilep_2018.year = 2018
-TT_dilep_2018.dataset = "/TT_DiLept_TuneCP5_13TeV-powheg-pythia8/"+tag_2018+"-v1/NANOAODSIM"
+TT_dilep_2018.dataset = "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/"+tag_2018+"-v1/NANOAODSIM"
 
 ################################ WJets ################################
 WJetsHT200to400_2018 = sample(ROOT.kGreen+2, 1, 1001, "W + Jets", "WJetsHT200to400_2018")

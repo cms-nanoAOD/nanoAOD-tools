@@ -6,7 +6,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.tools import *
 
-class preselection(Module):
+class trigger_preselection(Module):
     def __init__(self):
         pass
     def beginJob(self):
@@ -45,7 +45,7 @@ class preselection(Module):
 
         self.out.fillBranch("HT_eventHT", eventSum.Pt())
 
-        isGoodEvent = ((((len(goodMu) >= 1) and (len(goodEle) >= 1)))) and len(goodJet)>=1)
+        isGoodEvent = (len(goodMu) >= 1) and (len(goodEle) >= 1) and (len(goodJet) >= 1)
         goodEvent = isGoodPV and isGoodEvent
         #if(goodEvent):
             #print "No. Mu = ", len(goodMu), " No. Ele = ", len(goodEle), " veto Mu is ", not isVetoMu, " veto Ele is ", not isVetoEle, " No. barrel jets = ", len(goodJet)
