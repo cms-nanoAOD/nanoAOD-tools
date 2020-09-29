@@ -1137,8 +1137,28 @@ class systWeights(object):
             self.weightedNames[7] = "PFSF"
             self.weightedNames[8] = "PFUp"
             self.weightedNames[9] = "PFDown"
-            #self.weightedNames[1] = "btagUp"
-            #self.weightedNames[2] = "btagDown"
+            self.weightedNames[10] = "btagSF"
+            self.weightedNames[11] = "btagUp"
+            self.weightedNames[12] = "btagDown"            
+            self.weightedNames[13] = "btagShape"
+            self.weightedNames[14] = "btagShapeUpCferr1"
+            self.weightedNames[15] = "btagShapeUpCferr2"
+            self.weightedNames[16] = "btagShapeUpJes"
+            self.weightedNames[17] = "btagShapeUpLf"
+            self.weightedNames[18] = "btagShapeUpLfStats1"
+            self.weightedNames[19] = "btagShapeUpLfStats2"
+            self.weightedNames[21] = "btagShapeUpHf"
+            self.weightedNames[22] = "btagShapeUpHfStats1"
+            self.weightedNames[23] = "btagShapeUpHfStats2"
+            self.weightedNames[24] = "btagShapeDownCferr1"
+            self.weightedNames[25] = "btagShapeDownCferr2"
+            self.weightedNames[26] = "btagShapeDownJes"
+            self.weightedNames[27] = "btagShapeDownLf"
+            self.weightedNames[28] = "btagShapeDownLfStats1"
+            self.weightedNames[29] = "btagShapeDownLfStats2"
+            self.weightedNames[30] = "btagShapeDownHf"
+            self.weightedNames[31] = "btagShapeDownHfStats1"
+            self.weightedNames[32] = "btagShapeDownHfStats2"
             #self.weightedNames[3] = "mistagUp"
             #self.weightedNames[4] = "mistagDown"
             #self.weightedNames[10] = "isoDown"
@@ -1204,19 +1224,30 @@ class systWeights(object):
 
     def addSystNonPDF(self, name):
         self.weightedNames[self.maxSystsNonPDF] = copy.deepcopy(name)
-        self.setMaxNonPDF(maxSystsNonPDF+1)
+        self.setMaxNonPDF(self.maxSystsNonPDF+1)
         nPDF = self.nPDF
         for i in range(nPDF):
             ss = str(i+1)
             self.weightedNames[i+self.maxSystsNonPDF] = "pdf" + str(ss)
-        self.setMax(maxSystsNonPDF+nPDF)
+        self.setMax(self.maxSystsNonPDF+nPDF)
         self.weightedNames[self.maxSysts] = ""
 
-    def addTopTagSF(self, name):
+    def addbTagSF(self, name):
+        types = ['cferr1', 'jes', 'lf', 'lfstats1', 'lfstats2', 'cferr2', 'hfstats1', 'hfstats2', 'hf']
+        sf = name + "SF"
         up = name + "Up"
         down = name + "Down"
+        self.addSystNonPDF(sf)
         self.addSystNonPDF(up)
         self.addSystNonPDF(down)
+        up = '_shape_' + up
+        down = '_shape_' + up
+        for typ in types:
+            ut = up + "_" + typ
+            dt = down + "_" + typ
+            self.addSystNonPDF(ut)
+            self.addSystNonPDF(dt)
+            
 
     def addWTagSF(self, name):
         up = name + "Up"
