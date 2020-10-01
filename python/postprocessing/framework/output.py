@@ -48,7 +48,7 @@ class OutputBranch:
         else:
             if len(val) != self.n:
                 raise RuntimeError("Mismatch in filling branch %s of fixed length %d with %d values (%s)" % (
-                    self.Branch.GetName(), self.n, len(val), val))
+                    self.branch.GetName(), self.n, len(val), val))
             for i, v in enumerate(val):
                 self.buff[i] = v
 

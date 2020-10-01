@@ -160,13 +160,13 @@ class PostProcessor:
             elist, jsonFilter = preSkim(
                 inTree, self.json, self.cut, maxEntries=self.maxEntries, firstEntry=self.firstEntry)
             if self.justcount:
-                print('Would select %d / %d entries from %s (%.2f%%)' % (elist.GetN() if elist else nEntries, nEntries, fname, old_div((elist.GetN() if elist else nEntries), (0.01 * nEntries)) if nEntries else 0))
+                print('Would select %d / %d entries from %s (%.2f%%)' % (elist.GetN() if elist else nEntries, nEntries, fname, o(elist.GetN() if elist else nEntries) / (0.01 * nEntries) if nEntries else 0))
                 if self.prefetch:
                     if toBeDeleted:
                         os.unlink(ftoread)
                 continue
             else:
-                print('Pre-select %d entries out of %s (%.2f%%)' % (elist.GetN() if elist else nEntries, nEntries, old_div((elist.GetN() if elist else nEntries), (0.01 * nEntries)) if nEntries else 0))
+                print('Pre-select %d entries out of %s (%.2f%%)' % (elist.GetN() if elist else nEntries, nEntries, (elist.GetN() if elist else nEntries) / (0.01 * nEntries) if nEntries else 0))
                 inAddFiles = []
                 inAddTrees = []
             for ffname in ffnames:
@@ -224,7 +224,7 @@ class PostProcessor:
                 print('Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, nEntries, npass))
             else:
                 nall = nEntries
-                print('Selected %d / %d entries from %s (%.2f%%)' % (outTree.tree().GetEntries(), nall, fname, old_div(outTree.tree().GetEntries(), (0.01 * nall)) if nall else 0))
+                print('Selected %d / %d entries from %s (%.2f%%)' % (outTree.tree().GetEntries(), nall, fname, outTree.tree().GetEntries() / (0.01 * nall) if nall else 0))
 
             # now write the output
             if not self.noOut:
@@ -240,7 +240,7 @@ class PostProcessor:
         for m in self.modules:
             m.endJob()
 
-        print("Total time %.1f sec. to process %i events. Rate = %.1f Hz." % ((time.time() - t0), totEntriesRead, old_div(totEntriesRead, (time.time() - t0))))
+        print("Total time %.1f sec. to process %i events. Rate = %.1f Hz." % ((time.time() - t0), totEntriesRead, totEntriesRead / (time.time() - t0)))
 
         if self.haddFileName:
             haddnano = "./haddnano.py" if os.path.isfile(
