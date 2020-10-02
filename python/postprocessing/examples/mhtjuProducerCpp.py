@@ -37,22 +37,27 @@ class mhtjuProducerCpp(Module):
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
 
-    # this function gets the pointers to Value and ArrayReaders and sets them in the C++ worker class
+    # this function gets the pointers to Value and ArrayReaders and sets
+    # them in the C++ worker class
     def initReaders(self, tree):
         self.nJet = tree.valueReader("nJet")
         self.Jet_pt = tree.arrayReader("Jet_pt")
         self.Jet_phi = tree.arrayReader("Jet_phi")
         self.worker.setJets(self.nJet, self.Jet_pt, self.Jet_phi)
-        # self._ttreereaderversion must be set AFTER all calls to tree.valueReader or tree.arrayReader
+        # self._ttreereaderversion must be set AFTER all calls to
+        # tree.valueReader or tree.arrayReader
         self._ttreereaderversion = tree._ttreereaderversion
 
     def analyze(self, event):
-        """process event, return True (go to next module) or False (fail, go to next event)"""
+        """process event, return True (go to next module) or False (fail,
+        go to next event)"""
 
-        # do this check at every event, as other modules might have read further branches
+        # do this check at every event, as other modules might have read
+        # further branches
         if event._tree._ttreereaderversion > self._ttreereaderversion:
             self.initReaders(event._tree)
-        # do NOT access other branches in python between the check/call to initReaders and the call to C++ worker code
+        # do NOT access other branches in python between the check/call to
+        # initReaders and the call to C++ worker code
         output = self.worker.getHT()
 
         self.out.fillBranch("MHTju_pt", output[0])
@@ -60,6 +65,7 @@ class mhtjuProducerCpp(Module):
         return True
 
 
-# define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
+# define modules using the syntax 'name = lambda : constructor' to avoid
+# having them loaded when not needed
 
 mhtju = lambda: mhtjuProducerCpp()

@@ -14,9 +14,14 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 
 class PostProcessor:
-    def __init__(self, outputDir, inputFiles, cut=None, branchsel=None, modules=[], compression="LZMA:9", friend=False, postfix=None,
-                 jsonInput=None, noOut=False, justcount=False, provenance=False, haddFileName=None, fwkJobReport=False, histFileName=None, histDirName=None, outputbranchsel=None, maxEntries=None, firstEntry=0,
-                 prefetch=False, longTermCache=False):
+    def __init__(
+            self, outputDir, inputFiles, cut=None, branchsel=None, modules=[],
+            compression="LZMA:9", friend=False, postfix=None, jsonInput=None,
+            noOut=False, justcount=False, provenance=False, haddFileName=None,
+            fwkJobReport=False, histFileName=None, histDirName=None,
+            outputbranchsel=None, maxEntries=None, firstEntry=0, prefetch=False,
+            longTermCache=False
+    ):
         self.outputDir = outputDir
         self.inputFiles = inputFiles
         self.cut = cut
@@ -33,7 +38,8 @@ class PostProcessor:
         self.histFile = None
         self.histDirName = None
         if self.jobReport and not self.haddFileName:
-            print("Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root")
+            print("Because you requested a FJR we assume you want the final " \
+                "hadd. No name specified for the output file, will use tree.root")
             self.haddFileName = "tree.root"
         self.branchsel = BranchSelection(branchsel) if branchsel else None
         if outputbranchsel != None:
@@ -58,20 +64,24 @@ class PostProcessor:
         if not fname.startswith("root://"):
             return fname, False
         rndchars = "".join([hex(ord(i))[2:] for i in os.urandom(
-            8)]) if not self.longTermCache else "long_cache-id%d-%s" % (os.getuid(), hashlib.sha1(fname).hexdigest())
-        localfile = "%s/%s-%s.root" % (tmpdir,
-                                       os.path.basename(fname).replace(".root", ""), rndchars)
+            8)]) if not self.longTermCache else "long_cache-id%d-%s" \
+            % (os.getuid(), hashlib.sha1(fname).hexdigest())
+        localfile = "%s/%s-%s.root" \
+            % (tmpdir, os.path.basename(fname).replace(".root", ""), rndchars)
         if self.longTermCache and os.path.exists(localfile):
             if verbose:
-                print("Filename %s is already available in local path %s " % (fname, localfile))
+                print("Filename %s is already available in local path %s " \
+                    % (fname, localfile))
             return localfile, False
         try:
             if verbose:
-                print("Filename %s is remote, will do a copy to local path %s " % (fname, localfile))
-            start = time.clock()
+                print("Filename %s is remote, will do a copy to local path %s"\
+                    % (fname, localfile))
+            start = time.time()
             subprocess.check_output(["xrdcp", "-f", "-N", fname, localfile])
             if verbose:
-                print("Time used for transferring the file locally: %s s" % (time.clock() - start))
+                print("Time used for transferring the file locally: %.2f s"\
+                    % (time.time() - start))
             return localfile, (not self.longTermCache)
         except:
             if verbose:
@@ -160,7 +170,7 @@ class PostProcessor:
             elist, jsonFilter = preSkim(
                 inTree, self.json, self.cut, maxEntries=self.maxEntries, firstEntry=self.firstEntry)
             if self.justcount:
-                print('Would select %d / %d entries from %s (%.2f%%)' % (elist.GetN() if elist else nEntries, nEntries, fname, o(elist.GetN() if elist else nEntries) / (0.01 * nEntries) if nEntries else 0))
+                print('Would select %d / %d entries from %s (%.2f%%)' % (elist.GetN() if elist else nEntries, nEntries, fname, (elist.GetN() if elist else nEntries) / (0.01 * nEntries) if nEntries else 0))
                 if self.prefetch:
                     if toBeDeleted:
                         os.unlink(ftoread)
@@ -219,8 +229,10 @@ class PostProcessor:
             if not fullClone:
                 eventRange = range(self.firstEntry, self.firstEntry +
                                     nEntries) if nEntries > 0 and not elist else None
-                (nall, npass, timeLoop) = eventLoop(self.modules, inFile, outFile,
-                                                    inTree, outTree, eventRange=eventRange, maxEvents=self.maxEntries)
+                (nall, npass, timeLoop) = eventLoop(
+                    self.modules, inFile, outFile, inTree, outTree,
+                    eventRange=eventRange, maxEvents=self.maxEntries
+                )
                 print('Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, nEntries, npass))
             else:
                 nall = nEntries

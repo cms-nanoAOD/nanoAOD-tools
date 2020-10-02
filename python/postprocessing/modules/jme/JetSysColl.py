@@ -1,12 +1,12 @@
 import ROOT
 '''
-Class to hold the four-vectors of jets (and their groomed versions, if desired) with 
+Class to hold the four-vectors of jets (and their groomed versions, if desired) with
 kinematic systematic uncertainties applied such as the JEC, JER, JMS, JMR.
 These four-vectors need to be updated very often so we want a small
 helper structure to facilitate. Also keep a reference to the original object
-to access the non-kinematic information. 
+to access the non-kinematic information.
 
-This assumes that "jetmetUncertainties" has been run and uses that tree output structure. 
+This assumes that "jetmetUncertainties" has been run and uses that tree output structure.
 '''
 
 

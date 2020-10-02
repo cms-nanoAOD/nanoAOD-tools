@@ -7,12 +7,13 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 
 class jecUncertProducer(Module):
-    def __init__(self,
-                 globalTag,
-                 uncerts=["Total"],
-                 jetFlavour="AK4PFchs",
-                 jetColl="Jet",
-                 doCppOutput=False
+    def __init__(
+        self,
+        globalTag,
+        uncerts=["Total"],
+        jetFlavour="AK4PFchs",
+        jetColl="Jet",
+        doCppOutput=False
      ):
         self.jetColl = jetColl
         self.uncerts = [(x, jetColl + "_jecUncert%s" % x) for x in uncerts]

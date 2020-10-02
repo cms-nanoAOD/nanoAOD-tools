@@ -4,12 +4,24 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 
-_rootBranchType2PythonArray = {'b': 'B', 'B': 'b', 'i': 'I',
-                               'I': 'i', 'F': 'f', 'D': 'd', 'l': 'L', 'L': 'l', 'O': 'B'}
+_rootBranchType2PythonArray = {
+    'b': 'B',
+    'B': 'b',
+    'i': 'I',
+    'I': 'i',
+    'F': 'f',
+    'D': 'd',
+    'l': 'L',
+    'L': 'l',
+    'O': 'B'
+}
 
 
 class OutputBranch:
-    def __init__(self, tree, name, rootBranchType, n=1, lenVar=None, title=None, limitedPrecision=False):
+    def __init__(
+            self, tree, name, rootBranchType, n=1,
+            lenVar=None, title=None, limitedPrecision=False
+    ):
         n = int(n)
         self.buff = array(
             _rootBranchType2PythonArray[rootBranchType], n * [0. if rootBranchType in 'FD' else 0])
@@ -60,12 +72,17 @@ class OutputTree:
         self._intree = intree
         self._branches = {}
 
-    def branch(self, name, rootBranchType, n=1, lenVar=None, title=None, limitedPrecision=False):
+    def branch(
+            self, name, rootBranchType, n=1, lenVar=None,
+            title=None, limitedPrecision=False
+    ):
         # and (not self._tree.GetBranch(lenVar)):
         if (lenVar != None) and (lenVar not in self._branches):
             self._branches[lenVar] = OutputBranch(self._tree, lenVar, "i")
         self._branches[name] = OutputBranch(
-            self._tree, name, rootBranchType, n=n, lenVar=lenVar, title=title, limitedPrecision=limitedPrecision)
+            self._tree, name, rootBranchType, n=n,
+            lenVar=lenVar, title=title, limitedPrecision=limitedPrecision
+        )
         return self._branches[name]
 
     def fillBranch(self, name, val):

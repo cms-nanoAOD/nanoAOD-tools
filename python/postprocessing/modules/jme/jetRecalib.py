@@ -45,7 +45,8 @@ class jetRecalib(Module):
             calculateSeparateCorrections=False,
             calculateType1METCorrection=False)
 
-        # load libraries for accessing JES scale factors and uncertainties from txt files
+        # load libraries for accessing JES scale factors and
+        # uncertainties from txt files
         for library in [
                 "libCondFormatsJetMETObjects", "libPhysicsToolsNanoAODTools"
         ]:
@@ -203,7 +204,8 @@ class jetRecalib(Module):
         return True
 
 
-# define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
+# define modules using the syntax 'name = lambda : constructor' to avoid
+# having them loaded when not needed
 jetRecalib2016BCD = lambda: jetRecalib("Summer16_07Aug2017BCD_V11_DATA",
                                        "Summer16_07Aug2017_V11_DATA")
 jetRecalib2016EF = lambda: jetRecalib("Summer16_07Aug2017EF_V11_DATA",

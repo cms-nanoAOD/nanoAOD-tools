@@ -6,19 +6,20 @@ from PhysicsTools.HeppyCore.utils.deltar import *
 
 
 class JetReCalibrator:
-    def __init__(self,
-                 globalTag,
-                 jetFlavour,
-                 doResidualJECs,
-                 jecPath,
-                 upToLevel=3,
-                 calculateSeparateCorrections=False,
-                 calculateType1METCorrection=False,
-                 type1METParams={
-                     'jetPtThreshold': 15.,
-                     'skipEMfractionThreshold': 0.9,
-                     'skipMuons': True
-                 }
+    def __init__(
+        self,
+        globalTag,
+        jetFlavour,
+        doResidualJECs,
+        jecPath,
+        upToLevel=3,
+        calculateSeparateCorrections=False,
+        calculateType1METCorrection=False,
+        type1METParams={
+            'jetPtThreshold': 15.,
+            'skipEMfractionThreshold': 0.9,
+            'skipMuons': True
+        }
      ):
         """Create a corrector object that reads the payloads from the text
         dumps of a global tag under CMGTools/RootTools/data/jec (see the

@@ -1,7 +1,3 @@
-from __future__ import division
-from __future__ import print_function
-from builtins import range
-from past.utils import old_div
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.JetReCalibrator import JetReCalibrator
 from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetSmearer import jetSmearer
 from PhysicsTools.NanoAODTools.postprocessing.tools import matchObjectCollection, matchObjectCollectionMultiple
@@ -19,21 +15,22 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 
 class fatJetUncertaintiesProducer(Module):
-    def __init__(self,
-                 era,
-                 globalTag,
-                 jesUncertainties=["Total"],
-                 archive=None,
-                 jetType="AK8PFPuppi",
-                 noGroom=False,
-                 jerTag="",
-                 jmrVals=[],
-                 jmsVals=[],
-                 isData=False,
-                 applySmearing=True,
-                 applyHEMfix=False,
-                 splitJER=False
-     ):
+    def __init__(
+            self,
+            era,
+            globalTag,
+            jesUncertainties=["Total"],
+            archive=None,
+            jetType="AK8PFPuppi",
+            noGroom=False,
+            jerTag="",
+            jmrVals=[],
+            jmsVals=[],
+            isData=False,
+            applySmearing=True,
+            applyHEMfix=False,
+            splitJER=False
+    ):
         self.era = era
         self.noGroom = noGroom
         self.isData = isData
@@ -57,23 +54,29 @@ class fatJetUncertaintiesProducer(Module):
             self.jerUncertaintyInputFileName = jerTag + "_SF_" + jetType + ".txt"
         else:
             print(
-                "WARNING: jerTag is empty!!! This module will soon be " \
-                + "deprecated! Please use jetmetHelperRun2 in the future."
+                "WARNING: jerTag is empty!!! This module will soon be "
+                "deprecated! Please use jetmetHelperRun2 in the future."
             )
             if era == "2016":
-                self.jerInputFileName = "Summer16_25nsV1_MC_PtResolution_" + jetType + ".txt"
-                self.jerUncertaintyInputFileName = "Summer16_25nsV1_MC_SF_" + jetType + ".txt"
-            elif era == "2017" or era == "2018":  # use Fall17 as temporary placeholder until post-Moriond 2019 JERs are out
-                self.jerInputFileName = "Fall17_V3_MC_PtResolution_" + jetType + ".txt"
-                self.jerUncertaintyInputFileName = "Fall17_V3_MC_SF_" + jetType + ".txt"
+                self.jerInputFileName = ''.join([
+                    "Summer16_25nsV1_MC_PtResolution_", jetType, ".txt"])
+                self.jerUncertaintyInputFileName = ''.join([
+                    "Summer16_25nsV1_MC_SF_", jetType, ".txt"])
+            elif era == "2017" or era == "2018":
+            # use Fall17 as temporary placeholder until
+            # post-Moriond 2019 JERs are out
+                self.jerInputFileName = ''.join([
+                    "Fall17_V3_MC_PtResolution_", jetType, ".txt"])
+                self.jerUncertaintyInputFileName = ''.join([
+                    "Fall17_V3_MC_SF_", jetType, ".txt"])
 
         # jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
         self.jmrVals = jmrVals
         if not self.jmrVals:
             print(
-                "WARNING: jmrVals is empty!!! Using default values. This " \
-                + "module will soon be deprecated! Please use " \
-                + "jetmetHelperRun2 in the future."
+                "WARNING: jmrVals is empty!!! Using default values. This "
+                "module will soon be deprecated! Please use "
+                "jetmetHelperRun2 in the future."
             )
             self.jmrVals = [1.0, 1.2, 0.8]  # nominal, up, down
             # Use 2017 values for 2018 until 2018 are released
@@ -116,8 +119,8 @@ class fatJetUncertaintiesProducer(Module):
         self.jmsVals = jmsVals
         if not self.jmsVals:
             print(
-                "WARNING: jmsVals is empty!!! Using default values! This " \
-                + "module will soon be deprecated! Please use " \
+                "WARNING: jmsVals is empty!!! Using default values! This "
+                + "module will soon be deprecated! Please use "
                 + "jetmetHelperRun2 in the future."
             )
             # 2016 values
@@ -201,16 +204,17 @@ class fatJetUncertaintiesProducer(Module):
         print("Loading jet energy scale (JES) uncertainties from file '%s'" %
               os.path.join(self.jesInputFilePath,
                            self.jesUncertaintyInputFileName))
-        #self.jesUncertainty = ROOT.JetCorrectionUncertainty(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName))
+        # self.jesUncertainty = ROOT.JetCorrectionUncertainty(os.path.join(self.jesInputFilePath, self.jesUncertaintyInputFileName))
 
         self.jesUncertainty = {}
-        # implementation didn't seem to work for factorized JEC, try again another way
+        # implementation didn't seem to work for factorized JEC,try again
+        # another way
         for jesUncertainty in self.jesUncertainties:
             jesUncertainty_label = jesUncertainty
-            if jesUncertainty == "Total" and (
-                    len(self.jesUncertainties) == 1 or
-                (len(self.jesUncertainties) == 2
-                 and "HEMIssue" in self.jesUncertainties)):
+            if jesUncertainty == 'Total' \
+                and (len(self.jesUncertainties) == 1
+                     or len(self.jesUncertainties) == 2 and 'HEMIssue'
+                     in self.jesUncertainties):
                 jesUncertainty_label = ''
             if jesUncertainty != "HEMIssue":
                 pars = ROOT.JetCorrectorParameters(
@@ -447,7 +451,7 @@ class fatJetUncertaintiesProducer(Module):
             jet.mass = jet_mass
             jets_pt_raw.append(jet_rawpt)
             jets_mass_raw.append(jet_rawmass)
-            jets_corr_JEC.append(old_div(jet_pt, jet_rawpt))
+            jets_corr_JEC.append(jet_pt / jet_rawpt)
 
             if not self.isData:
                 genJet = pairs[jet]
@@ -534,10 +538,10 @@ class fatJetUncertaintiesProducer(Module):
             if self.doGroomed:
                 if not self.isData:
                     genGroomedSubJets = genSubJetMatcher[
-                        genJet] if genJet != None else None
+                        genJet] if genJet is not None else None
                     genGroomedJet = genGroomedSubJets[0].p4(
                     ) + genGroomedSubJets[1].p4(
-                    ) if genGroomedSubJets != None and len(
+                    ) if genGroomedSubJets is not None and len(
                         genGroomedSubJets) >= 2 else None
                 else:
                     genGroomedSubJets = None
@@ -548,7 +552,7 @@ class fatJetUncertaintiesProducer(Module):
                 else:
                     groomedP4 = None
 
-                jet_msdcorr_raw = groomedP4.M() if groomedP4 != None else 0.0
+                jet_msdcorr_raw = groomedP4.M() if groomedP4 is not None else 0.0
                 # raw value always stored withoud mass correction
                 jets_msdcorr_raw.append(jet_msdcorr_raw)
                 # LC: Apply PUPPI SD mass correction https://github.com/cms-jet/PuppiSoftdropMassCorr/
@@ -560,24 +564,23 @@ class fatJetUncertaintiesProducer(Module):
 
                 puppisd_total = puppisd_genCorr * puppisd_recoCorr
                 jets_msdcorr_corr_PUPPI.append(puppisd_total)
-                if groomedP4 != None:
+                if groomedP4 is not None:
                     groomedP4.SetPtEtaPhiM(groomedP4.Perp(), groomedP4.Eta(),
                                            groomedP4.Phi(),
                                            groomedP4.M() * puppisd_total)
 
                 # now apply the mass correction to the raw value
-                jet_msdcorr_raw = groomedP4.M() if groomedP4 != None else 0.0
+                jet_msdcorr_raw = groomedP4.M() if groomedP4 is not None else 0.0
                 if jet_msdcorr_raw < 0.0:
                     jet_msdcorr_raw *= -1.0
 
                 # Evaluate JMS and JMR scale factors and uncertainties
                 if not self.isData:
                     (jet_msdcorr_jmrNomVal, jet_msdcorr_jmrUpVal,
-                     jet_msdcorr_jmrDownVal) = self.jetSmearer.getSmearValsM(
-                         groomedP4, genGroomedJet
-                     ) if groomedP4 != None and genGroomedJet != None else (0.,
-                                                                            0.,
-                                                                            0.)
+                     jet_msdcorr_jmrDownVal) = \
+                        (self.jetSmearer.getSmearValsM(groomedP4,
+                         genGroomedJet) if groomedP4 is not None
+                         and genGroomedJet is not None else (0., 0., 0.))
                 else:
                     (jet_msdcorr_jmrNomVal, jet_msdcorr_jmrUpVal,
                      jet_msdcorr_jmrDownVal) = (1, 1, 1)
@@ -645,9 +648,7 @@ class fatJetUncertaintiesProducer(Module):
                      jet_msdcorr_tau21DDT_jmrDownVal
                      ) = self.jetSmearer.getSmearValsM(
                          groomedP4, genGroomedJet
-                     ) if groomedP4 != None and genGroomedJet != None else (0.,
-                                                                            0.,
-                                                                            0.)
+                     ) if groomedP4 is not None and genGroomedJet is not None else (0., 0., 0.)
 
                     jet_msdcorr_tau21DDT_nom = jet_pt_jerNomVal * \
                         jet_msdcorr_tau21DDT_jmrNomVal * jmstau21DDTNomVal * jet_msdcorr_raw
@@ -697,7 +698,7 @@ class fatJetUncertaintiesProducer(Module):
                 jet_msdcorr_jesDown = {}
 
                 for jesUncertainty in self.jesUncertainties:
-                    # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties )
+                    # (cf. https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties)
                     # cf. https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/2000.html
                     if jesUncertainty == "HEMIssue":
                         delta = 1.
@@ -732,8 +733,7 @@ class fatJetUncertaintiesProducer(Module):
                             jet_msdcorr_jesUp[jesUncertainty] = jet_msdcorr_nom * \
                                 (1. + delta)
                             jet_msdcorr_jesDown[
-                                jesUncertainty] = jet_msdcorr_nom * (1. -
-                                                                     delta)
+                                jesUncertainty] = jet_msdcorr_nom * (1. - delta)
                     jets_pt_jesUp[jesUncertainty].append(
                         jet_pt_jesUp[jesUncertainty])
                     jets_pt_jesDown[jesUncertainty].append(

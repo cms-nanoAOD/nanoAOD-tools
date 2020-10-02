@@ -35,18 +35,18 @@ class btagSFProducer(Module):
     """Calculate btagging scale factors
     """
 
-    def __init__(self, era, algo='csvv2', selectedWPs=['M', 'shape_corr'], sfFileName=None, verbose=0, jesSystsForShape=["jes"]):
-
+    def __init__(
+            self, era, algo='csvv2', selectedWPs=['M', 'shape_corr'],
+            sfFileName=None, verbose=0, jesSystsForShape=["jes"]
+    ):
         self.era = era
         self.algo = algo.lower()
         self.selectedWPs = selectedWPs
         self.verbose = verbose
         self.jesSystsForShape = jesSystsForShape
-
         # CV: Return value of BTagCalibrationReader::eval_auto_bounds() is zero
-        #     in case jet abs(eta) > 2.4 !!
+        # in case jet abs(eta) > 2.4 !!
         self.max_abs_eta = 2.4
-
         # define measurement type for each flavor
         self.inputFilePath = os.environ['CMSSW_BASE'] + \
             "/src/PhysicsTools/NanoAODTools/data/btagSF/"
@@ -251,7 +251,7 @@ class btagSFProducer(Module):
         """
         wp_btv = {"l": 0, "m": 1, "t": 2,
                   "shape_corr": 3}.get(wp.lower(), None)
-        if wp_btv == None or not wp_btv in list(self.readers.keys()):
+        if wp_btv is None or wp_btv not in list(self.readers.keys()):
             if self.verbose > 0:
                 print(
                     "WARNING: Unknown working point '%s', setting b-tagging SF reader to None!" % wp)
@@ -339,7 +339,6 @@ class btagSFProducer(Module):
                     preloaded_jets, central_or_syst, reader, 'auto', isShape))
                 self.out.fillBranch(
                     self.branchNames_central_and_systs[wp][central_or_syst], scale_factors)
-
         return True
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed

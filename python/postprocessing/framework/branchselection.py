@@ -24,9 +24,15 @@ class BranchSelection():
                 elif op == "dropmatch":
                     ops.append((re.compile("(:?%s)$" % sel), 0))
                 else:
-                    print("Error in file %s, line '%s': it's not (keep|keepmatch|drop|dropmatch) <branch_pattern>" % (filename, line))
+                    print("Error in file %s, line '%s': "% (filename, line)
+                        + ": it's not (keep|keepmatch|drop|dropmatch) "
+                        + "<branch_pattern>"
+                    )
             except ValueError as e:
-                print("Error in file %s, line '%s': it's not (keep|keepmatch|drop|dropmatch) <branch_pattern>" % (filename, line))
+                print("Error in file %s, line '%s': " % (filename, line)
+                    + "it's not (keep|keepmatch|drop|dropmatch) "
+                    + "<branch_pattern>"
+                )
         self._ops = ops
 
     def selectBranches(self, tree):

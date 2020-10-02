@@ -46,7 +46,7 @@ class Event:
             self._tree.entry = self._entry
             # self._tree._exprs[expr].SetQuickLoad(False)
         else:
-            self._tree.gotoEntry(entry)
+            self._tree.gotoEntry(self._entry)
             formula = self._tree._exprs[expr]
         if "[" in expr:  # unclear why this is needed, but otherwise for some arrays x[i] == 0 for all i > 0
             formula.GetNdata()

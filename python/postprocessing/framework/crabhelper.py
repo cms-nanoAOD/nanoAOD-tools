@@ -14,7 +14,7 @@ def inputFiles():
     firstInput = crabFiles[0]
     tested = False
     forceaaa = False
-    print("--------------- using edmFileUtil to convert PFN to LFN -------------------------")
+    print("--------- using edmFileUtil to convert PFN to LFN --------------")
     for i in range(0, len(crabFiles)):
         if os.getenv("GLIDECLIENT_Group", "") != "overflow" and os.getenv("GLIDECLIENT_Group", "") != "overflow_conservative" and not forceaaa:
             print("Data is local")
