@@ -53,4 +53,3 @@ class preselection(Module):
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 #MySelectorModuleConstr = lambda : exampleProducer(jetetaSelection= lambda j : abs(j.eta)<2.4) 
- 
