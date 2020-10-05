@@ -7,7 +7,7 @@ import PSet
 
 
 def inputFiles():
-    print("ARGV: ", sys.argv)
+    print("ARGV: " + sys.argv)
     JobNumber = sys.argv[1]
     crabFiles = PSet.process.source.fileNames
     print(crabFiles)
@@ -20,7 +20,7 @@ def inputFiles():
             print("Data is local")
             pfn = os.popen("edmFileUtil -d %s" % (crabFiles[i])).read()
             pfn = re.sub("\n", "", pfn)
-            print(crabFiles[i], "->", pfn)
+            print(str(crabFiles[i]) + "->" + str(pfn))
             if not tested:
                 print("Testing file open")
                 import ROOT
@@ -62,6 +62,6 @@ def runsAndLumis():
             if rstart not in runsAndLumis:
                 runsAndLumis[rstart] = []
             runsAndLumis[rstart].append([int(lstart), int(lstop)])
-        print("Runs and Lumis", runsAndLumis)
+        print("Runs and Lumis: " + runsAndLumis)
         return runsAndLumis
     return None

@@ -319,7 +319,7 @@ class jetmetUncertaintiesProducer(Module):
                     "%s_phi_unclustEn%s" % (self.metBranchName, shift), "F")
 
         self.isV5NanoAOD = hasattr(inputTree, "Jet_muonSubtrFactor")
-        print("nanoAODv5 or higher?", self.isV5NanoAOD)
+        print("nanoAODv5 or higher: " + str(self.isV5NanoAOD))
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass

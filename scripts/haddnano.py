@@ -18,7 +18,7 @@ def zeroFill(tree, brName, brObj, allowNonBool=False):
         print(("Did not expect to back fill non-boolean branches", tree, brName, brObj.GetLeaf(br).GetTypeName()))
     else:
         if brType not in branch_type_dict:
-            raise_(RuntimeError, 'Impossible to backfill branch of type %s' % brType)
+            raise RuntimeError('Impossible to backfill branch of type %s' % brType)
         buff = numpy.zeros(1, dtype=numpy.dtype(branch_type_dict[brType][0]))
         b = tree.Branch(brName, buff, brName + "/" +
                         branch_type_dict[brType][1])
