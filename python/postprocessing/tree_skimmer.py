@@ -38,7 +38,7 @@ DeltaFilter = True
 TriggerStudy = False # True #
 bjetSwitch = False # True #
 startTime = datetime.datetime.now()
-#print("Starting running at " + str(startTime))
+print("Starting running at " + str(startTime))
 
 ROOT.gROOT.SetBatch()
 
@@ -46,15 +46,12 @@ leadingjet_ptcut = 150.
 
 chain = ROOT.TChain('Events')
 #print(chain)
-#print("loop #2 over file_list")
 for infile in file_list: 
-    #print("Adding %s to the chain" %(infile))
+    print("Adding %s to the chain" %(infile))
     chain.Add(infile)
 
-#print("Number of events in chain " + str(chain.GetEntries()))
-#print("Number of events in tree from chain " + str((chain.GetTree()).GetEntries()))
-#print("Type of tree from chain " + str(type(chain.GetTree())))
-#treechain = (ROOT.TTree)(chain.GetTree())
+print("Number of events in chain " + str(chain.GetEntries()))
+print("Number of events in tree from chain " + str((chain.GetTree()).GetEntries()))
 tree = InputTree(chain)
 #print("Number of entries: " +str(tree.GetEntries()))
 #print("tree: ", tree)
@@ -793,14 +790,12 @@ if('TT_' in sample.label):
 #++++++++++++++++++++++++++++++++++
 #++      taking MC weights       ++
 #++++++++++++++++++++++++++++++++++
-##print("isMC: ", isMC)
+print("isMC: ", isMC)
 if(isMC):
     h_genweight = ROOT.TH1F()
     h_genweight.SetNameTitle('h_genweight', 'h_genweight')
     h_PDFweight = ROOT.TH1F()
     h_PDFweight.SetNameTitle("h_PDFweight","h_PDFweight")
-    #print(file_list)
-    #print("loop #3 over file_list")
     for infile in file_list: 
         #if Debug:
             #print(infile)
@@ -809,7 +804,6 @@ if(isMC):
         newfile = ROOT.TFile.Open(infile)
         dirc = ROOT.TDirectory()
         dirc = newfile.Get("plots")
-        #h_genw_tmp = ROOT.TH1F(newfile.Get("plots/h_genweight"))
         h_genw_tmp = ROOT.TH1F(dirc.Get("h_genweight"))
         #if Debug:
             #print("in newfile: ")
@@ -818,32 +812,23 @@ if(isMC):
             #h_genw_tmp.Print()
         
         if(dirc.GetListOfKeys().Contains("h_PDFweight")):
-            #h_pdfw_tmp = ROOT.TH1F(newfile.Get("plots/h_PDFweight"))
             h_pdfw_tmp = ROOT.TH1F(dirc.Get("h_PDFweight"))
-            #print("in newfile: ")
-            #dirc.Get("h_PDFweight").Print()
-            #print("in macro: ")
-            #h_pdfw_tmp.Print()
 
             if(ROOT.TH1F(h_PDFweight).Integral() < 1.):
                 h_PDFweight.SetBins(h_pdfw_tmp.GetXaxis().GetNbins(), h_pdfw_tmp.GetXaxis().GetXmin(), h_pdfw_tmp.GetXaxis().GetXmax())
-                #print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(dirc.Get("h_genweight")).GetBinContent(1), ROOT.TH1F(dirc.Get("h_PDFweight")).GetNbinsX()))
+                print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(dirc.Get("h_genweight")).GetBinContent(1), ROOT.TH1F(dirc.Get("h_PDFweight")).GetNbinsX()))
             h_PDFweight.Add(h_pdfw_tmp)
         else:
             addPDF = False
         if(ROOT.TH1F(h_genweight).Integral() < 1.):
             h_genweight.SetBins(h_genw_tmp.GetXaxis().GetNbins(), h_genw_tmp.GetXaxis().GetXmin(), h_genw_tmp.GetXaxis().GetXmax())
         h_genweight.Add(h_genw_tmp)
-    #print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
+    print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
 
 
 #++++++++++++++++++++++++++++++++++
 #++      Efficiency studies      ++
 #++++++++++++++++++++++++++++++++++
-
-
-#print("Total number of events: ", tree.GetEntries())
-
 neutrino_failed = 0
 nrecochi = 0
 nrecoclosest = 0
@@ -865,8 +850,8 @@ for i in range(tree.GetEntries()):
         if i > 2000:
             break
     
-    #if not Debug and i%5000 == 0:
-        #print("Event #", i+1, " out of ", tree.GetEntries())
+    if not Debug and i%5000 == 0:
+        print("Event #", i+1, " out of ", tree.GetEntries())
     event = Event(tree,i)
     electrons = Collection(event, "Electron")
     muons = Collection(event, "Muon")
@@ -935,8 +920,8 @@ for i in range(tree.GetEntries()):
     ## Removing events with HEM problem  ##
     #######################################
     passesMETHEMVeto = HEMveto(jets, electrons)
-    if(sample.year == "2018" and not passesMETHEMVeto):
-        if(not isMC and chain.runNumber > 319077.):
+    if(sample.year == 2018 and not passesMETHEMVeto):
+        if(not isMC and chain.run > 319077.):
             continue
         elif(isMC):
             w_nominal_all[0] *= 0.354
@@ -1000,15 +985,11 @@ for i in range(tree.GetEntries()):
     elif isElectron:
         h_eff_ele.Fill('passEle+jetsel', int(isElectron))
 
-    if(TriggerStudy):
-        isdileptonic[0] = 0
-        isDilepton = (len(goodMu) == 1) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT or passEle)
     if(isMuon):
         isEle_all[0] = 0
         isMu_all[0] = 1
         tightlep = goodMu[0]
         tightlep_p4 = copy.deepcopy(tightlep.p4())#ROOT.TLorentzVector()
-        #tightlep_p4.SetPtEtaPhiM(goodMu[0].pt,goodMu[0].eta,goodMu[0].phi,goodMu[0].mass)
         tightlep_p4t = copy.deepcopy(tightlep.p4())
         tightlep_p4t.SetPz(0.)
         if(isMC):
@@ -1033,17 +1014,6 @@ for i in range(tree.GetEntries()):
             systTree.setWeightName("lepSF", copy.deepcopy(tightlep_SF))
             systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SFUp))
             systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SFDown))
-    elif(isDilepton and TriggerStudy):
-        muon_pt[0] = goodMu[0].pt
-        muon_eta[0] = goodMu[0].eta
-        muon_phi[0] = goodMu[0].phi
-        muon_SF[0] = goodMu[0].effSF
-        electron_pt[0] = goodEle[0].pt
-        electron_eta[0] = goodEle[0].eta
-        electron_phi[0] = goodEle[0].phi
-        electron_m[0] = goodEle[0].mass
-        electron_SF[0] = goodEle[0].effSF
-        isdileptonic[0] = 1
     else:
         ##print('Event %i not a good' %(i))
         continue
@@ -1080,7 +1050,6 @@ for i in range(tree.GetEntries()):
     nPV_tot_all[0] = PV.npvs
 
     if tightlep != None:
-        ##print("ev #", i, ": tightlep exists")
         lepton_pt_all[0] = tightlep_p4.Pt()
         lepton_eta_all[0] = tightlep_p4.Eta()
         lepton_phi_all[0] = tightlep_p4.Phi()
@@ -1111,7 +1080,6 @@ for i in range(tree.GetEntries()):
             elif(genp.genPartIdxMother == 0 and genp.pdgId == -6):
                 antitop_q4.SetPtEtaPhiM(genp.pt, genp.eta, genp.phi, genp.mass)
         tt_q4 = top_q4 + antitop_q4
-        #mtt[0] = tt_q4.M()
         if(tt_q4.M() > 700.):
             w_nominal_all[0] *= 0 #trick to make the events with mtt > 700 count zero
 
@@ -1136,7 +1104,7 @@ for i in range(tree.GetEntries()):
         nlep_all[0] = lhe_ele + lhe_mu + lhe_tau
 
     # checking the top 4-vector at LHE level 
-    if Debug:
+    if Debug and isMC:
         for genp in genpart:
             if(abs(genp.pdgId) == 6):
                 top_q4 = ROOT.TLorentzVector()
@@ -1166,7 +1134,6 @@ for i in range(tree.GetEntries()):
 
     #MCtruth event reconstruction
     if MCReco:
-
         #GenParticles
         gentopFound = False
         genbottFound = False
@@ -2091,6 +2058,7 @@ if(isMC):
     h_eff_mu.Write()
     h_eff_ele.Write()
 systTree.writeTreesSysts(trees, outTreeFile)
+print("Number of events in output tree " + str(trees[0].GetEntries()))
 
 endTime = datetime.datetime.now()
-#print("Ending running at " + str(endTime))
+print("Ending running at " + str(endTime))
