@@ -247,7 +247,7 @@ class jetSmearer(Module):
                 #
                 dM = jet.M() - genJet.M()
                 smearFactor = 1. + \
-                    jet_m_sf_and_uncertainty[central_or_shift] - 1. * dM, jet.M()
+                    jet_m_sf_and_uncertainty[central_or_shift] - 1. * dM / jet.M()
 
                 # check that smeared jet energy remains positive,
                 # as the direction of the jet would change ("flip")

@@ -48,7 +48,7 @@ class puWeightProducer(Module):
         # CMSSW directory, causing problems if many jobs are working from the
         # same CMSSW directory
         except Exception as e:
-            print("Could not load module via python, trying via ROOT", e)
+            print("Could not load module via python, trying via ROOT" + str(e))
             if "/WeightCalculatorFromHistogram_cc.so" not in ROOT.gSystem.GetLibraries(
             ):
                 print("Load C++ Worker")
