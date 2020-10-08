@@ -9,12 +9,12 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 class lepSFProducer(Module):
     def __init__(self, muonSelectionTag, electronSelectionTag):
         if muonSelectionTag == "TightWP_2016":
-            mu_f = ["Mu_RunBCDEFGH_SF_ID_2016_syst.root", "Mu_MiniIso.root"]
+            mu_f = ["Mu_RunBCDEFGH_SF_ID_2016_syst.root", "Mu_RunBCDEFGH_SF_MiniIso_2016.root"]
             mu_h = ["NUM_TightID_DEN_genTracks_eta_pt",
-                    "LooseISO_TightID_pt_eta/pt_abseta_ratio"] # Check the histogram name
+                    "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio"]
 
         if electronSelectionTag == "NoIsoMVA90_2016":
-            el_f = ["EGM2D_RECO_SF_2016.root", "2016LegacyReReco_ElectronMVA90noiso_Fall17V2.root", "EGM2D_MiniIso_SF_2017.root"]
+            el_f = ["EGM2D_RECO_SF_2016.root", "2016LegacyReReco_ElectronMVA90noiso_Fall17V2.root", "EGM2D_MiniIso_SF_2016.root"]
             el_h = ["EGamma_SF2D", "EGamma_SF2D", "EGamma_SF2D"]
 
         if muonSelectionTag == "TightWP_2017":

@@ -243,12 +243,17 @@ for i in range(tree.GetEntries()):
     passed_ht_all[0] = int(passHT)
     isDilepton = (len(goodMu) == 1) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT or passEle)
 
+    double_counting = False
+    if not isMC:
+        double_counting = True
     #Double counting removal
-    if('DataHT' in sample.label and (passMu or passEle)):
-        continue
-    if('DataEle' in sample.label and (passMu or not passEle)):
-        continue
-    if('DataMu' in sample.label and (passEle or not passMu)):
+    if('DataHT' in sample.label and (passHT and not passMu and not passEle)):
+        double_counting = False
+    if('DataEle' in sample.label and ((passEle and passMu and passHT) or (passEle and passMu and not passHT) or (passEle and not passMu and passHT) or (passEle and not passMu and not passHT))):
+        double_counting = False
+    if('DataMu' in sample.label and ((passMu and not passEle and not passHT) or (passMu and not passEle and passHT))):
+        double_counting = False
+    if double_counting:
         continue
 
     #######################################

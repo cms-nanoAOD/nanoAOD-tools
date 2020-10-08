@@ -69,7 +69,7 @@ def lumi_writer(dataset, lumi):
      else:
           samples.append(dataset)
      for sample in samples:
-          if not 'Data' in sample.label:
+          if not ('Data' in sample.label or 'TT_dilep' in sample.label):
                infile =  ROOT.TFile.Open(filerepo + sample.label + "/"  + sample.label + "_merged.root")
                tree = infile.Get('events_all')
                tree.SetBranchStatus('w_nominal', 0)
@@ -120,7 +120,7 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      h1 = ROOT.TH1F(histoname, variable._name + "_" + reg, variable._nbins, variable._xmin, variable._xmax)
      h1.Sumw2()
      if 'muon' in lep: 
-          cut = variable._taglio + '*isMu*(' + str(variable._name) + ">" + str(variable._xmin) + ")"#&&" + str(variable._name) + "<" + str(variable._xmax) + ")" 
+          cut = variable._taglio + '*isMu'
           #if not 'Data' in sample.label:
           #cut += '*passed_mu*(1-passed_ht)'
           #cut += '*passed_ht*(1-passed_mu)*(1-passed_ele)'
@@ -133,7 +133,7 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
                cut += '*passed_ht'
           '''
      elif 'electron' in lep:
-          cut  = variable._taglio + '*isEle*(' + str(variable._name) + ">" + str(variable._xmin) + ")"#&&" + str(variable._name) + "<" + str(variable._xmax) + ")" 
+          cut  = variable._taglio + '*isEle'
           if 'MC' in variable._name:
                cut = cut + "*(" + str(variable._name) + "!=-100.)"
           #if not 'Data' in sample.label: 
@@ -200,7 +200,6 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           canvasname = "stack_"+reg_+"_"+variabile_._name+"_"+cut_tag_+"_"+lep_ + "_" + str(samples_[0].year)
      if("selection_AND_best_Wpjet_isbtag_AND_best_topjet_isbtag" in cut_tag_ ) or ("selection_AND_best_topjet_isbtag_AND_best_Wpjet_isbtag" in cut_tag_ ):
           blind = True
-     blind = False
      stack = ROOT.THStack(stackname, variabile_._name)
      leg_stack = ROOT.TLegend(0.33,0.62,0.91,0.87)
      signal = False
@@ -226,8 +225,6 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           tmp = (ROOT.TH1F)(infile[s.label].Get(histoname))
           tmp.SetLineColor(ROOT.kBlack)
           tmp.SetName(s.leglabel)
-          print s.label, s.color 
-          print blind
           if('Data' in s.label):
                if ("GenPart" in variabile_._name) or ("MC_" in variabile_._name):
                     continue
@@ -261,6 +258,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           if not ('Data' in hist.GetName()):
                leg_stack.AddEntry(hist, hist.GetName(), "f")
      #style options
+     print "Is it blind? " + blind
      leg_stack.SetNColumns(2)
      leg_stack.SetFillColor(0)
      leg_stack.SetFillStyle(0)
