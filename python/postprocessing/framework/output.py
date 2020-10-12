@@ -81,11 +81,10 @@ class FullOutput(OutputTree):
     ):
         outputFile.cd()
 
-        # enable/disable the output branches as requested in outputbranchSelection,
-        # then clone the input tree
-        if outputbranchSelection:
-            outputbranchSelection.selectBranches(inputTree)
-
+        
+        self.outputbranchSelection = outputbranchSelection
+        self.maxEntries = maxEntries
+        self.firstEntry = firstEntry
         if fullClone:
             outputTree = inputTree.CopyTree('1', "", maxEntries if maxEntries else ROOT.TVirtualTreePlayer.kMaxEntries, firstEntry)
         else:            
@@ -124,6 +123,10 @@ class FullOutput(OutputTree):
         self._inputTree.readAllBranches()
         self._tree.Fill()
     def write(self):
+        if self.outputbranchSelection:
+            self.outputbranchSelection.selectBranches(self._tree)
+        self._tree = self.tree().CopyTree('1', "", self.maxEntries if self.maxEntries else ROOT.TVirtualTreePlayer.kMaxEntries, self.firstEntry)
+
         OutputTree.write(self)
         for t in self._otherTrees.itervalues():
             t.Write()
