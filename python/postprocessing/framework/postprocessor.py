@@ -35,7 +35,14 @@ class PostProcessor :
 		print "Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root"
 		self.haddFileName="tree.root"
  	self.branchsel = BranchSelection(branchsel) if branchsel else None 
-        self.outputbranchsel = BranchSelection(outputbranchsel) if outputbranchsel else None
+        if outputbranchsel != None:
+            self.outputbranchsel = BranchSelection(outputbranchsel)
+        elif outputbranchsel == None and branchsel != None:
+            # Use the same branches in the output as in input
+            self.outputbranchsel = BranchSelection(branchsel)
+        else: 
+            self.outputbranchsel = None
+
         self.histFileName=histFileName
         self.histDirName=histDirName
         self.maxEntries = maxEntries if maxEntries else 9223372036854775807L # 2^63 - 1, largest int64
@@ -108,7 +115,7 @@ class PostProcessor :
 
 	fullClone = (len(self.modules) == 0)
 	outFileNames=[]
-        t0 = time.clock()
+        t0 = time.time()
 	totEntriesRead=0
 	for fname in self.inputFiles:
 	    ffnames = []
@@ -202,7 +209,7 @@ class PostProcessor :
 		
 	for m in self.modules: m.endJob()
 	
-	print  totEntriesRead/(time.clock()-t0), "Hz"
+	print "Total time %.1f sec. to process %i events. Rate = %.1f Hz." %((time.time()-t0), totEntriesRead, totEntriesRead/(time.time()-t0))
 
 
 	if self.haddFileName :
