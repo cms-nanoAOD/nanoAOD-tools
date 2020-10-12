@@ -1,4 +1,3 @@
-# Source: https://github.com/cms-tau-pog/TauTriggerSFs
 '''
 Class to get Tau Trigger SF based on 2017 Rereco data
 and MCv2 (re-miniaod).
@@ -6,6 +5,7 @@ T. Ruggles
 5 February, 2018
 Updated 12 August, 2018
 Updated 16 Feb, 2019
+Source: https://github.com/cms-tau-pog/TauTriggerSFs
 '''
 import os
 import ROOT
