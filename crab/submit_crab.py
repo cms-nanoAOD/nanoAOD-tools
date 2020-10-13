@@ -120,21 +120,6 @@ def crab_script_writer(sample, outpath, isMC, modules, presel):
     f_sh.write("fi\n")
     f_sh.close()
 
-def PSet_writer(sample):
-    f = open("PSet.py", "w")
-    f.write("import FWCore.ParameterSet.Config as cms\n")
-    f.write("process = cms.Process('NANO')\n")
-    f.write("process.source = cms.Source('PoolSource', fileNames = cms.untracked.vstring(),\n")
-    #       lumisToProcess=cms.untracked.VLuminosityBlockRange("254231:1-254231:24")
-    f.write(")\n")
-    f.write("process.source.fileNames = [\n")
-    f.write("        '../../NanoAOD/test/lzma.root' ##you can change only this line\n")
-    f.write("]\n")
-    f.write("process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))\n")
-    f.write("process.output = cms.OutputModule('PoolOutputModule', fileName = cms.untracked.string('"+sample.label+".root'))\n")
-    f.write("process.out = cms.EndPath(process.output)\n")
-    f.close()
-
 if not(opt.dat in sample_dict.keys()):
     print sample_dict.keys()
 dataset = sample_dict[opt.dat]
@@ -167,15 +152,15 @@ for sample in samples:
             isMC = False
             presel = "Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter "
             if year == '2016' and sample.runP != 'H':
-                presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
+                presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele32_eta2p1_WPTight_Gsf_v)"
             elif year == '2016' and sample.runP == 'H':
-                presel += " && (HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
+                presel += " && (HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele32_eta2p1_WPTight_Gsf_v)"
             elif year == '2017' and sample.runP != 'B':
-                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
+                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele35_WPTight_Gsf_v)"
             elif year == '2017' and sample.runP == 'B':
-                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50)"
+                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele35_WPTight_Gsf_v)"
             elif year == '2018':
-                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT)"
+                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele35_WPTight_Gsf_v)"
         else:
             isMC = True
             presel = ""
