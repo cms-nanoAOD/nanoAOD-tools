@@ -19,7 +19,7 @@ def cfg_writer(sample, isMC, outdir):
     #f.write("from CRABClient.UserUtilities import config, getUsernameFromSiteDB\n")
     f.write("\nconfig = Configuration()\n")
     f.write("config.section_('General')\n")
-    f.write("config.General.requestName = '"+sample.label+"_for_trigger'\n")
+    f.write("config.General.requestName = '"+sample.label+"'\n")
     if not isMC:
         f.write("config.General.instance = 'preprod'\n") #needed to solve a bug with Oracle server... 
     f.write("config.General.transferLogs=True\n")
@@ -139,7 +139,7 @@ resubmit = opt.resub
 getout = opt.gout
 #Writing the configuration file
 for sample in samples:
-    for_trigger = True
+    for_trigger = False
     print 'Launching sample ' + sample.label
     if submit:
         #Writing the script file 
@@ -152,9 +152,9 @@ for sample in samples:
             isMC = False
             presel = "Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter "
             if year == '2016' and sample.runP != 'H':
-                presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele32_eta2p1_WPTight_Gsf_v)"
+                presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele32_WPTight_Gsf_v)"
             elif year == '2016' and sample.runP == 'H':
-                presel += " && (HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele32_eta2p1_WPTight_Gsf_v)"
+                presel += " && (HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele32_WPTight_Gsf_v)"
             elif year == '2017' and sample.runP != 'B':
                 presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele35_WPTight_Gsf_v)"
             elif year == '2017' and sample.runP == 'B':
