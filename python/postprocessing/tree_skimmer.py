@@ -29,13 +29,9 @@ else:
 sample = sample_dict[sys.argv[1]]
 part_idx = sys.argv[2]
 file_list = list(map(str, sys.argv[3].strip('[]').split(',')))
-#print("file_list: ", file_list, "\nloop #1 over it")
-#for infile in file_list:
-    #print(infile)
 
 MCReco = True
 DeltaFilter = True
-TriggerStudy = False # True #
 bjetSwitch = False # True #
 startTime = datetime.datetime.now()
 print("Starting running at " + str(startTime))
@@ -53,8 +49,6 @@ for infile in file_list:
 print("Number of events in chain " + str(chain.GetEntries()))
 print("Number of events in tree from chain " + str((chain.GetTree()).GetEntries()))
 tree = InputTree(chain)
-#print("Number of entries: " +str(tree.GetEntries()))
-#print("tree: ", tree)
 isMC = True
 if ('Data' in sample.label):
     isMC = False
@@ -64,7 +58,7 @@ MCReco = MCReco * isMC
 #++++++++++++++++++++++++++++++++++
 #++   branching the new trees    ++
 #++++++++++++++++++++++++++++++++++
-outTreeFile = ROOT.TFile(sample.label+"_part"+str(part_idx)+".root", "RECREATE") #some name of the output file
+outTreeFile = ROOT.TFile(sample.label+"_part"+str(part_idx)+".root", "RECREATE") # output file
 trees = []
 for i in range(10):
     trees.append(None)
@@ -179,18 +173,6 @@ if MCReco:
     GenPart_Top_mt_all = array.array('f', [0.])
     MC_RecoTop_isNeg_all = array.array('i', [0])
     MC_RecoTop_chi2_all = array.array('i', [0])
-    if(TriggerStudy):
-        isdileptonic = array.array('i', [0])
-        muon_pt = array.array('f', [0.])
-        muon_eta = array.array('f', [0.])
-        muon_phi = array.array('f', [0.])
-        muon_m = array.array('f', [0.])
-        muon_SF = array.array('f', [0.])
-        electron_pt = array.array('f', [0.])
-        electron_eta = array.array('f', [0.])
-        electron_phi = array.array('f', [0.])
-        electron_m = array.array('f', [0.])
-        electron_SF = array.array('f', [0.])
 closest_RecoTop_pt_all = array.array('f', [0.])
 closest_RecoTop_eta_all = array.array('f', [0.])
 closest_RecoTop_phi_all = array.array('f', [0.])
@@ -768,18 +750,6 @@ systTree.branchTreesSysts(trees, "all", "WprAK8_tau2", outTreeFile, WprAK8_tau2)
 systTree.branchTreesSysts(trees, "all", "WprAK8_tau3", outTreeFile, WprAK8_tau3)
 systTree.branchTreesSysts(trees, "all", "WprAK8_tau4", outTreeFile, WprAK8_tau4)
 
-if(TriggerStudy):
-    systTree.branchTreesSysts(trees, "all", "isdileptonic", outTreeFile, isdileptonic)
-    systTree.branchTreesSysts(trees, "all", "muon_pt", outTreeFile, muon_pt)
-    systTree.branchTreesSysts(trees, "all", "muon_eta", outTreeFile, muon_eta)
-    systTree.branchTreesSysts(trees, "all", "muon_phi", outTreeFile, muon_phi)
-    systTree.branchTreesSysts(trees, "all", "muon_m", outTreeFile, muon_m)
-    systTree.branchTreesSysts(trees, "all", "muon_SF", outTreeFile, muon_SF)
-    systTree.branchTreesSysts(trees, "all", "electron_pt", outTreeFile, electron_pt)
-    systTree.branchTreesSysts(trees, "all", "electron_eta", outTreeFile, electron_eta)
-    systTree.branchTreesSysts(trees, "all", "electron_phi", outTreeFile, electron_phi)
-    systTree.branchTreesSysts(trees, "all", "electron_m", outTreeFile, electron_m)
-    systTree.branchTreesSysts(trees, "all", "electron_SF", outTreeFile, electron_SF)
 #print("Is MC: " + str(isMC) + "      option addPDF: " + str(addPDF))
 if(isMC and addPDF):
     systTree.branchTreesSysts(trees, "all", "w_PDF", outTreeFile, w_PDF_all)
@@ -908,12 +878,18 @@ for i in range(tree.GetEntries()):
     isMuon = (len(goodMu) == 1) and (len(goodEle) == 0) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT)
     isElectron = (len(goodMu) == 0) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passEle or passHT)
 
+    if(isMC):
+        doublecounting = False
+    doublecounting = True
     #Double counting removal
-    if('DataHT' in sample.label and (passMu or passEle)):
-        continue
-    if('DataEle' in sample.label and (passMu or not passEle)):
-        continue
-    if('DataMu' in sample.label and (passEle or not passMu)):
+    if('DataMu' in sample.label and passMu):
+        doublecounting = False
+    if('DataEle' in sample.label and (not passMu and passEle)):
+        doublecounting = False
+    if('DataHT' in sample.label and (passHT and not passMu and not passEle)):
+        doublecounting = False
+
+    if doublecounting:
         continue
 
     #######################################

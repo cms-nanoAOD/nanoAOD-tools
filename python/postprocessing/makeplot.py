@@ -56,11 +56,12 @@ def mergepart(dataset):
 def mergetree(sample):
      if not os.path.exists(filerepo + sample.label):
           os.makedirs(filerepo + sample.label)
-     add = "hadd -f " + filerepo + sample.label + "/"  + sample.label + ".root" 
-     for comp in sample.components:
-          add+= " " + filerepo + comp.label + "/"  + comp.label + ".root" 
-     print add
-     os.system(str(add))
+     if hasattr(sample, 'components'): # How to check whether this exists or not
+          add = "hadd -f " + filerepo + sample.label + "/"  + sample.label + ".root" 
+          for comp in sample.components:
+               add+= " " + filerepo + comp.label + "/"  + comp.label + ".root" 
+          print add
+          os.system(str(add))
 
 def lumi_writer(dataset, lumi):
      samples = []
@@ -258,7 +259,7 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           if not ('Data' in hist.GetName()):
                leg_stack.AddEntry(hist, hist.GetName(), "f")
      #style options
-     print "Is it blind? " + blind
+     print "Is it blind? " + str(blind)
      leg_stack.SetNColumns(2)
      leg_stack.SetFillColor(0)
      leg_stack.SetFillStyle(0)
@@ -517,7 +518,7 @@ for year in years:
                dataset_new.remove(sample_dict['DataMu_'+str(year)])
 
           variables = []
-          wzero = 'w_nominal'
+          wzero = 'w_nominal*PFSF*puSF*lepSF'
           cut = cut_dict[lep]
                     
           variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))

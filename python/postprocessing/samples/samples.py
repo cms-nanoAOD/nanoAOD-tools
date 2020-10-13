@@ -47,8 +47,8 @@ TT_Mtt_2016.components = [TT_incl_2016, TT_Mtt700to1000_2016, TT_Mtt1000toInf_20
 TT_dilep_2016 = sample(ROOT.kRed, 1, 1001, "t#bar{t}", "TT_dilep_2016")
 TT_dilep_2016.sigma = 831.76 #pb
 TT_dilep_2016.year = 2016
-TT_dilep_2016.dataset = "/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/"+tag_2016+"-v2/NANOAODSIM"
-
+TT_dilep_2016.dataset = "/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/"+tag_2016+"-v1/NANOAODSIM"
+# /TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv6-PUMoriond17_Nano25Oct2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM
 ################################ QCD ################################
 QCDHT_300to500_2016 = sample(ROOT.kGray, 1, 1001, "QCD", "QCDHT_300to500_2016")
 QCDHT_300to500_2016.sigma = 347700 #pb
@@ -2262,7 +2262,7 @@ DataMuD_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuD_2018")
 DataMuD_2018.runP = 'D'
 DataMuD_2018.year = 2018
 DataMuD_2018.dataset = '/SingleMuon/Run2018D-'+tag_data + '-v1/NANOAOD'
-DataMu_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataDataMu_2018")
+DataMu_2018 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMu_2018")
 DataMu_2018.year = 2018
 DataMu_2018.components = [DataMuA_2018, DataMuB_2018, DataMuC_2018, DataMuD_2018]
 
