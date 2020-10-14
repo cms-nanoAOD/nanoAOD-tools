@@ -19,7 +19,7 @@ class MET_HLT_Filter(Module):
         good_MET = flag.goodVertices and flag.globalSuperTightHalo2016Filter and flag.HBHENoiseFilter and flag.HBHENoiseIsoFilter and flag.EcalDeadCellTriggerPrimitiveFilter and flag.BadPFMuonFilter
         if(self.year == 2016):
             good_HLT = HLT.PFHT800 or HLT.PFHT900 or HLT.Mu50 or HLT.TkMu50 or HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele32_WPTight_Gsf
-        elif(self.year == 2017)
+        elif(self.year == 2017):
             good_HLT = HLT.PFHT780 or HLT.PFHT890 or HLT.Mu50 or HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele35_WPTight_Gsf
         elif(self.year == 2018):
             good_HLT = HLT.PFHT780 or HLT.PFHT890 or HLT.Mu50 or HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele35_WPTight_Gsf
