@@ -28,8 +28,8 @@ parser.add_option('-d', '--dat', dest='dat', type='string', default = 'all', hel
 
 folder = opt.folder
 
-#filerepo = '/eos/user/a/apiccine/Wprime/nosynch/v12/'
-filerepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
+filerepo = '/eos/user/a/apiccine/Wprime/nosynch/v13/'
+#filerepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
 plotrepo = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'#_topjet/'#/only_Wpjetbtag_ev1btag/'
 
 ROOT.gROOT.SetBatch() # don't pop up canvases
@@ -114,9 +114,19 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      f1 = ROOT.TFile.Open(filerepo + sample.label + "/"  + sample.label + ".root")
      treename = "events_all"
      if(cut_tag == ""):
-          histoname = "h_" + reg + "_" + variable._name
+          if variable._name=='WprAK8_tau2/WprAK8_tau1':
+               histoname = "h_" + reg + "_WprAK8_tau21"
+          elif variable._name== 'WprAK8_tau3/WprAK8_tau2':
+               histoname =  "h_" + reg + "_WprAK8_tau32"
+          else:
+               histoname = "h_" + reg + "_" + variable._name
      else:
-          histoname = "h_" + reg + "_" + variable._name + "_" + cut_tag
+          if variable._name=='WprAK8_tau2/WprAK8_tau1':
+               histoname = "h_" + reg + "_WprAK8_tau21_" + cut_tag
+          elif variable._name== 'WprAK8_tau3/WprAK8_tau2':
+               histoname =  "h_" + reg + "_WprAK8_tau32_" + cut_tag
+          else:
+               histoname = "h_" + reg + "_" + variable._name + "_" + cut_tag
      nbins = variable._nbins
      h1 = ROOT.TH1F(histoname, variable._name + "_" + reg, variable._nbins, variable._xmin, variable._xmax)
      h1.Sumw2()
@@ -177,6 +187,10 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
 
 def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
      os.system('set LD_PRELOAD=libtcmalloc.so')
+     if variabile_._name=='WprAK8_tau2/WprAK8_tau1':
+          variabile_._name = 'WprAK8_tau21' 
+     elif variabile_._name== 'WprAK8_tau3/WprAK8_tau2':
+          variabile_._name = 'WprAK8_tau32'
      blind = False
      infile = {}
      histo = []
@@ -518,7 +532,7 @@ for year in years:
                dataset_new.remove(sample_dict['DataMu_'+str(year)])
 
           variables = []
-          wzero = 'w_nominal*PFSF*puSF*lepSF'
+          wzero = 'w_nominal*PFSF*lepSF'
           cut = cut_dict[lep]
                     
           variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 100, 0, 1200))
@@ -541,6 +555,8 @@ for year in years:
           variables.append(variabile('WprAK8_ttagMD', 'WprAK8 t tag MD', wzero+'*(WprAK8_ttagMD>-1&&'+cut+')', 20, 0, 1.0))
           variables.append(variabile('WprAK8_tau1', 'WprAK8 tau 1', wzero+'*('+cut+')', 80, 0, .8))
           variables.append(variabile('WprAK8_tau2', 'WprAK8 tau 2', wzero+'*('+cut+')', 60, 0, .6))
+          variables.append(variabile('WprAK8_tau2/WprAK8_tau1', 'WprAK8 tau21', wzero+'*('+cut+')', 80, 0, 1.))
+          variables.append(variabile('WprAK8_tau3/WprAK8_tau2', 'WprAK8 tau32', wzero+'*('+cut+')', 60, 0, 1.))
           variables.append(variabile('WprAK8_tau3', 'WprAK8 tau 3', wzero+'*('+cut+')', 40, 0, .4))
           variables.append(variabile('WprAK8_tau4', 'WprAK8 tau 4', wzero+'*('+cut+')', 20, 0, .2))
           variables.append(variabile('WprAK8_m', 'WprAK8 mass [GeV]', wzero+'*('+cut+')', 40, 0, 400))
