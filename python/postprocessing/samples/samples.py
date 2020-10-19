@@ -2077,12 +2077,12 @@ WP_RH_2018.components = [WP_M2000W200_RH_2018, WP_M2000W400_RH_2018, WP_M2000W60
 
 
 ####################################################### Data #####################################################################################
-tag_data = 'Nano25Oct2019'
+tag_data = '02Apr2020'
 
 DataMuB_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuB_2016")
 DataMuB_2016.runP = 'B'
 DataMuB_2016.year = 2016
-DataMuB_2016.dataset = '/SingleMuon/Run2016B_ver2-'+tag_data + '_ver2-v1/NANOAOD'
+DataMuB_2016.dataset = '/SingleMuon/Run2016B-'+tag_data + '_ver2-v1/NANOAOD'
 DataMuC_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataMuC_2016")
 DataMuC_2016.runP = 'C'
 DataMuC_2016.year = 2016
@@ -2114,7 +2114,7 @@ DataMu_2016.components = [DataMuB_2016, DataMuC_2016, DataMuD_2016, DataMuE_2016
 DataEleB_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleB_2016")
 DataEleB_2016.runP = 'B'
 DataEleB_2016.year = 2016
-DataEleB_2016.dataset = '/SingleElectron/Run2016B_ver2-'+tag_data + '_ver2-v1/NANOAOD'
+DataEleB_2016.dataset = '/SingleElectron/Run2016B-'+tag_data + '_ver2-v1/NANOAOD'
 DataEleC_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataEleC_2016")
 DataEleC_2016.runP = 'C'
 DataEleC_2016.year = 2016
@@ -2146,7 +2146,7 @@ DataEle_2016.components = [DataEleB_2016, DataEleC_2016, DataEleD_2016, DataEleE
 DataHTB_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataHTB_2016")
 DataHTB_2016.runP = 'B'
 DataHTB_2016.year = 2016
-DataHTB_2016.dataset = '/JetHT/Run2016B_ver2-'+tag_data + '_ver2-v1/NANOAOD'
+DataHTB_2016.dataset = '/JetHT/Run2016B-'+tag_data + '_ver2-v1/NANOAOD'
 DataHTC_2016 = sample(ROOT.kBlack, 1, 1001, "Data", "DataHTC_2016")
 DataHTC_2016.runP = 'C'
 DataHTC_2016.year = 2016

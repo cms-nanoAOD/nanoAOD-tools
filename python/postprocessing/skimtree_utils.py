@@ -278,27 +278,27 @@ def trig_map(HLT, year, runPeriod):
     passHT = False
     noTrigger = False
     if(year == 2016 and runPeriod != 'H'):
-        if(HLT.Mu50 or HLT.TkMu50):
+        if(HLT.Mu50):
             passMu = True
-        if(HLT.Ele115_CaloIdVT_GsfTrkIdT):
-            passEle = True  
+        if(HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele27_WPTight_Gsf):
+            passEle = True
         if(HLT.PFHT800 or HLT.PFHT900):
             passHT = True
         if not(passMu or passEle or passHT):
             noTrigger = True
     elif(year == 2016 and runPeriod == 'H'):
-        if(HLT.Mu50 or HLT.TkMu50):
+        if(HLT.Mu50):
             passMu = True
-        if(HLT.Ele115_CaloIdVT_GsfTrkIdT):
+        if(HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele27_WPTight_Gsf):
             passEle = True  
         if(HLT.PFHT900):
             passHT = True
         if not(passMu or passEle or passHT):
             noTrigger = True
-    elif(year == 2017 and runPeriod != 'B' or year == 2018):
+    elif((year == 2017 and runPeriod != 'B') or year == 2018):
         if(HLT.Mu50):
             passMu = True
-        if(HLT.Ele115_CaloIdVT_GsfTrkIdT):
+        if(HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele35_WPTight_Gsf):
             passEle = True  
         if(HLT.PFHT780 or HLT.PFHT890):
             passHT = True
@@ -307,6 +307,8 @@ def trig_map(HLT, year, runPeriod):
     elif(year == 2017 and runPeriod == 'B'):
         if(HLT.Mu50):
             passMu = True
+        if(HLT.Ele35_WPTight_Gsf):
+            passEle = True
         if(HLT.PFHT780 or HLT.PFHT890):
             passHT = True
         if not(passMu or passEle or passHT):

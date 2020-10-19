@@ -880,7 +880,8 @@ for i in range(tree.GetEntries()):
 
     if(isMC):
         doublecounting = False
-    doublecounting = True
+    else:
+        doublecounting = True
     #Double counting removal
     if('DataMu' in sample.label and passMu):
         doublecounting = False

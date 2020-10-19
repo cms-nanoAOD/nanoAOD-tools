@@ -17,10 +17,10 @@ def printh(filename, period, h, plotpath):
     c = ROOT.TCanvas(filename + '_' + period + '_' + h.GetName(), filename + '_' + period + '_' + h.GetName())
     c.Draw()
     h.Draw()
-    c.Print(plotpath + c.GetName() + 'HT.png')
+    c.Print(plotpath + c.GetName() + '.png')
 
-inpfiles = {"muon_16":["DataMu_2016", "DataHT_2016", "DataEle_2016", "TT_dilep_2016"],
-            "electron_16":["DataMu_2016", "DataHT_2016", "DataEle_2016", "TT_dilep_2016"],
+inpfiles = {"muon_16":["DataMu_2016", "DataEle_2016", "TT_dilep_2016"],
+            "electron_16":["DataMu_2016", "DataEle_2016", "TT_dilep_2016"],
             "muon_17":["DataMu_2017", "DataHT_2017", "DataEle_2017", "TT_dilep_2017"],
             "electron_17":["DataMu_2017", "DataHT_2017", "DataEle_2017", "TT_dilep_2017"],
             "muon_18":["DataMu_2018", "DataHT_2018", "DataEle_2018", "TT_dilep_2018"],
@@ -31,8 +31,8 @@ ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch()        # don't pop up canvases
 ROOT.TH1.SetDefaultSumw2()
 
-#edges = array.array('f', [0., 50., 65., 80., 100., 130., 160., 190., 230., 270., 320., 360., 700.])
-edges = array.array('f',[0., 200., 400., 600., 800., 1000., 1200., 1400., 1600., 1800., 2000., 2200., 2400., 2800., 3400., 4000.])
+edges = array.array('f', [0., 50., 65., 80., 100., 130., 160., 190., 230., 270., 320., 360., 700.])
+#edges = array.array('f',[0., 200., 400., 600., 800., 1000., 1200., 1400., 1600., 1800., 2000., 2200., 2400., 2800., 3400., 4000.])
 nbins = len(edges)-1
 h_HLT_data_num = ROOT.TH1F("HLT_data_num", "HLT_data_num", nbins, edges)
 h_HLT_data_den = ROOT.TH1F("HLT_data_den", "HLT_data_den", nbins, edges)
@@ -46,26 +46,26 @@ for inpfile in inpfiles[period]:
     h_HLT_den = ROOT.TH1F("HLT_den", "HLT_den", nbins, edges)
     if 'muon' in period:
         if 'Data' not in infile.GetName():
-            #tree.Project("HLT_num", "muon_pt", "w_nominal*PFSF*puSF*isdileptonic*muon_SF*passed_ele*(passed_mu||passed_ht)")
-            #tree.Project("HLT_den", "muon_pt", "w_nominal*PFSF*puSF*isdileptonic*muon_SF*passed_ele")
-            tree.Project("HLT_num", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_ele*(passed_mu||passed_ht)")
-            tree.Project("HLT_den", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_ele")
+            tree.Project("HLT_num", "muon_pt", "w_nominal*PFSF*puSF*isdileptonic*muon_SF*passed_ele*(passed_mu||passed_ht)")
+            tree.Project("HLT_den", "muon_pt", "w_nominal*PFSF*puSF*isdileptonic*muon_SF*passed_ele")
+            #tree.Project("HLT_num", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_ele*(passed_mu||passed_ht)")
+            #tree.Project("HLT_den", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_ele")
         else:
-            #tree.Project("HLT_num", "muon_pt", "w_nominal*PFSF*puSF*isdileptonic*passed_ele*(passed_mu||passed_ht)")
-            #tree.Project("HLT_den", "muon_pt", "w_nominal*PFSF*puSF*isdileptonic*passed_ele")
-            tree.Project("HLT_num", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_ele*(passed_mu||passed_ht)")
-            tree.Project("HLT_den", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_ele")
+            tree.Project("HLT_num", "muon_pt", "w_nominal*PFSF*puSF*isdileptonic*passed_ele*(passed_mu||passed_ht)")
+            tree.Project("HLT_den", "muon_pt", "w_nominal*PFSF*puSF*isdileptonic*passed_ele")
+            #tree.Project("HLT_num", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_ele*(passed_mu||passed_ht)")
+            #tree.Project("HLT_den", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_ele")
     else:
         if 'Data' not in infile.GetName():
-            #tree.Project("HLT_num", "electron_pt", "w_nominal*PFSF*puSF*isdileptonic*electron_SF*passed_mu*(passed_ele||passed_ht)")
-            #tree.Project("HLT_den", "electron_pt", "w_nominal*PFSF*puSF*isdileptonic*electron_SF*passed_mu")
-            tree.Project("HLT_num", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_mu*(passed_ele||passed_ht)")
-            tree.Project("HLT_den", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_mu")
+            tree.Project("HLT_num", "electron_pt", "w_nominal*PFSF*puSF*isdileptonic*electron_SF*passed_mu*(passed_ele||passed_ht)")
+            tree.Project("HLT_den", "electron_pt", "w_nominal*PFSF*puSF*isdileptonic*electron_SF*passed_mu")
+            #tree.Project("HLT_num", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_mu*(passed_ele||passed_ht)")
+            #tree.Project("HLT_den", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_mu")
         else:
-            #tree.Project("HLT_num", "electron_pt", "w_nominal*PFSF*puSF*isdileptonic*passed_mu*(passed_ele||passed_ht)")
-            #tree.Project("HLT_den", "electron_pt", "w_nominal*PFSF*puSF*isdileptonic*passed_mu")
-            tree.Project("HLT_num", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_mu*(passed_ele||passed_ht)")
-            tree.Project("HLT_den", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_mu")
+            tree.Project("HLT_num", "electron_pt", "w_nominal*PFSF*puSF*isdileptonic*passed_mu*(passed_ele||passed_ht)")
+            tree.Project("HLT_den", "electron_pt", "w_nominal*PFSF*puSF*isdileptonic*passed_mu")
+            #tree.Project("HLT_num", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_mu*(passed_ele||passed_ht)")
+            #tree.Project("HLT_den", "Event_HT", "w_nominal*PFSF*puSF*isdileptonic*passed_mu")
     #print h_HLT_num.Integral()
     #print h_HLT_den.Integral()
     if 'Data' in inpfile:
