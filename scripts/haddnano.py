@@ -32,7 +32,7 @@ def zeroFill(tree, brName, brObj, allowNonBool=False):
 fileHandles = []
 goFast = True
 for fn in files:
-    print(("Adding file", fn))
+    print("Adding file" + str(fn))
     fileHandles.append(ROOT.TFile.Open(fn))
     if fileHandles[-1].GetCompressionSettings() != fileHandles[0].GetCompressionSettings():
         goFast = False
@@ -44,7 +44,7 @@ of.cd()
 
 for e in fileHandles[0].GetListOfKeys():
     name = e.GetName()
-    print(("Merging", name))
+    print("Merging" + str(name))
     obj = e.ReadObj()
     cl = ROOT.TClass.GetClass(e.GetClassName())
     inputs = ROOT.TList()
@@ -61,7 +61,7 @@ for e in fileHandles[0].GetListOfKeys():
                                  for x in otherObj.GetListOfBranches()])
             missingBranches = list(branchNames - otherBranches)
             additionalBranches = list(otherBranches - branchNames)
-            print(("missing:", missingBranches, "\n Additional:", additionalBranches))
+            print("missing: " + str(missingBranches) + "\n Additional:" + str(additionalBranches))
             for br in missingBranches:
                 # fill "Other"
                 zeroFill(otherObj, br, obj.GetListOfBranches().FindObject(br))
@@ -76,7 +76,7 @@ for e in fileHandles[0].GetListOfKeys():
                                  for x in otherObj.GetListOfBranches()])
             missingBranches = list(branchNames - otherBranches)
             additionalBranches = list(otherBranches - branchNames)
-            print(("missing:", missingBranches, "\n Additional:", additionalBranches))
+            print("missing: " + str(missingBranches) + "\n Additional:" + str(additionalBranches))
             for br in missingBranches:
                 # fill "Other"
                 zeroFill(otherObj, br, obj.GetListOfBranches(
@@ -102,4 +102,4 @@ for e in fileHandles[0].GetListOfKeys():
                 print("Strings are not matching")
         obj.Write()
     else:
-        print(("Cannot handle ", obj.IsA().GetName()))
+        print("Cannot handle " + str(obj.IsA().GetName()))

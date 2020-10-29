@@ -7,7 +7,7 @@ import PSet
 
 
 def inputFiles():
-    print("ARGV: " + sys.argv)
+    print("ARGV: " + str(sys.argv))
     JobNumber = sys.argv[1]
     crabFiles = PSet.process.source.fileNames
     print(crabFiles)
@@ -62,6 +62,6 @@ def runsAndLumis():
             if rstart not in runsAndLumis:
                 runsAndLumis[rstart] = []
             runsAndLumis[rstart].append([int(lstart), int(lstop)])
-        print("Runs and Lumis: " + runsAndLumis)
+        print("Runs and Lumis: " + str(runsAndLumis))
         return runsAndLumis
     return None
