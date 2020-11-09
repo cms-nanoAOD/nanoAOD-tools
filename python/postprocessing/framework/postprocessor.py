@@ -42,9 +42,9 @@ class PostProcessor:
                 "hadd. No name specified for the output file, will use tree.root")
             self.haddFileName = "tree.root"
         self.branchsel = BranchSelection(branchsel) if branchsel else None
-        if outputbranchsel != None:
+        if outputbranchsel is not None:
             self.outputbranchsel = BranchSelection(outputbranchsel)
-        elif outputbranchsel == None and branchsel != None:
+        elif outputbranchsel is None and branchsel is not None:
             # Use the same branches in the output as in input
             self.outputbranchsel = BranchSelection(branchsel)
         else:
@@ -96,7 +96,7 @@ class PostProcessor:
             return fname, False
 
     def run(self):
-        outpostfix = self.postfix if self.postfix != None else (
+        outpostfix = self.postfix if self.postfix is not None else (
             "_Friend" if self.friend else "_Skim")
         if not self.noOut:
 
@@ -127,10 +127,10 @@ class PostProcessor:
                     "Running with --noout and no modules does nothing!")
 
         # Open histogram file, if desired
-        if (self.histFileName != None and self.histDirName == None) or (self.histFileName == None and self.histDirName != None):
+        if (self.histFileName is not None and self.histDirName is None) or (self.histFileName is None and self.histDirName is not None):
             raise RuntimeError(
                 "Must specify both histogram file and histogram directory!")
-        elif self.histFileName != None and self.histDirName != None:
+        elif self.histFileName is not None and self.histDirName is None:
             self.histFile = ROOT.TFile.Open(self.histFileName, "RECREATE")
         else:
             self.histFile = None
@@ -161,7 +161,7 @@ class PostProcessor:
 
             # get input tree
             inTree = inFile.Get("Events")
-            if inTree == None:
+            if inTree is None:
                 inTree = inFile.Get("Friends")
             nEntries = min(inTree.GetEntries() -
                            self.firstEntry, self.maxEntries)
@@ -182,7 +182,7 @@ class PostProcessor:
             for ffname in ffnames:
                 inAddFiles.append(ROOT.TFile.Open(ffname))
                 inAddTree = inAddFiles[-1].Get("Events")
-                if inAddTree == None:
+                if inAddTree is None:
                     inAddTree = inAddFiles[-1].Get("Friends")
                 inAddTrees.append(inAddTree)
                 inTree.AddFriend(inAddTree)
