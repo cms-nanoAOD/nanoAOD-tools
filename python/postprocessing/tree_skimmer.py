@@ -81,10 +81,11 @@ systTree.addSelection("all")
 systTree.initTreesSysts(trees, outTreeFile)
 
 systTree.setWeightName("w_nominal",1.)
+
+systTree.setWeightName("LHESF", 1.)
+systTree.setWeightName("LHEUp", 1.)
+systTree.setWeightName("LHEDown", 1.)
 '''
-systTree.setWeightName("btagSF", 1.)
-systTree.setWeightName("btagUp", 1.)
-systTree.setWeightName("btagDown", 1.)
 systTree.setWeightName("btagShape", 1.)
 systTree.setWeightName("btagShapeUpCferr1", 1.)
 systTree.setWeightName("btagShapeUpCferr2", 1.)
@@ -795,6 +796,7 @@ if(isMC):
         h_genweight.Add(h_genw_tmp)
     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
 
+lheweight = h_genweight.GetBinContent(2)/h_genweight.GetBinContent(1)
 
 #++++++++++++++++++++++++++++++++++
 #++      Efficiency studies      ++
@@ -833,9 +835,24 @@ for i in range(tree.GetEntries()):
     HLT = Object(event, "HLT")
     Flag = Object(event, 'Flag')
     met = Object(event, "MET")
+    LHEScaleWeight = Collection(event, 'LHEScaleWeight')
+    
+    lhemin = min([LHEScaleWeight[g].__getattr__("") for g in range(len(LHEScaleWeight))])
+    lhemax = max([LHEScaleWeight[g].__getattr__("") for g in range(len(LHEScaleWeight))])
+    lheSF = lheweight * LHEScaleWeight[4].__getattr__("")
+    lheUp = lheweight * lhemax
+    lheDown = lheweight * lhemin
+
+    systTree.setWeightName("LHESF", copy.deepcopy(lheSF))
+    systTree.setWeightName("LHEUp", copy.deepcopy(lheUp))
+    systTree.setWeightName("LHEDown", copy.deepcopy(lheDown))
+
+        #, min(LHEScaleWeight)
     MET = {'metPx': met.pt*ROOT.TMath.Cos(met.phi), 'metPy': met.pt*ROOT.TMath.Sin(met.phi)}
     genpart = None
     
+
+
     h_eff_mu.Fill('Total', 1)
     h_eff_ele.Fill('Total', 1)
     if isMC:

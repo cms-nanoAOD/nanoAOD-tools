@@ -1157,9 +1157,10 @@ class systWeights(object):
             self.weightedNames[7] = "PFSF"
             self.weightedNames[8] = "PFUp"
             self.weightedNames[9] = "PFDown"
-            self.weightedNames[10] = "btagSF"
-            self.weightedNames[11] = "btagUp"
-            self.weightedNames[12] = "btagDown"            
+            self.weightedNames[10] = "LHESF"
+            self.weightedNames[11] = "LHEUp"
+            self.weightedNames[12] = "LHEDown"            
+            '''
             self.weightedNames[13] = "btagShape"
             self.weightedNames[14] = "btagShapeUpCferr1"
             self.weightedNames[15] = "btagShapeUpCferr2"
@@ -1184,7 +1185,8 @@ class systWeights(object):
             #self.weightedNames[10] = "isoDown"
             #self.weightedNames[11] = "trigUp"
             #self.weightedNames[12] = "trigDown"
-            self.setMax(10)
+            '''
+            self.setMax(13)
             self.setMaxNonPDF(9)
             self.weightedNames[self.maxSysts] = ""
 
