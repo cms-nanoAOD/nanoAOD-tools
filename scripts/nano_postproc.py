@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import print_function
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from importlib import import_module
 import os
