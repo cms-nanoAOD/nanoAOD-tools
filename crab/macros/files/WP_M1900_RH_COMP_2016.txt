@@ -1,0 +1,1 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WprimeToTB_TToLep_M-1900_RH_TuneCUETP8M1_13TeV-comphep-pythia8/WP_M1900_RH_COMP_2016/201109_082651/0000/tree_hadd_1.root

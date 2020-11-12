@@ -9,31 +9,28 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 class lepSFProducer(Module):
     def __init__(self, muonSelectionTag, electronSelectionTag):
         if muonSelectionTag == "TightWP_2016":
-            mu_f = ["Mu_RunBCDEFGH_SF_ID_2016_syst.root", "Mu_RunBCDEFGH_SF_MiniIso_2016.root"]
-            mu_h = ["NUM_TightID_DEN_genTracks_eta_pt",
-                    "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio"]
+            mu_f = ["Mu_RunBCDEFGH_SF_ID_2016_syst.root", "Mu_RunBCDEFGH_SF_MiniIso_2016.root", "muon_16.root"]
+            mu_h = ["NUM_TightID_DEN_genTracks_eta_pt", "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio", "h_SF"]
 
         if electronSelectionTag == "NoIsoMVA90_2016":
-            el_f = ["EGM2D_RECO_SF_2016.root", "2016LegacyReReco_ElectronMVA90noiso_Fall17V2.root", "EGM2D_MiniIso_SF_2016.root"]
-            el_h = ["EGamma_SF2D", "EGamma_SF2D", "EGamma_SF2D"]
+            el_f = ["EGM2D_RECO_SF_2016.root", "2016LegacyReReco_ElectronMVA90noiso_Fall17V2.root", "EGM2D_MiniIso_SF_2016.root", "electron_16.root"]
+            el_h = ["EGamma_SF2D", "EGamma_SF2D", "EGamma_SF2D", "h_SF"]
 
         if muonSelectionTag == "TightWP_2017":
-            mu_f = ["Mu_RunBCDEF_SF_ID_2017_syst.root", "Mu_RunBCDEF_SF_MiniIso_2017.root"]
-            mu_h = ["NUM_TightID_DEN_genTracks_pt_abseta_syst",
-                    "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio"]
+            mu_f = ["Mu_RunBCDEF_SF_ID_2017_syst.root", "Mu_RunBCDEF_SF_MiniIso_2017.root", "muon_17.root"]
+            mu_h = ["NUM_TightID_DEN_genTracks_pt_abseta_syst", "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio", "h_SF"]
 
         if electronSelectionTag == "NoIsoMVA90_2017":
-            el_f = ["EGM2D_RECO_SF_2017.root", "2017_ElectronMVA90noiso.root", "EGM2D_MiniIso_SF_2017.root"]
-            el_h = ["EGamma_SF2D", "EGamma_SF2D", "EGamma_SF2D"]
+            el_f = ["EGM2D_RECO_SF_2017.root", "2017_ElectronMVA90noiso.root", "EGM2D_MiniIso_SF_2017.root",  "electron_17.root"]
+            el_h = ["EGamma_SF2D", "EGamma_SF2D", "EGamma_SF2D", "h_SF"]
 
         if muonSelectionTag == "TightWP_2018":
-            mu_f = ["Mu_RunABCD_SF_ID_2018_syst.root", "Mu_RunABCD_SF_MiniIso_2018.root"]
-            mu_h = ["NUM_TightID_DEN_TrackerMuons_pt_abseta_syst", 
-                    "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio"]
+            mu_f = ["Mu_RunABCD_SF_ID_2018_syst.root", "Mu_RunABCD_SF_MiniIso_2018.root", "muon_18.root"]
+            mu_h = ["NUM_TightID_DEN_TrackerMuons_pt_abseta_syst", "NUM_TightMiniIso_DEN_TightIDandIPCut/pt_abseta_ratio", "h_SF"]
 
         if electronSelectionTag == "NoIsoMVA90_2018":
-            el_f = ["EGM2D_RECO_SF_2018.root", "2018_ElectronMVA90noiso.root", "EGM2D_MiniIso_SF_2018.root"]
-            el_h = ["EGamma_SF2D", "EGamma_SF2D", "EGamma_SF2D"]
+            el_f = ["EGM2D_RECO_SF_2018.root", "2018_ElectronMVA90noiso.root", "EGM2D_MiniIso_SF_2018.root", "electron_18.root"]
+            el_h = ["EGamma_SF2D", "EGamma_SF2D", "EGamma_SF2D", "h_SF"]
 
         mu_f = ["%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/leptonSF/" % os.environ['CMSSW_BASE'] + f for f in mu_f]
         el_f = ["%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/leptonSF/" % os.environ['CMSSW_BASE'] + f for f in el_f]

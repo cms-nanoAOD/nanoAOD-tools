@@ -24,8 +24,8 @@ path = ".."
 for sample in samples:
     if not os.path.exists("./files/"):
         os.makedirs("./files/")
-    f = open("./files/"+str(sample.label)+"_for_trigger.txt", "w")
-    url = os.popen('crab getoutput --xrootd --jobids=1 -d ' + path + '/crab_' + str(sample.label) + '_for_trigger/').readlines()[0]
+    f = open("./files/"+str(sample.label)+".txt", "w")
+    url = os.popen('crab getoutput --xrootd --jobids=1 -d ' + path + '/crab_' + str(sample.label) + '/').readlines()[0]
     print(url)
     s1=url.split(str(os.environ.get('USER')))
     print(s1[1])

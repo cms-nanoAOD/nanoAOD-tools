@@ -1,4 +1,4 @@
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M4000W800_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M4000W800_LH_2017/200909_141053/0000/tree_hadd_2.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M4000W800_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M4000W800_LH_2017/200909_141053/0000/tree_hadd_3.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M4000W800_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M4000W800_LH_2017/200909_141053/0000/tree_hadd_1.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/Wprimetotb_M4000W800_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M4000W800_LH_2017/200909_141053/0000/tree_hadd_4.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M4000W800_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M4000W800_LH_2017/201108_141911/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M4000W800_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M4000W800_LH_2017/201108_141911/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M4000W800_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M4000W800_LH_2017/201108_141911/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M4000W800_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M4000W800_LH_2017/201108_141911/0000/tree_hadd_4.root

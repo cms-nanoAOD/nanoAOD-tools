@@ -11,27 +11,30 @@ folder = 'vtrigger'
 inputpath = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
 plotpath = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/plot/'
 
+if not os.path.exists(plotpath):
+    os.makedirs(plotpath)
+
 period = sys.argv[1]
 
 def printh(filename, period, h, plotpath):
     c = ROOT.TCanvas(filename + '_' + period + '_' + h.GetName(), filename + '_' + period + '_' + h.GetName())
     c.Draw()
     h.Draw()
-    c.Print(plotpath + c.GetName() + '.png')
+    c.Print(plotpath + c.GetName() + '.pdf')
 
 inpfiles = {"muon_16":["DataMu_2016", "DataEle_2016", "TT_dilep_2016"],
             "electron_16":["DataMu_2016", "DataEle_2016", "TT_dilep_2016"],
-            "muon_17":["DataMu_2017", "DataHT_2017", "DataEle_2017", "TT_dilep_2017"],
-            "electron_17":["DataMu_2017", "DataHT_2017", "DataEle_2017", "TT_dilep_2017"],
-            "muon_18":["DataMu_2018", "DataHT_2018", "DataEle_2018", "TT_dilep_2018"],
-            "electron_18":["DataMu_2018", "DataHT_2018", "DataEle_2018", "TT_dilep_2018"],
+            "muon_17":["DataMu_2017", "DataEle_2017", "TT_dilep_2017"],
+            "electron_17":["DataMuF_2017", "DataEleF_2017", "TT_dilep_2017"],
+            "muon_18":["DataMu_2018",  "DataEle_2018", "TT_dilep_2018"],
+            "electron_18":["DataMu_2018", "DataEle_2018", "TT_dilep_2018"],
         }
 
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch()        # don't pop up canvases
 ROOT.TH1.SetDefaultSumw2()
 
-edges = array.array('f', [0., 50., 65., 80., 100., 130., 160., 190., 230., 270., 320., 360., 700.])
+edges = array.array('f', [0., 10., 20., 30., 40., 42., 44., 46.,  48., 50., 52., 55., 60., 65., 80., 100., 130.])#, 160., 190., 230., 270., 320., 360., 700.])
 #edges = array.array('f',[0., 200., 400., 600., 800., 1000., 1200., 1400., 1600., 1800., 2000., 2200., 2400., 2800., 3400., 4000.])
 nbins = len(edges)-1
 h_HLT_data_num = ROOT.TH1F("HLT_data_num", "HLT_data_num", nbins, edges)

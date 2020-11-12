@@ -81,10 +81,14 @@ def crab_script_writer(sample, outpath, isMC, modules, presel):
     if isMC:
         f.write("metCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", jesUncert='All', redojec=True)\n")
         f.write("fatJetCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", jesUncert='All', redojec=True, jetType = 'AK8PFchs')\n")
+        f.write("metCorrector_tot = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", jesUncert='Total', redojec=True)\n")
+        f.write("fatJetCorrector_tot = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", jesUncert='Total', redojec=True, jetType = 'AK8PFchs')\n")
         f.write("p=PostProcessor('.', inputFiles(), '', modules=["+modules+"], provenance=True, fwkJobReport=True, histFileName='hist.root', histDirName='plots', outputbranchsel='keep_and_drop.txt')\n")# haddFileName='"+sample.label+".root'
     else: 
         f.write("metCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", runPeriod='"+str(sample.runP)+"', jesUncert='All', redojec=True)\n")
         f.write("fatJetCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", runPeriod='"+str(sample.runP)+"', jesUncert='All', redojec=True, jetType = 'AK8PFchs')\n")
+        f.write("metCorrector_tot = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", runPeriod='"+str(sample.runP)+"', jesUncert='Total', redojec=True)\n")
+        f.write("fatJetCorrector_tot = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", runPeriod='"+str(sample.runP)+"', jesUncert='Total', redojec=True, jetType = 'AK8PFchs')\n")
         f.write("p=PostProcessor('.', inputFiles(), '"+presel+"', modules=["+modules+"], provenance=True, fwkJobReport=True, jsonInput=runsAndLumis(), haddFileName='tree_hadd.root', outputbranchsel='keep_and_drop.txt')\n")#
     f.write("p.run()\n")
     f.write("print 'DONE'\n")
@@ -147,20 +151,20 @@ for sample in samples:
         lep_mod = 'lepSF_'+year+'()'
         btag_mod = 'btagSF'+year+'()'
         met_hlt_mod = 'MET_HLT_Filter_'+year+'()'
-        pu_mod = 'puWeight_'+year+'()'
+        pu_mod = 'puAutoWeight_'+year+'()'
         if ('Data' in sample.label):
             isMC = False
             presel = "Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter "
             if year == '2016' and sample.runP != 'H':
-                presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele32_WPTight_Gsf_v)"
+                presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Photon175 || HLT_Ele27_WPTight_Gsf)"
             elif year == '2016' and sample.runP == 'H':
-                presel += " && (HLT_PFHT900 || HLT_Mu50 || HLT_TkMu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele32_WPTight_Gsf_v)"
+                presel += " && (HLT_PFHT900 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Photon175 || HLT_Ele27_WPTight_Gsf)"
             elif year == '2017' and sample.runP != 'B':
-                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele35_WPTight_Gsf_v)"
+                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Photon200 || HLT_Ele35_WPTight_Gsf)"
             elif year == '2017' and sample.runP == 'B':
-                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele35_WPTight_Gsf_v)"
+                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele35_WPTight_Gsf)"
             elif year == '2018':
-                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele35_WPTight_Gsf_v)"
+                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele35_WPTight_Gsf)"
         else:
             isMC = True
             presel = ""
@@ -168,14 +172,14 @@ for sample in samples:
         print 'The flag isMC is: ' + str(isMC)
 
         print "Producing crab configuration file"
-        cfg_writer(sample, isMC, "Trigger")
+        cfg_writer(sample, isMC, "Wprime_final")
         
         if isMC:
-            modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), " + lep_mod + ", " + pu_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
+            modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), " + lep_mod + ", " + pu_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
             if for_trigger:
                 modules = met_hlt_mod + ", trigger_preselection(), " + lep_mod + ", " + pu_mod + ", PrefCorr()" # Put here all the modules you want to be runned by crab
         else:
-            modules = "preselection(), metCorrector(), fatJetCorrector()" # Put here all the modules you want to be runned by crab
+            modules = "preselection(), metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
             if for_trigger:
                 modules = "trigger_preselection()"
             
@@ -213,7 +217,7 @@ for sample in samples:
     elif getout:
         print "crab getoutput -d crab_" + sample.label + " --xrootd > ./macros/files/" + sample.label + ".txt"
         if for_trigger:
-            os.system("crab getoutput -d crab_" + sample.label + "_for_trigger --xrootd > ./macros/files/" + sample.label + ".txt")
+            os.system("crab getoutput -d crab_" + sample.label + "_for_trigger --xrootd > ./macros/files/" + sample.label + "_for_trigger.txt")
         else:
             os.system("crab getoutput -d crab_" + sample.label + " --xrootd > ./macros/files/" + sample.label + ".txt")
         #for i in xrange(1, 969):

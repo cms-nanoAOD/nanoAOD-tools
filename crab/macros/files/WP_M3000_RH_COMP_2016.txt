@@ -1,0 +1,2 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WprimeToTB_TToLep_M-3000_RH_TuneCUETP8M1_13TeV-comphep-pythia8/WP_M3000_RH_COMP_2016/201109_082857/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WprimeToTB_TToLep_M-3000_RH_TuneCUETP8M1_13TeV-comphep-pythia8/WP_M3000_RH_COMP_2016/201109_082857/0000/tree_hadd_2.root

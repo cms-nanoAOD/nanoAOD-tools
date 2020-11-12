@@ -1,7 +1,7 @@
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/200901_144759/0000/tree_hadd_2.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/200901_144759/0000/tree_hadd_7.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/200901_144759/0000/tree_hadd_5.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/200901_144759/0000/tree_hadd_6.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/200901_144759/0000/tree_hadd_4.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/200901_144759/0000/tree_hadd_3.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/OutDir/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/200901_144759/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/201108_131518/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/201108_131518/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/201108_131518/0000/tree_hadd_7.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/201108_131518/0000/tree_hadd_4.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/201108_131518/0000/tree_hadd_6.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/201108_131518/0000/tree_hadd_5.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/QCD_HT2000toInf_TuneCP5_13TeV-madgraph-pythia8/QCDHT_2000toInf_2017/201108_131518/0000/tree_hadd_1.root
