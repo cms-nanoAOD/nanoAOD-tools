@@ -144,6 +144,7 @@ getout = opt.gout
 #Writing the configuration file
 for sample in samples:
     for_trigger = False
+    print "For trigger: ", for_trigger
     print 'Launching sample ' + sample.label
     if submit:
         #Writing the script file 
@@ -172,8 +173,12 @@ for sample in samples:
         print 'The flag isMC is: ' + str(isMC)
 
         print "Producing crab configuration file"
-        cfg_writer(sample, isMC, "Wprime_final")
-        
+
+        if for_trigger:
+            cfg_writer(sample, isMC, "Trigger")
+        else:
+            cfg_writer(sample, isMC, "Wprime_final")
+
         if isMC:
             modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), " + lep_mod + ", " + pu_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
             if for_trigger:
