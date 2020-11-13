@@ -500,14 +500,14 @@ if opt.cut == "lepton_eta>-10." and not opt.sel:
      cut_tag = ""
 else:
      if opt.sel:
-          cut_dict = {'muon':"MET_pt>120&&lepton_pt>50&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 
-                      'electron':"MET_pt>120&&lepton_pt>120&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut
+          cut_dict = {'muon':"MET_pt>120&&lepton_pt>180&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut, 
+                      'electron':"MET_pt>120&&lepton_pt>180&&leadingjet_pt>300&&subleadingjet_pt>150&&" + cut
           }
-          cut_dict = {'muon':"MET_pt>120&&lepton_pt>180&&leadingjets_pt>350&&best_top_pt>250&&" + cut, 
-                      'electron':"MET_pt>120&&lepton_pt>180&&leadingjets_pt>350&&best_top_pt>250&&" + cut
-          }
+          #cut_dict = {'muon':"MET_pt>120&&lepton_pt>180&&leadingjets_pt>350&&best_top_pt>250&&" + cut, 
+          #            'electron':"MET_pt>120&&lepton_pt>180&&leadingjets_pt>350&&best_top_pt>250&&" + cut
+          #}
           if opt.cut != "lepton_eta>-10.":
-               cut_tag = 'selectionsoft_AND_' + cutToTag(opt.cut) 
+               cut_tag = 'selection_lep180_AND_' + cutToTag(opt.cut) 
           else:
                cut_tag = 'selection' 
      else:
