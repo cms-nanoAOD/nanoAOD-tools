@@ -130,7 +130,7 @@ class PostProcessor:
         if (self.histFileName is not None and self.histDirName is None) or (self.histFileName is None and self.histDirName is not None):
             raise RuntimeError(
                 "Must specify both histogram file and histogram directory!")
-        elif self.histFileName is not None and self.histDirName is None:
+        elif self.histFileName is not None and self.histDirName is not None:
             self.histFile = ROOT.TFile.Open(self.histFileName, "RECREATE")
         else:
             self.histFile = None
