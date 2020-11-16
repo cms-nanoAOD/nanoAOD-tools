@@ -249,16 +249,16 @@ class fatJetUncertaintiesProducer(Module):
         self.out.branch("%s_corr_JEC" % self.jetBranchName,
                         "F",
                         lenVar=self.lenVar)
+        self.out.branch("%s_corr_JMR" % self.jetBranchName,
+                        "F",
+                        lenVar=self.lenVar)
         self.out.branch("%s_corr_JER" % self.jetBranchName,
                         "F",
                         lenVar=self.lenVar)
         self.out.branch("%s_corr_JMS" % self.jetBranchName,
                         "F",
                         lenVar=self.lenVar)
-        self.out.branch("%s_corr_JMR" % self.jetBranchName,
-                        "F",
-                        lenVar=self.lenVar)
-
+        
         if self.doGroomed:
             self.out.branch("%s_msoftdrop_raw" % self.jetBranchName,
                             "F",
