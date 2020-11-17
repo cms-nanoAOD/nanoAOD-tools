@@ -12,7 +12,7 @@ import tempfile
 import shutil
 import numpy as np
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-
+pjoin = os.path.join
 
 class fatJetUncertaintiesProducer(Module):
     def __init__(
@@ -133,6 +133,7 @@ class fatJetUncertaintiesProducer(Module):
         # (downloaded from https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC )
         self.jesInputArchivePath = os.environ['CMSSW_BASE'] + \
             "/src/PhysicsTools/NanoAODTools/data/jme/"
+
         # Text files are now tarred so must extract first into temporary
         # directory (gets deleted during python memory management at script exit)
         self.jesArchive = tarfile.open(
@@ -148,8 +149,14 @@ class fatJetUncertaintiesProducer(Module):
             self.jesUncertaintyInputFileName = "Regrouped_" + \
                 globalTag + "_UncertaintySources_" + jetType + ".txt"
         else:
-            self.jesUncertaintyInputFileName = globalTag + \
-                "_UncertaintySources_" + jetType + ".txt"
+            self.jesGroupedFilePath = os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/jme/regrouped/"
+            self.jesGroupedUncertaintyFileName = "RegroupedV2_" + globalTag + "_UncertaintySources_" + jetType + ".txt"
+            self.jesGroupedUncertaintyFilePath = pjoin(self.jesGroupedFilePath, self.jesGroupedUncertaintyFileName)
+            # Copy the uncertainty source file to the tmp directory
+            shutil.copy(self.jesGroupedUncertaintyFilePath, pjoin(self.jesInputFilePath, self.jesGroupedUncertaintyFileName))
+            self.jesUncertaintyInputFileName = self.jesGroupedUncertaintyFileName
+            #self.jesUncertaintyInputFileName = "RegroupedV2_" + globalTag + "_UncertaintySources_" + jetType + ".txt"
+
 
         # read all uncertainty source names from the loaded file
         if jesUncertainties[0] in ["All", "Merged"]:
