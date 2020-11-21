@@ -68,6 +68,7 @@ def crab_script_writer(sample, outpath, isMC, modules, presel):
     f.write("from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.examples.MCweight_writer import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.examples.MET_HLT_Filter import *\n")
+    f.write("from PhysicsTools.NanoAODTools.postprocessing.examples.HLT_Filter import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.examples.preselection import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.examples.trigger_preselection import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.modules.common.PrefireCorr import *\n")
@@ -89,7 +90,9 @@ def crab_script_writer(sample, outpath, isMC, modules, presel):
         f.write("fatJetCorrector = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", runPeriod='"+str(sample.runP)+"', jesUncert='All', redojec=True, jetType = 'AK8PFchs')\n")
         f.write("metCorrector_tot = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", runPeriod='"+str(sample.runP)+"', jesUncert='Total', redojec=True)\n")
         f.write("fatJetCorrector_tot = createJMECorrector(isMC="+str(isMC)+", dataYear="+str(sample.year)+", runPeriod='"+str(sample.runP)+"', jesUncert='Total', redojec=True, jetType = 'AK8PFchs')\n")
+        f.write("HLT = HLT_fun('"+str(sample.year)+"', '"+str(sample.runP)+"')\n")
         f.write("p=PostProcessor('.', inputFiles(), '"+presel+"', modules=["+modules+"], provenance=True, fwkJobReport=True, jsonInput=runsAndLumis(), haddFileName='tree_hadd.root', outputbranchsel='keep_and_drop.txt')\n")#
+
     f.write("p.run()\n")
     f.write("print 'DONE'\n")
     f.close()
@@ -155,17 +158,7 @@ for sample in samples:
         pu_mod = 'puAutoWeight_'+year+'()'
         if ('Data' in sample.label):
             isMC = False
-            presel = "Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter "
-            if year == '2016' and sample.runP != 'H':
-                presel += " && (HLT_PFHT800 || HLT_PFHT900 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Photon175 || HLT_Ele27_WPTight_Gsf)"
-            elif year == '2016' and sample.runP == 'H':
-                presel += " && (HLT_PFHT900 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Photon175 || HLT_Ele27_WPTight_Gsf)"
-            elif year == '2017' and sample.runP != 'B':
-                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Photon200 || HLT_Ele35_WPTight_Gsf)"
-            elif year == '2017' and sample.runP == 'B':
-                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele35_WPTight_Gsf)"
-            elif year == '2018':
-                presel += " && (HLT_PFHT780 || HLT_PFHT890 || HLT_Mu50 || HLT_Ele115_CaloIdVT_GsfTrkIdT || HLT_Ele35_WPTight_Gsf)"
+            presel = "Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter "
         else:
             isMC = True
             presel = ""
@@ -176,17 +169,15 @@ for sample in samples:
 
         if for_trigger:
             cfg_writer(sample, isMC, "Trigger")
-        else:
-            cfg_writer(sample, isMC, "Wprime_final")
 
         if isMC:
             modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), " + lep_mod + ", " + pu_mod + ", " + btag_mod + ", PrefCorr(), metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
             if for_trigger:
                 modules = met_hlt_mod + ", trigger_preselection(), " + lep_mod + ", " + pu_mod + ", PrefCorr()" # Put here all the modules you want to be runned by crab
         else:
-            modules = "preselection(), metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
+            modules = "HLT(), preselection(), metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
             if for_trigger:
-                modules = "trigger_preselection()"
+                modules = "HLT(), trigger_preselection()"
             
         print "Producing crab script"
         crab_script_writer(sample,'/eos/user/'+str(os.environ.get('USER')[0]) + '/'+str(os.environ.get('USER'))+'/Wprime/nosynch/', isMC, modules, presel)

@@ -52,7 +52,7 @@ isMC = True
 scenarios = ["nominal", "jesUp", "jesDown", "jerUp", "jerDown"]
 if ('Data' in sample.label):
     isMC = False
-    scenario = ["nominal"]
+    scenarios = ["nominal"]
 MCReco = MCReco * isMC
 
 #++++++++++++++++++++++++++++++++++
@@ -500,6 +500,8 @@ def reco(scenario, isMC, addPDF, MCReco):
     #FatJet_nBHadrons UChar_tnumber of b-hadrons
     #FatJet_nCHadrons UChar_tnumber of c-hadrons
     
+    total_events = 1.
+    lumi = {'2016': 35.9, "2017": 41.53, "2018": 59.7}
     #++++++++++++++++++++++++++++++++++
     #++   branching the new trees    ++
     #++++++++++++++++++++++++++++++++++
@@ -784,20 +786,10 @@ def reco(scenario, isMC, addPDF, MCReco):
         h_PDFweight = ROOT.TH1F()
         h_PDFweight.SetNameTitle("h_PDFweight","h_PDFweight")
         for infile in file_list: 
-            #if Debug:
-            #print(infile)
-            #print("entered file_list loop #3")    
-            #print("Getting the histos from %s" %(infile))
             newfile = ROOT.TFile.Open(infile)
             dirc = ROOT.TDirectory()
             dirc = newfile.Get("plots")
             h_genw_tmp = ROOT.TH1F(dirc.Get("h_genweight"))
-            #if Debug:
-            #print("in newfile: ")
-            #dirc.Get("h_genweight").Print()
-            #print("in macro: ")
-            #h_genw_tmp.Print()
-            
             if(dirc.GetListOfKeys().Contains("h_PDFweight")):
                 h_pdfw_tmp = ROOT.TH1F(dirc.Get("h_PDFweight"))
                 
@@ -811,8 +803,7 @@ def reco(scenario, isMC, addPDF, MCReco):
                 h_genweight.SetBins(h_genw_tmp.GetXaxis().GetNbins(), h_genw_tmp.GetXaxis().GetXmin(), h_genw_tmp.GetXaxis().GetXmax())
             h_genweight.Add(h_genw_tmp)
         print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
-        
-    lheweight = h_genweight.GetBinContent(2)/h_genweight.GetBinContent(1)
+        lheweight = h_genweight.GetBinContent(2)/h_genweight.GetBinContent(1)
     
     #++++++++++++++++++++++++++++++++++
     #++      Efficiency studies      ++
@@ -850,23 +841,7 @@ def reco(scenario, isMC, addPDF, MCReco):
         PV = Object(event, "PV")
         HLT = Object(event, "HLT")
         Flag = Object(event, 'Flag')
-        met = Object(event, "MET")
-        LHEScaleWeight = Collection(event, 'LHEScaleWeight')
-
-        lheSF = 1.
-        lheUp = 1.
-        lheDown = 1.
-        if len(LHEScaleWeight) > 1:
-            lhemin = min([LHEScaleWeight[g].__getattr__("") for g in range(len(LHEScaleWeight))])
-            lhemax = max([LHEScaleWeight[g].__getattr__("") for g in range(len(LHEScaleWeight))])
-            lheSF = lheweight * LHEScaleWeight[4].__getattr__("")
-            lheUp = lheweight * lhemax
-            lheDown = lheweight * lhemin
-            
-        systTree.setWeightName("LHESF", copy.deepcopy(lheSF))
-        systTree.setWeightName("LHEUp", copy.deepcopy(lheUp))
-        systTree.setWeightName("LHEDown", copy.deepcopy(lheDown))
-        
+        met = Object(event, "MET")        
         MET = {'metPx': met.pt*ROOT.TMath.Cos(met.phi), 'metPy': met.pt*ROOT.TMath.Sin(met.phi)}
         genpart = None
         
@@ -875,6 +850,21 @@ def reco(scenario, isMC, addPDF, MCReco):
         if isMC:
             genpart = Collection(event, "GenPart")
             LHE = Collection(event, "LHEPart")
+            LHEScaleWeight = Collection(event, 'LHEScaleWeight')
+            lheSF = 1.
+            lheUp = 1.
+            lheDown = 1.
+            if len(LHEScaleWeight) > 1:
+                lhemin = min([LHEScaleWeight[g].__getattr__("") for g in range(len(LHEScaleWeight))])
+                lhemax = max([LHEScaleWeight[g].__getattr__("") for g in range(len(LHEScaleWeight))])
+                lheSF = lheweight * LHEScaleWeight[4].__getattr__("")
+                lheUp = lheweight * lhemax
+                lheDown = lheweight * lhemin
+            
+            systTree.setWeightName("LHESF", copy.deepcopy(lheSF))
+            systTree.setWeightName("LHEUp", copy.deepcopy(lheUp))
+            systTree.setWeightName("LHEDown", copy.deepcopy(lheDown))
+
         chain.GetEntry(i)
 
         if scenario == 'jesUp':
@@ -913,16 +903,6 @@ def reco(scenario, isMC, addPDF, MCReco):
                 fatjet.pt = fatjet.pt_jerDown
                 fatjet.mass = fatjet.mass_jerDown 
                 fatjet.msoftdrop = fatjet.msoftdrop_jerDown
-            
-        if i == 1:
-            print MET['metPx']
-            for jet in jets:
-                print "jet pt is ", jet.pt
-                print "jet mass is ", jet.mass
-            for fatjet in fatjets: 
-                print "fatjet pt is ", fatjet.pt
-                print "fatjet mass is ", fatjet.mass
-                print "fatjet msoftdrop is ", fatjet.msoftdrop
         #++++++++++++++++++++++++++++++++++
         #++      defining variables      ++
         #++++++++++++++++++++++++++++++++++
@@ -955,7 +935,6 @@ def reco(scenario, isMC, addPDF, MCReco):
         passed_mu_nominal[0] = int(passMu)
         passed_ele_nominal[0] = int(passEle)
         passed_ht_nominal[0] = int(passHT)
-        isDilepton = False
         isMuon = (len(goodMu) == 1) and (len(goodEle) == 0) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT)
         isElectron = (len(goodMu) == 0) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passEle or passHT)
 
@@ -1214,7 +1193,7 @@ def reco(scenario, isMC, addPDF, MCReco):
                 else:
                     continue
 
-            ##print gentop, genbott
+            ##print(gentop, genbott)
             if gentopFound and genbottFound:
                 genWprime_p4 = gentop_p4 + genbott_p4
                 GenPart_Wprime_m_nominal[0] = genWprime_p4.M()
@@ -2111,10 +2090,11 @@ def reco(scenario, isMC, addPDF, MCReco):
             h_eff_ele.Write()
     systTree.writeTreesSysts(trees, outTreeFile)
     print("Number of events in output tree nominal " + str(trees[0].GetEntries()))
-    print("Number of events in output tree jesUp " + str(trees[1].GetEntries()))
-    print("Number of events in output tree jesDown " + str(trees[2].GetEntries()))
-    print("Number of events in output tree jerUp " + str(trees[3].GetEntries()))
-    print("Number of events in output tree jerDown " + str(trees[4].GetEntries()))
+    if isMC:
+        print("Number of events in output tree jesUp " + str(trees[1].GetEntries()))
+        print("Number of events in output tree jesDown " + str(trees[2].GetEntries()))
+        print("Number of events in output tree jerUp " + str(trees[3].GetEntries()))
+        print("Number of events in output tree jerDown " + str(trees[4].GetEntries()))
 
 for scenario in scenarios:
     reco(scenario, isMC, addPDF, MCReco)
