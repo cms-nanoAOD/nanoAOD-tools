@@ -746,7 +746,7 @@ TT_Mtt1000toInf_2017.year = 2017
 TT_Mtt1000toInf_2017.dataset = "/TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8/"+tag_2017+"-v1/NANOAODSIM"
 #TT_Mtt1000toInf_2017.files = jr.json_reader(path+"/TT_Mtt1000toInf_2017.json")
 
-TT_semilep_2017 = sample(ROOT.kRed, 1, 1001, "t#bar{t}", "TT_SemiLep2017")
+TT_semilep_2017 = sample(ROOT.kRed, 1, 1001, "t#bar{t}", "TT_SemiLep_2017")
 TT_semilep_2017.sigma = 831.76*0.438
 TT_semilep_2017.year = 2017
 TT_semilep_2017.dataset = "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/"+tag2_2017+"-v1/NANOAODSIM"

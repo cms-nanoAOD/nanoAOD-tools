@@ -51,7 +51,8 @@ def mergepart(dataset):
           print add
           os.system(str(add))
           check = ROOT.TFile.Open(filerepo + sample.label + "/"  + sample.label + "_merged.root ")
-          print "Number of entries of the file %s are %s" %(filerepo + sample.label + "/"  + sample.label + "_merged.root", (check.Get("events_nominal")).GetEntries())
+          #print "Number of entries of the file %s are %s" %(filerepo + sample.label + "/"  + sample.label + "_merged.root", (check.Get("events_nominal")).GetEntries())
+          print "Number of entries of the file %s are %s" %(filerepo + sample.label + "/"  + sample.label + "_merged.root", (check.Get("events_all")).GetEntries())
 
 def mergetree(sample):
      if not os.path.exists(filerepo + sample.label):

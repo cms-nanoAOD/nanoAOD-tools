@@ -191,10 +191,7 @@ def reco(scenario, isMC, addPDF, MCReco):
     closest_RecoTop_chi2_nominal = array.array('i', [0])
     closest_RecoTop_costheta_nominal = array.array('f', [0.])
     closest_RecoTop_costhetalep_nominal = array.array('f', [0.])
-    if isMC:
-        closest_RecoTop_btagSF_nominal = array.array('f', [1.])
-        closest_RecoTop_btagUp_nominal = array.array('f', [1.])
-        closest_RecoTop_btagDown_nominal = array.array('f', [1.])
+
     chi_RecoTop_pt_nominal = array.array('f', [0.])
     chi_RecoTop_eta_nominal = array.array('f', [0.])
     chi_RecoTop_phi_nominal = array.array('f', [0.])
@@ -204,10 +201,7 @@ def reco(scenario, isMC, addPDF, MCReco):
     chi_RecoTop_chi2_nominal = array.array('i', [0])
     chi_RecoTop_costheta_nominal = array.array('f', [0.])
     chi_RecoTop_costhetalep_nominal = array.array('f', [0.])
-    if isMC:
-        chi_RecoTop_btagSF_nominal = array.array('f', [1.])
-        chi_RecoTop_btagUp_nominal = array.array('f', [1.])
-        chi_RecoTop_btagDown_nominal = array.array('f', [1.])
+
     sublead_RecoTop_pt_nominal = array.array('f', [0.])
     sublead_RecoTop_eta_nominal = array.array('f', [0.])
     sublead_RecoTop_phi_nominal = array.array('f', [0.])
@@ -217,10 +211,7 @@ def reco(scenario, isMC, addPDF, MCReco):
     sublead_RecoTop_chi2_nominal = array.array('i', [0])
     sublead_RecoTop_costheta_nominal = array.array('f', [0.])
     sublead_RecoTop_costhetalep_nominal = array.array('f', [0.])
-    if isMC:
-        sublead_RecoTop_btagSF_nominal = array.array('f', [1.])
-        sublead_RecoTop_btagUp_nominal = array.array('f', [1.])
-        sublead_RecoTop_btagDown_nominal = array.array('f', [1.])
+
     best_RecoTop_pt_nominal = array.array('f', [0.])
     best_RecoTop_eta_nominal = array.array('f', [0.])
     best_RecoTop_phi_nominal = array.array('f', [0.])
@@ -230,10 +221,6 @@ def reco(scenario, isMC, addPDF, MCReco):
     best_RecoTop_chi2_nominal = array.array('i', [0])
     best_RecoTop_costheta_nominal = array.array('f', [0.])
     best_RecoTop_costhetalep_nominal = array.array('f', [0.])
-    if isMC:
-        best_RecoTop_btagSF_nominal = array.array('f', [1.])
-        best_RecoTop_btagUp_nominal = array.array('f', [1.])
-        best_RecoTop_btagDown_nominal = array.array('f', [1.])
         
     nJet_lowpt_nominal = array.array('i', [0])
     nfatJet_nominal = array.array('i', [0])
@@ -255,30 +242,21 @@ def reco(scenario, isMC, addPDF, MCReco):
     closest_TopJet_m_nominal = array.array('f', [0.])
     closest_TopJet_isBTagged_nominal = array.array('i', [0])
     closest_TopJet_dRLepJet_nominal = array.array('f', [0])
-    if isMC:
-        closest_TopJet_btagSF_nominal = array.array('f', [1.])
-        closest_TopJet_btagUp_nominal = array.array('f', [1.])
-        closest_TopJet_btagDown_nominal = array.array('f', [1.])
+
     chi_TopJet_pt_nominal = array.array('f', [0.])
     chi_TopJet_eta_nominal = array.array('f', [0.])
     chi_TopJet_phi_nominal = array.array('f', [0.])
     chi_TopJet_m_nominal = array.array('f', [0.])
     chi_TopJet_isBTagged_nominal = array.array('i', [0])
     chi_TopJet_dRLepJet_nominal = array.array('f', [0])
-    if isMC:
-        chi_TopJet_btagSF_nominal = array.array('f', [1.])
-        chi_TopJet_btagUp_nominal = array.array('f', [1.])
-        chi_TopJet_btagDown_nominal = array.array('f', [1.])
+
     sublead_TopJet_pt_nominal = array.array('f', [0.])
     sublead_TopJet_eta_nominal = array.array('f', [0.])
     sublead_TopJet_phi_nominal = array.array('f', [0.])
     sublead_TopJet_m_nominal = array.array('f', [0.])
     sublead_TopJet_isBTagged_nominal = array.array('i', [0])
     sublead_TopJet_dRLepJet_nominal = array.array('f', [0])
-    if isMC:
-        sublead_TopJet_btagSF_nominal = array.array('f', [1.])
-        sublead_TopJet_btagUp_nominal = array.array('f', [1.])
-        sublead_TopJet_btagDown_nominal = array.array('f', [1.])
+
     best_TopJet_pt_nominal = array.array('f', [0.])
     best_TopJet_eta_nominal = array.array('f', [0.])
     best_TopJet_phi_nominal = array.array('f', [0.])
@@ -289,9 +267,6 @@ def reco(scenario, isMC, addPDF, MCReco):
     if isMC:
         best_TopJet_hadronflv_nominal = array.array('f', [1.])
         best_TopJet_partonflv_nominal = array.array('f', [1.])
-        best_TopJet_btagSF_nominal = array.array('f', [1.])
-        best_TopJet_btagUp_nominal = array.array('f', [1.])
-        best_TopJet_btagDown_nominal = array.array('f', [1.])
         
     Event_HT_nominal = array.array('f', [0.])
     
@@ -337,28 +312,19 @@ def reco(scenario, isMC, addPDF, MCReco):
     closest_WpJet_phi_nominal = array.array('f', [0.])
     closest_WpJet_m_nominal = array.array('f', [0.])
     closest_WpJet_isBTagged_nominal = array.array('i', [0])
-    if isMC:
-        closest_WpJet_btagSF_nominal = array.array('f', [1.])
-        closest_WpJet_btagUp_nominal = array.array('f', [1.])
-        closest_WpJet_btagDown_nominal = array.array('f', [1.])
+
     chi_WpJet_pt_nominal = array.array('f', [0.])
     chi_WpJet_eta_nominal = array.array('f', [0.])
     chi_WpJet_phi_nominal = array.array('f', [0.])
     chi_WpJet_m_nominal = array.array('f', [0.])
     chi_WpJet_isBTagged_nominal = array.array('i', [0])
-    if isMC:
-        chi_WpJet_btagSF_nominal = array.array('f', [1.])
-        chi_WpJet_btagUp_nominal = array.array('f', [1.])
-        chi_WpJet_btagDown_nominal = array.array('f', [1.])
+
     sublead_WpJet_pt_nominal = array.array('f', [0.])
     sublead_WpJet_eta_nominal = array.array('f', [0.])
     sublead_WpJet_phi_nominal = array.array('f', [0.])
     sublead_WpJet_m_nominal = array.array('f', [0.])
     sublead_WpJet_isBTagged_nominal = array.array('i', [0])
-    if isMC:
-        sublead_WpJet_btagSF_nominal = array.array('f', [1.])
-        sublead_WpJet_btagUp_nominal = array.array('f', [1.])
-        sublead_WpJet_btagDown_nominal = array.array('f', [1.])
+
     best_WpJet_pt_nominal = array.array('f', [0.])
     best_WpJet_eta_nominal = array.array('f', [0.])
     best_WpJet_phi_nominal = array.array('f', [0.])
@@ -368,9 +334,6 @@ def reco(scenario, isMC, addPDF, MCReco):
     if isMC:
         best_WpJet_hadronflv_nominal = array.array('f', [0])
         best_WpJet_partonflv_nominal = array.array('f', [0])
-        best_WpJet_btagSF_nominal = array.array('f', [1.])
-        best_WpJet_btagUp_nominal = array.array('f', [1.])
-        best_WpJet_btagDown_nominal = array.array('f', [1.])
         
         '''
         closest_WpJet_isDFL_nominal = array.array('i', [0])
@@ -618,30 +581,21 @@ def reco(scenario, isMC, addPDF, MCReco):
     systTree.branchTreesSysts(trees, scenario, "closest_topjet_m", outTreeFile, closest_TopJet_m_nominal)
     systTree.branchTreesSysts(trees, scenario, "closest_topjet_isbtag", outTreeFile, closest_TopJet_isBTagged_nominal)
     systTree.branchTreesSysts(trees, scenario, "closest_topjet_dRLepJet", outTreeFile, closest_TopJet_dRLepJet_nominal)
-    if isMC:
-        systTree.branchTreesSysts(trees, scenario, "closest_topjet_btagSF", outTreeFile, closest_TopJet_btagSF_nominal)
-        systTree.branchTreesSysts(trees, scenario, "closest_topjet_btagUp", outTreeFile, closest_TopJet_btagUp_nominal)
-        systTree.branchTreesSysts(trees, scenario, "closest_topjet_btagDowm", outTreeFile, closest_TopJet_btagDown_nominal)
+
     systTree.branchTreesSysts(trees, scenario, "chi_topjet_pt", outTreeFile, chi_TopJet_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "chi_topjet_eta", outTreeFile, chi_TopJet_eta_nominal)
     systTree.branchTreesSysts(trees, scenario, "chi_topjet_phi", outTreeFile, chi_TopJet_phi_nominal)
     systTree.branchTreesSysts(trees, scenario, "chi_topjet_m", outTreeFile, chi_TopJet_m_nominal)
     systTree.branchTreesSysts(trees, scenario, "chi_topjet_isbtag", outTreeFile, chi_TopJet_isBTagged_nominal)
     systTree.branchTreesSysts(trees, scenario, "chi_topjet_dRLepJet", outTreeFile, chi_TopJet_dRLepJet_nominal)
-    if isMC:
-        systTree.branchTreesSysts(trees, scenario, "chi_topjet_btagSF", outTreeFile, chi_TopJet_btagSF_nominal)
-        systTree.branchTreesSysts(trees, scenario, "chi_topjet_btagUp", outTreeFile, chi_TopJet_btagUp_nominal)
-        systTree.branchTreesSysts(trees, scenario, "chi_topjet_btagDowm", outTreeFile, chi_TopJet_btagDown_nominal)
+
     systTree.branchTreesSysts(trees, scenario, "sublead_topjet_pt", outTreeFile, sublead_TopJet_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "sublead_topjet_eta", outTreeFile, sublead_TopJet_eta_nominal)
     systTree.branchTreesSysts(trees, scenario, "sublead_topjet_phi", outTreeFile, sublead_TopJet_phi_nominal)
     systTree.branchTreesSysts(trees, scenario, "sublead_topjet_m", outTreeFile, sublead_TopJet_m_nominal)
     systTree.branchTreesSysts(trees, scenario, "sublead_topjet_isbtag", outTreeFile, sublead_TopJet_isBTagged_nominal)
     systTree.branchTreesSysts(trees, scenario, "sublead_topjet_dRLepJet", outTreeFile, sublead_TopJet_dRLepJet_nominal)
-    if isMC:
-        systTree.branchTreesSysts(trees, scenario, "sublead_topjet_btagSF", outTreeFile, sublead_TopJet_btagSF_nominal)
-        systTree.branchTreesSysts(trees, scenario, "sublead_topjet_btagUp", outTreeFile, sublead_TopJet_btagUp_nominal)
-        systTree.branchTreesSysts(trees, scenario, "sublead_topjet_btagDowm", outTreeFile, sublead_TopJet_btagDown_nominal)
+
     systTree.branchTreesSysts(trees, scenario, "best_topjet_pt", outTreeFile, best_TopJet_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "best_topjet_eta", outTreeFile, best_TopJet_eta_nominal)
     systTree.branchTreesSysts(trees, scenario, "best_topjet_phi", outTreeFile, best_TopJet_phi_nominal)
@@ -652,9 +606,6 @@ def reco(scenario, isMC, addPDF, MCReco):
     if isMC:
         systTree.branchTreesSysts(trees, scenario, "best_topjet_hadronflv", outTreeFile, best_TopJet_hadronflv_nominal)
         systTree.branchTreesSysts(trees, scenario, "best_topjet_partonflv", outTreeFile, best_TopJet_partonflv_nominal)
-        systTree.branchTreesSysts(trees, scenario, "best_topjet_btagSF", outTreeFile, best_TopJet_btagSF_nominal)
-        systTree.branchTreesSysts(trees, scenario, "best_topjet_btagUp", outTreeFile, best_TopJet_btagUp_nominal)
-        systTree.branchTreesSysts(trees, scenario, "best_topjet_btagDowm", outTreeFile, best_TopJet_btagDown_nominal)
 
     if MCReco:
         systTree.branchTreesSysts(trees, scenario, "MC_Wpjet_pt", outTreeFile, MC_WpJet_pt_nominal)
@@ -670,28 +621,19 @@ def reco(scenario, isMC, addPDF, MCReco):
     systTree.branchTreesSysts(trees, scenario, "closest_Wpjet_phi", outTreeFile, closest_WpJet_phi_nominal)
     systTree.branchTreesSysts(trees, scenario, "closest_Wpjet_m", outTreeFile, closest_WpJet_m_nominal)
     systTree.branchTreesSysts(trees, scenario, "closest_Wpjet_isbtag", outTreeFile, closest_WpJet_isBTagged_nominal)
-    if isMC:
-        systTree.branchTreesSysts(trees, scenario, "closest_Wpjet_btagSF", outTreeFile, closest_WpJet_btagSF_nominal)
-        systTree.branchTreesSysts(trees, scenario, "closest_Wpjet_btagUp", outTreeFile, closest_WpJet_btagUp_nominal)
-        systTree.branchTreesSysts(trees, scenario, "closest_Wpjet_btagDowm", outTreeFile, closest_WpJet_btagDown_nominal)
+
     systTree.branchTreesSysts(trees, scenario, "chi_Wpjet_pt", outTreeFile, chi_WpJet_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "chi_Wpjet_eta", outTreeFile, chi_WpJet_eta_nominal)
     systTree.branchTreesSysts(trees, scenario, "chi_Wpjet_phi", outTreeFile, chi_WpJet_phi_nominal)
     systTree.branchTreesSysts(trees, scenario, "chi_Wpjet_m", outTreeFile, chi_WpJet_m_nominal)
     systTree.branchTreesSysts(trees, scenario, "chi_Wpjet_isbtag", outTreeFile, chi_WpJet_isBTagged_nominal)
-    if isMC:
-        systTree.branchTreesSysts(trees, scenario, "chi_Wpjet_btagSF", outTreeFile, chi_WpJet_btagSF_nominal)
-        systTree.branchTreesSysts(trees, scenario, "chi_Wpjet_btagUp", outTreeFile, chi_WpJet_btagUp_nominal)
-        systTree.branchTreesSysts(trees, scenario, "chi_Wpjet_btagDowm", outTreeFile, chi_WpJet_btagDown_nominal)
+
     systTree.branchTreesSysts(trees, scenario, "sublead_Wpjet_pt", outTreeFile, sublead_WpJet_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "sublead_Wpjet_eta", outTreeFile, sublead_WpJet_eta_nominal)
     systTree.branchTreesSysts(trees, scenario, "sublead_Wpjet_phi", outTreeFile, sublead_WpJet_phi_nominal)
     systTree.branchTreesSysts(trees, scenario, "sublead_Wpjet_m", outTreeFile, sublead_WpJet_m_nominal)
     systTree.branchTreesSysts(trees, scenario, "sublead_Wpjet_isbtag", outTreeFile, sublead_WpJet_isBTagged_nominal)
-    if isMC:
-        systTree.branchTreesSysts(trees, scenario, "sublead_Wpjet_btagSF", outTreeFile, sublead_WpJet_btagSF_nominal)
-        systTree.branchTreesSysts(trees, scenario, "sublead_Wpjet_btagUp", outTreeFile, sublead_WpJet_btagUp_nominal)
-        systTree.branchTreesSysts(trees, scenario, "sublead_Wpjet_btagDowm", outTreeFile, sublead_WpJet_btagDown_nominal)
+
     systTree.branchTreesSysts(trees, scenario, "best_Wpjet_pt", outTreeFile, best_WpJet_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "best_Wpjet_eta", outTreeFile, best_WpJet_eta_nominal)
     systTree.branchTreesSysts(trees, scenario, "best_Wpjet_phi", outTreeFile, best_WpJet_phi_nominal)
@@ -701,9 +643,7 @@ def reco(scenario, isMC, addPDF, MCReco):
     if isMC:
         systTree.branchTreesSysts(trees, scenario, "best_Wpjet_hadronflv", outTreeFile, best_WpJet_hadronflv_nominal)
         systTree.branchTreesSysts(trees, scenario, "best_Wpjet_partonflv", outTreeFile, best_WpJet_partonflv_nominal)
-        systTree.branchTreesSysts(trees, scenario, "best_Wpjet_btagSF", outTreeFile, best_WpJet_btagSF_nominal)
-        systTree.branchTreesSysts(trees, scenario, "best_Wpjet_btagUp", outTreeFile, best_WpJet_btagUp_nominal)
-        systTree.branchTreesSysts(trees, scenario, "best_Wpjet_btagDowm", outTreeFile, best_WpJet_btagDown_nominal)
+
     systTree.branchTreesSysts(trees, scenario, "lepton_pt", outTreeFile, lepton_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "lepton_eta", outTreeFile, lepton_eta_nominal)
     systTree.branchTreesSysts(trees, scenario, "lepton_phi", outTreeFile, lepton_phi_nominal)
@@ -1078,6 +1018,16 @@ def reco(scenario, isMC, addPDF, MCReco):
             systTree.setWeightName("puUp", copy.deepcopy(PU_SFUp))
             systTree.setWeightName("puDown", copy.deepcopy(PU_SFDown))
             
+            btagSF, btagUp, btagDown = btagcalc(goodJets)
+            systTree.setWeightName("btagSF", copy.deepcopy(btagSF))
+            systTree.setWeightName("btagUp", copy.deepcopy(btagUp))
+            systTree.setWeightName("btagDown", copy.deepcopy(btagDown))
+
+            mistagSF, mistagUp, mistagDown = mistagcalc(goodJets)
+            systTree.setWeightName("mistagSF", copy.deepcopy(mistagSF))
+            systTree.setWeightName("mistagUp", copy.deepcopy(mistagUp))
+            systTree.setWeightName("mistagDown", copy.deepcopy(mistagDown))
+
         recomet_p4t = ROOT.TLorentzVector()
         recomet_p4t.SetPtEtaPhiM(met.pt, 0., met.phi, 0)
         
@@ -1494,14 +1444,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             ##print(chi_jet_p4.Print())
             ##print(chi_promptjet_p4.Print())
             
-        if isMC:
-            chi_topjet_btagSF = chi_jet.btagSF_deepjet_M
-            chi_Wpjet_btagSF = chi_promptjet.btagSF_deepjet_M
-            chi_topjet_btagUp = chi_jet.btagSF_deepjet_M_up
-            chi_Wpjet_btagUp = chi_promptjet.btagSF_deepjet_M_up
-            chi_topjet_btagDown = chi_jet.btagSF_deepjet_M_down
-            chi_Wpjet_btagDown = chi_promptjet.btagSF_deepjet_M_down
-            
         ## Chi top reconstruction
         chi_recotop_p4, IsNeg_chi, chi_dR_lepjet = recotop.top4Momentum(tightlep.p4(), chi_jet_p4, MET['metPx'], MET['metPy'])
         IsNeg_chi = IsNeg_chi * DeltaFilter
@@ -1569,15 +1511,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             ##print(closest_jet_p4.Print())
             ##print(closest_promptjet_p4.Print())
             
-        if isMC:
-            closest_topjet_btagSF = closest_jet.btagSF_deepjet_M
-            closest_Wpjet_btagSF = closest_promptjet.btagSF_deepjet_M
-            closest_topjet_btagUp = closest_jet.btagSF_deepjet_M_up
-            closest_Wpjet_btagUp = closest_promptjet.btagSF_deepjet_M_up
-            closest_topjet_btagDown = closest_jet.btagSF_deepjet_M_down
-            closest_Wpjet_btagDown = closest_promptjet.btagSF_deepjet_M_down
-            ##print("closest_btagSF: ", closest_btagSF)
-            
         ## Closest top reconstruction
         closest_recotop_p4, IsNeg_closest, closest_dR_lepjet = recotop.top4Momentum(tightlep.p4(), closest_jet_p4, MET['metPx'], MET['metPy'])
         IsNeg_closest = IsNeg_closest * DeltaFilter
@@ -1630,14 +1563,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             sublead_promptjet_p4 = sublead_promptjet.p4()
             ##print(sublead_jet_p4.Print())
             ##print(sublead_promptjet_p4.Print())
-            
-        if isMC:
-            sublead_topjet_btagSF = sublead_jet.btagSF_deepjet_M
-            sublead_Wpjet_btagSF = sublead_promptjet.btagSF_deepjet_M
-            sublead_topjet_btagUp = sublead_jet.btagSF_deepjet_M_up
-            sublead_Wpjet_btagUp = sublead_promptjet.btagSF_deepjet_M_up
-            sublead_topjet_btagDown = sublead_jet.btagSF_deepjet_M_down
-            sublead_Wpjet_btagDown = sublead_promptjet.btagSF_deepjet_M_down
             
         ## Subleading top reconstruction
         sublead_recotop_p4, IsNeg_sublead, sublead_dR_lepjet = recotop.top4Momentum(tightlep.p4(), sublead_jet_p4, MET['metPx'], MET['metPy'])
@@ -1705,14 +1630,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             
             ##print("best_topjet: ", best_jet, "best_promptjet", best_promptjet)
             
-        if isMC:
-            best_topjet_btagSF = best_jet.btagSF_deepjet_M
-            best_Wpjet_btagSF = best_promptjet.btagSF_deepjet_M
-            best_topjet_btagUp = best_jet.btagSF_deepjet_M_up
-            best_Wpjet_btagUp = best_promptjet.btagSF_deepjet_M_up
-            best_topjet_btagDown = best_jet.btagSF_deepjet_M_down
-            best_Wpjet_btagDown = best_promptjet.btagSF_deepjet_M_down
-            
         IsNeg_best = IsNeg_best * DeltaFilter
         best_jet_p4t = copy.deepcopy(best_jet_p4)
         best_jet_p4t.SetPz(0.)
@@ -1771,22 +1688,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             closest_WpJet_eta_nominal[0] = closest_promptjet.p4().Eta()
             closest_WpJet_phi_nominal[0] = closest_promptjet.p4().Phi()
             closest_WpJet_isBTagged_nominal[0] = copy.deepcopy(is_closest_Wpjet_btag) #int(len(bjet_filter([closest_promptjet], 'DeepFlv', 'M')[0]))
-            if isMC:
-                closest_TopJet_btagSF_nominal[0] = copy.deepcopy((closest_topjet_btagSF-1.)*is_closest_topjet_btag + 1.)
-                closest_TopJet_btagUp_nominal[0] = copy.deepcopy((closest_topjet_btagUp-1.)*is_closest_topjet_btag + 1.)
-                closest_TopJet_btagDown_nominal[0] = copy.deepcopy((closest_topjet_btagDown-1.)*is_closest_topjet_btag + 1.)
-                #if Debug:
-                #print("closest_topjet_btagSF: ", closest_topjet_btagSF, " is_btag: ", is_closest_topjet_btag, " saved btagSF: ", closest_TopJet_btagSF_nominal[0])
-                #print("closest_topjet_btagUp: ", closest_topjet_btagUp, " is_btag: ", is_closest_topjet_btag, " saved btagUp: ", closest_TopJet_btagUp_nominal[0])
-                #print("closest_topjet_btagDown: ", closest_topjet_btagDown, " is_btag: ", is_closest_topjet_btag, " saved btagDown: ", closest_TopJet_btagDown_nominal[0])
-                closest_WpJet_btagSF_nominal[0] = copy.deepcopy((closest_Wpjet_btagSF-1.)*is_closest_Wpjet_btag + 1.)
-                closest_WpJet_btagUp_nominal[0] = copy.deepcopy((closest_Wpjet_btagUp-1.)*is_closest_Wpjet_btag + 1.)
-                closest_WpJet_btagDown_nominal[0] = copy.deepcopy((closest_Wpjet_btagDown-1.)*is_closest_Wpjet_btag + 1.)
-                #if Debug:
-                #print("closest_Wpjet_btagSF: ", closest_Wpjet_btagSF, " is_btag: ", is_closest_Wpjet_btag, " saved btagSF: ", closest_WpJet_btagSF_nominal[0])
-                #print("closest_Wpjet_btagUp: ", closest_Wpjet_btagUp, " is_btag: ", is_closest_Wpjet_btag, " saved btagUp: ", closest_WpJet_btagUp_nominal[0])
-                #print("closest_Wpjet_btagDown: ", closest_Wpjet_btagDown, " is_btag: ", is_closest_Wpjet_btag, " saved btagDown: ", closest_WpJet_btagDown_nominal[0])
-                
             ##print("closest_WpJet_isBTagged: ", closest_WpJet_isBTagged_nominal[0])
             ##print( "closest W' mass: ", closest_Wprime_p4.M())
         else:
@@ -1812,13 +1713,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             closest_WpJet_eta_nominal[0] = -100.
             closest_WpJet_phi_nominal[0] = -100.
             closest_WpJet_isBTagged_nominal[0] = -1
-            if isMC:
-                closest_TopJet_btagSF_nominal[0] = 0.
-                closest_TopJet_btagUp_nominal[0] = 0.
-                closest_TopJet_btagDown_nominal[0] = 0.
-                closest_WpJet_btagSF_nominal[0] = 0.
-                closest_WpJet_btagUp_nominal[0] = 0.
-                closest_WpJet_btagDown_nominal[0] = 0.
 
         if chi_recotop_p4 != None and tightlep != None:
             chi_Wprime_p4 = chi_recotop_p4 + chi_promptjet.p4()
@@ -1853,21 +1747,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             chi_topW_jets_pt[0] = (chi_jet_p4 + chi_promptjet.p4()).Pt()
             chi_topW_jets_deltaR[0] = deltaR(chi_jet_p4.Eta(), chi_jet_p4.Phi(), chi_promptjet.p4().Eta(), chi_promptjet.p4().Phi())
             chi_topW_jets_deltaphi[0] = deltaPhi(chi_jet_p4.Phi(), chi_promptjet.p4().Phi())
-            if isMC:
-                chi_TopJet_btagSF_nominal[0] = copy.deepcopy((chi_topjet_btagSF-1.)*is_chi_topjet_btag + 1.)
-                chi_TopJet_btagUp_nominal[0] = copy.deepcopy((chi_topjet_btagUp-1.)*is_chi_topjet_btag + 1.)
-                chi_TopJet_btagDown_nominal[0] = copy.deepcopy((chi_topjet_btagDown-1.)*is_chi_topjet_btag + 1.)
-                #if Debug:
-                #print("chi_topjet_btagSF: ", chi_topjet_btagSF, " is_btag: ", is_chi_topjet_btag, " saved btagSF: ", chi_TopJet_btagSF_nominal[0])
-                #print("chi_topjet_btagUp: ", chi_topjet_btagUp, " is_btag: ", is_chi_topjet_btag, " saved btagUp: ", chi_TopJet_btagUp_nominal[0])
-                #print("chi_topjet_btagDown: ", chi_topjet_btagDown, " is_btag: ", is_chi_topjet_btag, " saved btagDown: ", chi_TopJet_btagDown_nominal[0])
-                chi_WpJet_btagSF_nominal[0] = copy.deepcopy((chi_Wpjet_btagSF-1.)*is_chi_Wpjet_btag + 1.)
-                chi_WpJet_btagUp_nominal[0] = copy.deepcopy((chi_Wpjet_btagUp-1.)*is_chi_Wpjet_btag + 1.)
-                chi_WpJet_btagDown_nominal[0] = copy.deepcopy((chi_Wpjet_btagDown-1.)*is_chi_Wpjet_btag + 1.)
-                #if Debug:
-                #print("chi_Wpjet_btagSF: ", chi_Wpjet_btagSF, " is_btag: ", is_chi_Wpjet_btag, " saved btagSF: ", chi_WpJet_btagSF_nominal[0])
-                #print("chi_Wpjet_btagUp: ", chi_Wpjet_btagUp, " is_btag: ", is_chi_Wpjet_btag, " saved btagUp: ", chi_WpJet_btagUp_nominal[0])
-                #print("chi_Wpjet_btagDown: ", chi_Wpjet_btagDown, " is_btag: ", is_chi_Wpjet_btag, " saved btagDown: ", chi_WpJet_btagDown_nominal[0])
                 ##print("chi W' mass: ", chi_Wprime_p4.M())
         else:
             chi_Wprime_m_nominal[0] = -100.
@@ -1892,13 +1771,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             chi_WpJet_eta_nominal[0] = -100.
             chi_WpJet_phi_nominal[0] = -100.
             chi_WpJet_isBTagged_nominal[0] = -1
-            if isMC:
-                chi_TopJet_btagSF_nominal[0] = 0.
-                chi_TopJet_btagUp_nominal[0] = 0.
-                chi_TopJet_btagDown_nominal[0] = 0.
-                chi_WpJet_btagSF_nominal[0] = 0.
-                chi_WpJet_btagUp_nominal[0] = 0.
-                chi_WpJet_btagDown_nominal[0] = 0.
                 
         if sublead_recotop_p4 != None and tightlep != None:
             sublead_Wprime_p4 = sublead_recotop_p4 + sublead_promptjet.p4()
@@ -1928,21 +1800,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             sublead_WpJet_isBTagged_nominal[0] = copy.deepcopy(is_sublead_Wpjet_btag) #int(len(bjet_filter([sublead_promptjet], 'DeepFlv', 'M')[0]))
             ##print("sublead_WpJet_isBTagged: ", sublead_WpJet_isBTagged_nominal[0])
             ##print( "sublead W' mass: ", sublead_Wprime_p4.M())
-            if isMC:
-                sublead_TopJet_btagSF_nominal[0] = copy.deepcopy((sublead_topjet_btagSF-1.)*is_sublead_topjet_btag + 1.)
-                sublead_TopJet_btagUp_nominal[0] = copy.deepcopy((sublead_topjet_btagUp-1.)*is_sublead_topjet_btag + 1.)
-                sublead_TopJet_btagDown_nominal[0] = copy.deepcopy((sublead_topjet_btagDown-1.)*is_sublead_topjet_btag + 1.)
-                #if Debug:
-                #print("sublead_topjet_btagSF: ", sublead_topjet_btagSF, " is_btag: ", is_sublead_topjet_btag, " saved btagSF: ", sublead_TopJet_btagSF_nominal[0])
-                #print("sublead_topjet_btagUp: ", sublead_topjet_btagUp, " is_btag: ", is_sublead_topjet_btag, " saved btagUp: ", sublead_TopJet_btagUp_nominal[0])
-                #print("sublead_topjet_btagDown: ", sublead_topjet_btagDown, " is_btag: ", is_sublead_topjet_btag, " saved btagDown: ", sublead_TopJet_btagDown_nominal[0])
-                sublead_WpJet_btagSF_nominal[0] = copy.deepcopy((sublead_Wpjet_btagSF-1.)*is_sublead_Wpjet_btag + 1.)
-                sublead_WpJet_btagUp_nominal[0] = copy.deepcopy((sublead_Wpjet_btagUp-1.)*is_sublead_Wpjet_btag + 1.)
-                sublead_WpJet_btagDown_nominal[0] = copy.deepcopy((sublead_Wpjet_btagDown-1.)*is_sublead_Wpjet_btag + 1.)
-                #if Debug:
-                #print("sublead_Wpjet_btagSF: ", sublead_Wpjet_btagSF, " is_btag: ", is_sublead_Wpjet_btag, " saved btagSF: ", sublead_WpJet_btagSF_nominal[0])
-                #print("sublead_Wpjet_btagUp: ", sublead_Wpjet_btagUp, " is_btag: ", is_sublead_Wpjet_btag, " saved btagUp: ", sublead_WpJet_btagUp_nominal[0])
-                #print("sublead_Wpjet_btagDown: ", sublead_Wpjet_btagDown, " is_btag: ", is_sublead_Wpjet_btag, " saved btagDown: ", sublead_WpJet_btagDown_nominal[0])
 
         else:
             sublead_Wprime_m_nominal[0] = -100.
@@ -1967,13 +1824,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             sublead_WpJet_eta_nominal[0] = -100.
             sublead_WpJet_phi_nominal[0] = -100.
             sublead_WpJet_isBTagged_nominal[0] = -1
-            if isMC:
-                sublead_TopJet_btagSF_nominal[0] = 0.
-                sublead_TopJet_btagUp_nominal[0] = 0.
-                sublead_TopJet_btagDown_nominal[0] = 0.
-                sublead_WpJet_btagSF_nominal[0] = 0.
-                sublead_WpJet_btagUp_nominal[0] = 0.
-                sublead_WpJet_btagDown_nominal[0] = 0.
 
         if best_recotop_p4 != None and tightlep != None:
             best_Wprime_p4 = best_recotop_p4 + best_promptjet.p4()
@@ -2026,23 +1876,8 @@ def reco(scenario, isMC, addPDF, MCReco):
             if isMC:
                 best_TopJet_hadronflv_nominal[0] = best_jet.hadronFlavour
                 best_TopJet_partonflv_nominal[0] = best_jet.partonFlavour
-                best_TopJet_btagSF_nominal[0] = copy.deepcopy((best_topjet_btagSF-1.)*is_best_topjet_btag + 1.)
-                best_TopJet_btagUp_nominal[0] = copy.deepcopy((best_topjet_btagUp-1.)*is_best_topjet_btag + 1.)
-                best_TopJet_btagDown_nominal[0] = copy.deepcopy((best_topjet_btagDown-1.)*is_best_topjet_btag + 1.)
-                #if Debug:
-                #print("best_topjet_btagSF: ", best_topjet_btagSF, " is_btag: ", is_best_topjet_btag, " saved btagSF: ", best_TopJet_btagSF_nominal[0])
-                #print("best_topjet_btagUp: ", best_topjet_btagUp, " is_btag: ", is_best_topjet_btag, " saved btagUp: ", best_TopJet_btagUp_nominal[0])
-                #print("best_topjet_btagDown: ", best_topjet_btagDown, " is_btag: ", is_best_topjet_btag, " saved btagDown: ", best_TopJet_btagDown_nominal[0])
                 best_TopJet_hadronflv_nominal[0] = best_promptjet.hadronFlavour
                 best_TopJet_partonflv_nominal[0] = best_promptjet.partonFlavour
-                best_WpJet_btagSF_nominal[0] = copy.deepcopy((best_Wpjet_btagSF-1.)*is_best_Wpjet_btag + 1.)
-                best_WpJet_btagUp_nominal[0] = copy.deepcopy((best_Wpjet_btagUp-1.)*is_best_Wpjet_btag + 1.)
-                best_WpJet_btagDown_nominal[0] = copy.deepcopy((best_Wpjet_btagDown-1.)*is_best_Wpjet_btag + 1.)
-                #if Debug:
-                #print("best_Wpjet_btagSF: ", best_Wpjet_btagSF, " is_btag: ", is_best_Wpjet_btag, " saved btagSF: ", best_WpJet_btagSF_nominal[0])
-                #print("best_Wpjet_btagUp: ", best_Wpjet_btagUp, " is_btag: ", is_best_Wpjet_btag, " saved btagUp: ", best_WpJet_btagUp_nominal[0])
-                #print("best_Wpjet_btagDown: ", best_Wpjet_btagDown, " is_btag: ", is_best_Wpjet_btag, " saved btagDown: ", best_WpJet_btagDown_nominal[0])
-                
             ##print( "best W' mass: ", best_Wprime_p4.M())
         else:
             best_Wprime_m_nominal[0] = -100.
@@ -2070,13 +1905,6 @@ def reco(scenario, isMC, addPDF, MCReco):
             best_WpJet_phi_nominal[0] = -100.                    
             best_WpJet_isBTagged_nominal[0] = -1
             best_WpJet_btagscore_nominal[0] = -100.
-            if isMC:
-                best_TopJet_btagSF_nominal[0] = 0.
-                best_TopJet_btagUp_nominal[0] = 0.
-                best_TopJet_btagDown_nominal[0] = 0.
-                best_WpJet_btagSF_nominal[0] = 0.
-                best_WpJet_btagUp_nominal[0] = 0.
-                best_WpJet_btagDown_nominal[0] = 0.
         
         systTree.setWeightName("w_nominal",copy.deepcopy(w_nominal_nominal[0]))
         systTree.fillTreesSysts(trees, scenario)

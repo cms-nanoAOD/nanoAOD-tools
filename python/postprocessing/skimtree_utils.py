@@ -272,50 +272,87 @@ def get_HT(jets):
         HT += jet.pt
     return HT
 
-def trig_map(HLT, year, runPeriod):
+def trig_map(HLT, year, runPeriod, runN):
     passMu = False
     passEle = False
+    passPh = False
     passHT = False
     noTrigger = False
-    if(year == 2016 and runPeriod != 'H'):
+    if(year == 2016):
+      if(runN > 274954):
+        if(HLT.Mu50 or HLT.TkMu50):
+            passMu = True
+      else:
         if(HLT.Mu50):
             passMu = True
-        if(HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele27_WPTight_Gsf):
-            passEle = True
+      if(HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele27_WPTight_Gsf):
+        passEle = True
+      if(HLT.Photon175):
+        passPh = True
+      if(runPeriod != 'H'):
         if(HLT.PFHT800 or HLT.PFHT900):
-            passHT = True
-        if not(passMu or passEle or passHT):
-            noTrigger = True
-    elif(year == 2016 and runPeriod == 'H'):
-        if(HLT.Mu50):
-            passMu = True
-        if(HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele27_WPTight_Gsf):
-            passEle = True  
+          passHT = True
+      else:
         if(HLT.PFHT900):
-            passHT = True
-        if not(passMu or passEle or passHT):
-            noTrigger = True
-    elif((year == 2017 and runPeriod != 'B') or year == 2018):
-        if(HLT.Mu50):
-            passMu = True
-        if(HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele35_WPTight_Gsf):
-            passEle = True  
-        if(HLT.PFHT780 or HLT.PFHT890):
-            passHT = True
-        if not(passMu or passEle or passHT):
-            noTrigger = True
-    elif(year == 2017 and runPeriod == 'B'):
-        if(HLT.Mu50):
-            passMu = True
-        if(HLT.Ele35_WPTight_Gsf):
-            passEle = True
-        if(HLT.PFHT780 or HLT.PFHT890):
-            passHT = True
-        if not(passMu or passEle or passHT):
-            noTrigger = True
+          passHT = True
     else:
-        print('Wrong year! Please enter 2016, 2017, or 2018')
-    return passMu, passEle, passHT, noTrigger
+      if(HLT.PFHT780 or HLT.PFHT890):
+        passHT = True
+      if(year == 2017 and runPeriod == 'B'):
+        if(HLT.Ele35_WPTight_Gsf):
+          passEle = True
+        if(HLT.Mu50):
+          passMu = True
+      if((year == 2017 and runPeriod != 'B') or year == 2018):
+        if(HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele35_WPTight_Gsf):
+          passEle = True
+        if(HLT.Photon200):
+          passPh = True
+        if(HLT.Mu50 or HLT.OldMu100 or HLT.TkMu100):
+          passMu = True
+    if not(passMu or passEle or passHT):
+      noTrigger = True
+    return passMu, passEle, passHT, passPh, noTrigger
+
+def getweightfromhisto(histogram, eta, pt):
+    binx = max(1, min(histogram.GetNbinsX(), histogram.GetXaxis().FindBin(pt)))
+    biny = max(1, min(histogram.GetNbinsY(), histogram.GetYaxis().FindBin(eta)))
+    return histogram.GetBinContent(binx,biny)
+
+def efficiency(flv, tag, eta, pt):
+  infile = ROOT.TFile.Open("data/BtagEfficiency.root")
+  h = ROOT.TH2F()
+  if(tag):
+    if(flv == 5):
+      h = infile.Get("h2_BtagEff_b")
+    elif(flv == 4):
+      h = infile.Get("h2_BtagEff_c")
+    else:
+      h = infile.Get("h2_BtagEff_udsg")
+  if not (tag):
+    if(flv == 5):
+      h = infile.Get("h2_BmistagEff_b")
+    elif(flv == 4):
+      h = infile.Get("h2_BmistagEff_c")
+    else:
+      h = infile.Get("h2_BmistagEff_udsg")
+  return getweightfromhisto(h, eta, pt)
+ 
+def btagcalc(goodJets):
+  bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
+  p_MC = 1.
+  p_data = 1.
+  p_dataUp = 1.
+  p_dataDown = 1.
+  p_MC *= [efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt) for jet in bjets]
+  p_MC *= [(1 - efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt)) for jet in nobjets]
+  p_data *= [jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt) for jet in bjets]
+  p_data *= [(1 -jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt)) for jet in nobjets]
+  p_dataUp *= [jet.btagSF_deepjet_M_up*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt) for jet in bjets]
+  p_dataUp *= [(1 -jet.btagSF_deepjet_M_up*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt)) for jet in nobjets]
+  p_dataDown *= [jet.btagSF_deepjet_M_down*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt) for jet in bjets]
+  p_dataDown *= [(1 -jet.btagSF_deepjet_M_down*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt)) for jet in nobjets]
+  return p_data/p_MC, p_dataUp/p_MC, p_dataDown/p_MC
 
 def get_ptrel(lepton, jet):
     ptrel = ((jet.p4()-lepton.p4()).Vect().Cross(lepton.p4().Vect())).Mag()/(jet.p4().Vect().Mag())

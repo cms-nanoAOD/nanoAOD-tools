@@ -237,22 +237,28 @@ for i in range(tree.GetEntries()):
         runPeriod = None
     else:
         runPeriod = sample.runP
-    passMu, passEle, passHT, noTrigger = trig_map(HLT, year, runPeriod)
+    passMu, passEle, passHT, passPh, noTrigger = trig_map(HLT, year, runPeriod, chain.run)
     passed_mu_all[0] = int(passMu)
     passed_ele_all[0] = int(passEle)
     passed_ht_all[0] = int(passHT)
-    isDilepton = (len(goodMu) == 1) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT or passEle)
+    isDilepton = (len(goodMu) == 1) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT or passEle or passPh)
 
     double_counting = False
     if not isMC:
         double_counting = True
     #Double counting removal
+    if('DataMu' in sample.label and passMu):
+        double_counting = False
     if('DataHT' in sample.label and (passHT and not passMu and not passEle)):
         double_counting = False
-    if('DataEle' in sample.label and ((passEle and passMu and passHT) or (passEle and passMu and not passHT) or (passEle and not passMu and passHT) or (passEle and not passMu and not passHT))):
-        double_counting = False
-    if('DataMu' in sample.label and ((passMu and not passEle and not passHT) or (passMu and not passEle and passHT))):
-        double_counting = False
+    if year == '2018':
+        if('DataEle' in sample.label and (passEle or passPh) and not passMu):
+            double_counting = False
+    else:
+        if('DataEle' in sample.label and passEle and not passMu):
+            double_counting = False
+        if('DataPh' in sample.label and (passHT and not passMu and not passEle)):
+            double_counting = False
     if double_counting:
         continue
 
@@ -260,7 +266,7 @@ for i in range(tree.GetEntries()):
     ## Removing events with HEM problem  ##
     #######################################
     passesMETHEMVeto = HEMveto(jets, electrons)
-    if(sample.year == "2018" and not passesMETHEMVeto):
+    if(year == "2018" and not passesMETHEMVeto):
         if(not isMC and chain.runNumber > 319077.):
             continue
         elif(isMC):
