@@ -1,0 +1,3 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/QCDHT_2000toInf_2016/201107_220615/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/QCDHT_2000toInf_2016/201107_220615/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/QCDHT_2000toInf_2016/201107_220615/0000/tree_hadd_3.root

@@ -1,0 +1,1 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Highpt/Wprimetotb_M2000W20_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2000W20_RH_2016/201209_114347/0000/tree_hadd_1.root

@@ -1,0 +1,4 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_s-channel_4f_InclusiveDecays_13TeV-amcatnlo-pythia8/ST_sch_2016/201107_215401/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_s-channel_4f_InclusiveDecays_13TeV-amcatnlo-pythia8/ST_sch_2016/201107_215401/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_s-channel_4f_InclusiveDecays_13TeV-amcatnlo-pythia8/ST_sch_2016/201107_215401/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_s-channel_4f_InclusiveDecays_13TeV-amcatnlo-pythia8/ST_sch_2016/201107_215401/0000/tree_hadd_4.root

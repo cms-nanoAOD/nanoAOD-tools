@@ -1,7 +1,7 @@
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201107_212816/0000/tree_hadd_3.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201107_212816/0000/tree_hadd_1.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201107_212816/0000/tree_hadd_4.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201107_212816/0000/tree_hadd_6.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201107_212816/0000/tree_hadd_7.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201107_212816/0000/tree_hadd_5.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201107_212816/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201128_192724/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201128_192724/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201128_192724/0000/tree_hadd_4.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201128_192724/0000/tree_hadd_6.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201128_192724/0000/tree_hadd_5.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201128_192724/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT70to100_2016/201128_192724/0000/tree_hadd_7.root

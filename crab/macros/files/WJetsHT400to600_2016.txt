@@ -1,3 +1,3 @@
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT400to600_2016/201107_213402/0000/tree_hadd_3.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT400to600_2016/201107_213402/0000/tree_hadd_1.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT400to600_2016/201107_213402/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT400to600_2016/201128_193004/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT400to600_2016/201128_193004/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsHT400to600_2016/201128_193004/0000/tree_hadd_2.root

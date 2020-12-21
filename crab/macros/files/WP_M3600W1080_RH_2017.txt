@@ -1,1 +1,1 @@
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3600W1080_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M3600W1080_RH_2017/201108_155931/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/Wprimetotb_M3600W1080_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M3600W1080_RH_2017/201128_223721/0000/tree_hadd_1.root

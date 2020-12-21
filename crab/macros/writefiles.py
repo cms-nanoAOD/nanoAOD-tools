@@ -20,7 +20,7 @@ else:
     samples.append(dataset)
 
 path = ".."
-for_trigger = True
+for_trigger = False # True #
 
 for sample in samples:
     if not os.path.exists("./files/"):

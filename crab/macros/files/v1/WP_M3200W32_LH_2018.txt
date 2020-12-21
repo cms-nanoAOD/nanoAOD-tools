@@ -1,0 +1,12 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_5.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_4.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_11.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_7.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_12.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_8.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_9.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_6.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M3200W32_LH_TuneCP5_13TeV-madgraph-pythia8/WP_M3200W32_LH_2018/201108_193954/0000/tree_hadd_10.root

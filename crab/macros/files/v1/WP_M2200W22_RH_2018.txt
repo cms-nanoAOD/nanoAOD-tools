@@ -1,0 +1,8 @@
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2200W22_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2200W22_RH_2018/201108_211558/0000/tree_hadd_5.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2200W22_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2200W22_RH_2018/201108_211558/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2200W22_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2200W22_RH_2018/201108_211558/0000/tree_hadd_4.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2200W22_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2200W22_RH_2018/201108_211558/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2200W22_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2200W22_RH_2018/201108_211558/0000/tree_hadd_7.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2200W22_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2200W22_RH_2018/201108_211558/0000/tree_hadd_8.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2200W22_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2200W22_RH_2018/201108_211558/0000/tree_hadd_2.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2200W22_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2200W22_RH_2018/201108_211558/0000/tree_hadd_6.root

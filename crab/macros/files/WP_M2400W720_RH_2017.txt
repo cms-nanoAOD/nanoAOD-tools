@@ -1,7 +1,2 @@
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2400W720_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2400W720_RH_2017/201108_154205/0000/tree_hadd_5.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2400W720_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2400W720_RH_2017/201108_154205/0000/tree_hadd_6.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2400W720_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2400W720_RH_2017/201108_154205/0000/tree_hadd_1.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2400W720_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2400W720_RH_2017/201108_154205/0000/tree_hadd_4.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2400W720_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2400W720_RH_2017/201108_154205/0000/tree_hadd_3.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2400W720_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2400W720_RH_2017/201108_154205/0000/tree_hadd_2.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M2400W720_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M2400W720_RH_2017/201108_154205/0000/tree_hadd_7.root
+You requested to process files for 559 jobs.
+The limit is 500. Please use the '--jobids'option to select up to 500 jobs.

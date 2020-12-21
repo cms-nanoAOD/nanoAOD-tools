@@ -1,8 +1,8 @@
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201108_125505/0000/tree_hadd_5.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201108_125505/0000/tree_hadd_3.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201108_125505/0000/tree_hadd_1.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201108_125505/0000/tree_hadd_4.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201108_125505/0000/tree_hadd_7.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201108_125505/0000/tree_hadd_6.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201108_125505/0000/tree_hadd_2.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201108_125505/0000/tree_hadd_8.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201128_212435/0000/tree_hadd_1.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201128_212435/0000/tree_hadd_8.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201128_212435/0000/tree_hadd_3.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201128_212435/0000/tree_hadd_5.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201128_212435/0000/tree_hadd_6.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201128_212435/0000/tree_hadd_4.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201128_212435/0000/tree_hadd_7.root
+root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/ST_tch_t_2017/201128_212435/0000/tree_hadd_2.root

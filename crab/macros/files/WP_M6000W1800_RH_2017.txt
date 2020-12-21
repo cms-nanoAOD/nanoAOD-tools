@@ -1,5 +1,1 @@
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M6000W1800_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M6000W1800_RH_2017/201108_163432/0000/tree_hadd_3.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M6000W1800_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M6000W1800_RH_2017/201108_163432/0000/tree_hadd_5.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M6000W1800_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M6000W1800_RH_2017/201108_163432/0000/tree_hadd_4.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M6000W1800_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M6000W1800_RH_2017/201108_163432/0000/tree_hadd_1.root
-root://cms-xrd-global.cern.ch//store/user/adeiorio/Wprime_final/Wprimetotb_M6000W1800_RH_TuneCP5_13TeV-madgraph-pythia8/WP_M6000W1800_RH_2017/201108_163432/0000/tree_hadd_2.root
+Cannot find .requestcache file in CRAB project directory /afs/cern.ch/work/a/adeiorio/CMSSW_10_5_0/src/PhysicsTools/NanoAODTools/crab/crab_TT_Mtt700to1000_2018
