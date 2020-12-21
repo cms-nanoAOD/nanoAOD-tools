@@ -19,9 +19,9 @@ def cfg_writer(sample, isMC, outdir):
     #f.write("from CRABClient.UserUtilities import config, getUsernameFromSiteDB\n")
     f.write("\nconfig = Configuration()\n")
     f.write("config.section_('General')\n")
-    f.write("config.General.requestName = '"+sample.label+"'\n")
-    #if not isMC:
-    #    f.write("config.General.instance = 'preprod'\n") #needed to solve a bug with Oracle server... 
+    f.write("config.General.requestName = '"+sample.label+"_for_trigger'\n")
+    if not isMC:
+        f.write("config.General.instance = 'preprod'\n") #needed to solve a bug with Oracle server... 
     f.write("config.General.transferLogs=True\n")
     f.write("config.section_('JobType')\n")
     f.write("config.JobType.pluginName = 'Analysis'\n")
@@ -146,16 +146,15 @@ resubmit = opt.resub
 getout = opt.gout
 #Writing the configuration file
 for sample in samples:
+    print "*********** For trigger ***************"
     print 'Launching sample ' + sample.label
     if submit:
         #Writing the script file 
         year = str(sample.year)
         lep_mod = 'lepSF_'+year+'()'
-        trg_mod = 'trigSF_'+year+'()'
         btag_mod = 'btagSF'+year+'()'
         met_hlt_mod = 'MET_HLT_Filter_'+year+'()'
         pu_mod = 'puAutoWeight_'+year+'()'
-        prefire_mod = 'PrefCorr_'+year+'()'
         if ('Data' in sample.label):
             isMC = False
             presel = "Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter "
@@ -166,15 +165,15 @@ for sample in samples:
         print 'The flag isMC is: ' + str(isMC)
 
         print "Producing crab configuration file"
-        cfg_writer(sample, isMC, "Wprime")
+        cfg_writer(sample, isMC, "Trigger")
 
         if isMC:
             if year != '2018':
-                modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), " + lep_mod + ", " + trg_mod + ", " + pu_mod + ", " + btag_mod + ", " + prefire_mod + ", metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
+                modules = met_hlt_mod + ", preselection(), " + lep_mod + ", " + pu_mod + ", " + prefire_mod
             else:
-                modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), " + lep_mod + ", " + trg_mod + ", " + pu_mod + ", " + btag_mod + ", metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
+                modules = met_hlt_mod + ", preselection(), " + lep_mod + ", " + trg_mod + ", " + pu_mod
         else:
-            modules = "HLT(), preselection(), metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
+            modules = "HLT(), preselection()" # Put here all the modules you want to be runned by crab
             
         print "Producing crab script"
         crab_script_writer(sample,'/eos/user/'+str(os.environ.get('USER')[0]) + '/'+str(os.environ.get('USER'))+'/Wprime/nosynch/', isMC, modules, presel)
@@ -186,19 +185,19 @@ for sample in samples:
 
     elif kill:
         print "Killing crab jobs..."
-        os.system("crab kill -d crab_" + sample.label)
-        os.system("rm -rf crab_" + sample.label)
+        os.system("crab kill -d crab_" + sample.label + '_for_trigger')
+        os.system("rm -rf crab_" + sample.label + '_for_trigger')
 
     elif resubmit:
         print "Resubmitting crab jobs..."
-        os.system("crab resubmit -d crab_" + sample.label)
+        os.system("crab resubmit -d crab_" + sample.label + '_for_trigger')
 
     elif status:
         print "Checking crab jobs status..."
-        os.system("crab status -d crab_" + sample.label)
+        os.system("crab status -d crab_" + sample.label + '_for_trigger')
 
     elif getout:
         print "crab getoutput -d crab_" + sample.label + " --xrootd > ./macros/files/" + sample.label + ".txt"
-        os.system("crab getoutput -d crab_" + sample.label + " --xrootd > ./macros/files/" + sample.label + ".txt")
+        os.system("crab getoutput -d crab_" + sample.label + "_for_trigger --xrootd > ./macros/files/" + sample.label + "_for_trigger.txt")
         #for i in xrange(1, 969):
         #os.system("crab getoutput -d crab_" + sample.label + " --outputpath=/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label + "/ --jobids="+str(i))

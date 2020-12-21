@@ -109,8 +109,6 @@ systTree.setWeightName("btagShapeDownHf", 1.)
 systTree.setWeightName("btagShapeDownHfStats1", 1.)
 systTree.setWeightName("btagShapeDownHfStats2", 1.)
 
-systTree.setWeightName("mistagUp",1.)
-systTree.setWeightName("mistagDown",1.)
 '''
 systTree.setWeightName("puSF",1.)
 systTree.setWeightName("puUp",1.)
@@ -118,9 +116,17 @@ systTree.setWeightName("puDown",1.)
 systTree.setWeightName("lepSF",1.)
 systTree.setWeightName("lepUp",1.)
 systTree.setWeightName("lepDown",1.)
+systTree.setWeightName("trigSF",1.)
+systTree.setWeightName("trigUp",1.)
+systTree.setWeightName("trigDown",1.)
 systTree.setWeightName("PFSF",1.)
 systTree.setWeightName("PFUp",1.)
 systTree.setWeightName("PFDown",1.)
+systTree.setWeightName("btagSF",1.)
+systTree.setWeightName("btagUp",1.)
+systTree.setWeightName("btagDown",1.)
+systTree.setWeightName("mistagUp",1.)
+systTree.setWeightName("mistagDown",1.)
 
 
 #++++++++++++++++++++++++++++++++++
@@ -369,11 +375,15 @@ def reco(scenario, isMC, addPDF, MCReco):
     lepton_miniIso_nominal = array.array('f', [0.])
     lepton_stdIso_nominal = array.array('f', [0.])
     lepMET_deltaPhi_nominal = array.array('f', [0.])
+    lepjet_deltaR_nominal = array.array('f', [0.])
     isEle_nominal = array.array('i', [0])
     isMu_nominal = array.array('i', [0])
     
     MET_pt_nominal = array.array('f', [0.])
     MET_phi_nominal = array.array('f', [0.])
+
+    MET_HT_nominal = array.array('f', [0.])
+    lepMETpt_HT_nominal = array.array('f', [0.])
     
     nPV_tot_nominal = array.array('f', [0.])
     nPV_good_nominal = array.array('f', [0.])
@@ -389,6 +399,7 @@ def reco(scenario, isMC, addPDF, MCReco):
     subleadingjet_pt_nominal = array.array('f', [0.])
     leadingbjet_pt_nominal = array.array('f', [0.])
     subleadingbjet_pt_nominal = array.array('f', [0.])
+    jet1pt_jet2pt = array.array('f', [0.])
     
     leadingjets_deltaPhi = array.array('f', [0.])
     leadingjets_deltaEta = array.array('f', [0.])
@@ -507,6 +518,7 @@ def reco(scenario, isMC, addPDF, MCReco):
     systTree.branchTreesSysts(trees, scenario, "nbjet_pt100", outTreeFile, nbJet_pt100_nominal)
     systTree.branchTreesSysts(trees, scenario, "leadingjet_pt", outTreeFile, leadingjet_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "subleadingjet_pt", outTreeFile, subleadingjet_pt_nominal)
+    systTree.branchTreesSysts(trees, scenario, "jet1pt_jet2pt", outTreeFile, jet1pt_jet2pt)
     systTree.branchTreesSysts(trees, scenario, "leadingbjet_pt", outTreeFile, leadingbjet_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "subleadingbjet_pt", outTreeFile, subleadingbjet_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "leadingjets_deltaR", outTreeFile, leadingjets_deltaR)
@@ -650,6 +662,8 @@ def reco(scenario, isMC, addPDF, MCReco):
     systTree.branchTreesSysts(trees, scenario, "lepton_miniIso", outTreeFile, lepton_miniIso_nominal)
     systTree.branchTreesSysts(trees, scenario, "lepton_stdIso", outTreeFile, lepton_stdIso_nominal)
     systTree.branchTreesSysts(trees, scenario, "lepMET_deltaphi", outTreeFile, lepMET_deltaPhi_nominal)
+    systTree.branchTreesSysts(trees, scenario, "lepMETpt_HT_nominal", outTreeFile, lepMETpt_HT_nominal)
+
     systTree.branchTreesSysts(trees, scenario, "passed_mu", outTreeFile, passed_mu_nominal)
     systTree.branchTreesSysts(trees, scenario, "passed_ele", outTreeFile, passed_ele_nominal)
     systTree.branchTreesSysts(trees, scenario, "passed_ht", outTreeFile, passed_ht_nominal)
@@ -660,6 +674,7 @@ def reco(scenario, isMC, addPDF, MCReco):
     systTree.branchTreesSysts(trees, scenario, "Event_HT", outTreeFile, Event_HT_nominal)
     systTree.branchTreesSysts(trees, scenario, "MET_pt", outTreeFile, MET_pt_nominal)
     systTree.branchTreesSysts(trees, scenario, "MET_phi", outTreeFile, MET_phi_nominal)
+    systTree.branchTreesSysts(trees, scenario, "MET_HT", outTreeFile, MET_HT_nominal)
     systTree.branchTreesSysts(trees, scenario, "mtw", outTreeFile, mtw_nominal)
     systTree.branchTreesSysts(trees, scenario, "ptrel_leadAK4_closestAK8", outTreeFile, ptrel_leadAK4_closestAK8)
     systTree.branchTreesSysts(trees, scenario, "deltaR_leadAK4_closestAK8", outTreeFile, deltaR_leadAK4_closestAK8)
@@ -871,7 +886,7 @@ def reco(scenario, isMC, addPDF, MCReco):
             runPeriod = None
         else:
             runPeriod = sample.runP
-        passMu, passEle, passHT, noTrigger = trig_map(HLT, year, runPeriod)
+        passMu, passEle, passHT, passPh, noTrigger = trig_map(HLT, year, runPeriod, chain.run)
         passed_mu_nominal[0] = int(passMu)
         passed_ele_nominal[0] = int(passEle)
         passed_ht_nominal[0] = int(passHT)
@@ -885,9 +900,15 @@ def reco(scenario, isMC, addPDF, MCReco):
         #Double counting removal
         if('DataMu' in sample.label and passMu):
             doublecounting = False
-        if('DataEle' in sample.label and (not passMu and passEle)):
-            doublecounting = False
-        if('DataHT' in sample.label and (passHT and not passMu and not passEle)):
+        if year == 2018:
+            if('DataEle' in sample.label and (not passMu and (passEle or passPh))):
+                doublecounting = False
+        else:
+            if('DataEle' in sample.label and (not passMu and passEle)):
+                doublecounting = False
+            if('DataPh' in sample.label and (passPh and not passMu and not passEle)):
+                doublecounting = False
+        if('DataHT' in sample.label and (passHT and not passMu and not passEle and not passPh)):
             doublecounting = False
             
         if doublecounting:
@@ -971,11 +992,14 @@ def reco(scenario, isMC, addPDF, MCReco):
             tightlep_p4t.SetPz(0.)
             if(isMC):
                 tightlep_SF = goodMu[0].effSF
-                tightlep_SFUp = goodMu[0].effSF_errUp
-                tightlep_SFDown = goodMu[0].effSF_errDown
+                tightlep_SFUp = goodMu[0].effSF_Up
+                tightlep_SFDown = goodMu[0].effSF_Down
                 systTree.setWeightName("lepSF", copy.deepcopy(tightlep_SF))
                 systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SFUp))
                 systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SFDown))
+                systTree.setWeightName("trigSF", copy.deepcopy(goodMu[0].trigSF))
+                systTree.setWeightName("trigUp", copy.deepcopy(goodMu[0].trigSF_Up))
+                systTree.setWeightName("trigDown", copy.deepcopy(goodMu[0].trigSF_Down))
         elif(isElectron):
             isEle_nominal[0] = 1
             isMu_nominal[0] = 0
@@ -986,11 +1010,14 @@ def reco(scenario, isMC, addPDF, MCReco):
             tightlep_p4t.SetPz(0.)
             if(isMC):
                 tightlep_SF = goodEle[0].effSF
-                tightlep_SFUp = goodEle[0].effSF_errUp
-                tightlep_SFDown = goodEle[0].effSF_errDown
+                tightlep_SFUp = goodEle[0].effSF_Up
+                tightlep_SFDown = goodEle[0].effSF_Down
                 systTree.setWeightName("lepSF", copy.deepcopy(tightlep_SF))
                 systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SFUp))
                 systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SFDown))
+                systTree.setWeightName("trigSF", copy.deepcopy(goodEle[0].trigSF))
+                systTree.setWeightName("trigUp", copy.deepcopy(goodEle[0].trigSF_Up))
+                systTree.setWeightName("trigDown", copy.deepcopy(goodEle[0].trigSF_Down))
         else:
             ##print('Event %i not a good' %(i))
             continue
@@ -1004,13 +1031,14 @@ def reco(scenario, isMC, addPDF, MCReco):
             continue
 
         if(isMC):
-            PF_SF = chain.PrefireWeight
-            PF_SFUp = chain.PrefireWeight_Up
-            PF_SFDown = chain.PrefireWeight_Down
-            systTree.setWeightName("PFSF", copy.deepcopy(PF_SF))
-            systTree.setWeightName("PFUp", copy.deepcopy(PF_SFUp))
-            systTree.setWeightName("PFDown", copy.deepcopy(PF_SFDown))
-            
+            if not year == 2018:
+                PF_SF = chain.PrefireWeight
+                PF_SFUp = chain.PrefireWeight_Up
+                PF_SFDown = chain.PrefireWeight_Down
+                systTree.setWeightName("PFSF", copy.deepcopy(PF_SF))
+                systTree.setWeightName("PFUp", copy.deepcopy(PF_SFUp))
+                systTree.setWeightName("PFDown", copy.deepcopy(PF_SFDown))
+
             PU_SF = chain.puWeight
             PU_SFUp = chain.puWeightUp
             PU_SFDown = chain.puWeightDown
@@ -1018,13 +1046,10 @@ def reco(scenario, isMC, addPDF, MCReco):
             systTree.setWeightName("puUp", copy.deepcopy(PU_SFUp))
             systTree.setWeightName("puDown", copy.deepcopy(PU_SFDown))
             
-            btagSF, btagUp, btagDown = btagcalc(goodJets)
+            btagSF, btagUp, btagDown, mistagUp, mistagDown = btagcalc(goodJets)
             systTree.setWeightName("btagSF", copy.deepcopy(btagSF))
             systTree.setWeightName("btagUp", copy.deepcopy(btagUp))
             systTree.setWeightName("btagDown", copy.deepcopy(btagDown))
-
-            mistagSF, mistagUp, mistagDown = mistagcalc(goodJets)
-            systTree.setWeightName("mistagSF", copy.deepcopy(mistagSF))
             systTree.setWeightName("mistagUp", copy.deepcopy(mistagUp))
             systTree.setWeightName("mistagDown", copy.deepcopy(mistagDown))
 
@@ -1044,7 +1069,8 @@ def reco(scenario, isMC, addPDF, MCReco):
             MET_pt_nominal[0] = met.pt
             MET_phi_nominal[0] = met.phi
             Event_HT_nominal[0] = HT.eventHT
-            
+            MET_HT_nominal[0] = met.pt/HT.eventHT
+            lepMETpt_HT_nominal[0] = (tightlep_p4 + recomet_p4t).Pt()/HT.eventHT
         else:
             lepton_pt_nominal[0] = -100.
             lepton_eta_nominal[0] = -100.
@@ -1327,6 +1353,7 @@ def reco(scenario, isMC, addPDF, MCReco):
         deltaR_subleadAK4_closestAK8[0] = copy.deepcopy(dR_subleadAK4AK8)
         leadingjet_pt_nominal[0] = jets[0].pt
         subleadingjet_pt_nominal[0] = jets[1].pt
+        jet1pt_jet2pt[0] = jets[0].pt/jets[1].pt
         leadingbjet_pt_nominal[0] = 0.
         subleadingbjet_pt_nominal[0] = 0.
         
@@ -1908,15 +1935,24 @@ def reco(scenario, isMC, addPDF, MCReco):
         
         systTree.setWeightName("w_nominal",copy.deepcopy(w_nominal_nominal[0]))
         systTree.fillTreesSysts(trees, scenario)
-    if isNominal:
-        outTreeFile.cd()
+    outTreeFile.cd()
+    if scenario == 'nominal':
+        trees[0].Write()
         if(isMC):
             #print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
             h_genweight.Write()
             h_PDFweight.Write()
             h_eff_mu.Write()
             h_eff_ele.Write()
-    systTree.writeTreesSysts(trees, outTreeFile)
+    elif scenario == 'jesUp':
+        trees[1].Write()
+    elif scenario == 'jesDown':
+        trees[2].Write()
+    elif scenario == 'jerUp':
+        trees[3].Write()
+    elif scenario == 'jerDown':
+        trees[4].Write()
+
     print("Number of events in output tree nominal " + str(trees[0].GetEntries()))
     if isMC:
         print("Number of events in output tree jesUp " + str(trees[1].GetEntries()))

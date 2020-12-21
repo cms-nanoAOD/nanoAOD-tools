@@ -17,6 +17,8 @@ if username == 'adeiorio':
     uid = 103214
 elif username == 'apiccine':
     uid = 124949
+elif username == 'fcarneva':
+    uid = 127697
 
 def sub_writer(sample, n, files, folder):
     f = open("condor.sub", "w")
@@ -27,9 +29,9 @@ def sub_writer(sample, n, files, folder):
     f.write("use_x509userproxy       = true\n")
     f.write("should_transfer_files   = YES\n")
     f.write("when_to_transfer_output = ON_EXIT\n")
-    f.write("transfer_input_files    = $(Proxy_path), samples/samples.py, skimtree_utils.py, __init__.py\n")
+    f.write("transfer_input_files    = $(Proxy_path), samples/samples.py, skimtree_utils.py, __init__.py, BtagEfficiency.root\n")
     f.write("transfer_output_remaps  = \""+ sample.label + "_part" + str(n) + ".root=/eos/user/"+inituser + "/" + username+"/Wprime/nosynch/" + folder + "/" + sample.label +"/"+ sample.label + "_part" + str(n) + ".root\"\n")
-    f.write("+JobFlavour             = \"workday\"\n") # options are espresso = 20 minutes, microcentury = 1 hour, longlunch = 2 hours, workday = 8 hours, tomorrow = 1 day, testmatch = 3 days, nextweek     = 1 week
+    f.write("+JobFlavour             = \"tomorrow\"\n") # options are espresso = 20 minutes, microcentury = 1 hour, longlunch = 2 hours, workday = 8 hours, tomorrow = 1 day, testmatch = 3 days, nextweek     = 1 week
     f.write("executable              = tree_skimmer.py\n")
     f.write("arguments               = " + sample.label + " " + str(n) + " " + str(files) + " remote" + "\n")
     #f.write("input                   = input.txt\n")

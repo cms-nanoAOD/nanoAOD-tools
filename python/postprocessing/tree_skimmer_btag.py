@@ -126,7 +126,7 @@ for i in range(tree.GetEntries()):
         runPeriod = sample.runP
     passMu, passEle, passHT, noTrigger = trig_map(HLT, year, runPeriod)
     isMuon = (len(goodMu) == 1) and (len(goodEle) == 0) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passMu or passHT)
-    isElectron = (len(goodMu) == 0) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passEle or passHT)
+    isElectron = (len(goodMu) == 0) and (len(goodEle) == 1) and len(VetoMu) == 0 and len(VetoEle) == 0 and (passEle or passHT or passPh)
 
     if not (isMuon or isElectron):
         continue

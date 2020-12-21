@@ -287,7 +287,7 @@ def trig_map(HLT, year, runPeriod, runN):
             passMu = True
       if(HLT.Ele115_CaloIdVT_GsfTrkIdT or HLT.Ele27_WPTight_Gsf):
         passEle = True
-      if(HLT.Photon175):
+      #if(HLT.Photon175):
         passPh = True
       if(runPeriod != 'H'):
         if(HLT.PFHT800 or HLT.PFHT900):
@@ -315,44 +315,63 @@ def trig_map(HLT, year, runPeriod, runN):
     return passMu, passEle, passHT, passPh, noTrigger
 
 def getweightfromhisto(histogram, eta, pt):
-    binx = max(1, min(histogram.GetNbinsX(), histogram.GetXaxis().FindBin(pt)))
-    biny = max(1, min(histogram.GetNbinsY(), histogram.GetYaxis().FindBin(eta)))
-    return histogram.GetBinContent(binx,biny)
+  #print(histogram.GetName(), eta, pt)
+  binx = max(1, min(histogram.GetNbinsX(), histogram.GetXaxis().FindBin(pt)))
+  biny = max(1, min(histogram.GetNbinsY(), histogram.GetYaxis().FindBin(abs(eta))))
+  #print(histogram.GetBinContent(binx,biny))
+  return histogram.GetBinContent(binx,biny)
 
-def efficiency(flv, tag, eta, pt):
-  infile = ROOT.TFile.Open("data/BtagEfficiency.root")
+def efficiency(flv, eta, pt):
+  infile = ROOT.TFile.Open("BtagEfficiency.root")
   h = ROOT.TH2F()
-  if(tag):
-    if(flv == 5):
-      h = infile.Get("h2_BtagEff_b")
-    elif(flv == 4):
-      h = infile.Get("h2_BtagEff_c")
-    else:
-      h = infile.Get("h2_BtagEff_udsg")
-  if not (tag):
-    if(flv == 5):
-      h = infile.Get("h2_BmistagEff_b")
-    elif(flv == 4):
-      h = infile.Get("h2_BmistagEff_c")
-    else:
-      h = infile.Get("h2_BmistagEff_udsg")
+  if(flv == 5):
+    h = infile.Get("h2_BtagEff_b").CreateHistogram()
+  elif(flv == 4):
+    h = infile.Get("h2_BtagEff_c").CreateHistogram()
+  else:
+    h = infile.Get("h2_BtagEff_udsg").CreateHistogram()
   return getweightfromhisto(h, eta, pt)
  
 def btagcalc(goodJets):
   bjets, nobjets = bjet_filter(goodJets, 'DeepFlv', 'M')
   p_MC = 1.
   p_data = 1.
-  p_dataUp = 1.
-  p_dataDown = 1.
-  p_MC *= [efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt) for jet in bjets]
-  p_MC *= [(1 - efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt)) for jet in nobjets]
-  p_data *= [jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt) for jet in bjets]
-  p_data *= [(1 -jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt)) for jet in nobjets]
-  p_dataUp *= [jet.btagSF_deepjet_M_up*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt) for jet in bjets]
-  p_dataUp *= [(1 -jet.btagSF_deepjet_M_up*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt)) for jet in nobjets]
-  p_dataDown *= [jet.btagSF_deepjet_M_down*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt) for jet in bjets]
-  p_dataDown *= [(1 -jet.btagSF_deepjet_M_down*efficiency(abs(jet.partonFlavour), 1, jet.eta, jet.pt)) for jet in nobjets]
-  return p_data/p_MC, p_dataUp/p_MC, p_dataDown/p_MC
+  p_data_btagUp = 1.
+  p_data_btagDown = 1.
+  p_data_mistagUp = 1.
+  p_data_mistagDown = 1.
+
+  for jet in bjets:
+    #print('prima MC' , p_MC)
+    #print(abs(jet.partonFlavour), jet.eta, jet.pt)
+    #print(efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+    p_MC *= efficiency(abs(jet.partonFlavour), jet.eta, jet.pt)
+    #print('dopo MC' , p_MC)
+    p_data *= jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt)
+    if abs(jet.partonFlavour) == 4 or abs(jet.partonFlavour) == 5:
+      p_data_btagUp *= jet.btagSF_deepjet_M_up*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt)
+      p_data_mistagUp *= jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt)
+      p_data_btagDown *= jet.btagSF_deepjet_M_down*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt)
+      p_data_mistagDown *= jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt)
+    else:
+      p_data_btagUp *= jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt)
+      p_data_mistagUp *= jet.btagSF_deepjet_M_up*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt)
+      p_data_btagDown *= jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt)
+      p_data_mistagDown *= jet.btagSF_deepjet_M_down*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt)
+  for jet in nobjets:
+    p_MC *= (1 - efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+    p_data *= (1 - jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+    if abs(jet.partonFlavour) == 4 or abs(jet.partonFlavour) == 5:
+      p_data_btagUp *= (1 - jet.btagSF_deepjet_M_up*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+      p_data_mistagUp *= (1 - jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+      p_data_btagDown *= (1 - jet.btagSF_deepjet_M_down*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+      p_data_mistagDown *= (1 - jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+    else:
+      p_data_btagUp *= (1 - jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+      p_data_mistagUp *= (1 - jet.btagSF_deepjet_M_up*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+      p_data_btagDown *= (1 - jet.btagSF_deepjet_M*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+      p_data_mistagDown *= (1 - jet.btagSF_deepjet_M_down*efficiency(abs(jet.partonFlavour), jet.eta, jet.pt))
+  return p_data/p_MC, p_data_btagUp/p_MC, p_data_btagDown/p_MC, p_data_mistagUp/p_MC, p_data_mistagDown/p_MC
 
 def get_ptrel(lepton, jet):
     ptrel = ((jet.p4()-lepton.p4()).Vect().Cross(lepton.p4().Vect())).Mag()/(jet.p4().Vect().Mag())
@@ -1197,6 +1216,14 @@ class systWeights(object):
             self.weightedNames[10] = "LHESF"
             self.weightedNames[11] = "LHEUp"
             self.weightedNames[12] = "LHEDown"            
+            self.weightedNames[13] = "btagSF"
+            self.weightedNames[14] = "btagUp"
+            self.weightedNames[15] = "btagDown"
+            self.weightedNames[16] = "mistagUp"
+            self.weightedNames[17] = "mistagDown"
+            self.weightedNames[18] = "trigSF"
+            self.weightedNames[19] = "trigUp"
+            self.weightedNames[20] = "trigDown"
             '''
             self.weightedNames[13] = "btagShape"
             self.weightedNames[14] = "btagShapeUpCferr1"
@@ -1223,8 +1250,8 @@ class systWeights(object):
             #self.weightedNames[11] = "trigUp"
             #self.weightedNames[12] = "trigDown"
             '''
-            self.setMax(13)
-            self.setMaxNonPDF(9)
+            self.setMax(21)
+            self.setMaxNonPDF(21)
             self.weightedNames[self.maxSysts] = ""
 
         if addQ2: 

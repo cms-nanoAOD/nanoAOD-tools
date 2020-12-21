@@ -1,19 +1,7 @@
 #!/bin/env python3
 import os
-##print(os.environ)
-##print("**********************************************************************")
-##print("**********************************************************************")
-##print("**********************************************************************")
-##print(str(os.environ.get('PYTHONPATH')))
-##print(str(os.environ.get('PYTHON3PATH')))
 import sys
-##print("*************** This is system version info ***************************")
-##print(sys.version_info)
-#import platform
-##print("*************** This is python version info ***************************")
-##print(platform.python_version())
 import ROOT
-##print("Succesfully imported ROOT")
 import math
 import datetime
 import copy

@@ -19,9 +19,9 @@ def cfg_writer(sample, isMC, outdir):
     #f.write("from CRABClient.UserUtilities import config, getUsernameFromSiteDB\n")
     f.write("\nconfig = Configuration()\n")
     f.write("config.section_('General')\n")
-    f.write("config.General.requestName = '"+sample.label+"'\n")
-    #if not isMC:
-    #    f.write("config.General.instance = 'preprod'\n") #needed to solve a bug with Oracle server... 
+    f.write("config.General.requestName = '"+sample.label+"_highpt'\n")
+    if not isMC:
+        f.write("config.General.instance = 'preprod'\n") #needed to solve a bug with Oracle server... 
     f.write("config.General.transferLogs=True\n")
     f.write("config.section_('JobType')\n")
     f.write("config.JobType.pluginName = 'Analysis'\n")
@@ -71,6 +71,7 @@ def crab_script_writer(sample, outpath, isMC, modules, presel):
     f.write("from PhysicsTools.NanoAODTools.postprocessing.examples.HLT_Filter import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.examples.preselection import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.examples.trigger_preselection import *\n")
+    f.write("from PhysicsTools.NanoAODTools.postprocessing.examples.highpt import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.modules.common.PrefireCorr import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *\n")
     f.write("from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer import *\n")
@@ -146,6 +147,7 @@ resubmit = opt.resub
 getout = opt.gout
 #Writing the configuration file
 for sample in samples:
+    crab_folder = "crab_"+sample.label + "_highpt"
     print 'Launching sample ' + sample.label
     if submit:
         #Writing the script file 
@@ -166,13 +168,10 @@ for sample in samples:
         print 'The flag isMC is: ' + str(isMC)
 
         print "Producing crab configuration file"
-        cfg_writer(sample, isMC, "Wprime")
+        cfg_writer(sample, isMC, "Highpt")
 
         if isMC:
-            if year != '2018':
-                modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), " + lep_mod + ", " + trg_mod + ", " + pu_mod + ", " + btag_mod + ", " + prefire_mod + ", metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
-            else:
-                modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), " + lep_mod + ", " + trg_mod + ", " + pu_mod + ", " + btag_mod + ", metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
+            modules = "MCweight_writer(),  " + met_hlt_mod + ", preselection(), highpt()" # Put here all the modules you want to be runned by crab
         else:
             modules = "HLT(), preselection(), metCorrector(), fatJetCorrector(), metCorrector_tot(), fatJetCorrector_tot()" # Put here all the modules you want to be runned by crab
             
@@ -186,19 +185,19 @@ for sample in samples:
 
     elif kill:
         print "Killing crab jobs..."
-        os.system("crab kill -d crab_" + sample.label)
-        os.system("rm -rf crab_" + sample.label)
+        os.system("crab kill -d " + crab_folder)
+        os.system("rm -rf " + crab_folder)
 
     elif resubmit:
         print "Resubmitting crab jobs..."
-        os.system("crab resubmit -d crab_" + sample.label)
+        os.system("crab resubmit -d " + crab_folder)
 
     elif status:
         print "Checking crab jobs status..."
-        os.system("crab status -d crab_" + sample.label)
+        os.system("crab status -d " + crab_folder)
 
     elif getout:
-        print "crab getoutput -d crab_" + sample.label + " --xrootd > ./macros/files/" + sample.label + ".txt"
-        os.system("crab getoutput -d crab_" + sample.label + " --xrootd > ./macros/files/" + sample.label + ".txt")
+        print "crab getoutput -d " + crab_folder + " --xrootd > ./macros/files/" + sample.label + "_highpt.txt"
+        os.system("crab getoutput -d " + crab_folder + " --xrootd > ./macros/files/" + sample.label + "_highpt.txt")
         #for i in xrange(1, 969):
-        #os.system("crab getoutput -d crab_" + sample.label + " --outputpath=/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label + "/ --jobids="+str(i))
+        #os.system("crab getoutput -d " + crab_folder + " --outputpath=/eos/user/"+str(os.environ.get('USER')[0]) + "/"+str(os.environ.get('USER'))+"/Wprime/nosynch/" + sample.label + "/ --jobids="+str(i))
