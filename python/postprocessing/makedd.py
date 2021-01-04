@@ -23,6 +23,7 @@ parser.add_option('', '--docrosscheck', dest='docrosscheck', action="store_true"
 parser.add_option('', '--symJesJer', dest='symJesJer', action="store_true", default = False, help='add symmetrized jes/jer')
 parser.add_option('', '--doaddsig', dest='doaddsig', action="store_true", default = False, help='add signal to cr')
 parser.add_option('', '--plotpath', dest='plotpath',type='string', default='./plots/', help='the folder where the plots are stored')
+parser.add_option('', '--year_sf', dest='year_sf',type='string', default='None', help='year from which to extract sf, if None it is done from the same as Data')
 
 (opt, args) = parser.parse_args()
 categories =[""]
@@ -35,40 +36,47 @@ if not os.path.exists(plotpath):
 if not plotpath[-1]=="/": plotpath=plotpath+"/" 
 #wjets_veto_threshold=400
 wjets_veto_threshold=200
+sig_cut = "best_top_m_G_120_AND_best_top_m_L_220_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
+CR_cut = "best_top_m_G_220_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
+
+if not os.path.exists(opt.pathin + '/Data_' + opt.year + '_' + opt.category + '.root'):  
+    os.system('hadd -f Data_' + opt.year + '_' + opt.category + '.root DataEle_' + opt.year + '_' + opt.category + '.root DataMu_' + opt.year + '_' + opt.category + '.root DataPh_' + opt.year + '_' + opt.category + '.root DataHT_' + opt.year + '_' + opt.category + '.root')
 
 lepcut=""
 #lepcut="lep180_"
     
 namemap={}
-namemap["SR2B"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
-namemap["SR2B_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_AND_best_top_m_G_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
+namemap["SR2B"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_AND_" + sig_cut
+namemap["SR2B_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_AND_" + CR_cut
 namemap["SR2B_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
 
-namemap["SRW"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
-namemap["SRW_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_AND_best_top_m_G_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
+namemap["SRW"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_AND_" + sig_cut
+namemap["SRW_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_AND_" + CR_cut
 namemap["SRW_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
 
-namemap["SRT"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_EQ_0_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
-namemap["SRT_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_EQ_0_AND_best_top_m_G_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
+namemap["SRT"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_EQ_0_AND_" + sig_cut
+namemap["SRT_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_EQ_0_AND_" + CR_cut
 namemap["SRT_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_EQ_0_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
 
-namemap["CR0B"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_0_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
-namemap["CR0B_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_0_AND_best_top_m_G_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
+namemap["CR0B"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_0_AND_" + sig_cut
+namemap["CR0B_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_0_AND_" + CR_cut
 namemap["CR0B_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_0_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
 
-namemap["CR1B"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_1_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
-namemap["CR1B_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_1_AND_best_top_m_G_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
+namemap["CR1B"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_1_AND_" + sig_cut
+namemap["CR1B_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_1_AND_" + CR_cut
 namemap["CR1B_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_1_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
 #
 #wjets_veto_map = {"CR0B":"CR0B_I","CR1B":"CR1B_I"}
 #wjets_veto_map = {"SR2B":"SR2B_I"}
 #wjets_veto_map = {"SR2B":"SR2B_I","SRW":"SRW_I","SRT":"SRT_I","CR0B":"CR0B_I","CR1B":"CR1B_I"}
+#wjets_veto_map = {"SR2B":"SR2B_I","SRW":"SRW_I","SRT":"SRT_I"}
 wjets_veto_map = {"SR2B":"SR2B_I","SRW":"SRW_I","SRT":"SRT_I"}
 #
 ttbar_veto_map= {"SR2B":"SR2B_II","SRW":"SRW_II","SRT":"SRT_II","CR0B":"CR0B_II","CR1B":"CR1B_II"}
 srcr_map = {"SR2B":"SRT","SR2B_I":"SRT_I","SRW":"CR1B","SRW_I":"CR1B_I"}
 srcr_map_2 = {"SR2B":"SRW","SR2B_I":"SRW_I","SRW":"CR0B","SRW_I":"CR0B_I"}
 srcr_map_3 = {"SR2B":"CR1B","SR2B_I":"CR1B_I"}
+srcr_map_4 = {"SRT":"CR1B","SRT_I":"CR1B_I"}
 srcr_map_4 = {"SRT":"CR1B","SRT_I":"CR1B_I"}
 
 
@@ -374,7 +382,7 @@ class data_driven(single_process):
     def update_single_channel(self,namemap=None):
         if (namemap is None):
             namemap =self.__namemap
-        print "tag is ",self.__tag, " syst ", self.__syst, " path ",self.__path
+        print "tag is ",self.__tag, " syst ", self.__syst, " path ",self.__path, " year ", self.__year
         super(data_driven,self).__init__(namemap=namemap,sample=self.__sample,path=self.__path,category=self.__category,year=self.__year,syst=self.__syst,tag=self.__tag,bins=self.__bins,verbose=self.__verbose)#initialize the parent class with the map names     
     def set_maps(self,namemap=namemap):
         self.__namemap=namemap
@@ -446,6 +454,7 @@ class data_driven(single_process):
         self.set_sample(sample)
         systtmp=self.__syst
         tagtmp=self.__tag
+        year = self.__year
         if nominaltag:
             self.set_tag(None)
         if nominalsyst:
@@ -458,6 +467,7 @@ class data_driven(single_process):
         #print "getting histo now!!! sample ",sample, "region",region,"syst",self.__syst
         hs=super(data_driven,self).getHistoR(region=region,verbose=verbose)
         self.reset_info()
+        self.__year = year
         self.set_syst(systtmp)        
         self.set_tag(tagtmp)        
         self.update_filename()
@@ -473,6 +483,9 @@ class data_driven(single_process):
         if syst_sf==True:
             syst=None
         self.set_syst(syst)
+        if not(year is None):
+            self.set_year(year)
+    
         print "sample tfratio ",sample
         print "path before super",path
         pathtmp=self.__path
@@ -487,15 +500,13 @@ class data_driven(single_process):
             if isinstance(sample,list):
                 if len(sample)>1:
                     print "making internal multiprocess"
-                    sp=self.make_multiprocess(regions=regions,pathout=path, samplelist=sample,sampleweights=sampleweights,syst=syst,syst_sf=syst_sf,savecr=savecr,tag=tag)
+                    sp=self.make_multiprocess(regions=regions,pathout=path, samplelist=sample,year=year,sampleweights=sampleweights,syst=syst,syst_sf=syst_sf,savecr=savecr,tag=tag)
                     print "got it "
                 if len(sample)==1:
                     sp=sample[0]
             if isinstance(sample,str):
                 sp= sample
             self.set_sample(sp)
-        if not(year is None):
-            self.set_year(year)
         if not(category is None):
             self.set_category(category)
         
@@ -504,7 +515,7 @@ class data_driven(single_process):
            
         #print "filename is ",self.__filename
         print "calling super  method"
-        histomap = super(data_driven,self).transfer_factors(regions_map=regions,onlyCentral=onlyCentral, mapFitFunction=mapFitFunction,tag=tag,plot=plot,verbose=verbose)
+        histomap = super(data_driven,self).transfer_factors(regions_map=regions,onlyCentral=onlyCentral,mapFitFunction=mapFitFunction,tag=tag,plot=plot,verbose=verbose)
         self.reset_info()
         self.set_syst(systtmp)
         self.set_path(pathtmp)
@@ -617,10 +628,11 @@ class data_driven(single_process):
                 #print "in savecr, saving to fileout ",fout ," name ", fout.GetName()
         fout.Close()
         self.reset_syst()
+        self.reset_info()
         self.set_tag(tagtmp)
         return sample
 
-    def tfratio(self,regions,samplelist,ddMapFitFunction=None, tfMapFitFunction=None,sampleweights=None,onlyCentral=False,savecr=True,option="histo",namemap=None,category=None,year=None,plot=False,syst_sf=False,syst=None,tag=None,pathout=None,portname="",verbose=False): 
+    def tfratio(self,regions,samplelist,ddMapFitFunction=None, tfMapFitFunction=None,sampleweights=None,onlyCentral=False,savecr=True,option="histo",namemap=None,category=None,year=None,year_sf=None,plot=False,syst_sf=False,syst=None,tag=None,pathout=None,portname="",verbose=False): 
         #Subtract
         if (namemap is None):
             namemap= self.__namemap
@@ -651,8 +663,13 @@ class data_driven(single_process):
         if pathout==self.__path:
             portname=""
         print "pathout is ",pathout
+        #yearmultiprocess=None
         if len(samplelist)>1:
             mp=self.make_multiprocess(regions=regions,samplelist=samplelist,pathout=pathout,sampleweights=sampleweights,syst_sf=syst_sf,syst=syst,tag=tag)#hwere we produce this in the input file directory
+            if not (year_sf is None):
+                print " =========> mp what year it is ?", year_sf
+                mpalternate=self.make_multiprocess(regions=regions,samplelist=samplelist,pathout=pathout,year=year_sf,sampleweights=sampleweights,syst_sf=syst_sf,syst=syst,tag=tag, verbose=True)#hwere we produce this in the input file directory
+
         self.set_syst(syst)
         print "after multiprocess, syst",self.__syst
         hs_proj_ss={}
@@ -661,8 +678,10 @@ class data_driven(single_process):
 #        for sl in samplelist:
 #            hs_proj_ss[sl] = self.transfer_factor(regions,sl,namemap=namemap,onlyCentral=onlyCentral,mapFitFunction=tfMapFitFunction,category=category,year=year,plot=plot,syst=syst,tag=tag,syst_sf=syst_sf,verbose=False)
         print "pathout is ",pathout, " mp is ",mp
-        hs_proj_multiprocess = self.transfer_factor(regions,mp,path=pathout,namemap=namemap,onlyCentral=onlyCentral,mapFitFunction=tfMapFitFunction,category=category,year=year,plot=plot,syst=syst,tag=tag,syst_sf=syst_sf,verbose=False)
-
+        if (year_sf is None): hs_proj_multiprocess = self.transfer_factor(regions,mp,path=pathout,namemap=namemap,onlyCentral=onlyCentral,mapFitFunction=tfMapFitFunction,category=category,year=year,plot=plot,syst=syst,tag=tag,syst_sf=syst_sf,verbose=False)
+        if not (year_sf is None):
+            print " =========> tf what year it is ?", year_sf, " mpalternate is ",mpalternate
+            hs_proj_multiprocess = self.transfer_factor(regions,mpalternate,path=pathout,namemap=namemap,onlyCentral=onlyCentral,mapFitFunction=tfMapFitFunction,year=year_sf,category=category,plot=plot,syst=syst,tag=tag,syst_sf=syst_sf,verbose=False)
         
         self.set_syst(syst)
         print "before regions syst is" ,self.__syst
@@ -750,6 +769,8 @@ class data_driven(single_process):
             if len(samplelist)>1:
                 #make composite sample as well:
                 histoproj =hs_proj_multiprocess
+#                if not (year_sf is None):
+#                    histoproj =hs_proj_multiprocess_alt
 #            if len(samplelist)==1:
 #                histoproj =hs_proj_ss[samplelist[0]]
             print "histproj is", histoproj 
@@ -945,31 +966,34 @@ sampleweights_wdown={"WJets":0.5,"TT_Mtt":1.}
 sampleweights_ttup={"WJets":1.0,"TT_Mtt":1.33}
 sampleweights_ttdown={"WJets":1.0,"TT_Mtt":0.75}
 
-signalsamples=[ "WP_M"+str(x)+"000W"+str(x)+"0_RH" for x in xrange(2,5)]
+signalsamples=[ "WP_M"+str(x)+"000W"+str(x)+"0_RH" for x in xrange(2,7)]
 
 print signalsamples
 
 testnominal=True
 copysignals=True
 altwjetstt=True
-systs=["jesUp","jesDown","jerUp","jerDown","PFUp","PFDown","puUp","puDown"]
+systs=["jesUp","jesDown","jerUp","jerDown","PFUp","PFDown","puUp","puDown","btagUp","btagDown","mistagUp","mistagDown"]
 doTFPlots=True
 
-systs=[]
+#systs=[]
 #testnominal=False
-altwjetstt=False
+#altwjetstt=False
 doTFPlots=False
-copysignals=False
+#copysignals=False
 
 mapTFFunctions= expo2_fit_map
 if opt.category=="electron" :
     mapTFFunctions= expo2ele_fit_map
 
+year_sf=None
+if opt.year_sf!="None":
+    year_sf=opt.year_sf
 
 if testnominal:
     dd.portSamples(samplelist=signalsamples,regions=wjets_veto_map,syst_sf=True,savecr=True,tag=None) #this takes CR as from nominal always
-    dd.tfratio(wjets_veto_map,ddMapFitFunction=expo2_cr_fit_map,onlyCentral=True,tfMapFitFunction=mapTFFunctions,samplelist=["WJets","TT_Mtt"],savecr=True,syst_sf=False,plot=False)
-    dd.transfer_factor(wjets_veto_map,namemap=namemap,mapFitFunction=mapTFFunctions,onlyCentral=True,tag=None,sample=["WJets","TT_Mtt"],plot=True,verbose=False)
+    dd.tfratio(wjets_veto_map,ddMapFitFunction=expo2_cr_fit_map,onlyCentral=True,year_sf=year_sf,tfMapFitFunction=mapTFFunctions,samplelist=["WJets","TT_Mtt"],savecr=True,syst_sf=False,plot=False)
+#    dd.transfer_factor(wjets_veto_map,namemap=namemap,mapFitFunction=mapTFFunctions,onlyCentral=True,tag=None,sample=["WJets","TT_Mtt"],plot=True,verbose=False)
 #        dd.portSamples(samplelist=signalsamples,regions=wjets_veto_map,syst_sf=True,savecr=True,tag=None,tagout="WJetsUp") #this takes CR as from nominal always
 
 
