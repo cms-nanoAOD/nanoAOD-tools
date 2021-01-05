@@ -298,7 +298,8 @@ def makestack(lep_, reg_, variabile_, samples_, cut_tag_, syst_, lumi):
           canvasname = "stack_"+reg_+"_"+variabile_._name+"_"+cut_tag_+"_"+lep_ + "_" + str(samples_[0].year)
      if("selection_AND_best_Wpjet_isbtag_AND_best_topjet_isbtag" in cut_tag_ ) or ("selection_AND_best_topjet_isbtag_AND_best_Wpjet_isbtag" in cut_tag_ ) or  ("selection_AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag" in cut_tag_ ):
           blind = True
-     blind = False
+     if("selection_AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_" in cut_tag_ ):
+          blind = False
      stack = ROOT.THStack(stackname, variabile_._name)
      leg_stack = ROOT.TLegend(0.33,0.62,0.91,0.87)
      signal = False
@@ -632,18 +633,20 @@ for year in years:
           #elif lep == 'electron' and sample_dict['DataMu_'+str(year)] in dataset_new:
                #dataset_new.remove(sample_dict['DataMu_'+str(year)])
           variables = []
-          wzero = 'w_nominal*PFSF*puSF*lepSF*trigSF'#*btagSF'
+          wzero = 'w_nominal*PFSF*puSF*lepSF*trigSF*btagSF'
           cut = cut_dict[lep]
           #variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', None, None, None,  array('f', [55., 60., 65., 80., 100., 130., 200., 300., 400., 600., 800., 1000.])))
-          variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 50, 0, 1200))
+          #variables.append(variabile('lepton_pt', 'lepton p_{T} [GeV]', wzero+'*('+cut+')', 120, 0, 1200))
+          #variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', None, None, None,  array('f', [120., 150., 180., 230, 280., 340., 400., 480., 560., 650., 740., 840., 940., 1050.])))
+          #variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', 120, 0, 1200))
+          #variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
           '''
           #------->   plot nota
-          variables.append(variabile('njet_pt100', 'no. of jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
-          variables.append(variabile('nbjet_pt100', 'no. of b jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
-          variables.append(variabile('leadingjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', None, None, None,  array('f', [150., 180., 230, 280., 350., 400., 480., 560., 650., 740., 840., 940., 1050., 1200., 1350., 1500., 1650., 1800., 1950., 2100., 2300.])))
-          variables.append(variabile('subleadingjet_pt', 'subleading jet p_{T} [GeV]',  wzero+'*('+cut+')', None, None, None,  array('f', [100., 120., 150., 180., 230, 280., 340., 400., 480., 560., 650., 740., 840., 940., 1050., 1200., 1350., 1500., 1650., 1800.])))
+          #variables.append(variabile('njet_pt100', 'no. of jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
+          #variables.append(variabile('nbjet_pt100', 'no. of b jets with p_{T} > 100 GeV',  wzero+'*('+cut+')', 7, -0.5, 6.5))
+          variables.append(variabile('leadingjet_pt', 'leading jet p_{T} [GeV]',  wzero+'*('+cut+')', None, None, None,  array('f', [300., 350., 400., 480., 560., 650., 740., 840., 940., 1050., 1200., 1350., 1500., 1650., 1800., 1950., 2100., 2300.])))
+          variables.append(variabile('subleadingjet_pt', 'subleading jet p_{T} [GeV]',  wzero+'*('+cut+')', None, None, None,  array('f', [150., 180., 230, 280., 340., 400., 480., 560., 650., 740., 840., 940., 1050., 1200., 1350., 1500., 1650., 1800.])))
 
-          #variables.append(variabile('MET_pt', "Missing transverse momentum [GeV]",wzero+'*('+cut+')', None, None, None,  array('f', [0., 50., 100., 120., 150., 180., 230, 280., 340., 400., 480., 560., 650., 740., 840., 940., 1050.])))
 
           variables.append(variabile('lepton_eta', 'lepton #eta', wzero+'*('+cut+')', 48, -2.4, 2.4))
           variables.append(variabile('lepton_phi', 'lepton #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
@@ -655,8 +658,9 @@ for year in years:
           #variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')',  46, 80, 1000))
 
           #variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')', None, None, None,  array('f', [100., 120., 150., 180., 230, 280., 340., 400., 480., 560., 650., 740., 840., 940., 1050., 1200., 1350., 1500., 1650., 1800., 1950., 2100., 2300., 2500., 2750., 3000., 3250., 3500., 3750., 4000., 4500., 5000., 6000.])))
-          #variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')', None, None, None,  array('f', [1000., 1250., 1500., 1750., 2000., 2250., 2500., 2750., 3000., 3500., 4000., 5000.])))
+          variables.append(variabile('best_Wprime_m', 'Wprime mass [GeV] (best)',  wzero+'*(best_Wprime_m>0&&'+cut+')', None, None, None,  array('f', [1000., 1250., 1500., 1750., 2000., 2250., 2500., 2750., 3000., 3500., 4000., 5000.])))
           #variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')', None, None, None,  array('f', [80., 100., 120., 150., 180., 230, 280., 340., 400., 480., 560., 650., 740., 840., 940., 1050.])))
+          #variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')', None, None, None,  array('f', [50., 60., 70., 80., 90., 100., 110., 120., 130., 140., 150., 180., 230, 280., 340., 400., 480., 560., 650., 740., 840., 940., 1050.])))
 
           #variables.append(variabile('leadingjets_pt', 'leadings jets system p_{T} [GeV]',  wzero+'*('+cut+')', 150, 0, 3000))
           #variables.append(variabile('leadingjets_pt', 'leadings jets system p_{T} [GeV]',  wzero+'*('+cut+')', None, None, None,  array('f', [100., 120., 150., 180., 230, 280., 340., 400., 480., 560., 650., 740., 840., 940., 1050., 1200., 1350., 1500., 1650., 1800., 1950., 2100., 2300., 2500., 2750., 3000.,])))
@@ -698,7 +702,6 @@ for year in years:
           #variables.append(variabile('lepton_stdIso', 'lepton std Iso',  wzero+'*('+cut+')', 5, -0.5, 4.5))
           variables.append(variabile('best_top_m', 'top mass [GeV] (best)',  wzero+'*(best_top_m>0&&'+cut+')', 46, 80, 1000))
           variables.append(variabile('Event_HT', 'event HT [GeV]', wzero+'*('+cut+')', 70, 0, 1400))
-          variables.append(variabile('MET_phi', 'Missing transverse momentum #phi',  wzero+'*('+cut+')', 20, -3.14, 3.14))
           variables.append(variabile('njet_lowpt', 'no. of jets with 25 < p_{T} < 100 GeV',  wzero+'*('+cut+')', 8, 1.5, 9.5))
           variables.append(variabile('nbjet_lowpt', 'no. of b jets with 25 < p_{T} < 100 GeV',  wzero+'*('+cut+')', 9, -0.5, 8.5))
           variables.append(variabile('nfatjet', 'no. of AK8 jets',  wzero+'*('+cut+')', 5, 1.5, 6.5))

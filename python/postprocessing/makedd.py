@@ -24,11 +24,13 @@ parser.add_option('', '--symJesJer', dest='symJesJer', action="store_true", defa
 parser.add_option('', '--doaddsig', dest='doaddsig', action="store_true", default = False, help='add signal to cr')
 parser.add_option('', '--plotpath', dest='plotpath',type='string', default='./plots/', help='the folder where the plots are stored')
 parser.add_option('', '--year_sf', dest='year_sf',type='string', default='None', help='year from which to extract sf, if None it is done from the same as Data')
+parser.add_option('', '--resetMF', dest='resetMF',action="store_true" ,default=False, help='reset missing files file or append to it')
 
 (opt, args) = parser.parse_args()
 categories =[""]
 systs=[""]
 #systs = ["","_btagUp","_btagDown","_mistagUp","_mistagDown","_pdf_totalUp","_pdf_totalDown","_puUp","_puDown","_q2TTUp","_q2QCDUp","_q2ZJetsUp","_q2WJetsUp","_q2TprimeUp","_q2TTDown","_q2QCDDown","_q2ZJetsDown","_q2WJetsDown","_q2TprimeDown","_jesUp","_jesDown","_jerUp","_jerDown","_topTagUp", "_topTagDown","_wTagUp", "_wTagDown","_topPtWeightDown","_topPtWeightUp"]
+gROOT.SetBatch() # don't pop up canvases
 
 plotpath=opt.plotpath
 if not os.path.exists(plotpath):
@@ -39,8 +41,8 @@ wjets_veto_threshold=200
 sig_cut = "best_top_m_G_120_AND_best_top_m_L_220_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
 CR_cut = "best_top_m_G_220_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_L_60"
 
-if not os.path.exists(opt.pathin + '/Data_' + opt.year + '_' + opt.category + '.root'):  
-    os.system('hadd -f Data_' + opt.year + '_' + opt.category + '.root DataEle_' + opt.year + '_' + opt.category + '.root DataMu_' + opt.year + '_' + opt.category + '.root DataPh_' + opt.year + '_' + opt.category + '.root DataHT_' + opt.year + '_' + opt.category + '.root')
+if not os.path.exists(opt.pathin + '/' + opt.category + '/Data_' + opt.year + '_' + opt.category + '.root'):  
+    os.system('hadd -f ' + opt.pathin + '/' + opt.category + '/Data_' + opt.year + '_' + opt.category + '.root ' + opt.pathin + '/' + opt.category + '/Data*_' + opt.year + '_' + opt.category + '.root ')
 
 lepcut=""
 #lepcut="lep180_"
@@ -48,23 +50,23 @@ lepcut=""
 namemap={}
 namemap["SR2B"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_AND_" + sig_cut
 namemap["SR2B_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_AND_" + CR_cut
-namemap["SR2B_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
+#namemap["SR2B_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
 
 namemap["SRW"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_AND_" + sig_cut
 namemap["SRW_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_AND_" + CR_cut
-namemap["SRW_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
+#namemap["SRW_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
 
 namemap["SRT"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_EQ_0_AND_" + sig_cut
 namemap["SRT_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_EQ_0_AND_" + CR_cut
-namemap["SRT_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_EQ_0_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
+#namemap["SRT_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_AND_best_Wpjet_isbtag_EQ_0_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
 
 namemap["CR0B"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_0_AND_" + sig_cut
 namemap["CR0B_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_0_AND_" + CR_cut
-namemap["CR0B_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_0_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
+#namemap["CR0B_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_0_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
 
 namemap["CR1B"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_1_AND_" + sig_cut
 namemap["CR1B_I"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_1_AND_" + CR_cut
-namemap["CR1B_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_1_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WprAK8_mSD_G_60"
+#namemap["CR1B_II"]="h_jets_best_Wprime_m_selection_"+lepcut+"AND_best_topjet_isbtag_EQ_0_AND_best_Wpjet_isbtag_EQ_0_AND_nbjet_pt100_EQ_1_AND_best_top_m_L_"+str(wjets_veto_threshold)+"_AND_deltaR_bestWAK4_closestAK8_L_0p4_AND_WpAK8_mSD_G_60"
 #
 #wjets_veto_map = {"CR0B":"CR0B_I","CR1B":"CR1B_I"}
 #wjets_veto_map = {"SR2B":"SR2B_I"}
@@ -275,8 +277,9 @@ class single_process(namecollection):
                 if h_ret==0:
                     print "no histogram in ",region
                     return 0
-            except (ValueError): 
-                print "no histogram in ",region
+            except : 
+                print "no histogram in region ",region, "hname ",hname 
+#                print "no histogram in ",region
                 return 0
             h_ret.SetDirectory(0)
             if(verbose):print "returning ",h_ret," name ",h_ret.GetName()
@@ -382,7 +385,7 @@ class data_driven(single_process):
     def update_single_channel(self,namemap=None):
         if (namemap is None):
             namemap =self.__namemap
-        print "tag is ",self.__tag, " syst ", self.__syst, " path ",self.__path, " year ", self.__year
+        if(self.__verbose): print "tag is ",self.__tag, " syst ", self.__syst, " path ",self.__path, " year ", self.__year
         super(data_driven,self).__init__(namemap=namemap,sample=self.__sample,path=self.__path,category=self.__category,year=self.__year,syst=self.__syst,tag=self.__tag,bins=self.__bins,verbose=self.__verbose)#initialize the parent class with the map names     
     def set_maps(self,namemap=namemap):
         self.__namemap=namemap
@@ -485,23 +488,23 @@ class data_driven(single_process):
         self.set_syst(syst)
         if not(year is None):
             self.set_year(year)
-    
-        print "sample tfratio ",sample
-        print "path before super",path
+        if(verbose):
+            print "sample tfratio ",sample
+            print "path before super",path
         pathtmp=self.__path
         if path is None:
             path=self.__pathout#not a mistake: by default taking the path where multiprocess below will write it. This avoids overwriting local files as default behavior 
         self.set_path(path)
-        print self.__path
+        if(verbose):print self.__path
         if syst_sf==True:
             syst=None
         self.set_syst(syst)
         if not(sample is None):    
             if isinstance(sample,list):
                 if len(sample)>1:
-                    print "making internal multiprocess"
+                    if(verbose):print "making internal multiprocess"
                     sp=self.make_multiprocess(regions=regions,pathout=path, samplelist=sample,year=year,sampleweights=sampleweights,syst=syst,syst_sf=syst_sf,savecr=savecr,tag=tag)
-                    print "got it "
+                    if(verbose):print "got it "
                 if len(sample)==1:
                     sp=sample[0]
             if isinstance(sample,str):
@@ -514,7 +517,7 @@ class data_driven(single_process):
         self.update_single_channel(namemap)
            
         #print "filename is ",self.__filename
-        print "calling super  method"
+        if(verbose):print "calling super  method"
         histomap = super(data_driven,self).transfer_factors(regions_map=regions,onlyCentral=onlyCentral,mapFitFunction=mapFitFunction,tag=tag,plot=plot,verbose=verbose)
         self.reset_info()
         self.set_syst(systtmp)
@@ -523,6 +526,49 @@ class data_driven(single_process):
         self.update_filename()
         return histomap
 
+    def get_missing_histos(self,regions, samples,namemap=None,category=None,year=None,syst=None,tag=None,resetFile=False,addLongName=False):
+        allFilesPresent=True
+        if (namemap is None):
+           namemap= self.__namemap
+        if not(year is None):
+            self.set_year(year)
+        if not(category is None):
+            self.set_category(category)
+        samplenom=self.__sample
+        if syst is None:
+            syst=self.__syst
+        else: self.set_syst(syst)
+        tagtmp=self.__tag
+        if tag is None:
+            tag=self.__tag
+        suffix=""
+        if not (syst is None):
+            suffix=suffix+"_"+syst
+        if not (tag is None):
+            suffix=suffix+"_"+tag
+        missinghistos = open("missing_files.txt","a") 
+        if(resetFile): missinghistos = open("missing_files.txt","w") 
+        for sr,cr in regions.iteritems():
+            for s in samples: 
+                try:
+                    h=self.getHisto(region=sr,sample=s,verbose=False)        
+                    h.Integral()
+                except:
+                    if(addLongName):missinghistos.write(s+" "+sr+" "+self.__year+" "+self.__category+" "+suffix+" long name:"+namemap[sr]+"\n")
+                    else: missinghistos.write(s+" "+sr+" "+self.__year+" "+self.__category+" "+suffix+"\n")
+                    allFilesPresent=False
+                try:
+                    hc=self.getHisto(region=cr,sample=s,verbose=False)        
+                    hc.Integral()
+                except:
+                    if(addLongName):missinghistos.write(s+" "+cr+" "+self.__year+" "+self.__category+" "+suffix+" long name:"+namemap[cr]+"\n")
+                    else: missinghistos.write(s+" "+cr+" "+self.__year+" "+self.__category+" "+suffix+"\n")
+                    allFilesPresent=False
+        self.reset_syst()
+        self.reset_info()
+        self.set_tag(tagtmp)
+        return allFilesPresent
+        
     def make_multiprocess(self,regions,samplelist,sampleweights=None,namemap=None,category=None,year=None,syst=None,tag=None,syst_sf=False,savecr=True,pathout=None,verbose=False ):
         if (namemap is None):
            namemap= self.__namemap
@@ -648,10 +694,10 @@ class data_driven(single_process):
         #print "tag is ",self.__tag 
         if syst is None:
             syst=self.__syst
-        print "syst is ",self.__syst 
+        if(verbose):print "syst is ",self.__syst 
         self.set_syst(syst)
         self.update_filename()
-        print "filename is ", self.__filename
+        if(verbose):print "filename is ", self.__filename
         if category is None:
             category=self.__defaults["category"] 
         self.set_category(category)
@@ -662,36 +708,36 @@ class data_driven(single_process):
             pathout=self.__pathout
         if pathout==self.__path:
             portname=""
-        print "pathout is ",pathout
+        if(verbose):print "pathout is ",pathout
         #yearmultiprocess=None
         if len(samplelist)>1:
-            mp=self.make_multiprocess(regions=regions,samplelist=samplelist,pathout=pathout,sampleweights=sampleweights,syst_sf=syst_sf,syst=syst,tag=tag)#hwere we produce this in the input file directory
+            mp=self.make_multiprocess(regions=regions,samplelist=samplelist,pathout=pathout,sampleweights=sampleweights,syst_sf=syst_sf,syst=syst,tag=tag,verbose=False)#hwere we produce this in the input file directory
             if not (year_sf is None):
-                print " =========> mp what year it is ?", year_sf
+                if(verbose):print " =========> mp what year it is ?", year_sf
                 mpalternate=self.make_multiprocess(regions=regions,samplelist=samplelist,pathout=pathout,year=year_sf,sampleweights=sampleweights,syst_sf=syst_sf,syst=syst,tag=tag, verbose=True)#hwere we produce this in the input file directory
 
         self.set_syst(syst)
-        print "after multiprocess, syst",self.__syst
+        if(verbose):print "after multiprocess, syst",self.__syst
         hs_proj_ss={}
         #if len(samplelist)==1:
 
 #        for sl in samplelist:
 #            hs_proj_ss[sl] = self.transfer_factor(regions,sl,namemap=namemap,onlyCentral=onlyCentral,mapFitFunction=tfMapFitFunction,category=category,year=year,plot=plot,syst=syst,tag=tag,syst_sf=syst_sf,verbose=False)
-        print "pathout is ",pathout, " mp is ",mp
+        if(verbose):print "pathout is ",pathout, " mp is ",mp
         if (year_sf is None): hs_proj_multiprocess = self.transfer_factor(regions,mp,path=pathout,namemap=namemap,onlyCentral=onlyCentral,mapFitFunction=tfMapFitFunction,category=category,year=year,plot=plot,syst=syst,tag=tag,syst_sf=syst_sf,verbose=False)
         if not (year_sf is None):
-            print " =========> tf what year it is ?", year_sf, " mpalternate is ",mpalternate
+            if(verbose):print " =========> tf what year it is ?", year_sf, " mpalternate is ",mpalternate
             hs_proj_multiprocess = self.transfer_factor(regions,mpalternate,path=pathout,namemap=namemap,onlyCentral=onlyCentral,mapFitFunction=tfMapFitFunction,year=year_sf,category=category,plot=plot,syst=syst,tag=tag,syst_sf=syst_sf,verbose=False)
         
         self.set_syst(syst)
-        print "before regions syst is" ,self.__syst
+        if(verbose):print "before regions syst is" ,self.__syst
         for sr,cr in regions.iteritems():
 #            print "getting data"
             h_data_sr=self.getHisto(region=sr,sample="Data")
             h_data_cr=self.getHisto(region=cr,sample="Data")
-            print "before fit syst is" ,self.__syst
+            if(verbose):print "before fit syst is" ,self.__syst
             h_data_cr_fit=fittedHisto(self.getHisto(region=sr,sample="Data"),ddMapFitFunction[cr],doRemove=True,npars=-1,behavior="shape_only")[0]
-            print "after fit syst is" ,self.__syst
+            if(verbose):print "after fit syst is" ,self.__syst
 
             doskip=False
             if(h_data_sr==0):
@@ -732,37 +778,37 @@ class data_driven(single_process):
             #h_dd_cr_fit=fittedHisto(h_dd_cr,ddMapFitFunction[cr],doRemove=False,npars=-1,behavior="shape_only")[0]
             #h_dd_cr_fit.SetName("DDFit"+"".join(samplelist)+"_"+cr+"_"+category)
             h_dd_cr_fit=h_data_cr_fit.Clone("DDFit"+"".join(samplelist)+"_"+cr+"_"+category)
-            print "data integral before selection in sr is ",h_dd_sr.Integral(), " and in cr", h_dd_cr.Integral()
+            if(verbose):print "data integral before selection in sr is ",h_dd_sr.Integral(), " and in cr", h_dd_cr.Integral()
             samples = self.__samples
-            print "samples are",samples
+            if(verbose):print "samples are",samples
             for s in samples:
                 if (s=="Data"):continue
                 if (s in samplelist):continue
                 try:
-                    print "sample is ",s,"syst is" ,self.__syst
+                    if(verbose):print "sample is ",s,"syst is" ,self.__syst
                                 
-                    print "adding hsr and hcr for sample ",s, " regions are ",sr,cr, " "
+                    if(verbose):print "adding hsr and hcr for sample ",s, " regions are ",sr,cr, " "
                     hsr= self.getHisto(region=sr,sample=s,verbose=False,nominaltag=True)
                     
-                    print "hsr integral",hsr.Integral()
+                    if(verbose):print "hsr integral",hsr.Integral()
                     h_dd_sr.Add(hsr,-1)
-                    print "data integral sr is ",h_dd_sr.Integral()
+                    if(verbose):print "data integral sr is ",h_dd_sr.Integral()
                     self.writeHistoToFile(histo=hsr,pathout=pathout,region=sr,sample=s+portname,syst=syst,tag=tag)
 
                     if not savecr:
                         self.set_syst(None)
                     hcr= self.getHisto(region=cr,sample=s,verbose=False,nominaltag=True)
 
-                    print "hcr integral",hcr.Integral()
+                    if(verbose):print "hcr integral",hcr.Integral()
                     h_dd_cr.Add(hcr,-1)
                     h_dd_cr_fit.Add(hsr,-1)
                     
-                    print "data integral cr is ",h_dd_cr.Integral()
+                    if(verbose):print "data integral cr is ",h_dd_cr.Integral()
                     
                     self.writeHistoToFile(histo=hcr,pathout=pathout,region=cr,sample=s+portname,syst=syst,tag=tag)
                     self.set_syst(syst)
                 except (TypeError): 
-                    print "hsr or hcr not found!",hsr,hcr
+                    if(verbose):print "hsr or hcr not found!",hsr,hcr
             
                 
                 
@@ -773,7 +819,7 @@ class data_driven(single_process):
 #                    histoproj =hs_proj_multiprocess_alt
 #            if len(samplelist)==1:
 #                histoproj =hs_proj_ss[samplelist[0]]
-            print "histproj is", histoproj 
+            if(verbose):print "histproj is", histoproj 
 
             histo_res={}   
 
@@ -785,20 +831,21 @@ class data_driven(single_process):
             c2= TCanvas("c2")
             h_dd_cr.Write()
             h_dd_cr_fit.Write()
-            print "ischanigng cr 1",h_dd_cr.Integral()
+            if(verbose):print "ischanigng cr 1",h_dd_cr.Integral()
             if(plot):
                 h_dd_cr_fit.Draw()
                 h_data_sr.Write(str("Data"+sr+"_"+category))
                 c2.SetLogy()
                 c2.SaveAs(str(plotpath+"h_dd_cr"+h_dd_cr_fit.GetName()+".png"))
 
-            print "ischanigng cr 2",h_dd_cr.Integral()
+            if(verbose):print "ischanigng cr 2",h_dd_cr.Integral()
             for sc,hp in histoproj[sr].iteritems():
                 if(verbose):
                     # if(True):
-                    print " checking sc hp"
-                    print "  sc ",sc," \n\n"
-                    print " hp ",hp," integral ",hp.Integral()," bin1 ",hp.GetBinContent(1)," bin4 ",hp.GetBinContent(4)
+                    if(verbose):
+                        print " checking sc hp"
+                        print "  sc ",sc," \n\n"
+                        print " hp ",hp," integral ",hp.Integral()," bin1 ",hp.GetBinContent(1)," bin4 ",hp.GetBinContent(4)
                     
                 h_dd_sr_proj=copy.deepcopy(hp)#.Clone(str(hp.GetName()+"mult"))
                
@@ -819,14 +866,15 @@ class data_driven(single_process):
                 h_dd_fit_sr_proj.Write()
                 histo_res[sc]=h_dd_sr_proj
                 #histo_res[sc]=h_dd_fit_sr_proj
-                print " hp ",h_dd_sr_proj," integral ",h_dd_sr_proj.Integral()," bin1 ",h_dd_sr_proj.GetBinContent(1)," bin4 ",h_dd_sr_proj.GetBinContent(4)
+                if(verbose): 
+                    print " hp ",h_dd_sr_proj," integral ",h_dd_sr_proj.Integral()," bin1 ",h_dd_sr_proj.GetBinContent(1)," bin4 ",h_dd_sr_proj.GetBinContent(4)
                 if(plot):
                     if(verbose):print "plotting, is sc ", sc , " string ",isinstance(sc,str)
                     if(not isinstance(sc,str)):
                         #c1.cd()
-                        print "hist 0 integral ",h_dd_sr_proj.Integral(), " max ",h_dd_sr_proj.GetMaximum()
+                        if(verbose): print "hist 0 integral ",h_dd_sr_proj.Integral(), " max ",h_dd_sr_proj.GetMaximum()
                         for b in xrange(1,h_dd_sr_proj.GetNbinsX()+1):
-                            print "hist 0 content",h_dd_sr_proj.GetBinContent(b), " edge ",h_dd_sr_proj.GetBinLowEdge(b) 
+                            if(verbose): print "hist 0 content",h_dd_sr_proj.GetBinContent(b), " edge ",h_dd_sr_proj.GetBinLowEdge(b) 
                         if (int(sc)==0): 
                         #    c1.cd()
                             h_dd_sr_proj.SetLineColor(kBlack)
@@ -835,12 +883,12 @@ class data_driven(single_process):
                            
                         if (int(sc)!=0): 
                         #    c1.cd()
-                            print " plotting sc !=0 "
+                            if(verbose): print " plotting sc !=0 "
                             if(int(sc)>0):h_dd_sr_proj.SetLineColor(kRed)
                             if(int(sc)<0):h_dd_sr_proj.SetLineColor(kBlue)
                             #h_dd_sr_proj.SetLineStyle(abs(int(sc)))
                             h_dd_sr_proj.Draw("esame")
-                            print("printed ")
+                            if(verbose): print("printed ")
                     else:
                         h_dd_sr_proj.SetLineColor(kViolet)
                         h_dd_sr_proj.Draw("samee")
@@ -851,7 +899,7 @@ class data_driven(single_process):
             h_sr.Write()
             if(plot):
                 h_sr.Draw()
-                print " h_sr ",h_sr," integral ",h_sr.Integral()," bin1 ",h_sr.GetBinContent(1)," bin4 ",h_sr.GetBinContent(4)
+                if(verbose): print " h_sr ",h_sr," integral ",h_sr.Integral()," bin1 ",h_sr.GetBinContent(1)," bin4 ",h_sr.GetBinContent(4)
             for sc,hp in histoproj[sr].iteritems():
                 
                 h_sr_proj=hp.Clone()
@@ -859,8 +907,7 @@ class data_driven(single_process):
                 h_sr_proj.Multiply(h_cr)
                 #h_sr_proj.SetDirectory(0)
                 h_sr_proj.Write()
-
-                if(True):
+                if(verbose):
                     print " checking sc hp"
                     print "  sc ",sc," \n\n"
                     print " hp ",hp," integral ",hp.Integral()," bin1 ",hp.GetBinContent(1)," bin4 ",hp.GetBinContent(4)
@@ -893,7 +940,7 @@ class data_driven(single_process):
                 h_dd_cr.Draw("e")
                 h_cr.Draw("same hist")
                 c.SaveAs(str(plotpath+"DDvsMC"+"".join(samplelist)+"_"+cr+"_"+year+"_"+category+".png"))
-            print "ischanigng cr 3",h_dd_cr.Integral()
+            if(verbose): print "ischanigng cr 3",h_dd_cr.Integral()
             #filename put it herer
             self.writeHistoToFile(histo=h_data_sr,pathout=pathout,region=sr,sample="Data"+portname,syst=syst,tag=tag)
             self.writeHistoToFile(histo=h_data_cr,pathout=pathout,region=cr,sample="Data"+portname,syst=syst,tag=tag) 
@@ -902,12 +949,12 @@ class data_driven(single_process):
             self.writeHistoToFile(histo=histo_res[0],pathout=pathout,region=sr,sample="DD"+"".join(samplelist),syst=syst,tag=tag)
             #if not (pathout is None):
             srregions=regions
-        print "syst sf is ", savecr, " regions bef",srregions
+        if(verbose):   print "syst sf is ", savecr, " regions bef",srregions
         if not savecr:
             srregions={}
             for sr,cr in regions.iteritems():
                 srregions[sr]=sr #in case, only save sr files
-        print "regions after ",srregions
+        if(verbose): print "regions after ",srregions
 
         self.make_multiprocess(regions=srregions,samplelist=samplelist,pathout=pathout,sampleweights=sampleweights,syst_sf=syst_sf,syst=syst,tag=tag)
         
@@ -939,7 +986,7 @@ class data_driven(single_process):
             portname="_rebin"
         for s in samplelist:
             for sr,cr in regions.iteritems():
-                print "sample is ",s,"syst is" ,self.__syst
+                if(verbose): print "sample is ",s,"syst is" ,self.__syst
                 hsr= self.getHisto(region=sr,sample=s,verbose=True)
                 self.writeHistoToFile(histo=hsr,pathout=pathout,region=sr,sample=s+portname,syst=syst,tag=tagout)
                 if(savecr):
@@ -967,20 +1014,35 @@ sampleweights_ttup={"WJets":1.0,"TT_Mtt":1.33}
 sampleweights_ttdown={"WJets":1.0,"TT_Mtt":0.75}
 
 signalsamples=[ "WP_M"+str(x)+"000W"+str(x)+"0_RH" for x in xrange(2,7)]
+allsamples= signalsamples
+allsamples.extend(["TT_Mtt","WJets","QCD","ST","Data"])
 
 print signalsamples
 
 testnominal=True
 copysignals=True
 altwjetstt=True
-systs=["jesUp","jesDown","jerUp","jerDown","PFUp","PFDown","puUp","puDown","btagUp","btagDown","mistagUp","mistagDown"]
+systs=["jesDown","jesUp","jerUp","jerDown","PFUp","PFDown","puUp","puDown","btagUp","btagDown","mistagUp","mistagDown"]
 doTFPlots=True
+#systs=["PFDown","puUp","puDown","btagUp","btagDown","mistagUp","mistagDown"]
 
-#systs=[]
-#testnominal=False
-#altwjetstt=False
-doTFPlots=False
-#copysignals=False
+
+
+resetMF = opt.resetMF
+skipall=False
+skipall=not(dd.get_missing_histos(samples=allsamples,regions=wjets_veto_map,resetFile=resetMF))
+for sy in systs:
+    print "syst is ",sy 
+    skiptmp= not(dd.get_missing_histos(samples=allsamples,regions=wjets_veto_map,syst=sy,resetFile=False))
+    print "skiptmpt is ",skiptmp
+    skipall=skipall or skiptmp
+
+if(skipall):
+    systs=[]
+    testnominal=False
+    altwjetstt=False
+    doTFPlots=False
+    copysignals=False
 
 mapTFFunctions= expo2_fit_map
 if opt.category=="electron" :
@@ -989,6 +1051,7 @@ if opt.category=="electron" :
 year_sf=None
 if opt.year_sf!="None":
     year_sf=opt.year_sf
+
 
 if testnominal:
     dd.portSamples(samplelist=signalsamples,regions=wjets_veto_map,syst_sf=True,savecr=True,tag=None) #this takes CR as from nominal always

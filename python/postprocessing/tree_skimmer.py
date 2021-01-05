@@ -1081,7 +1081,7 @@ def reco(scenario, isMC, addPDF, MCReco):
             Event_HT_nominal[0] = -100.
             
         # requiring mtt < 700 to merge inclusive tt with the mtt > 700
-        if('TT_incl' in sample.label):
+        if('TT_incl' in sample.label or 'TT_semilep_2018' in sample.label):
             top_q4 = ROOT.TLorentzVector()  
             antitop_q4 = ROOT.TLorentzVector()  
             tt_q4 = ROOT.TLorentzVector()  
