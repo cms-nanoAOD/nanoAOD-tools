@@ -6,7 +6,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.helpers.TauIDSFTool import TauIDSFTool, TauESTool, TauFESTool
 from PhysicsTools.NanoAODTools.postprocessing.tools import ensureTFile, extractTH1
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-datapath = os.path.join(os.environ['CMSSW_BASE'],"src/PhysicsTools/NanoAODTools/python/postprocessing/data/tau")
+datapath = os.path.join(os.environ.get('CMSSW_BASE','CMSSW_BASE'),"src/PhysicsTools/NanoAODTools/python/postprocessing/data/tau")
 
 
 class TauCorrectionsProducer(Module):
@@ -15,7 +15,7 @@ class TauCorrectionsProducer(Module):
                              antiEleID='DeepTau2017v2p1VSe',   antiEleWPs=['VVLoose','Tight'],
                              antiMuID='DeepTau2017v2p1VSmu',   antiMuWPs=['VLoose','Tight'],
                              antiJetPerDM=False, sys=True,
-                             tes=True, fes=True, tesSys=True, verbose=False):
+                             tes=True, fes=True, tesSys=True, path=datapath, verbose=False):
         """Choose the IDs and WPs for SFs. For available tau IDs, WPs and corrections, check
         https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html#Tau"""
         
@@ -29,17 +29,17 @@ class TauCorrectionsProducer(Module):
         antiMuSFs  = [ ]
         if antiJetID:
           for wp in antiJetWPs:
-            antiJetSFs.append(TauIDSFTool(year,antiJetID,wp,dm=antiJetPerDM,path=datapath,verbose=verbose))
+            antiJetSFs.append(TauIDSFTool(year,antiJetID,wp,dm=antiJetPerDM,path=path,verbose=verbose))
         if antiEleID:
           for wp in antiEleWPs:
-            antiEleSFs.append(TauIDSFTool(year,antiEleID,wp,path=datapath,verbose=verbose))
+            antiEleSFs.append(TauIDSFTool(year,antiEleID,wp,path=path,verbose=verbose))
         if antiMuID:
           for wp in antiMuWPs:
-            antiMuSFs.append(TauIDSFTool(year,antiMuID,wp,path=datapath,verbose=verbose))
+            antiMuSFs.append(TauIDSFTool(year,antiMuID,wp,path=path,verbose=verbose))
         
         # TAU ENERGY SCALE
-        testool = TauESTool(year)  if tes else None
-        festool = TauFESTool(year) if fes else None
+        testool = TauESTool(year,path=path)  if tes else None
+        festool = TauFESTool(year,path=path) if fes else None
         
         self.antiJetID  = antiJetID   # name of the anti-jet discriminator
         self.antiJetSFs = antiJetSFs  # tool for the anti-jet discriminator SF
@@ -184,16 +184,16 @@ class TauCorrectionsProducer(Module):
         
         # FILL BRANCHES
         if self.doSys:
-          for key, toolSFs in tau_sfs.iteritems():
-            for tool, sfs in toolSFs.iteritems():
+          for key, toolSFs in tau_sfs.items():
+            for tool, sfs in toolSFs.items():
               #for tau, sfdown, sf, sfup in zip(taus,sfs[0],sfs[1],sfs[2]):
               #  if tau.genPartFlav>0: print ">>> %-38s %3d %5d %6.2f %6.2f %6.2f +%6.2f -%6.2f"%(tool.branchname,tau.genPartFlav,tau.decayMode,tau.pt,tau.eta,sf,sfup,sfdown)
               self.out.fillBranch(tool.branchname+'Down',sfs[0])
               self.out.fillBranch(tool.branchname,       sfs[1])
               self.out.fillBranch(tool.branchname+'Up',  sfs[2])
         else:
-          for key, toolSFs in tau_sfs.iteritems():
-            for tool, sfs in toolSFs.iteritems():
+          for key, toolSFs in tau_sfs.items():
+            for tool, sfs in toolSFs.items():
               self.out.fillBranch(tool.branchname,sfs)
         if self.doTES:
           self.out.fillBranch("Tau_pt_corr",         taus_pt_corr)
