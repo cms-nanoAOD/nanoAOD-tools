@@ -10,13 +10,13 @@ Source: https://github.com/cms-tau-pog/TauTriggerSFs
 import os
 import ROOT
 from math import sqrt
-base = "%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/tauSF/"%os.environ['CMSSW_BASE']
+datapath  = os.path.join(os.environ.get('CMSSW_BASE','CMSSW_BASE'),"src/PhysicsTools/NanoAODTools/python/postprocessing/data/tau")
 
 
 class TauTriggerSFTool :
     
 
-    def __init__( self, trigger, year=2017, tauWP='medium', wpType='MVAv2' ):
+    def __init__( self, trigger, year=2017, tauWP='medium', wpType='MVAv2', path=datapath ):
 
         self.trigger = trigger
         assert( self.trigger in ['ditau', 'mutau', 'etau'] ), "Choose from: 'ditau', 'mutau', 'etau' triggers."
@@ -28,10 +28,10 @@ class TauTriggerSFTool :
         assert( self.wpType in ['MVAv2', 'dR0p3'] ), "Choose from two provided ID types: 'MVAv2', 'dR0p3'. 'MVAv2' uses dR0p5, and 'dR0p3' is also an MVA-based ID."
         assert( self.wpType == 'MVAv2' ), "Tau POG is currently only providing efficiencies for MVAv2, sorry."
         assert( self.year in [2016, 2017, 2018] ), "Choose which year trigger efficiencies you need."
-        print "Loading Efficiencies for trigger %s usingTau %s ID WP %s for year %i" % (self.trigger, self.wpType, self.tauWP, self.year)
+        print("Loading Efficiencies for trigger %s usingTau %s ID WP %s for year %i" % (self.trigger, self.wpType, self.tauWP, self.year))
 
         # Assume this is in CMSSW with the below path structure
-        self.f = ROOT.TFile( base+'tauTriggerEfficiencies%i.root' % self.year, 'r' )
+        self.f = ROOT.TFile(os.path.join(path,'tauTriggerEfficiencies%i.root'%self.year),'r')
 
 
         ## Load the TF1s containing the analytic best-fit results.
@@ -126,8 +126,8 @@ class TauTriggerSFTool :
         etaPhiVal = etaPhiHist.GetBinContent( etaPhiHist.FindBin( eta, phi ) )
         etaPhiAvg = etaPhiAvgHist.GetBinContent( etaPhiAvgHist.FindBin( eta, phi ) )
         if etaPhiAvg <= 0.0 :
-            print "One of the provided tau (eta, phi) values (%3.3f, %3.3f) is outside the boundary of triggering taus" % (eta, phi)
-            print "Returning efficiency = 0.0"
+            print("One of the provided tau (eta, phi) values (%3.3f, %3.3f) is outside the boundary of triggering taus"%(eta,phi))
+            print("Returning efficiency = 0.0")
             return 0.0
 
         eff *= etaPhiVal / etaPhiAvg
@@ -191,9 +191,9 @@ class TauTriggerSFTool :
         effData = self.getTriggerEfficiencyData( pt, eta, phi, dm )
         effMC = self.getTriggerEfficiencyMC( pt, eta, phi, dm )
         if effMC < 1e-5 :
-            print "Eff MC is suspiciously low. Please contact Tau POG."
-            print " - %s Trigger SF for Tau ID: %s   WP: %s   pT: %f   eta: %s   phi: %f" % (self.trigger, self.wpType, self.tauWP, pt, eta, phi)
-            print " - MC Efficiency = %f" % effMC
+            print("Eff MC is suspiciously low. Please contact Tau POG.")
+            print(" - %s Trigger SF for Tau ID: %s   WP: %s   pT: %f   eta: %s   phi: %f"%(self.trigger,self.wpType,self.tauWP,pt,eta,phi))
+            print(" - MC Efficiency = %f"%effMC)
             return 0.0
 
         if(self.year == 2016):
@@ -204,7 +204,7 @@ class TauTriggerSFTool :
                 if(effMC!=0): sf = effData / effMC
                 else:
                     sf = 0
-                    print "The efficiency is zero in either Data or MC histogram, so SF is set to zero"
+                    print("The efficiency is zero in either Data or MC histogram, so SF is set to zero")
             else:
                 sf = self.getBinnedScaleFactor(pt, dm, self.binnedSFMap[ dm])
 
@@ -212,7 +212,7 @@ class TauTriggerSFTool :
             if(effData!=0 and effMC!=0): sf = effData / effMC
             else:
                 sf = 0
-                print "The efficiency is zero in either Data or MC histogram, so SF is set to zero"
+                print("The efficiency is zero in either Data or MC histogram, so SF is set to zero")
 
         return sf
 
