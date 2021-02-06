@@ -7,7 +7,8 @@ import sys
 import os
 import copy
 
-folder = 'v3trigger'
+#folder = 'v3trigger'
+folder = 'highpt'
 inputpath = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/'
 plotpath = '/eos/user/'+str(os.environ.get('USER')[0])+'/'+str(os.environ.get('USER'))+'/Wprime/nosynch/' + folder + '/plot1D/'
 
@@ -43,6 +44,9 @@ inpfiles = {"muon_16":["DataMu_2016", "DataEle_2016", "DataPh_2016", "TT_dilep_2
             "muon_18":["DataMu_2018",  "DataEle_2018", "TT_dilep_2018"],
             "electron_18":["DataMu_2018", "DataEle_2018", "TT_dilep_2018"],
         }
+
+inpfiles = {"muon_16":["WP_M6000W600_RH_2016"],
+            "electron_16":["WP_M6000W600_RH_2016"]}
 
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch()        # don't pop up canvases

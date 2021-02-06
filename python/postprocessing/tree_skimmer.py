@@ -20,9 +20,9 @@ import copy
 from array import array
 from skimtree_utils import *
 
+Debug = False
 if sys.argv[4] == 'remote':
     from samples import *
-    Debug = False
 else:
     from samples.samples import *
     Debug = True
@@ -108,7 +108,6 @@ systTree.setWeightName("btagShapeDownLfStats2", 1.)
 systTree.setWeightName("btagShapeDownHf", 1.)
 systTree.setWeightName("btagShapeDownHfStats1", 1.)
 systTree.setWeightName("btagShapeDownHfStats2", 1.)
-
 '''
 systTree.setWeightName("puSF",1.)
 systTree.setWeightName("puUp",1.)
@@ -127,6 +126,8 @@ systTree.setWeightName("btagUp",1.)
 systTree.setWeightName("btagDown",1.)
 systTree.setWeightName("mistagUp",1.)
 systTree.setWeightName("mistagDown",1.)
+systTree.setWeightName("pdf_totalUp", 1.)
+systTree.setWeightName("pdf_totalDown", 1.)
 
 
 #++++++++++++++++++++++++++++++++++
@@ -374,6 +375,8 @@ def reco(scenario, isMC, addPDF, MCReco):
     lepton_phi_nominal = array.array('f', [0.])
     lepton_miniIso_nominal = array.array('f', [0.])
     lepton_stdIso_nominal = array.array('f', [0.])
+    muon_pt_tuneP_nominal = array.array('f', [0.])
+    muon_pt_tuneP_pull_nominal = array.array('f', [0.])
     lepMET_deltaPhi_nominal = array.array('f', [0.])
     lepjet_deltaR_nominal = array.array('f', [0.])
     isEle_nominal = array.array('i', [0])
@@ -661,6 +664,8 @@ def reco(scenario, isMC, addPDF, MCReco):
     systTree.branchTreesSysts(trees, scenario, "lepton_phi", outTreeFile, lepton_phi_nominal)
     systTree.branchTreesSysts(trees, scenario, "lepton_miniIso", outTreeFile, lepton_miniIso_nominal)
     systTree.branchTreesSysts(trees, scenario, "lepton_stdIso", outTreeFile, lepton_stdIso_nominal)
+    systTree.branchTreesSysts(trees, scenario, "muon_pt_tuneP", outTreeFile, muon_pt_tuneP_nominal)
+    systTree.branchTreesSysts(trees, scenario, "muon_pt_tuneP_pull", outTreeFile, muon_pt_tuneP_pull_nominal)
     systTree.branchTreesSysts(trees, scenario, "lepMET_deltaphi", outTreeFile, lepMET_deltaPhi_nominal)
     systTree.branchTreesSysts(trees, scenario, "lepMETpt_HT_nominal", outTreeFile, lepMETpt_HT_nominal)
 
@@ -735,6 +740,8 @@ def reco(scenario, isMC, addPDF, MCReco):
     #++      taking MC weights       ++
     #++++++++++++++++++++++++++++++++++
     print("isMC: ", isMC)
+    pdf_xsweight = 1.
+    pdf_weight_sum = 0.
     if(isMC):
         h_genweight = ROOT.TH1F()
         h_genweight.SetNameTitle('h_genweight', 'h_genweight')
@@ -747,8 +754,11 @@ def reco(scenario, isMC, addPDF, MCReco):
             h_genw_tmp = ROOT.TH1F(dirc.Get("h_genweight"))
             if(dirc.GetListOfKeys().Contains("h_PDFweight")):
                 h_pdfw_tmp = ROOT.TH1F(dirc.Get("h_PDFweight"))
-                
                 if(ROOT.TH1F(h_PDFweight).Integral() < 1.):
+                    for i in range(1, h_pdfw_tmp.GetXaxis().GetNbins()+1):
+                        pdf_weight_sum += h_pdfw_tmp.GetBinContent(i)
+                    pdf_weight_sum /= h_pdfw_tmp.GetXaxis().GetNbins()
+                    print(pdf_weight_sum)
                     h_PDFweight.SetBins(h_pdfw_tmp.GetXaxis().GetNbins(), h_pdfw_tmp.GetXaxis().GetXmin(), h_pdfw_tmp.GetXaxis().GetXmax())
                     print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(ROOT.TH1F(dirc.Get("h_genweight")).GetBinContent(1), ROOT.TH1F(dirc.Get("h_PDFweight")).GetNbinsX()))
                 h_PDFweight.Add(h_pdfw_tmp)
@@ -759,7 +769,9 @@ def reco(scenario, isMC, addPDF, MCReco):
             h_genweight.Add(h_genw_tmp)
         print("h_genweight first bin content is %f and h_PDFweight has %f bins" %(h_genweight.GetBinContent(1), h_PDFweight.GetNbinsX()))
         lheweight = h_genweight.GetBinContent(2)/h_genweight.GetBinContent(1)
-    
+        pdf_xsweight = pdf_weight_sum/h_genweight.GetBinContent(1)
+        #print(pdf_xsweight)
+
     #++++++++++++++++++++++++++++++++++
     #++      Efficiency studies      ++
     #++++++++++++++++++++++++++++++++++
@@ -775,6 +787,7 @@ def reco(scenario, isMC, addPDF, MCReco):
     #++   looping over the events    ++
     #++++++++++++++++++++++++++++++++++
     for i in range(tree.GetEntries()):
+    #for i in range(10000):
         w_nominal_nominal[0] = 1.
         #++++++++++++++++++++++++++++++++++
         #++        taking objects        ++
@@ -784,8 +797,8 @@ def reco(scenario, isMC, addPDF, MCReco):
             if i > 2000:
                 break
                 
-        if not Debug and i%5000 == 0:
-            print("Event #", i+1, " out of ", tree.GetEntries())
+        if i%5000 == 1:
+            print("Event #", i, " out of ", int(tree.GetEntries()))
         event = Event(tree,i)
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
@@ -802,23 +815,6 @@ def reco(scenario, isMC, addPDF, MCReco):
         
         h_eff_mu.Fill('Total', 1)
         h_eff_ele.Fill('Total', 1)
-        if isMC:
-            genpart = Collection(event, "GenPart")
-            LHE = Collection(event, "LHEPart")
-            LHEScaleWeight = Collection(event, 'LHEScaleWeight')
-            lheSF = 1.
-            lheUp = 1.
-            lheDown = 1.
-            if len(LHEScaleWeight) > 1:
-                lhemin = min([LHEScaleWeight[g].__getattr__("") for g in range(len(LHEScaleWeight))])
-                lhemax = max([LHEScaleWeight[g].__getattr__("") for g in range(len(LHEScaleWeight))])
-                lheSF = lheweight * LHEScaleWeight[4].__getattr__("")
-                lheUp = lheweight * lhemax
-                lheDown = lheweight * lhemin
-            
-            systTree.setWeightName("LHESF", copy.deepcopy(lheSF))
-            systTree.setWeightName("LHEUp", copy.deepcopy(lheUp))
-            systTree.setWeightName("LHEDown", copy.deepcopy(lheDown))
 
         chain.GetEntry(i)
 
@@ -983,6 +979,43 @@ def reco(scenario, isMC, addPDF, MCReco):
         elif isElectron:
             h_eff_ele.Fill('passEle+jetsel', int(isElectron))
 
+        if isMC:
+            genpart = Collection(event, "GenPart")
+            LHE = Collection(event, "LHEPart")
+            LHEScaleWeight = Collection(event, 'LHEScaleWeight')
+            lheSF = 1.
+            lheUp = 1.
+            lheDown = 1.
+            pdf_totalUp = 1.
+            pdf_totalDown = 1.
+            if scenario == 'nominal':
+                if len(LHEScaleWeight) > 1:
+                    lhemin = min([LHEScaleWeight[g].__getattr__("") for g in range(len(LHEScaleWeight))])
+                    lhemax = max([LHEScaleWeight[g].__getattr__("") for g in range(len(LHEScaleWeight))])
+                    lheSF = lheweight * LHEScaleWeight[4].__getattr__("")
+                    lheUp = lheweight * lhemax
+                    lheDown = lheweight * lhemin
+                if addPDF:
+                    LHEPdfWeight = Collection(event, 'LHEPdfWeight')
+                    mean_pdf = 0.
+                    rms = 0.
+                    for pdfw, i in zip(LHEPdfWeight, range(1, len(LHEPdfWeight)+1)):
+                        mean_pdf += pdfw.__getattr__("")
+                    mean_pdf /= len(LHEPdfWeight)
+                    #print(mean_pdf)
+                    for pdfw, i in zip(LHEPdfWeight, range(1, len(LHEPdfWeight)+1)):
+                        rms += (pdfw.__getattr__("")-mean_pdf)**2
+                    rms = math.sqrt(rms/len(LHEPdfWeight))
+                    #print(rms)
+                    pdf_totalUp = (1+rms)*pdf_xsweight
+                    pdf_totalDown = (1-rms)*pdf_xsweight
+                    #print(pdf_totalUp, pdf_totalDown)
+                systTree.setWeightName("pdf_totalUp", copy.deepcopy(pdf_totalUp))
+                systTree.setWeightName("pdf_totalDown", copy.deepcopy(pdf_totalDown))
+                systTree.setWeightName("LHESF", copy.deepcopy(lheSF))
+                systTree.setWeightName("LHEUp", copy.deepcopy(lheUp))
+                systTree.setWeightName("LHEDown", copy.deepcopy(lheDown))
+
         if(isMuon):
             isEle_nominal[0] = 0
             isMu_nominal[0] = 1
@@ -996,10 +1029,10 @@ def reco(scenario, isMC, addPDF, MCReco):
                 tightlep_SFDown = goodMu[0].effSF_Down
                 systTree.setWeightName("lepSF", copy.deepcopy(tightlep_SF))
                 systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SFUp))
-                systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SFDown))
+                systTree.setWeightName("lepDown", copy.deepcopy(abs(tightlep_SFDown)))
                 systTree.setWeightName("trigSF", copy.deepcopy(goodMu[0].trigSF))
                 systTree.setWeightName("trigUp", copy.deepcopy(goodMu[0].trigSF_Up))
-                systTree.setWeightName("trigDown", copy.deepcopy(goodMu[0].trigSF_Down))
+                systTree.setWeightName("trigDown", copy.deepcopy(abs(goodMu[0].trigSF_Down)))
         elif(isElectron):
             isEle_nominal[0] = 1
             isMu_nominal[0] = 0
@@ -1014,10 +1047,10 @@ def reco(scenario, isMC, addPDF, MCReco):
                 tightlep_SFDown = goodEle[0].effSF_Down
                 systTree.setWeightName("lepSF", copy.deepcopy(tightlep_SF))
                 systTree.setWeightName("lepUp", copy.deepcopy(tightlep_SFUp))
-                systTree.setWeightName("lepDown", copy.deepcopy(tightlep_SFDown))
+                systTree.setWeightName("lepDown", copy.deepcopy(abs(tightlep_SFDown)))
                 systTree.setWeightName("trigSF", copy.deepcopy(goodEle[0].trigSF))
                 systTree.setWeightName("trigUp", copy.deepcopy(goodEle[0].trigSF_Up))
-                systTree.setWeightName("trigDown", copy.deepcopy(goodEle[0].trigSF_Down))
+                systTree.setWeightName("trigDown", copy.deepcopy(abs(goodEle[0].trigSF_Down)))
         else:
             ##print('Event %i not a good' %(i))
             continue
@@ -1059,6 +1092,8 @@ def reco(scenario, isMC, addPDF, MCReco):
         nPV_good_nominal[0] = PV.npvsGood
         nPV_tot_nominal[0] = PV.npvs
         
+        muon_pt_tuneP_nominal[0] = -100.
+        muon_pt_tuneP_pull_nominal[0] = -100.
         if tightlep != None:
             lepton_pt_nominal[0] = tightlep_p4.Pt()
             lepton_eta_nominal[0] = tightlep_p4.Eta()
@@ -1066,6 +1101,8 @@ def reco(scenario, isMC, addPDF, MCReco):
             lepton_miniIso_nominal[0] = tightlep.miniPFRelIso_all
             if(isMuon):
                 lepton_stdIso_nominal[0] = tightlep.pfIsoId
+                muon_pt_tuneP_nominal[0] = tightlep_p4.Pt()*tightlep.tunepRelPt
+                muon_pt_tuneP_pull_nominal[0] = (1.-tightlep.tunepRelPt)/1.
             MET_pt_nominal[0] = met.pt
             MET_phi_nominal[0] = met.phi
             Event_HT_nominal[0] = HT.eventHT

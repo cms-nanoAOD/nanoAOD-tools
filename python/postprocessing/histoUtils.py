@@ -2,8 +2,52 @@ import math
 import copy
 from array import array
 from ROOT import *
-def resizeHisto(histo,varbins,normalizeToBinWidth=True,addUnderflow=False,addOverflow=True,verbose=False):
+import sympy
 
+def getIntegral(function, bmin, bmax):
+    return function.Integral(bmin,bmax)/(bmax-bmin)
+
+def totalError(func, npars, pars, sigmas, cov_matrix, bmin, bmax):
+    errorup = 0.
+    errordown = 0.
+    for i in range(npars):
+        for j in range(npars):
+            if i<= j:
+                print 'cov matrix element ', i, j, cov_matrix[i][j]
+                print 'pars' ,  pars[i], 'sigmas ', sigmas[i]
+                print 'pars' ,  pars[j], 'sigmas ', sigmas[j]
+                print 'func param ', i, func.GetParameter(i)
+                print 'func param ', j, func.GetParameter(j)
+                nominal = getIntegral(func, bmin, bmax)
+                print 'nominal ' , nominal
+                func.SetParameter(i, pars[i] + sigmas[i])
+                iup = getIntegral(func, bmin, bmax)
+                func.SetParameter(i, pars[i])
+                print 'iup ', iup
+                func.SetParameter(j, pars[j] + sigmas[j])
+                jup = getIntegral(func, bmin, bmax)
+                func.SetParameter(j, pars[j])
+                print 'jup ', jup
+                print 'func param ', i, func.GetParameter(i)
+                print 'func param ', j, func.GetParameter(j)
+                errorup += (iup - nominal)/sigmas[i]*(jup - nominal)/sigmas[j]*cov_matrix[i][j]
+                func.SetParameter(i, pars[i])
+                print 'error up ', errorup
+                func.SetParameter(i, pars[i] - sigmas[i])
+                idown = getIntegral(func, bmin, bmax)
+                func.SetParameter(i, pars[i])
+                print 'idown ', idown
+                func.SetParameter(j, pars[j] - sigmas[j])
+                jdown = getIntegral(func, bmin, bmax)
+                func.SetParameter(j, pars[j])
+                print 'jdown ', jdown
+                print 'func param ', i, func.GetParameter(i)
+                print 'func param ', j, func.GetParameter(j)
+                errordown += (nominal - idown)/sigmas[i]*(nominal - jdown)/sigmas[j]*cov_matrix[i][j]
+                print 'error down ', errordown
+    return math.sqrt(errorup), math.sqrt(errordown)
+
+def resizeHisto(histo,varbins,normalizeToBinWidth=True,addUnderflow=False,addOverflow=True,verbose=False):
     nbins=histo.GetNbinsX()
     mins={0:-14000}
     maxs={(len(varbins)):14000}
@@ -78,9 +122,13 @@ def resizeHisto(histo,varbins,normalizeToBinWidth=True,addUnderflow=False,addOve
     return h_ret,maxs,mins,bincontent,binerrors    
 
 
-def fittedHisto(histo,function,npars=-1,onlyCentral=False,behavior="nominal",doRemove=True,verbose=False):
-    fitresults=histo.Fit(function,"S")
-    corrmatrix=fitresults.GetCovarianceMatrix()
+def fittedHisto(histo,function,npars=-1,onlyCentral=False,behavior="nominal",doRemove=True,verbose=True,fitrange=None):
+    if fitrange is None: 
+        fitresults=histo.Fit(function,"SI")
+    else:
+        fitresults=histo.Fit(function,"SI","",fitrange[0],fitrange[1])
+    covmatrix=fitresults.GetCovarianceMatrix()
+    corrmatrix=fitresults.GetCorrelationMatrix()
     if(verbose):
         print fitresults
         print corrmatrix
@@ -94,7 +142,6 @@ def fittedHisto(histo,function,npars=-1,onlyCentral=False,behavior="nominal",doR
         if(verbose):print "parameter ", p, " value ",fitresults.Value(p), " error ",  fitresults.Error(p)
         pars.append(fitresults.Value(p))
         variations.append(fitresults.Error(p))
-        
     if(doRemove):
         if(verbose):
             print histo.GetListOfFunctions().ls()
@@ -111,9 +158,12 @@ def fittedHisto(histo,function,npars=-1,onlyCentral=False,behavior="nominal",doR
     for b in xrange(1,histo.GetNbinsX()+1):
         minb=histo.GetBinLowEdge(b)
         maxb=histo.GetBinLowEdge(b+1)
-        content_x=function.Integral(minb,maxb)/(maxb-minb)
+        content_x= getIntegral(function, minb, maxb)
+        if not (fitrange is None):
+            isOutOfBounds=(maxb<=fitrange[0] ) or ( minb>=fitrange[1] )   
+            if isOutOfBounds:
+                content_x=histo.GetBinContent(b)
         if(verbose):print "bin ",b," min , max ",minb," , ",maxb," orig ",histo.GetBinContent(b)," fit ", content_x 
-    
         h_ret.SetBinContent(b,content_x)
     hs_ret[0]=h_ret    
     if(behavior=="shape_only"):
@@ -122,46 +172,29 @@ def fittedHisto(histo,function,npars=-1,onlyCentral=False,behavior="nominal",doR
     if onlyCentral:
         return hs_ret
     if(verbose):print "zero integral ",h_ret.Integral()
-    for p in xrange(npars):
-#        h_ret_up=histo.Clone(str(histo.GetName()+"par"+str(p)+"up"))
-#        h_ret_down=histo.Clone(str(histo.GetName()+"par"+str(p)+"down"))
-        h_ret_up=copy.deepcopy(histo)
-        h_ret_up.SetName((str(histo.GetName()+"par"+str(p)+"up")))
-        h_ret_down=copy.deepcopy(histo)
-        h_ret_down.SetName((str(histo.GetName()+"par"+str(p)+"down")))
-        h_ret_up.Reset("ICES")
-        h_ret_down.Reset("ICES")
-        for b in xrange(1,histo.GetNbinsX()+1):
-            minb=histo.GetBinLowEdge(b)
-            maxb=histo.GetBinLowEdge(b+1)
-            #
-            function.SetParameter(p,pars[p]+variations[p])
-            content_x_up=function.Integral(minb,maxb)/(maxb-minb)
-            h_ret_up.SetBinContent(b,content_x_up)
-            
+    h_ret_up=copy.deepcopy(histo)
+    h_ret_up.SetName((str(histo.GetName()+"TFup")))
+    h_ret_down=copy.deepcopy(histo)
+    h_ret_down.SetName((str(histo.GetName()+"TFdown")))
+    h_ret_up.Reset("ICES")
+    h_ret_down.Reset("ICES")
+    for b in xrange(1,histo.GetNbinsX()+1):
+        minb=histo.GetBinLowEdge(b)
+        maxb=histo.GetBinLowEdge(b+1)
+        content_x= getIntegral(function, minb, maxb)
+        
+        isOutOfBounds=False
+        if not (fitrange is None):
+            isOutOfBounds=(maxb<=fitrange[0] ) or ( minb>=fitrange[1] )   
+        content_x_up, content_x_down = totalError(function, npars, pars, variations, covmatrix, minb, maxb)
+        print '********************************************************************************************************************'
+        if(verbose): print "bin ",b," min , max ",minb," , ",maxb," orig ",histo.GetBinContent(b)," fit up ", content_x_up , " nominal, ", content_x, " fit down ",content_x_down
+        h_ret_down.SetBinContent(b,content_x - content_x_down)
+        h_ret_up.SetBinContent(b,content_x + content_x_up)
+        print 'h_ret_down bin content ', h_ret_down.GetBinContent(b), 'h_ret_up bin content ', h_ret_up.GetBinContent(b)
+        print '********************************************************************************************************************'
 
-            function.SetParameter(p,pars[p]-variations[p])
-            content_x_down=function.Integral(minb,maxb)/(maxb-minb)
-            h_ret_down.SetBinContent(b,content_x_down)
-
-            function.SetParameter(p,pars[p])
-            content_x=function.Integral(minb,maxb)/(maxb-minb)
-            #            h_ret_up.SetBinContent(b,content_x_down)
-            
-            if(verbose): print "bin ",b," min , max ",minb," , ",maxb," orig ",histo.GetBinContent(b)," fit up ", content_x_up , " nominal, ", content_x, " fit down ",content_x_down
-
-        hs_ret[p+1]=h_ret_up
-        hs_ret[-1*(p+1)]=h_ret_down
-        if(verbose):
-            print "par ",p+1,"integral ",hs_ret[p+1].Integral()
-            print "par ",-1*(p+1),"integral ",hs_ret[-1*(p+1)].Integral()
-        if(behavior=="shape_only"):
-            if(hs_ret[p+1].Integral()):
-                hs_ret[p+1].Scale(histo.Integral()/hs_ret[1*(p+1)].Integral())
-#                hs_ret[p+1].Scale(hs_ret[0].Integral()/hs_ret[1*(p+1)].Integral())
-            if(hs_ret[-1*(p+1)].Integral()):
-                hs_ret[-1*(p+1)].Scale(histo.Integral()/hs_ret[-1*(p+1)].Integral())
-#                hs_ret[-1*(p+1)].Scale(hs_ret[0].Integral()/hs_ret[-1*(p+1)].Integral())
-
+    hs_ret[1]=h_ret_up
+    hs_ret[2]=h_ret_down
     return hs_ret
 

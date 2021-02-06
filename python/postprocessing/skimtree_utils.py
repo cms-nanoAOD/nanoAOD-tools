@@ -1224,6 +1224,8 @@ class systWeights(object):
             self.weightedNames[18] = "trigSF"
             self.weightedNames[19] = "trigUp"
             self.weightedNames[20] = "trigDown"
+            self.weightedNames[21] = "pdf_totalUp"
+            self.weightedNames[22] = "pdf_totalDown"
             '''
             self.weightedNames[13] = "btagShape"
             self.weightedNames[14] = "btagShapeUpCferr1"
@@ -1250,8 +1252,8 @@ class systWeights(object):
             #self.weightedNames[11] = "trigUp"
             #self.weightedNames[12] = "trigDown"
             '''
-            self.setMax(21)
-            self.setMaxNonPDF(21)
+            self.setMax(23)
+            self.setMaxNonPDF(23)
             self.weightedNames[self.maxSysts] = ""
 
         if addQ2: 
