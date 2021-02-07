@@ -205,27 +205,10 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
      h1.Sumw2()
      if 'muon' in lep: 
           cut = variable._taglio + '*isMu'
-          #if not 'Data' in sample.label:
-          #cut += '*passed_mu*(1-passed_ht)'
-          #cut += '*passed_ht*(1-passed_mu)*(1-passed_ele)'
-          '''
-          if 'DataMu' in sample.label:
-               cut += '*passed_ht*(passed_mu)'
-          elif 'DataHT' in sample.label:
-               cut += '*passed_ht*(1-passed_mu)'
-          else:
-               cut += '*passed_ht'
-          '''
      elif 'electron' in lep:
           cut  = variable._taglio + '*isEle'
           if 'MC' in variable._name:
                cut = cut + "*(" + str(variable._name) + "!=-100.)"
-          #if not 'Data' in sample.label: 
-          #cut += '*passed_ht*(1-passed_ele)'
-          #cut += '*passed_ele'
-     #if 'MC' in variable._name:
-     #if not 'Data' in sample.label:
-          #cut = cut + "*(MC_Wprime_m!=-100.)"
      print str(cut)
      foutput = plotrepo + "plot/" + lep + "/" + sample.label + "_" + lep+".root"
      if not 'Data' in sample.label: 
@@ -236,7 +219,7 @@ def plot(lep, reg, variable, sample, cut_tag, syst):
                foutput = plotrepo + "plot/" + lep + "/" + sample.label + "_" + lep + ".root"
           else:
                foutput = plotrepo + "plot/" + lep + "/" + sample.label + "_" + lep + "_" + syst + ".root"
-
+               cut += '*'+syst
      #print treename
      f1.Get(treename).Project(histoname,variable._name,cut)
      #if not 'Data' in sample.label:
