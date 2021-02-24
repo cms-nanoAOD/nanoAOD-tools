@@ -26,7 +26,7 @@ archiveTagsDATA = {
     '2017': 'Fall17_17Nov2017_V32_DATA',
     '2018': 'Autumn18_V19_DATA',
     'UL2017': 'Summer19UL17_V5_DATA',
-    'UL2018': 'Summer19UL18_v5_DATA'
+    'UL2018': 'Summer19UL18_V5_DATA'
 }
 
 jecTagsDATA = {
