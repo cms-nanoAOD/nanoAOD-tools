@@ -1,0 +1,6 @@
+# this is a comment
+#keep *
+drop *
+keep Pass*
+keep Total*
+keep Jet*
