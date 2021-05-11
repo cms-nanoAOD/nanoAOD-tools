@@ -17,7 +17,7 @@ Please never commit neither the build directory, nor the empty init.py files cre
 ## Checkout instructions: CMSSW
 
     cd $CMSSW_BASE/src
-    git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
+    git clone git@github.com:rymuelle/nanoAOD-tools.git PhysicsTools/NanoAODTools
     cd PhysicsTools/NanoAODTools
     cmsenv
     scram b
