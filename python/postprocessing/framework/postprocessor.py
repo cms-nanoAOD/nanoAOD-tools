@@ -208,6 +208,7 @@ class PostProcessor:
                 if self.friend:
                     outTree = FriendOutput(inFile, inTree, outFile)
                 else:
+                    firstEntry = 0 if fullClone and elist else self.firstEntry
                     outTree = FullOutput(
                         inFile,
                         inTree,
@@ -216,7 +217,7 @@ class PostProcessor:
                         outputbranchSelection=self.outputbranchsel,
                         fullClone=fullClone,
                         maxEntries=self.maxEntries,
-                        firstEntry=self.firstEntry,
+                        firstEntry=firstEntry,
                         jsonFilter=jsonFilter,
                         provenance=self.provenance)
             else:
