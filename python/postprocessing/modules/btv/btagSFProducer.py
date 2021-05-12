@@ -55,7 +55,7 @@ class btagSFProducer(Module):
         self.supported_wp = None
         supported_btagSF = {
             'csvv2': {
-                '2016': {
+                'Old2016': {
                     'inputFileName': "btagSF_CSVv2_ichep2016.csv",
                     'measurement_types': {
                         0: "comb",  # b
@@ -75,7 +75,7 @@ class btagSFProducer(Module):
                 }
             },
             'deepcsv': {
-                'Legacy2016': {
+                '2016': {
                     'inputFileName': "DeepCSV_2016LegacySF_V1.csv",
                     'measurement_types': {
                         0: "comb",  # b
@@ -122,7 +122,7 @@ class btagSFProducer(Module):
                 },
             },
             'deepjet': {
-                'Legacy2016': {
+                '2016': {
                     'inputFileName': "DeepJet_2016LegacySF_V1.csv",
                     'measurement_types': {
                         0: "comb",  # b
@@ -169,7 +169,7 @@ class btagSFProducer(Module):
                 },
             },
             'cmva': {
-                '2016': {
+                'Old2016': {
                     'inputFileName': "btagSF_cMVAv2_ichep2016.csv",
                     'measurement_types': {
                         0: "ttbar",  # b
@@ -380,5 +380,7 @@ class btagSFProducer(Module):
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
 
 
-btagSF2016 = lambda: btagSFProducer("2016")
-btagSF2017 = lambda: btagSFProducer("2017")
+btagSF2016 = lambda : btagSFProducer("2016","deepcsv")
+btagSF2017 = lambda : btagSFProducer("2017","deepcsv")
+btagSF2018 = lambda : btagSFProducer("2018","deepcsv")
+btagSF = lambda era: btagSFProducer(era,"deepcsv")
