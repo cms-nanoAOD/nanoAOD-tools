@@ -13,12 +13,14 @@ class bffPreselProducer(Module):
     def endJob(self):
         pass
 
-    def ptSel(self, obj, variation):
+    def ptSel(self, obj, variation, met=0):
         if variation=="jerUp": pt = obj.pt_jerUp
         elif variation=="jerDown": pt = obj.pt_jerDown
-        elif variation=="jesUp": pt = obj.pt_jesTotalUp
-        elif variation=="jesDown": pt = obj.pt_jesTotalDown
-        else: pt = obj.pt_nom
+        elif variation=="jesTotalUp": pt = obj.pt_jesTotalUp
+        elif variation=="jesTotalDown": pt = obj.pt_jesTotalDown
+        else: 
+            if met: pt = obj.pt
+            else:pt = obj.pt_nom
         return pt
     def bjetSel(self, jet, variation):
         btagWP = self.btagWP
@@ -31,9 +33,18 @@ class bffPreselProducer(Module):
     def alljetSel(self, jet, variation):
         btagWP = self.btagWP
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
-    def __init__(self, btagWP):
-        self.btagWP = btagWP
-        self.muSel = lambda x,pt: ((x.pt_corrected > pt) & (abs(x.eta) < 2.4) & (x.tightId > 0) 
+    def __init__(self, era):
+        if era==2016:
+                self.btagWP=.6321
+                self.triggers= ['HLT_Mu50','HLT_TkMu50', 'HLT_DoubleEle33_CaloIdL_MW', 'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL'] 
+        if era==2017:
+                self.btagWP=.4941
+                self.triggers= ['HLT_Mu50','HLT_OldMu100','HLT_TkMu100', 'HLT_DoubleEle33_CaloIdL_MW', 'HLT_DoubleEle25_CaloIdL_MW'] 
+        if era==2018:
+                self.btagWP=.4184
+                self.triggers= ['HLT_Mu50','HLT_OldMu100','HLT_TkMu100', 'HLT_DoubleEle25_CaloIdL_MW'] 
+
+        self.muSel = lambda x,pt: ((x.pt > pt) & (abs(x.eta) < 2.4) & (x.tightId > 0) 
                                & (x.pfRelIso04_all < 0.25))
         self.eleSel = lambda x,pt: ((x.pt > pt) & (abs(x.eta) < 2.4) & x.cutBased_HEEP > 0)
         self.diLepMass = -1
@@ -41,10 +52,10 @@ class bffPreselProducer(Module):
         self.lep_2 = ROOT.TLorentzVector()
         self.isMC = True
         self.sysDict = {}
-        self.sysDict['nominal']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"nominal"),
-        'bjetSel': lambda sel:self.bjetSel(sel,"nominal"),
-        'alljetSel': lambda sel:self.alljetSel(sel,"nominal"),
-        'met': lambda sel:self.ptSel(sel,"nominal")}
+        self.sysDict['nom']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"nom"),
+        'bjetSel': lambda sel:self.bjetSel(sel,"nom"),
+        'alljetSel': lambda sel:self.alljetSel(sel,"nom"),
+        'met': lambda sel:self.ptSel(sel,"nom",met=1)}
         pass
 
     def beginJob(self):
@@ -56,7 +67,10 @@ class bffPreselProducer(Module):
         In case of data, the b-tagging scale factors are not produced. 
         Check whether they were produced and if not, drop them from jet selections
         '''
-        if wrappedOutputTree.tree().GetListOfBranches().FindObject("Jet_btagSF"):
+        list_of_branches = wrappedOutputTree.tree().GetListOfBranches()
+        self._triggers = [trigger for trigger in self.triggers if trigger in list_of_branches]
+        print(self._triggers)
+        if list_of_branches.FindObject("Jet_btagSF"):
             self.isMC = True
         else: 
             self.isMC = False
@@ -65,20 +79,19 @@ class bffPreselProducer(Module):
             self.sysDict['jerUp']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jerUp"),
             'bjetSel': lambda sel:self.bjetSel(sel,"jerUp"),
             'alljetSel': lambda sel:self.alljetSel(sel,"jerUp"),
-            'met': lambda sel:self.ptSel(sel,"jerUp")}
+            'met': lambda sel:self.ptSel(sel,"jerUp", met=1)}
             self.sysDict['jerDown']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jerDown"),
             'bjetSel': lambda sel:self.bjetSel(sel,"jerDown"),
             'alljetSel': lambda sel:self.alljetSel(sel,"jerDown"),
-            'met': lambda sel:self.ptSel(sel,"jerDown")}
-            self.sysDict['jesUp']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jesUp"),
-            'bjetSel': lambda sel:self.bjetSel(sel,"jesUp"),
-            'alljetSel': lambda sel:self.alljetSel(sel,"jesUp"),
-            'met': lambda sel:self.ptSel(sel,"jesUp")}
-            self.sysDict['jesDown']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jesDown"),
-            'bjetSel': lambda sel:self.bjetSel(sel,"jesDown"),
-            'alljetSel': lambda sel:self.alljetSel(sel,"jesDown"),
-            'met': lambda sel:self.ptSel(sel,"jesDown")}
-
+            'met': lambda sel:self.ptSel(sel,"jerDown",met=1)}
+            self.sysDict['jesTotalUp']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jesTotalUp"),
+            'bjetSel': lambda sel:self.bjetSel(sel,"jesTotalUp"),
+            'alljetSel': lambda sel:self.alljetSel(sel,"jesTotalUp"),
+            'met': lambda sel:self.ptSel(sel,"jesTotalUp",met=1)}
+            self.sysDict['jesTotalDown']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jesTotalDown"),
+            'bjetSel': lambda sel:self.bjetSel(sel,"jesTotalDown"),
+            'alljetSel': lambda sel:self.alljetSel(sel,"jesTotalDown"),
+            'met': lambda sel:self.ptSel(sel,"jesTotalDown",met=1)}
         self.out = wrappedOutputTree
         for key in self.sysDict:
             self.out.branch("nBjets_{}".format(key), "F")
@@ -86,9 +99,9 @@ class bffPreselProducer(Module):
             self.out.branch("JetSFWeight_{}".format(key), "F")
             self.out.branch("HTLT_{}".format(key), "F")
             self.out.branch("RelMET_{}".format(key), "F")
-            self.out.branch("SBM_{}".format(key), "F")
-            self.out.branch("SBMMin_{}".format(key), "F")
-            self.out.branch("SBMMax_{}".format(key), "F")
+            self.out.branch("TMB_{}".format(key), "F")
+            self.out.branch("TMBMin_{}".format(key), "F")
+            self.out.branch("TMBMax_{}".format(key), "F")
             self.out.branch("SR1_{}".format(key), "I")
             self.out.branch("CR10_{}".format(key), "I")
             self.out.branch("CR11_{}".format(key), "I")
@@ -111,8 +124,8 @@ class bffPreselProducer(Module):
             return False
         if (muons[0].charge+muons[1].charge) != 0:
             return False
-        self.lep_1 = muons[0].p4()*(muons[0].pt_corrected/muons[0].pt)
-        self.lep_2 = muons[1].p4()*(muons[1].pt_corrected/muons[1].pt)
+        self.lep_1 = muons[0].p4()*(muons[0].pt/muons[0].pt)
+        self.lep_2 = muons[1].p4()*(muons[1].pt/muons[1].pt)
         diLep = self.lep_1 + self.lep_2
         self.diLepMass = diLep.M()
         self.out.fillBranch("DiLepMass", self.diLepMass)
@@ -138,23 +151,28 @@ class bffPreselProducer(Module):
         if (electrons[0].charge+muons[0].charge) != 0:
             return False
         self.lep_1 = electrons[0].p4()
-        self.lep_2 = muons[0].p4()*(muons[0].pt_corrected/muons[0].pt)
+        self.lep_2 = muons[0].p4()*(muons[0].pt/muons[0].pt)
         diLep = self.lep_1 + self.lep_2
         self.diLepMass = diLep.M()
         self.out.fillBranch("DiLepMass", self.diLepMass)
         return True
 
     def analyze(self, event):
+        HLT_select = False
+        for trigger in self._triggers:
+            if event[trigger]: 
+                HLT_select = 1
+                break
+        if not HLT_select: return False
         electrons = sorted(filter(lambda x: self.eleSel(x,53), Collection(event, "Electron")), key=lambda x: x.pt)
-        muons = sorted(filter(lambda x: self.muSel(x,53), Collection(event, "Muon")), key=lambda x: x.pt_corrected)
-        MET = Object(event, "MET")
+        muons = sorted(filter(lambda x: self.muSel(x,53), Collection(event, "Muon")), key=lambda x: x.pt)
+        MET = Object(event, "MET_T1Smear")
         electronsLowPt = sorted(filter(lambda x: self.eleSel(x,24), Collection(event, "Electron")), key=lambda x: x.pt)
-        muonsLowPt = sorted(filter(lambda x: self.muSel(x,24), Collection(event, "Muon")), key=lambda x: x.pt_corrected)
+        muonsLowPt = sorted(filter(lambda x: self.muSel(x,24), Collection(event, "Muon")), key=lambda x: x.pt)
         nLowPtLep = len(electronsLowPt)+len(muonsLowPt)
         isDiMu = self.selectDiMu(electrons, muons) and nLowPtLep<3
         isDiEle = self.selectDiEle(electrons, muons) and nLowPtLep<3
         isEleMu = self.selectEleMu(electrons, muons) and nLowPtLep<3
-
         if not (isDiMu or isDiEle or isEleMu):
             return False
         eventSelected = False
@@ -166,7 +184,7 @@ class bffPreselProducer(Module):
             """process event, return True (go to next module) or False (fail, go to next event)"""
             jets = sorted(filter(alljetSel, Collection(event, "Jet")), key=lambda x: self.ptSel(x,key))
 
-            metPt = self.ptSel(MET,key)
+            metPt = self.ptSel(MET,key,met=1)
 
             n_Bjets = len(filter(bjetSel, jets))
             n_lightjets = len(filter(lightJetSel, jets))
@@ -186,7 +204,7 @@ class bffPreselProducer(Module):
 
             htlt = (sum([j.pt for j in jets]) 
                    - sum([ele.pt for ele in electrons]) 
-                   - sum([mu.pt_corrected for mu in muons]))
+                   - sum([mu.pt for mu in muons]))
             self.out.fillBranch("HTLT_{}".format(key), htlt)
             
             self.out.fillBranch("RelMET_{}".format(key), metPt/self.diLepMass)
@@ -241,12 +259,12 @@ class bffPreselProducer(Module):
                     sbmMax = sbm
             else:
                 pass
-            self.out.fillBranch("SBM_{}".format(key), sbm)
-            self.out.fillBranch("SBMMin_{}".format(key), sbmMin)
-            self.out.fillBranch("SBMMax_{}".format(key), sbmMax)
+            self.out.fillBranch("TMB_{}".format(key), sbm)
+            self.out.fillBranch("TMBMin_{}".format(key), sbmMin)
+            self.out.fillBranch("TMBMax_{}".format(key), sbmMax)
 
         if eventSelected: return True
-        else: return False
+        else: return True
 
 
 # define modules using the syntax 'name = lambda: constructor'
