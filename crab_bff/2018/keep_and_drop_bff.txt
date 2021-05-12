@@ -1,0 +1,26 @@
+# this is a comment
+#keep *
+drop *
+keep Muon*
+keep Electron*
+keep Jet*
+keep *MET*
+keep HTLT
+keep DiLepMass
+keep SR*
+keep CR*
+keep Inc*
+keep *Weight
+keep PV*
+keep Pileup*
+drop HLT_*
+drop L1_*
+keep HLT_Mu50
+keep HLT_TkMu50
+keep HLT_DoubleEle33_CaloIdL_MW
+keep HLT_DoubleEle33_CaloIdL_GsfTrkIdVL
+keep HLT_TkMu100
+keep HLT_OldMu100
+keep HLT_DoubleEle25_CaloIdL_MW
+keep *ilter*
+keep Flag_*
