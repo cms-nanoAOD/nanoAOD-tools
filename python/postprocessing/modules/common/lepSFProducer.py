@@ -159,13 +159,17 @@ class lepSFProducer(Module):
         self.mu_f = [["%s/src/PhysicsTools/NanoAODTools/python/postprocessing/data/leptonSF/"
             % os.environ['CMSSW_BASE'] + f for f in f_list] for f_list in self.mu_f]
 
-        if "/LeptonEfficiencyCorrector_cc.so" not in ROOT.gSystem.GetLibraries(
-        ):
-            print("Load C++ Worker")
-            ROOT.gROOT.ProcessLine(
-                ".L %s/src/PhysicsTools/NanoAODTools/python/postprocessing/helpers/LeptonEfficiencyCorrector.cc+"
+       # if "/LeptonEfficiencyCorrector_cc.so" not in ROOT.gSystem.GetLibraries(
+       # ):
+       #     print("Load C++ Worker")
+       #     ROOT.gROOT.ProcessLine(
+       #         ".L %s/src/PhysicsTools/NanoAODTools/python/postprocessing/helpers/LeptonEfficiencyCorrector.cc+"
 
-                % os.environ['CMSSW_BASE'])
+       #         % os.environ['CMSSW_BASE'])
+        for library in [ "libCondFormatsJetMETObjects", "libPhysicsToolsNanoAODTools" ]:
+            if library not in ROOT.gSystem.GetLibraries():
+                print("Load Library '%s'" % library.replace("lib", ""))
+                ROOT.gSystem.Load(library) 
     def beginJob(self):
         self._worker_mu = [[] for i in range(len(self.mu_f))]
         for i in range(len(self.mu_f)):
@@ -175,7 +179,7 @@ class lepSFProducer(Module):
                 roo_vec_hist = ROOT.std.vector(str)(1)
                 roo_vec_file[0] = f_list
                 roo_vec_hist[0] = self.mu_h[j]
-                self._worker_mu[i].append( ROOT.LeptonEfficiencyCorrector(roo_vec_file,roo_vec_hist) )
+                self._worker_mu[i].append( ROOT.LeptonEfficiencyCorrectorCppWorker(roo_vec_file,roo_vec_hist) )
         self._worker_sys_mu = [[] for i in range(len(self.mu_f))]
         for i in range(len(self.mu_sys_f)):
             for j, f_list in enumerate(self.mu_sys_f[i]):
@@ -183,7 +187,7 @@ class lepSFProducer(Module):
                 roo_vec_hist = ROOT.std.vector(str)(1)
                 roo_vec_file[0] = f_list
                 roo_vec_hist[0] = self.mu_sys_h[j]
-                self._worker_sys_mu[i].append( ROOT.LeptonEfficiencyCorrector(roo_vec_file,roo_vec_hist) )
+                self._worker_sys_mu[i].append( ROOT.LeptonEfficiencyCorrectorCppWorker(roo_vec_file,roo_vec_hist) )
     def endJob(self):
         pass
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
