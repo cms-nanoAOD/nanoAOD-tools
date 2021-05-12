@@ -20,7 +20,10 @@ class bffPreselProducer(Module):
         elif variation=="jesTotalDown": pt = obj.pt_jesTotalDown
         else: 
             if met: pt = obj.pt
-            else:pt = obj.pt_nom
+            else:
+                if self.isMC:
+                    pt = obj.pt_nom
+                else: pt = obj.pt
         return pt
     def bjetSel(self, jet, variation):
         btagWP = self.btagWP
@@ -44,7 +47,7 @@ class bffPreselProducer(Module):
                 self.btagWP=.4184
                 self.triggers= ['HLT_Mu50','HLT_OldMu100','HLT_TkMu100', 'HLT_DoubleEle25_CaloIdL_MW'] 
 
-        self.muSel = lambda x,pt: ((x.pt > pt) & (abs(x.eta) < 2.4) & (x.tightId > 0) 
+        self.muSel = lambda x,pt: ((x.corrected_pt > pt) & (abs(x.eta) < 2.4) & (x.tightId > 0) 
                                & (x.pfRelIso04_all < 0.25))
         self.eleSel = lambda x,pt: ((x.pt > pt) & (abs(x.eta) < 2.4) & x.cutBased_HEEP > 0)
         self.diLepMass = -1
@@ -74,7 +77,6 @@ class bffPreselProducer(Module):
             self.isMC = True
         else: 
             self.isMC = False
-
         if self.isMC:
             self.sysDict['jerUp']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jerUp"),
             'bjetSel': lambda sel:self.bjetSel(sel,"jerUp"),
@@ -124,8 +126,8 @@ class bffPreselProducer(Module):
             return False
         if (muons[0].charge+muons[1].charge) != 0:
             return False
-        self.lep_1 = muons[0].p4()*(muons[0].pt/muons[0].pt)
-        self.lep_2 = muons[1].p4()*(muons[1].pt/muons[1].pt)
+        self.lep_1 = muons[0].p4()*(muons[0].corrected_pt/muons[0].pt)
+        self.lep_2 = muons[1].p4()*(muons[1].corrected_pt/muons[1].pt)
         diLep = self.lep_1 + self.lep_2
         self.diLepMass = diLep.M()
         self.out.fillBranch("DiLepMass", self.diLepMass)
@@ -151,7 +153,7 @@ class bffPreselProducer(Module):
         if (electrons[0].charge+muons[0].charge) != 0:
             return False
         self.lep_1 = electrons[0].p4()
-        self.lep_2 = muons[0].p4()*(muons[0].pt/muons[0].pt)
+        self.lep_2 = muons[0].p4()*(muons[0].corrected_pt/muons[0].pt)
         diLep = self.lep_1 + self.lep_2
         self.diLepMass = diLep.M()
         self.out.fillBranch("DiLepMass", self.diLepMass)
@@ -165,10 +167,13 @@ class bffPreselProducer(Module):
                 break
         if not HLT_select: return False
         electrons = sorted(filter(lambda x: self.eleSel(x,53), Collection(event, "Electron")), key=lambda x: x.pt)
-        muons = sorted(filter(lambda x: self.muSel(x,53), Collection(event, "Muon")), key=lambda x: x.pt)
-        MET = Object(event, "MET_T1Smear")
+        muons = sorted(filter(lambda x: self.muSel(x,53), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
+        if self.isMC:
+            MET = Object(event, "MET_T1Smear")
+        else:
+            MET = Object(event,"MET")
         electronsLowPt = sorted(filter(lambda x: self.eleSel(x,24), Collection(event, "Electron")), key=lambda x: x.pt)
-        muonsLowPt = sorted(filter(lambda x: self.muSel(x,24), Collection(event, "Muon")), key=lambda x: x.pt)
+        muonsLowPt = sorted(filter(lambda x: self.muSel(x,24), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         nLowPtLep = len(electronsLowPt)+len(muonsLowPt)
         isDiMu = self.selectDiMu(electrons, muons) and nLowPtLep<3
         isDiEle = self.selectDiEle(electrons, muons) and nLowPtLep<3
@@ -204,7 +209,7 @@ class bffPreselProducer(Module):
 
             htlt = (sum([j.pt for j in jets]) 
                    - sum([ele.pt for ele in electrons]) 
-                   - sum([mu.pt for mu in muons]))
+                   - sum([mu.corrected_pt for mu in muons]))
             self.out.fillBranch("HTLT_{}".format(key), htlt)
             
             self.out.fillBranch("RelMET_{}".format(key), metPt/self.diLepMass)
