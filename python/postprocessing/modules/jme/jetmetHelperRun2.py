@@ -12,7 +12,7 @@ jecTagsMC = {
     '2016': 'Summer16_07Aug2017_V11_MC',
     '2017': 'Fall17_17Nov2017_V32_MC',
     '2018': 'Autumn18_V19_MC',
-    'UL2016_preVFB': 'Summer19UL16APV_V7_MC',
+    'UL2016_preVFP': 'Summer19UL16APV_V7_MC',
     'UL2016': 'Summer19UL16_V7_MC',
     'UL2017': 'Summer19UL17_V6_MC',
     'UL2018': 'Summer19UL18_V5_MC',
@@ -29,7 +29,7 @@ archiveTagsDATA = {
     '2016': 'Summer16_07Aug2017_V11_DATA',
     '2017': 'Fall17_17Nov2017_V32_DATA',
     '2018': 'Autumn18_V19_DATA',
-    'UL2016_preVFB': 'Summer19UL16APV_V7_DATA',
+    'UL2016_preVFP': 'Summer19UL16APV_V7_DATA',
     'UL2016': 'Summer19UL16_V7_DATA',
     'UL2017': 'Summer19UL17_V6_DATA',
     'UL2018': 'Summer19UL18_V5_DATA'
@@ -52,11 +52,11 @@ jecTagsDATA = {
     '2018B': 'Autumn18_RunB_V19_DATA',
     '2018C': 'Autumn18_RunC_V19_DATA',
     '2018D': 'Autumn18_RunD_V19_DATA',
-    'UL2016B_preVFB': 'Summer19UL16APV_RunBCD_V7_DATA',
-    'UL2016C_preVFB': 'Summer19UL16APV_RunBCD_V7_DATA',
-    'UL2016D_preVFB': 'Summer19UL16APV_RunBCD_V7_DATA',
-    'UL2016E_preVFB': 'Summer19UL16APV_RunEF_V7_DATA',
-    'UL2016F_preVFB': 'Summer19UL16APV_RunEF_V7_DATA',
+    'UL2016B_preVFP': 'Summer19UL16APV_RunBCD_V7_DATA',
+    'UL2016C_preVFP': 'Summer19UL16APV_RunBCD_V7_DATA',
+    'UL2016D_preVFP': 'Summer19UL16APV_RunBCD_V7_DATA',
+    'UL2016E_preVFP': 'Summer19UL16APV_RunEF_V7_DATA',
+    'UL2016F_preVFP': 'Summer19UL16APV_RunEF_V7_DATA',
     'UL2016F': 'Summer19UL16_RunFGH_V7_DATA',
     'UL2016G': 'Summer19UL16_RunFGH_V7_DATA',
     'UL2016H': 'Summer19UL16_RunFGH_V7_DATA',
@@ -76,7 +76,7 @@ jerTagsMC = {
     '2016': 'Summer16_25nsV1_MC',
     '2017': 'Fall17_V3_MC',
     '2018': 'Autumn18_V7b_MC',
-    'UL2016_preVFB': 'Summer20UL16APV_JRV3_MC',
+    'UL2016_preVFP': 'Summer20UL16APV_JRV3_MC',
     'UL2016': 'Summer20UL16_JRV3_MC',
     'UL2017': 'Summer19UL17_JRV2_MC',
     'UL2018': 'Summer19UL18_JRV2_MC',
@@ -89,7 +89,7 @@ jmrValues = {
     '2017': [1.09, 1.14, 1.04],
     # Use 2017 values for 2018 until 2018 are released
     '2018': [1.09, 1.14, 1.04],
-    'UL2016_preVFB': [1.00, 1.00, 1.00],  # placeholder
+    'UL2016_preVFP': [1.00, 1.00, 1.00],  # placeholder
     'UL2016': [1.00, 1.00, 1.00],  # placeholder
     'UL2017': [1.00, 1.00, 1.00],  # placeholder
     'UL2018': [1.00, 1.00, 1.00],  # placeholder
@@ -103,7 +103,7 @@ jmsValues = {
     '2017': [0.982, 0.978, 0.986],
     # Use 2017 values for 2018 until 2018 are released
     '2018': [0.982, 0.978, 0.986],
-    'UL2016_preVFB': [1.000, 1.000, 1.000],  # placeholder
+    'UL2016_preVFP': [1.000, 1.000, 1.000],  # placeholder
     'UL2016': [1.000, 1.000, 1.000],  # placeholder
     'UL2017': [1.000, 1.000, 1.000],  # placeholder
     'UL2018': [1.000, 1.000, 1.000],  # placeholder
