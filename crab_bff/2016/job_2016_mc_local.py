@@ -41,7 +41,7 @@ isMC = True
 dataYear = "2016"
 runPeriod = ""
 
-triggers= ['HLT_Mu50','HLT_OldMu100','HLT_TkMu100', 'HLT_DoubleEle33_CaloIdL_MW', 'HLT_DoubleEle25_CaloIdL_MW'] 
+triggers= ['HLT_Mu50','HLT_TkMu50', 'HLT_DoubleEle33_CaloIdL_MW', 'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL'] 
 
 jmeCorrections = createJMECorrector(
     isMC=isMC, 
@@ -72,7 +72,7 @@ p = PostProcessor(outdir,
                   provenance=True,
                   fwkJobReport=True,
                   outputbranchsel=keep_and_drop,
-                  #maxEntries=1000,
+                  maxEntries=1000,
                   )
 p.run()
 
