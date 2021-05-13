@@ -5,12 +5,14 @@ keep Muon*
 keep Electron*
 keep Jet*
 keep *MET*
-keep HTLT
+keep HTLT*
+keep TMB*
 keep DiLepMass
 keep SR*
 keep CR*
 keep Inc*
 keep *Weight
+keep *puWeight*
 keep PV*
 keep Pileup*
 drop HLT_*
