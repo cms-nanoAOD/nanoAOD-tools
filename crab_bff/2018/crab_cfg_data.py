@@ -21,7 +21,7 @@ config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 2
 config.Data.lumiMask = 'Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt'
 
-config.Data.outLFNDirBase = '/store/group/phys_exotica/bffZprime/nanoAODskimmed/2018'
+config.Data.outLFNDirBase = '/store/group/phys_exotica/bffZprime/nanoAODskimmed/crab/2018'
 config.Data.publication = False
 config.Data.outputDatasetTag = '{NanoTestPost}'
 config.section_('Site')
