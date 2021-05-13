@@ -55,6 +55,17 @@ float LeptonEfficiencyCorrectorCppWorker::getSFErr(unsigned type, int pdgid, flo
   return out;
 }
 
+float LeptonEfficiencyCorrectorCppWorker::getSFErr(int pdgid, float pt, float eta) {
+  float out=1.;
+  float x = pt;
+  float y = abs(pdgid)==13 ? fabs(eta) : eta;
+  for(std::vector<TH2F*>::iterator hist=effmaps_.begin(); hist<effmaps_.end(); ++hist) {
+    WeightCalculatorFromHistogram wc(*hist);
+    out *= wc.getWeightErr(x,y);
+  }
+  return out;
+}
+
 const std::vector<float> & LeptonEfficiencyCorrectorCppWorker::run() {
   ret_.clear();
   for (int iL = 0, nL = nLep_; iL < nL; ++iL) {
