@@ -20,7 +20,7 @@ config.Data.splitting = 'FileBased'
 #config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 2
 
-config.Data.outLFNDirBase = '/store/group/phys_exotica/bffZprime/nanoAODskimmed/2017'
+config.Data.outLFNDirBase = '/store/group/phys_exotica/bffZprime/nanoAODskimmed/crab/2017'
 config.Data.publication = False
 config.Data.outputDatasetTag = '{NanoTestPost}'
 config.section_('Site')
