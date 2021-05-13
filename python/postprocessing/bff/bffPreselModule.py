@@ -36,7 +36,7 @@ class bffPreselProducer(Module):
     def alljetSel(self, jet, variation):
         btagWP = self.btagWP
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
-    def __init__(self, era):
+    def __init__(self, era, isMC=False):
         if era==2016:
                 self.btagWP=.6321
                 self.triggers= ['HLT_Mu50','HLT_TkMu50', 'HLT_DoubleEle33_CaloIdL_MW', 'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL'] 
@@ -53,7 +53,7 @@ class bffPreselProducer(Module):
         self.diLepMass = -1
         self.lep_1 = ROOT.TLorentzVector()
         self.lep_2 = ROOT.TLorentzVector()
-        self.isMC = True
+        self.isMC = isMC
         self.sysDict = {}
         self.sysDict['nom']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"nom"),
         'bjetSel': lambda sel:self.bjetSel(sel,"nom"),
@@ -73,10 +73,6 @@ class bffPreselProducer(Module):
         list_of_branches = wrappedOutputTree.tree().GetListOfBranches()
         self._triggers = [trigger for trigger in self.triggers if trigger in list_of_branches]
         print(self._triggers)
-        if list_of_branches.FindObject("Jet_btagSF"):
-            self.isMC = True
-        else: 
-            self.isMC = False
         if self.isMC:
             self.sysDict['jerUp']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"jerUp"),
             'bjetSel': lambda sel:self.bjetSel(sel,"jerUp"),
@@ -204,7 +200,7 @@ class bffPreselProducer(Module):
             jetSFWeight = 1
             if self.isMC:
                 for j in jets:
-                    jetSFWeight *= j.btagSF
+                    jetSFWeight *= j.btagSF_deepcsv_M
             self.out.fillBranch("JetSFWeight_{}".format(key), jetSFWeight)
 
             htlt = (sum([j.pt for j in jets]) 

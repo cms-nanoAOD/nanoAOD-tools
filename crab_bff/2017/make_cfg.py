@@ -10,8 +10,8 @@ with open('data.list', 'r') as f:
        'NanoTestPost':post,
        'das':fname.replace('\n','')} 
 
-        #with open('cfg/'+post+'_cfg.py', 'w') as f2:
-        #    f2.write(template_data.format(**crab_dict))
+        with open('cfg/'+post+'_cfg.py', 'w') as f2:
+            f2.write(template_data.format(**crab_dict))
 
 with open('mc.list', 'r') as f:
     for fname in f.readlines():

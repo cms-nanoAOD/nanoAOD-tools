@@ -15,7 +15,7 @@ isMC = True
 dataYear = "2017"
 runPeriod = ""
 
-self.triggers= ['HLT_Mu50','HLT_OldMu100','HLT_TkMu100', 'HLT_DoubleEle33_CaloIdL_MW', 'HLT_DoubleEle25_CaloIdL_MW'] 
+triggers= ['HLT_Mu50','HLT_OldMu100','HLT_TkMu100', 'HLT_DoubleEle33_CaloIdL_MW', 'HLT_DoubleEle25_CaloIdL_MW'] 
 
 jmeCorrections = createJMECorrector(
     isMC=isMC, 
@@ -37,7 +37,7 @@ modules=[
     puWeight_2017(),
     muonScaleRes2017(),
     lepSF2017(),
-    bffPreselProducer(int(dataYear))
+    bffPreselProducer(int(dataYear), isMC=True)
     ]
 
 p = PostProcessor(".",
