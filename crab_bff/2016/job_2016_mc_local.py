@@ -72,7 +72,7 @@ p = PostProcessor(outdir,
                   provenance=True,
                   fwkJobReport=True,
                   outputbranchsel=keep_and_drop,
-                  maxEntries=1000,
+                  #maxEntries=1000,
                   )
 p.run()
 
