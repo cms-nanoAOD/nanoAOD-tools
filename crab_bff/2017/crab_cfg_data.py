@@ -18,7 +18,7 @@ config.Data.inputDataset = '{das}'
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 #config.Data.splitting = 'EventAwareLumiBased'
-config.Data.unitsPerJob = 2
+config.Data.unitsPerJob = 1
 config.Data.lumiMask = 'Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
 
 config.Data.outLFNDirBase = '/store/group/phys_exotica/bffZprime/nanoAODskimmed/crab/2017'
