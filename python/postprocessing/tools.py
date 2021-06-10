@@ -1,3 +1,4 @@
+import os, ROOT
 from math import hypot, pi
 
 # ========= UTILITIES =======================
@@ -76,3 +77,31 @@ def matchObjectCollectionMultiple(
                 matched.append(c)
         pairs[obj] = matched
     return pairs
+
+def ensureTFile(filename,option='READ',verbose=False):
+  """Open TFile, checking if the file in the given path exists."""
+  if not os.path.isfile(filename):
+    raise IOError("File in path '%s' does not exist!"%(filename))
+  if verbose:
+    print("Opening '%s'..."%(filename))
+  file = ROOT.TFile.Open(filename,option)
+  if not file or file.IsZombie():
+    raise IOError("Could not open file by name '%s'"%(filename))
+  return file
+
+def extractTH1(file,histname,setdir=True):
+  """Get histogram by name from a given file."""
+  close = False
+  if isinstance(file,str):
+    file  = ensureTFile(file,'READ')
+    close = True
+  if not file or file.IsZombie():
+    raise IOError("Could not open file for histogram '%s'!"%(histname))
+  hist = file.Get(histname)
+  if not hist:
+    raise IOError("Did not find histogram '%s' in file '%s'!"%(histname,file.GetName()))
+  if setdir and isinstance(hist,ROOT.TH1):
+    hist.SetDirectory(0)
+    if close:
+      file.Close()
+  return hist

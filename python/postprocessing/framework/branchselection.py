@@ -1,4 +1,9 @@
 import re
+try:
+    Pattern = re._pattern_type
+except AttributeError:
+    # Python 3.7
+    Pattern = re.Pattern
 
 
 class BranchSelection():
@@ -39,7 +44,7 @@ class BranchSelection():
         tree.SetBranchStatus("*", 1)
         branchNames = [b.GetName() for b in tree.GetListOfBranches()]
         for bre, stat in self._ops:
-            if type(bre) == re._pattern_type:
+            if type(bre) == Pattern:
                 for n in branchNames:
                     if re.match(bre, n):
                         tree.SetBranchStatus(n, stat)

@@ -98,6 +98,33 @@ class btagSFProducer(Module):
                     },
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 }
+                'UL2017': {
+                    'inputFileName': "DeepCSV_106XUL17SF.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                '2018': {
+                    'inputFileName': "DeepCSV_102XSF_V1.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL2018': {
+                    'inputFileName': "DeepCSV_106XUL18SF.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
             },
             'deepjet' : {
                 'Legacy2016' : {
@@ -127,6 +154,33 @@ class btagSFProducer(Module):
                     },
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
                 }
+                'UL2017': {
+                    'inputFileName': "DeepJet_106XUL17SF.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                '2018': {
+                    'inputFileName': "DeepJet_102XSF_V1.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL2018': {
+                    'inputFileName': "DeepJet_106XUL18SF.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
             },
             'cmva' : {
                 '2016' : {
