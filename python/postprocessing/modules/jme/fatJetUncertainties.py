@@ -627,17 +627,18 @@ class fatJetUncertaintiesProducer(Module):
                         jet_msdcorr_raw)
 
                     # Also evaluated JMS&JMR SD corr in tau21DDT region: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetWtagging#tau21DDT_0_43
-                    if self.era in ["2016"]:
+                    # UL recommendations not yet available, use same factors in both cases
+                    if self.era in ["2016", "UL2016", "UL2016_preVFP"]:
                         jmstau21DDTNomVal = 1.014
                         jmstau21DDTDownVal = 1.007
                         jmstau21DDTUpVal = 1.021
                         self.jetSmearer.jmr_vals = [1.086, 1.176, 0.996]
-                    elif self.era in ["2017"]:
+                    elif self.era in ["2017", "UL2017"]:
                         jmstau21DDTNomVal = 0.983
                         jmstau21DDTDownVal = 0.976
                         jmstau21DDTUpVal = 0.99
                         self.jetSmearer.jmr_vals = [1.080, 1.161, 0.999]
-                    elif self.era in ["2018"]:
+                    elif self.era in ["2018", "UL2018"]:
                         jmstau21DDTNomVal = 1.000  # tau21DDT < 0.43 WP
                         jmstau21DDTDownVal = 0.990
                         jmstau21DDTUpVal = 1.010
