@@ -36,7 +36,7 @@ class bffPreselProducer(Module):
     def alljetSel(self, jet, variation):
         btagWP = self.btagWP
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
-    def __init__(self, era, isMC=False):
+    def __init__(self, era, isMC=False, dr_cut=False):
         if era==2016:
                 self.btagWP=.6321
                 self.triggers= ['HLT_Mu50','HLT_TkMu50', 'HLT_DoubleEle33_CaloIdL_MW', 'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL'] 
@@ -54,6 +54,7 @@ class bffPreselProducer(Module):
         self.lep_1 = ROOT.TLorentzVector()
         self.lep_2 = ROOT.TLorentzVector()
         self.isMC = isMC
+        self.dr_cut = dr_cut
         self.sysDict = {}
         self.sysDict['nom']= {'lightJetSel': lambda sel:self.lightjetSel(sel,"nom"),
         'bjetSel': lambda sel:self.bjetSel(sel,"nom"),
@@ -184,6 +185,20 @@ class bffPreselProducer(Module):
     
             """process event, return True (go to next module) or False (fail, go to next event)"""
             jets = sorted(filter(alljetSel, Collection(event, "Jet")), key=lambda x: self.ptSel(x,key))
+
+            def minDR(x,ys):
+                minDR = 9999
+                for y in ys:
+                    minDR =min(minDR, x.p4().DeltaR(y.p4()))
+                return minDR
+
+            muon_dr = [minDR(jet, muonsLowPt) for jet in jets]
+            electron_dr = [minDR(jet, electronsLowPt) for jet in jets]
+            dr_arr = np.array([muon_dr, electron_dr])
+            dr_cut_arr =  dr_arr.min(axis=0) > .4
+           
+            if self.dr_cut:
+                jets = np.array(jets)[dr_cut_arr]
 
             metPt = self.ptSel(MET,key,met=1)
 
