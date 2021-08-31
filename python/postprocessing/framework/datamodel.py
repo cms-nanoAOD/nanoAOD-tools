@@ -1,35 +1,41 @@
+from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import InputTree
 import ROOT
 import math
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-from PhysicsTools.NanoAODTools.postprocessing.framework.treeReaderArrayTools import InputTree 
+
 
 class Event:
     """Class that allows seeing an entry of a PyROOT TTree as an Event"""
-    def __init__(self,tree,entry):
+
+    def __init__(self, tree, entry):
         self._tree = tree
         self._entry = entry
         self._tree.gotoEntry(entry)
-    def __getattr__(self,name):
-        if name in self.__dict__: return self.__dict__[name]
+
+    def __getattr__(self, name):
+        if name in self.__dict__:
+            return self.__dict__[name]
         return self._tree.readBranch(name)
-    def __getitem__(self,attr):
+
+    def __getitem__(self, attr):
         return self.__getattr__(attr)
-    def eval(self,expr):
+
+    def eval(self, expr):
         """Evaluate an expression, as TTree::Draw would do. 
 
            This is added for convenience, but it may perform poorly and the implementation is not bulletproof,
            so it's better to rely on reading values, collections or objects directly
-        """ 
+        """
         if not hasattr(self._tree, '_exprs'):
             self._tree._exprs = {}
             # remove useless warning about EvalInstance()
             import warnings
-            warnings.filterwarnings(action='ignore', category=RuntimeWarning, 
+            warnings.filterwarnings(action='ignore', category=RuntimeWarning,
                                     message='creating converter for unknown type "const char\*\*"$')
-            warnings.filterwarnings(action='ignore', category=RuntimeWarning, 
+            warnings.filterwarnings(action='ignore', category=RuntimeWarning,
                                     message='creating converter for unknown type "const char\*\[\]"$')
         if expr not in self._tree._exprs:
-            formula = ROOT.TTreeFormula(expr,expr,self._tree)
+            formula = ROOT.TTreeFormula(expr, expr, self._tree)
             if formula.IsInteger():
                 formula.go = formula.EvalInstance64
             else:
@@ -38,71 +44,87 @@ class Event:
             # force sync, to be safe
             self._tree.GetEntry(self._entry)
             self._tree.entry = self._entry
-            #self._tree._exprs[expr].SetQuickLoad(False)
+            # self._tree._exprs[expr].SetQuickLoad(False)
         else:
-            self._tree.gotoEntry(entry)
+            self._tree.gotoEntry(self._entry)
             formula = self._tree._exprs[expr]
-        if "[" in expr: # unclear why this is needed, but otherwise for some arrays x[i] == 0 for all i > 0
+        if "[" in expr:  # unclear why this is needed, but otherwise for some arrays x[i] == 0 for all i > 0
             formula.GetNdata()
         return formula.go()
 
+
 class Object:
     """Class that allows seeing a set branches plus possibly an index as an Object"""
-    def __init__(self,event,prefix,index=None):
+
+    def __init__(self, event, prefix, index=None):
         self._event = event
-        self._prefix = prefix+"_"
+        self._prefix = prefix + "_"
         self._index = index
-    def __getattr__(self,name):
-        if name in self.__dict__: return self.__dict__[name]
+
+    def __getattr__(self, name):
+        if name in self.__dict__:
+            return self.__dict__[name]
         if name[:2] == "__" and name[-2:] == "__":
             raise AttributeError
-        val = getattr(self._event,self._prefix+name)
+        val = getattr(self._event, self._prefix + name)
         if self._index != None:
             val = val[self._index]
-        val = ord(val) if type(val)==str else val # convert char to integer number
-        self.__dict__[name] = val ## cache
+        # convert char to integer number
+        val = ord(val) if type(val) == str else val
+        self.__dict__[name] = val  # cache
         return val
-    def __getitem__(self,attr):
+
+    def __getitem__(self, attr):
         return self.__getattr__(attr)
+
     def p4(self, corr_pt=None):
         ret = ROOT.TLorentzVector()
         if corr_pt == None:
-            ret.SetPtEtaPhiM(self.pt,self.eta,self.phi,self.mass)
+            ret.SetPtEtaPhiM(self.pt, self.eta, self.phi, self.mass)
         else:
-            ret.SetPtEtaPhiM(corr_pt,self.eta,self.phi,self.mass)
+            ret.SetPtEtaPhiM(corr_pt, self.eta, self.phi, self.mass)
         return ret
-    def DeltaR(self,other):
-        if isinstance(other,ROOT.TLorentzVector):
-          deta = abs(other.Eta()-self.eta)
-          dphi = abs(other.Phi()-self.phi)
+
+    def DeltaR(self, other):
+        if isinstance(other, ROOT.TLorentzVector):
+            deta = abs(other.Eta() - self.eta)
+            dphi = abs(other.Phi() - self.phi)
         else:
-          deta = abs(other.eta-self.eta)
-          dphi = abs(other.phi-self.phi)
+            deta = abs(other.eta - self.eta)
+            dphi = abs(other.phi - self.phi)
         while dphi > math.pi:
-          dphi = abs(dphi - 2*math.pi)
-        return math.sqrt(dphi**2+deta**2)
-    def subObj(self,prefix):
-        return Object(self._event,self._prefix+prefix)
+            dphi = abs(dphi - 2 * math.pi)
+        return math.sqrt(dphi**2 + deta**2)
+
+    def subObj(self, prefix):
+        return Object(self._event, self._prefix + prefix)
+
     def __repr__(self):
-        return ("<%s[%s]>" % (self._prefix[:-1],self._index)) if self._index != None else ("<%s>" % self._prefix[:-1])
+        return ("<%s[%s]>" % (self._prefix[:-1], self._index)) if self._index != None else ("<%s>" % self._prefix[:-1])
+
     def __str__(self):
         return self.__repr__()
 
+
 class Collection:
-    def __init__(self,event,prefix,lenVar=None):
+    def __init__(self, event, prefix, lenVar=None):
         self._event = event
         self._prefix = prefix
         if lenVar != None:
-            self._len = getattr(event,lenVar)
+            self._len = getattr(event, lenVar)
         else:
-            self._len = getattr(event,"n"+prefix)
+            self._len = getattr(event, "n" + prefix)
         self._cache = {}
-    def __getitem__(self,index):
-        if type(index) == int and index in self._cache: return self._cache[index]
-        if index >= self._len: raise IndexError, "Invalid index %r (len is %r) at %s" % (index,self._len,self._prefix)
-        ret = Object(self._event,self._prefix,index=index)
-        if type(index) == int: self._cache[index] = ret
+
+    def __getitem__(self, index):
+        if type(index) == int and index in self._cache:
+            return self._cache[index]
+        if index >= self._len:
+            raise IndexError("Invalid index %r (len is %r) at %s" % (index, self._len, self._prefix))
+        ret = Object(self._event, self._prefix, index=index)
+        if type(index) == int:
+            self._cache[index] = ret
         return ret
+
     def __len__(self):
         return self._len
-
