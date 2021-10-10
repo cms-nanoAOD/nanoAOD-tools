@@ -78,7 +78,7 @@ jerTagsMC = {
     '2018': 'Autumn18_V7b_MC',
     'UL2016_preVFP': 'Summer20UL16APV_JRV3_MC',
     'UL2016': 'Summer20UL16_JRV3_MC',
-    'UL2017': 'Summer19UL17_JRV2_MC',
+    'UL2017': 'Summer19UL17_JRV3_MC',
     'UL2018': 'Summer19UL18_JRV2_MC',
 }
 
