@@ -5,7 +5,6 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 import os
 from math import log
-from array import array
 
 def fill_stdvec(lst):
     try:
@@ -38,11 +37,9 @@ class TopLeptonMVAProducer(Module):
         electrons = Collection(event, "Electron")
         electronMVAs = []
         for electron in electrons:
-            # some events have jetIdx >= len(jets)... WTF
             electron_jet = jets[electron.jetIdx] if (electron.jetIdx >= 0 and electron.jetIdx < len(jets)) else None
-            # print("ele jet idx ", electron.jetIdx)
 
-            dxylog = log(abs(electron.dxy))
+            dxylog = log(abs(electron.dxy)) if abs(electron.dxy) > 0. else 0.
             miniIsoCharged = electron.miniPFRelIso_chg
             miniIsoNeutral = electron.miniPFRelIso_all - electron.miniPFRelIso_chg
             pTRel = electron.jetPtRelv2
@@ -61,7 +58,7 @@ class TopLeptonMVAProducer(Module):
             pt = electron.pt
             trackMultClosestJet = electron.jetNDauCharged if hasattr(electron, "jetNDauCharged") else electron.jetNDauChargedMVASel # different name in topNanoAOD
             etaAbs = abs(electron.eta)
-            dzlog = log(abs(electron.dz))
+            dzlog = log(abs(electron.dz)) if abs(electron.dz) > 0. else 0.
             relIso = electron.pfRelIso03_all
 
             mvaInputs = fill_stdvec([dxylog, miniIsoCharged, miniIsoNeutral, pTRel, sip3d, mvaIdFall17v2noIso, ptRatio, bTagDeepJetClosestJet, pt, trackMultClosestJet, etaAbs, dzlog, relIso])
@@ -72,7 +69,7 @@ class TopLeptonMVAProducer(Module):
         for muon in muons:
             muon_jet = jets[muon.jetIdx] if (muon.jetIdx >= 0 and muon.jetIdx < len(jets)) else None
 
-            dxylog = log(abs(muon.dxy))
+            dxylog = log(abs(muon.dxy)) if abs(muon.dxy) > 0. else 0.
             miniIsoCharged = muon.miniPFRelIso_chg
             miniIsoNeutral = muon.miniPFRelIso_all - muon.miniPFRelIso_chg
             pTRel = muon.jetPtRelv2
@@ -91,7 +88,7 @@ class TopLeptonMVAProducer(Module):
             pt = muon.pt
             trackMultClosestJet = muon.jetNDauCharged if hasattr(muon, "jetNDauCharged") else muon.jetNDauChargedMVASel # different name in topNanoAOD
             etaAbs = abs(muon.eta)
-            dzlog = log(abs(muon.dz))
+            dzlog = log(abs(muon.dz)) if abs(muon.dz) > 0. else 0.
             relIso = muon.pfRelIso03_all
 
             mvaInputs = fill_stdvec([dxylog, miniIsoCharged, miniIsoNeutral, pTRel, sip3d, segmentCompatibility, ptRatio, bTagDeepJetClosestJet, pt, trackMultClosestJet, etaAbs, dzlog, relIso])
