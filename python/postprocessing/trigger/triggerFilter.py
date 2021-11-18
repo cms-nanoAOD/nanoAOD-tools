@@ -13,6 +13,7 @@ class triggerFilter(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         list_of_branches = wrappedOutputTree.tree().GetListOfBranches()
         self._triggers = [trigger for trigger in self.triggers if trigger in list_of_branches]
+        print(self._triggers)
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
