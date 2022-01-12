@@ -28,25 +28,40 @@ class bffPreselProducer(Module):
     def bjetSel(self, jet, variation):
         btagWP = self.btagWP
         pt = self.ptSel(jet,variation)
-        return ((pt > 20) & (jet.btagDeepB > btagWP) & (abs(jet.eta) < 2.4) & (jet.jetId > 3) & ((jet.puId & 1) | (pt>50)))
+        return ((pt > 20) & (self.select_btag(jet)) & (abs(jet.eta) < 2.4) & (jet.jetId > 3) & ((jet.puId & 1) | (pt>50)))
     def lightjetSel(self, jet, variation):
         btagWP = self.btagWP
         pt = self.ptSel(jet,variation)
-        return ((pt > 30) & (jet.btagDeepB <= btagWP) & (abs(jet.eta) < 2.4) & (jet.jetId > 3) & ((jet.puId & 1) | (pt > 50)))
+        return ((pt > 30) & (~self.select_btag(jet)) & (abs(jet.eta) < 2.4) & (jet.jetId > 3) & ((jet.puId & 1) | (pt > 50)))
     def alljetSel(self, jet, variation):
         btagWP = self.btagWP
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
-    def __init__(self, era, isMC=False, dr_cut=False):
-        if era==2016:
-                self.btagWP=.6321
-                self.triggers= ['HLT_Mu50','HLT_TkMu50', 'HLT_DoubleEle33_CaloIdL_MW', 'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL'] 
-        if era==2017:
-                self.btagWP=.4941
-                self.triggers= ['HLT_Mu50','HLT_OldMu100','HLT_TkMu100', 'HLT_DoubleEle33_CaloIdL_MW', 'HLT_DoubleEle25_CaloIdL_MW'] 
-        if era==2018:
-                self.btagWP=.4184
-                self.triggers= ['HLT_Mu50','HLT_OldMu100','HLT_TkMu100', 'HLT_DoubleEle25_CaloIdL_MW'] 
-
+    def __init__(self, era, triggers, btag_type="DeepCSV", isMC=False, dr_cut=False):
+        self.triggers = triggers
+        era_dict = {
+            "DeepCSV": {
+                2016:.6321,
+                2017:.4941,
+                2018:.4184,
+            },
+           "DeepFlavour": {
+                2016:.3093,
+                2017:.3033,
+                2018:.2770,
+            },
+        }
+        self.btagWP = era_dict[btag_type][era]
+        #select different btags
+        def deepcsv(jet):
+            return jet.btagDeepB > self.btagWP
+        def deepflavour(jet):
+            return jet.btagDeepFlavB > self.btagWP
+           #set right filtering function
+        if btag_type=="DeepCSV":
+            self.select_btag = deepcsv
+        elif btag_type=="DeepFlavour":
+            self.select_btag = deepflavour
+        print("btag wp: {} type: {}".format(self.btagWP, btag_type))
         self.muSel = lambda x,pt: ((x.corrected_pt > pt) & (abs(x.eta) < 2.4) & (x.tightId > 0) 
                                & (x.pfRelIso04_all < 0.25))
         self.eleSel = lambda x,pt: ((x.pt > pt) & (abs(x.eta) < 2.4) & x.cutBased_HEEP > 0)
@@ -281,12 +296,4 @@ class bffPreselProducer(Module):
 
         if eventSelected: return True
         else: return True
-
-
-# define modules using the syntax 'name = lambda: constructor'
-# to avoid having them loaded when not needed
-
-bffPreselModuleConstr2016 = lambda: bffPreselProducer(0.6321)
-bffPreselModuleConstr2017 = lambda: bffPreselProducer(0.4941)
-bffPreselModuleConstr2018 = lambda: bffPreselProducer(0.4184)
 

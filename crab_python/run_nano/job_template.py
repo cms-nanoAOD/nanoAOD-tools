@@ -20,7 +20,7 @@ modules=[
     countHistogramsProducer(),
     triggerFilter(triggers),
     muonScaleRes{era}(),
-    bffPreselProducer(int(dataYear))
+    bffPreselProducer(int(dataYear), triggers, isMC=isMC, btag_type="{btag_type}")
     ]
 
 p = PostProcessor(".",
@@ -77,7 +77,7 @@ modules=[
     puWeight_{era}(),
     muonScaleRes{era}(),
     lepSF{era}(),
-    bffPreselProducer(int(dataYear), isMC=True)
+    bffPreselProducer(int(dataYear), triggers, isMC=isMC, btag_type="{btag_type}")
     ]
 
 p = PostProcessor(".",
@@ -160,7 +160,7 @@ modules=[
     puWeight_{era}(),
     muonScaleRes{era}(),
     lepSF{era}(),
-    bffPreselProducer(int(dataYear), isMC=isMC)
+    bffPreselProducer(int(dataYear), triggers, isMC=isMC, btag_type="{btag_type}")
     ]
 
 p = PostProcessor(outdir,
