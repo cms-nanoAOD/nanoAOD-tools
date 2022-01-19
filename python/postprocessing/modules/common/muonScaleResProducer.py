@@ -21,7 +21,7 @@ def mk_safe(fct, *args):
 
 
 class muonScaleResProducer(Module):
-    def __init__(self, rc_dir, rc_corrections, dataYear):
+    def __init__(self, rc_dir, rc_corrections, dataYear, overwritePt=False, syncMode=False):
         p_postproc = '%s/src/PhysicsTools/NanoAODTools/python/postprocessing' % os.environ[
             'CMSSW_BASE']
         p_roccor = p_postproc + '/data/' + rc_dir
@@ -30,6 +30,8 @@ class muonScaleResProducer(Module):
             print('Loading C++ helper from ' + p_helper)
             ROOT.gROOT.ProcessLine('.L ' + p_helper)
         self._roccor = ROOT.RoccoR(p_roccor + '/' + rc_corrections)
+        self.overwritePt = overwritePt
+        self.syncMode = syncMode
 
     def beginJob(self):
         pass
@@ -39,7 +41,11 @@ class muonScaleResProducer(Module):
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.out.branch("Muon_corrected_pt", "F", lenVar="nMuon")
+        if self.overwritePt :
+            self.out.branch("Muon_pt", "F", lenVar="nMuon")
+            self.out.branch("Muon_original_pt", "F", lenVar="nMuon")
+        else:
+            self.out.branch("Muon_corrected_pt", "F", lenVar="nMuon")
         self.out.branch("Muon_correctedUp_pt", "F", lenVar="nMuon")
         self.out.branch("Muon_correctedDown_pt", "F", lenVar="nMuon")
         self.is_mc = bool(inputTree.GetBranch("GenJet_pt"))
@@ -66,7 +72,8 @@ class muonScaleResProducer(Module):
                                   mk_safe(roccor.kSpreadMCerror, mu.charge,
                                           mu.pt, mu.eta, mu.phi, genMu.pt))
                 else:
-                    u1 = random.uniform(0.0, 1.0)
+                    u1 = 0.5
+                    if not self.syncMode : u1 = random.uniform(0.0, 1.0)
                     pt_corr.append(
                         mu.pt * mk_safe(roccor.kSmearMC, mu.charge, mu.pt,
                                         mu.eta, mu.phi, mu.nTrackerLayers, u1))
@@ -84,7 +91,12 @@ class muonScaleResProducer(Module):
                 mk_safe(roccor.kScaleDTerror, mu.charge, mu.pt, mu.eta, mu.phi)
                 for mu in muons)
 
-        self.out.fillBranch("Muon_corrected_pt", pt_corr)
+        if self.overwritePt :
+            pt_uncorr = list(mu.pt for mu in muons)
+            self.out.fillBranch("Muon_original_pt", pt_uncorr)
+            self.out.fillBranch("Muon_pt", pt_corr)
+        else :
+            self.out.fillBranch("Muon_corrected_pt", pt_corr)
         pt_corr_up = list(
             max(pt_corr[imu] + pt_err[imu], 0.0)
             for imu, mu in enumerate(muons))
@@ -96,9 +108,9 @@ class muonScaleResProducer(Module):
         return True
 
 
-muonScaleRes2016 = lambda: muonScaleResProducer('roccor.Run2.v3',
-                                                'RoccoR2016.txt', 2016)
-muonScaleRes2017 = lambda: muonScaleResProducer('roccor.Run2.v3',
-                                                'RoccoR2017.txt', 2017)
-muonScaleRes2018 = lambda: muonScaleResProducer('roccor.Run2.v3',
-                                                'RoccoR2018.txt', 2018)
+muonScaleRes2016 = lambda overwritePt=False, syncMode=False : muonScaleResProducer('roccor.Run2.v3',
+                                                                                   'RoccoR2016.txt', 2016, overwritePt, syncMode)
+muonScaleRes2017 = lambda overwritePt=False, syncMode=False : muonScaleResProducer('roccor.Run2.v3',
+                                                                                   'RoccoR2017.txt', 2017, overwritePt, syncMode)
+muonScaleRes2018 = lambda overwritePt=False, syncMode=False : muonScaleResProducer('roccor.Run2.v3',
+                                                                                   'RoccoR2018.txt', 2018, overwritePt, syncMode)
