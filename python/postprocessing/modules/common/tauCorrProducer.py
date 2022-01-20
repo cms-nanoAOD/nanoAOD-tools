@@ -214,3 +214,9 @@ class TauCorrectionsProducer(Module):
 tauCorrs2016Legacy = lambda: TauCorrectionsProducer('2016Legacy')
 tauCorrs2017ReReco = lambda: TauCorrectionsProducer('2017ReReco')
 tauCorrs2018ReReco = lambda: TauCorrectionsProducer('2018ReReco')
+
+tauCorrs2016ULpreVFP  = lambda: TauCorrectionsProducer('UL2016_preVFP')
+tauCorrs2016ULpostVFB = lambda: TauCorrectionsProducer('UL2016_postVFP')
+tauCorrs2017UL        = lambda: TauCorrectionsProducer('UL2017')
+tauCorrs2018UL        = lambda: TauCorrectionsProducer('UL2018')
+
