@@ -48,7 +48,7 @@ if suffix=='16a':
                   selection.replace('\n',''),
                   branchsel="keep_and_drop.txt",
                   outputbranchsel="keep_and_drop.txt",
-                  modules=[puAutoWeight_UL2016(),jetmetUncertaintiesAPV2016UL(),jetmetUncertaintiesAPV2016ULAll(), muonScaleRes2016v5ULAPV(), PrefireCorr2016(), tauCorrs2016ULpreVFP(), lepSFID2016_B(), lepSFISO2016_B()],
+                  modules=[puAutoWeight_UL2016(),jetmetUncertaintiesAPV2016UL(),jetmetUncertaintiesAPV2016ULAll(), muonScaleRes2016v5ULAPV(), PrefireCorr2016(), tauCorrs2016ULpreVFP(), lepSFID2016_B(), lepSFISO2016_B(), gammaSF_UL16PreVFP()],
                   provenance=True,
                   fwkJobReport=True, #NOT IN LOCAL
                   jsonInput=runsAndLumis() #NOT IN LOCAL
@@ -59,7 +59,7 @@ elif suffix=='16b' :
                   selection.replace('\n',''),
                   branchsel="keep_and_drop.txt",
                   outputbranchsel="keep_and_drop.txt",
-                  modules=[puAutoWeight_UL2016(),jetmetUncertainties2016UL(),jetmetUncertainties2016ULAll(), muonScaleRes2016v5UL(), PrefireCorr2016(), tauCorrs2016ULpostVFB(), lepSFID2016_H(), lepSFISO2016_H()],
+                  modules=[puAutoWeight_UL2016(),jetmetUncertainties2016UL(),jetmetUncertainties2016ULAll(), muonScaleRes2016v5UL(), PrefireCorr2016(), tauCorrs2016ULpostVFB(), lepSFID2016_H(), lepSFISO2016_H(), gammaSF_UL16PostVFP()],
                   provenance=True,
                   fwkJobReport=True, #NOT IN LOCAL
                   jsonInput=runsAndLumis() #NOT IN LOCAL
@@ -70,7 +70,7 @@ elif suffix=='17':
                   selection.replace('\n',''),
                   branchsel="keep_and_drop.txt",
                   outputbranchsel="keep_and_drop.txt",
-                  modules=[puAutoWeight_UL2017(),jetmetUncertainties2017UL(),jetmetUncertainties2017ULAll(), muonScaleRes2017v5UL(), PrefireCorr2017(), tauCorrs2017UL(), lepSFID2017(), lepSFISO2017()],
+                  modules=[puAutoWeight_UL2017(),jetmetUncertainties2017UL(),jetmetUncertainties2017ULAll(), muonScaleRes2017v5UL(), PrefireCorr2017(), tauCorrs2017UL(), lepSFID2017(), lepSFISO2017(), gammaSF_UL17()],
                   provenance=True,
                   fwkJobReport=True, #NOT IN LOCAL
                   jsonInput=runsAndLumis() #NOT IN LOCAL
@@ -81,7 +81,7 @@ elif suffix=='18':
                   selection.replace('\n',''),
                   branchsel="keep_and_drop.txt",
                   outputbranchsel="keep_and_drop.txt",
-                  modules=[puAutoWeight_UL2018(),jetmetUncertainties2018UL(),jetmetUncertainties2018ULAll(), muonScaleRes2018v5UL(), tauCorrs2018UL(), lepSFID2018(), lepSFISO2018()],
+                  modules=[puAutoWeight_UL2018(),jetmetUncertainties2018UL(),jetmetUncertainties2018ULAll(), muonScaleRes2018v5UL(), tauCorrs2018UL(), lepSFID2018(), lepSFISO2018(), gammaSF_UL18()],
                   provenance=True, 
                   fwkJobReport=True, #NOT IN LOCAL
                   jsonInput=runsAndLumis() #NOT IN LOCAL
