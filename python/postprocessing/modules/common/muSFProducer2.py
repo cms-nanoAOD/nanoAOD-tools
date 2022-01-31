@@ -16,7 +16,7 @@ muFileDict={ '2016' : ['Run2016_UL_HIPM_', 'Run2016_UL2_'],
 
 
 class lepSFProducerV2(Module):
-    def __init__(self, lepFlavour="Muon", cut= "Trigger", histos=["IsoMu24_OR_IsoTkMu24_PtEtaBins/pt_abseta_ratio"], useAbseta=True, ptEtaAxis=True,dataYear="2016", runPeriod="B"):
+    def __init__(self, lepFlavour="Muon", cut= "Trigger", histos=["IsoMu24_OR_IsoTkMu24_PtEtaBins/pt_abseta_ratio"], useAbseta=True, ptEtaAxis=False,dataYear="2016", runPeriod="B"):
         self.lepFlavour = lepFlavour
         self.histos = [h for h in histos]
         self.branchName = self.lepFlavour + "_" + cut
@@ -98,6 +98,7 @@ class lepSFProducerV2(Module):
         else:
             sf_lep_stat = [ 0.005 for lep in leptons ]
             sf_lep_syst = [ 0.005 for lep in leptons ]
+        #print [lep.pt for lep in leptons], [lep.eta for lep in leptons], sf_lep, sf_lep_stat, sf_lep_syst
         self.out.fillBranch(self.branchName + "_SF", sf_lep)
         self.out.fillBranch(self.branchName + "_SFstat", sf_lep_stat)
         self.out.fillBranch(self.branchName + "_SFsyst", sf_lep_syst)
@@ -123,7 +124,7 @@ isoHisto = {2016: ["NUM_LooseRelIso_DEN_LooseID_abseta_pt", "NUM_LooseRelIso_DEN
 ##But in any case, maybe useful if POG decides to switch from abs(eta) to eta
 ##Not used for Trigger
 useAbsEta = { 2016 : True, 2017 : True, 2018 : True}
-ptEtaAxis = { 2016 : True, 2017 : True, 2018 : True}
+ptEtaAxis = { 2016 : False, 2017 : False, 2018 : False}
 
 lepSFID2016_B   = lambda : lepSFProducerV2(lepFlavour="Muon", cut = "ID", histos=idHisto[2016], dataYear="2016", runPeriod="UL_HIPM", useAbseta=useAbsEta[2016], ptEtaAxis=ptEtaAxis[2016])
 lepSFISO2016_B  = lambda : lepSFProducerV2(lepFlavour="Muon", cut = "ISO", histos=isoHisto[2016], dataYear="2016", runPeriod="UL_HIPM", useAbseta=useAbsEta[2016], ptEtaAxis=ptEtaAxis[2016])

@@ -15,6 +15,8 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.muonScaleResProduce
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.tauCorrProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.muSFProducer2 import *
 
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.ggTemporaryScale import *
+
 #very basic selection which is covered then by the actual Hgg selection and crop at 1000 evts
 selection='''Sum$(Photon_pt > 18 && abs(Photon_eta)<2.5) > 1 && Entry$ < 1000'''
 
@@ -48,29 +50,30 @@ if suffix=='16a':
                   selection.replace('\n',''),
                   branchsel="keep_and_drop.txt",
                   outputbranchsel="keep_and_drop.txt",
-                  modules=[puAutoWeight_UL2016(),jetmetUncertaintiesAPV2016UL(),jetmetUncertaintiesAPV2016ULAll(), muonScaleRes2016v5ULAPV(), PrefireCorr2016(), tauCorrs2016ULpreVFP(), lepSFID2016_B(), lepSFISO2016_B()],
+                  modules=[puAutoWeight_UL2016(),jetmetUncertaintiesAPV2016UL(),jetmetUncertaintiesAPV2016ULAll(), muonScaleRes2016v5ULAPV(), PrefireCorr2016(), tauCorrs2016ULpreVFP(), lepSFID2016_B(), lepSFISO2016_B(), gammaSF_UL16PreVFP()],
                   provenance=True)
 elif suffix=='16b' :
    p=PostProcessor(".",f16b,     
                   selection.replace('\n',''),
                   branchsel="keep_and_drop.txt",
                   outputbranchsel="keep_and_drop.txt",
-                  modules=[puAutoWeight_UL2016(),jetmetUncertainties2016UL(),jetmetUncertainties2016ULAll(), muonScaleRes2016v5UL(), PrefireCorr2016(), tauCorrs2016ULpostVFB(), lepSFID2016_H(), lepSFISO2016_H()],
+                  modules=[puAutoWeight_UL2016(),jetmetUncertainties2016UL(),jetmetUncertainties2016ULAll(), muonScaleRes2016v5UL(), PrefireCorr2016(), tauCorrs2016ULpostVFB(), lepSFID2016_H(), lepSFISO2016_H(), gammaSF_UL16PostVFP()],
                   provenance=True)
 elif suffix=='17':
    p=PostProcessor(".",f17, 
                   selection.replace('\n',''),
                   branchsel="keep_and_drop.txt",
                   outputbranchsel="keep_and_drop.txt",
-                  modules=[puAutoWeight_UL2017(),jetmetUncertainties2017UL(),jetmetUncertainties2017ULAll(), muonScaleRes2017v5UL(), PrefireCorr2017(), tauCorrs2017UL(), lepSFID2017(), lepSFISO2017()],
+                  modules=[puAutoWeight_UL2017(),jetmetUncertainties2017UL(),jetmetUncertainties2017ULAll(), muonScaleRes2017v5UL(), PrefireCorr2017(), tauCorrs2017UL(), lepSFID2017(), lepSFISO2017(), gammaSF_UL17()],
                   provenance=True)
 elif suffix=='18':
    p=PostProcessor(".",f18, 
                   selection.replace('\n',''),
                   branchsel="keep_and_drop.txt",
                   outputbranchsel="keep_and_drop.txt",
-                  modules=[puAutoWeight_UL2018(),jetmetUncertainties2018UL(),jetmetUncertainties2018ULAll(), muonScaleRes2018v5UL(), tauCorrs2018UL(), lepSFID2018(), lepSFISO2018()],
+                  modules=[puAutoWeight_UL2018(),jetmetUncertainties2018UL(),jetmetUncertainties2018ULAll(), muonScaleRes2018v5UL(), tauCorrs2018UL(), lepSFID2018(), lepSFISO2018(), gammaSF_UL18()],
                   provenance=True)
+
 
 
 # keep and drop printout
