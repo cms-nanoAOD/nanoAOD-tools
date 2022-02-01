@@ -133,8 +133,8 @@ class lepSFProducer(Module):
                     "NUM_LooseRelIso_DEN_TightIDandIPCut_pt_abseta_syst"]
         #egamma
         if electronSelectionTag=="egamma_2016_legacy":
-            self.el_SF_EB = 0.971
-            self.el_SF_EE = 0.983
+            self.el_SF_EB = 0.983
+            self.el_SF_EE = 0.991
             self.el_stat_EB = 0.001
             self.el_stat_EE = 0.001
             self.el_sys_EB = [.01,0.0022,.03]
