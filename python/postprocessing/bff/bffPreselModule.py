@@ -32,25 +32,13 @@ class bffPreselProducer(Module):
     def lightjetSel(self, jet, variation):
         btagWP = self.btagWP
         pt = self.ptSel(jet,variation)
-        return ((pt > 30) & (~self.select_btag(jet)) & (abs(jet.eta) < 2.4) & (jet.jetId > 3) & ((jet.puId & 1) | (pt > 50)))
+        return ((pt > 30) & (not self.select_btag(jet)) & (abs(jet.eta) < 2.4) & (jet.jetId > 3) & ((jet.puId & 1) | (pt > 50)))
     def alljetSel(self, jet, variation):
         btagWP = self.btagWP
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
-    def __init__(self, era, triggers, btag_type="DeepCSV", isMC=False, dr_cut=False):
+    def __init__(self, btagWP, triggers, btag_type="DeepCSV", isMC=False, dr_cut=False):
         self.triggers = triggers
-        era_dict = {
-            "DeepCSV": {
-                2016:.6321,
-                2017:.4941,
-                2018:.4184,
-            },
-           "DeepFlavour": {
-                2016:.3093,
-                2017:.3033,
-                2018:.2770,
-            },
-        }
-        self.btagWP = era_dict[btag_type][era]
+        self.btagWP = btagWP
         #select different btags
         def deepcsv(jet):
             return jet.btagDeepB > self.btagWP
