@@ -26,3 +26,4 @@ keep HLT_OldMu100
 keep HLT_DoubleEle25_CaloIdL_MW
 keep *ilter*
 keep Flag_*
+keep inNregions
