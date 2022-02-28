@@ -24,7 +24,7 @@ mv module $CMSSW_BASE/module
 mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
-python job_data_crab_{btag_type}.py $1
+python job_data_crab_{btag_type}{eff}.py $1
 fi
 '''
 crab_sh_template_mc = '''
@@ -53,6 +53,6 @@ mv module $CMSSW_BASE/module
 mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
-python job_mc_crab_{btag_type}.py $1
+python job_mc_crab_{btag_type}{eff}.py $1
 fi
 '''
