@@ -6,10 +6,20 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 import numpy as np
 
 class bffBtagEffProducer(Module):
-    def __init__(self, btagWP):
+    def __init__(self, btagWP, btag_type="DeepCSV"):
         self.alljetSel = lambda j: ((j.pt > 20) & (abs(j.eta) < 2.4) & ((j.jetId >> 1) & 1) & ((j.puId & 1) | (j.pt>50)))
         self.isMC = True
         self.btagWP = btagWP
+        def deepcsv(jet):
+            return jet.btagDeepB > self.btagWP
+        def deepflavour(jet):
+            return jet.btagDeepFlavB > self.btagWP
+           #set right filtering function
+        if btag_type=="DeepCSV":
+            self.select_btag = deepcsv
+        elif btag_type=="DeepFlavour":
+            self.select_btag = deepflavour
+            
         pass
     def beginJob(self):
         pass
@@ -63,7 +73,7 @@ class bffBtagEffProducer(Module):
                           flavor=0
                       elif j.hadronFlavour==4:
                           flavor=1
-                  if j.btagDeepB > self.btagWP: 
+                  if self.select_btag(j): 
                       self.Pass[flavor][bin] += 1
                   self.Total[flavor][bin]+= 1
 	else:

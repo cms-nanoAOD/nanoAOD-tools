@@ -36,7 +36,7 @@ class bffPreselProducer(Module):
     def alljetSel(self, jet, variation):
         btagWP = self.btagWP
         return (self.bjetSel(jet, variation) or self.lightjetSel(jet, variation))
-    def __init__(self, btagWP, triggers, btag_type="DeepCSV", isMC=False, dr_cut=False):
+    def __init__(self, btagWP, triggers, btag_type="deepcsv", isMC=False, dr_cut=False):
         self.triggers = triggers
         self.btagWP = btagWP
         #select different btags
@@ -45,7 +45,7 @@ class bffPreselProducer(Module):
         def deepflavour(jet):
             return jet.btagDeepFlavB > self.btagWP
            #set right filtering function
-        if btag_type=="DeepCSV":
+        if btag_type=="deepcsv":
             self.select_btag = deepcsv
         elif btag_type=="DeepFlavour":
             self.select_btag = deepflavour
@@ -74,6 +74,12 @@ class bffPreselProducer(Module):
         In case of data, the b-tagging scale factors are not produced. 
         Check whether they were produced and if not, drop them from jet selections
         '''
+        #cutflow histogram
+        # all events, after htlt, after two lepton selection, after one or two jets
+        self._cutflow_unweighted = ROOT.TH1D('cutflow_unweighted', 'cutflow_unweighted', 4, .5, 4.5)
+        self._cutflow_weighted = ROOT.TH1D('cutflow_weighted', 'cutflow_weighted', 4, .5, 4.5)
+        self._denis_cutflow_unweighted = ROOT.TH1D('denis_cutflow_unweighted', 'denis_cutflow_unweighted', 10, .5, 10.5)
+        self._denis_cutflow_weighted = ROOT.TH1D('denis_cutflow_weighted', 'denis_cutflow_weighted', 10, .5, 10.5)
         list_of_branches = wrappedOutputTree.tree().GetListOfBranches()
         self._triggers = [trigger for trigger in self.triggers if trigger in list_of_branches]
         print(self._triggers)
@@ -95,6 +101,7 @@ class bffPreselProducer(Module):
             'alljetSel': lambda sel:self.alljetSel(sel,"jesTotalDown"),
             'met': lambda sel:self.ptSel(sel,"jesTotalDown",met=1)}
         self.out = wrappedOutputTree
+        self.out.branch("inNregions", "F")
         for key in self.sysDict:
             self.out.branch("nBjets_{}".format(key), "F")
             self.out.branch("nSeljets_{}".format(key), "F")
@@ -118,7 +125,15 @@ class bffPreselProducer(Module):
             self.out.branch("CR24_{}".format(key), "I")
         self.out.branch("DiLepMass", "F")
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        pass
+        #write cutflow hist
+        prevdir = ROOT.gDirectory
+        outputFile.cd()
+        self._cutflow_weighted.Write()
+        self._cutflow_unweighted.Write()
+        self._denis_cutflow_unweighted.Write()
+        self._denis_cutflow_weighted.Write()
+        prevdir.cd()
+
     def selectDiMu(self, electrons, muons):
         if len(muons) != 2:
             return False
@@ -158,14 +173,36 @@ class bffPreselProducer(Module):
         self.diLepMass = diLep.M()
         self.out.fillBranch("DiLepMass", self.diLepMass)
         return True
-
+    
+    def get_binary_event_weight(self, event):
+        #get +/- gen weight as in countHistogramModule
+        if hasattr(event, 'Generator_weight') and event.Generator_weight < 0: return -1
+        else: return 1
+        
+    def fill_cutflow(self, value, binary_gen_weight):
+        self._cutflow_unweighted.Fill(value)
+        self._cutflow_weighted.Fill(value, binary_gen_weight)
+        
+    def fill_denis_cutflow(self, value, binary_gen_weight):
+        self._denis_cutflow_unweighted.Fill(value)
+        self._denis_cutflow_weighted.Fill(value, binary_gen_weight)
+        
     def analyze(self, event):
+        #get +/- gen weight as in countHistogramModule
+        binary_gen_weight = self.get_binary_event_weight(event)
+        #cutflow all events
+        self.fill_cutflow(1, binary_gen_weight)
+        self.fill_denis_cutflow(1, binary_gen_weight)
         HLT_select = False
         for trigger in self._triggers:
             if event[trigger]: 
                 HLT_select = 1
                 break
         if not HLT_select: return False
+        #cutflow after hlt
+        self.fill_cutflow(2, binary_gen_weight)
+        self.fill_denis_cutflow(2, binary_gen_weight)
+        
         electrons = sorted(filter(lambda x: self.eleSel(x,53), Collection(event, "Electron")), key=lambda x: x.pt)
         muons = sorted(filter(lambda x: self.muSel(x,53), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         if self.isMC:
@@ -175,11 +212,29 @@ class bffPreselProducer(Module):
         electronsLowPt = sorted(filter(lambda x: self.eleSel(x,24), Collection(event, "Electron")), key=lambda x: x.pt)
         muonsLowPt = sorted(filter(lambda x: self.muSel(x,24), Collection(event, "Muon")), key=lambda x: x.corrected_pt)
         nLowPtLep = len(electronsLowPt)+len(muonsLowPt)
+                        
         isDiMu = self.selectDiMu(electrons, muons) and nLowPtLep<3
         isDiEle = self.selectDiEle(electrons, muons) and nLowPtLep<3
         isEleMu = self.selectEleMu(electrons, muons) and nLowPtLep<3
+
+        #cutflow after nlep
+        self.fill_cutflow(3, binary_gen_weight)
+        #Denis specific cuts
+        if len(muons)>=1:
+            self.fill_denis_cutflow(3, binary_gen_weight)
+            if len(muons)==2:
+                self.fill_denis_cutflow(4, binary_gen_weight)
+                if (muons[0].charge+muons[1].charge) == 0:
+                    self.fill_denis_cutflow(5, binary_gen_weight)
+                    if len(electrons)==0:
+                        self.fill_denis_cutflow(6, binary_gen_weight)
+                        if nLowPtLep<3:
+                            self.fill_denis_cutflow(7, binary_gen_weight)
+        if isDiMu: self.fill_denis_cutflow(8, binary_gen_weight)  
+            
         if not (isDiMu or isDiEle or isEleMu):
             return False
+      
         eventSelected = False
         for key in self.sysDict:
             lightJetSel = self.sysDict[key]['lightJetSel']
@@ -252,7 +307,10 @@ class bffPreselProducer(Module):
             self.out.fillBranch("CR22_{}".format(key), isCR22)
             self.out.fillBranch("CR23_{}".format(key), isCR23)
             self.out.fillBranch("CR24_{}".format(key), isCR24)
-
+            #should not be more than one
+            if key == "nom": 
+                self.out.fillBranch("inNregions",  + isSR1 + isCR10 + isCR11 + isCR12 + isCR13 + isCR14 + isSR2 + isCR20 + isCR21 + isCR22 + isCR23 + isCR24)
+                
             sbm = -1.
             sbmMin = -1.
             sbmMax = -1.
@@ -277,7 +335,12 @@ class bffPreselProducer(Module):
                     sbmMin = min(l1j2mass, l2j1mass)
                     sbmMax = sbm
             else:
-                pass
+                return False
+            if key == "nom": 
+                #cutflow after njets
+                self.fill_cutflow(4, binary_gen_weight)
+                if isDiMu  & (n_Bjets == 1): self.fill_denis_cutflow(9, binary_gen_weight)
+                if isSR1: self.fill_denis_cutflow(10, binary_gen_weight)
             self.out.fillBranch("TMB_{}".format(key), sbm)
             self.out.fillBranch("TMBMin_{}".format(key), sbmMin)
             self.out.fillBranch("TMBMax_{}".format(key), sbmMax)
