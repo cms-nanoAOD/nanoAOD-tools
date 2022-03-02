@@ -86,9 +86,8 @@ jerTagsMC = {
 #nominal, up, down
 jmrValues = {
     '2016': [1.0, 1.2, 0.8],
-    '2017': [1.09, 1.14, 1.04],
-    # Use 2017 values for 2018 until 2018 are released
-    '2018': [1.09, 1.14, 1.04],
+    '2017': [0.99, 1.032, 0.948],
+    '2018': [1.108, 1.142, 1.074],
     'UL2016_preVFP': [1.00, 1.00, 1.00],  # placeholder
     'UL2016': [1.00, 1.00, 1.00],  # placeholder
     'UL2017': [1.00, 1.00, 1.00],  # placeholder
@@ -99,10 +98,9 @@ jmrValues = {
 # W-tagging PUPPI softdrop JMS values: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
 # 2016 values
 jmsValues = {
-    '2016': [1.00, 0.9906, 1.0094],  # nominal, down, up
-    '2017': [0.982, 0.978, 0.986],
-    # Use 2017 values for 2018 until 2018 are released
-    '2018': [0.982, 0.978, 0.986],
+    '2016': [1.00, 0.9906, 1.0094],  # nominal, down, up                                 
+    '2017': [1.014, 1.011, 1.017],
+    '2018': [0.999, 0.997, 1.001],
     'UL2016_preVFP': [1.000, 1.000, 1.000],  # placeholder
     'UL2016': [1.000, 1.000, 1.000],  # placeholder
     'UL2017': [1.000, 1.000, 1.000],  # placeholder
