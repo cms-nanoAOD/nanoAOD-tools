@@ -15,8 +15,11 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.muonScaleResProduce
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.tauCorrProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.muSFProducer2 import *
 
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.ggTemporaryScale import *
+
 #very basic selection which is covered then by the actual Hgg selection and crop at 1000 evts
 selection='''Sum$(Photon_pt > 18 && abs(Photon_eta)<2.5) > 1'''
+selection='''Sum$(Photon_pt > 18 && (Photon_isScEtaEB || Photon_isScEtaEE) && Photon_electronVeto > 0.5 && Photon_hoe < 0.08) > 1'''
 
 #work on a local file
 # a modified nanoAOD which contians extra phton features -> to be merged soon to the central stuff
