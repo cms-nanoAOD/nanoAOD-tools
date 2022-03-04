@@ -11,8 +11,8 @@ datapath = os.path.join(os.environ.get('CMSSW_BASE','CMSSW_BASE'),"src/PhysicsTo
 
 class TauCorrectionsProducer(Module):
     
-    def __init__(self, year, antiJetID='DeepTau2017v2p1VSjet', antiJetWPs=['Medium','Tight'],
-                             antiEleID='DeepTau2017v2p1VSe',   antiEleWPs=['VVLoose','Tight'],
+    def __init__(self, year, antiJetID='DeepTau2017v2p1VSjet', antiJetWPs=['Loose','Tight'],
+                             antiEleID='DeepTau2017v2p1VSe',   antiEleWPs=['VVLoose','VLoose','Tight'],
                              antiMuID='DeepTau2017v2p1VSmu',   antiMuWPs=['VLoose','Tight'],
                              antiJetPerDM=False, sys=True,
                              tes=True, fes=True, tesSys=True, path=datapath, verbose=False):
