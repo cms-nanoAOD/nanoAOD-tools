@@ -45,6 +45,12 @@ mc16b=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv9
 mc17=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",]
 mc18=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM",]
 
+#drwxrwxr-x 11 fsetti fsetti 4,0K 15 feb 16.58 /hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2016_APV_final
+#drwxrwxr-x 11 fsetti fsetti 4,0K 15 feb 19.08 /hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2016_final
+#drwxrwxr-x 21 fsetti fsetti 4,0K 15 feb 19.36 /hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2018_final
+#drwxrwxr-x 21 fsetti fsetti 4,0K 15 feb 21.09 /hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2017_final
+
+
 #config.Data.splitting = 'FileBased'
 config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 10
@@ -61,7 +67,7 @@ from CRABAPI.RawCommand import crabCommand
 
 
 
-counter=100
+counter=21
 
 opds={}
 

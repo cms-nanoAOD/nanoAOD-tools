@@ -19,12 +19,12 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.ggTemporaryScale im
 
 #very basic selection which is covered then by the actual Hgg selection and crop at 1000 evts
 selection='''Sum$(Photon_pt > 18 && abs(Photon_eta)<2.5) > 1 && Entry$ < 1000'''
-
+selection='''Sum$(Photon_pt > 18 && (Photon_isScEtaEB || Photon_isScEtaEE) && Photon_electronVeto > 0.5 && Photon_hoe < 0.08) > 1 && Entry$ < 1000'''
 #work on a local file
 # a modified nanoAOD which contians extra phton features -> to be merged soon to the central stuff
 files=["/hadoop/cms/store/user/hmei/nanoaod_runII/HHggtautau/HHggtautau_Era2018_private_v2_20201005/test_nanoaod_1.root"]
 
-
+selection='''Sum$(Photon_pt > 18 && (Photon_isScEtaEB || Photon_isScEtaEE) && Photon_electronVeto > 0.5 && Photon_hoe < 0.08) > 1'''
 
 f16a=["root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAODAPVv9/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_preVFP_v11-v2/2520000/09C7F740-4B72-164F-802A-AD61543C717C.root"]
 
@@ -34,6 +34,13 @@ f17=["root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL17NanoAODv9/ttHToNonbb
 
 f18=["root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL18NanoAODv9/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/100000/5816099C-2902-3348-8627-2DEB0BBC33CD.root"]
 
+f16D=[
+  #'/ceph/cms/store/user/fsetti/Summer20UL_nanoAODv9/DoubleEG_Run2016D-HIPM_UL2016_MiniAODv2-v1_MINIAOD_fix_HIPM_v3/nanoaod_441.root',
+ '/ceph/cms/store/user/fsetti/Summer20UL_nanoAODv9/DoubleEG_Run2016D-HIPM_UL2016_MiniAODv2-v1_MINIAOD_fix_HIPM_v3/nanoaod_442.root',
+#'/ceph/cms/store/user/fsetti/Summer20UL_nanoAODv9/DoubleEG_Run2016D-HIPM_UL2016_MiniAODv2-v1_MINIAOD_fix_HIPM_v3/nanoaod_443.root',
+'/ceph/cms/store/user/fsetti/Summer20UL_nanoAODv9/DoubleEG_Run2016D-HIPM_UL2016_MiniAODv2-v1_MINIAOD_fix_HIPM_v3/nanoaod_444.root'
+  
+  ]
 
 #2016 modules MC
 PrefireCorr2016 = lambda : PrefCorr("L1prefiring_jetpt_2016BtoH.root", "L1prefiring_jetpt_2016BtoH", "L1prefiring_photonpt_2016BtoH.root", "L1prefiring_photonpt_2016BtoH")
@@ -72,6 +79,13 @@ elif suffix=='18':
                   branchsel="keep_and_drop.txt",
                   outputbranchsel="keep_and_drop.txt",
                   modules=[puAutoWeight_UL2018(),jetmetUncertainties2018UL(),jetmetUncertainties2018ULAll(), muonScaleRes2018v5UL(), tauCorrs2018UL(), lepSFID2018(), lepSFISO2018(), gammaSF_UL18()],
+                  provenance=True)
+elif suffix=='16D':
+   p=PostProcessor(".",f16D, 
+                  selection.replace('\n',''),
+                  branchsel="keep_and_drop.txt",
+                  outputbranchsel="keep_and_drop.txt",
+                  modules=[muonScaleRes2016v5ULAPV()],
                   provenance=True)
 
 

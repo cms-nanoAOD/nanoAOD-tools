@@ -1,4 +1,4 @@
-i#this is not mean to be run locally
+#this is not mean to be run locally
 #
 for i in "$@"
   do echo $i, "  UUU " 

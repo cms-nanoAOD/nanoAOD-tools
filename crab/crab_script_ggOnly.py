@@ -20,6 +20,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.ggTemporaryScale im
 #very basic selection which is covered then by the actual Hgg selection and crop at 1000 evts
 selection='''Sum$(Photon_pt > 18 && abs(Photon_eta)<2.5) > 1'''
 selection='''Sum$(Photon_pt > 18 && (Photon_isScEtaEB || Photon_isScEtaEE) && Photon_electronVeto > 0.5 && Photon_hoe < 0.08) > 1'''
+selection=""
 
 #work on a local file
 # a modified nanoAOD which contians extra phton features -> to be merged soon to the central stuff
@@ -89,6 +90,51 @@ elif suffix=='18':
                   fwkJobReport=True, #NOT IN LOCAL
                   jsonInput=runsAndLumis() #NOT IN LOCAL
                   )
+elif suffix=='16aD':
+  p=PostProcessor(".",
+                  inputFiles(), #NOT IN LOCAL  
+                  selection.replace('\n',''),
+                  branchsel="keep_and_drop.txt",
+                  outputbranchsel="keep_and_drop.txt",
+                  modules=[muonScaleRes2016v5ULAPV()],
+                  provenance=True,
+                  fwkJobReport=True, #NOT IN LOCAL
+                  jsonInput=runsAndLumis() #NOT IN LOCAL
+                  )
+elif suffix=='16bD' :
+   p=PostProcessor(".",
+                  inputFiles(), #NOT IN LOCAL      
+                  selection.replace('\n',''),
+                  branchsel="keep_and_drop.txt",
+                  outputbranchsel="keep_and_drop.txt",
+                  modules=[muonScaleRes2016v5UL()],
+                  provenance=True,
+                  fwkJobReport=True, #NOT IN LOCAL
+                  jsonInput=runsAndLumis() #NOT IN LOCAL
+                  )
+elif suffix=='17D':
+   p=PostProcessor(".",
+                  inputFiles(), #NOT IN LOCAL  
+                  selection.replace('\n',''),
+                  branchsel="keep_and_drop.txt",
+                  outputbranchsel="keep_and_drop.txt",
+                  modules=[muonScaleRes2017v5UL()],
+                  provenance=True,
+                  fwkJobReport=True, #NOT IN LOCAL
+                  jsonInput=runsAndLumis() #NOT IN LOCAL
+                  )
+elif suffix=='18D':
+   p=PostProcessor(".",
+                  inputFiles(), #NOT IN LOCAL  
+                  selection.replace('\n',''),
+                  branchsel="keep_and_drop.txt",
+                  outputbranchsel="keep_and_drop.txt",
+                  modules=[muonScaleRes2018v5UL()],
+                  provenance=True,
+                  fwkJobReport=True, #NOT IN LOCAL
+                  jsonInput=runsAndLumis() #NOT IN LOCAL
+                  )
+
 else:
   print "bo"
 
