@@ -3,6 +3,18 @@ import ROOT
 import math
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
+statusflags = { # GenPart_statusFlags, stored bitwise:
+  # https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html#GenPart
+  'isPrompt':                      0,   'fromHardProcess':                     8,
+  'isDecayedLeptonHadron':         1,   'isHardProcessTauDecayProduct':        9,
+  'isTauDecayProduct':             2,   'isDirectHardProcessTauDecayProduct': 10,
+  'isPromptTauDecayProduct':       3,   'fromHardProcessBeforeFSR':           11,
+  'isDirectTauDecayProduct':       4,   'isFirstCopy':                        12,
+  'isDirectPromptTauDecayProduct': 5,   'isLastCopy':                         13,
+  'isDirectHadronDecayProduct':    6,   'isLastCopyBeforeFSR':                14,
+  'isHardProcess':                 7,
+}
+
 
 class Event:
     """Class that allows seeing an entry of a PyROOT TTree as an Event"""
@@ -95,6 +107,10 @@ class Object:
         while dphi > math.pi:
             dphi = abs(dphi - 2 * math.pi)
         return math.sqrt(dphi**2 + deta**2)
+
+    def statusflag(self, *flags):
+      """Find if bit for statusflag is set (for GenPart only)."""
+      return all((self.statusFlags & (1 << statusflags[f]))>0 for f in flags)
 
     def subObj(self, prefix):
         return Object(self._event, self._prefix + prefix)

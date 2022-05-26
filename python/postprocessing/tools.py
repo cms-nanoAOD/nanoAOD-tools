@@ -78,6 +78,14 @@ def matchObjectCollectionMultiple(
         pairs[obj] = matched
     return pairs
 
+
+def hasbit(value,bit):
+  """Check if i'th bit is set to 1, i.e. binary of 2^i,
+  from the right to the left, starting from position i=0.
+  Example: hasbit(GenPart_statusFlags,0) -> isPrompt"""
+  return (value & (1 << bit))>0
+
+
 def ensureTFile(filename,option='READ',verbose=False):
   """Open TFile, checking if the file in the given path exists."""
   if not os.path.isfile(filename):
@@ -88,6 +96,7 @@ def ensureTFile(filename,option='READ',verbose=False):
   if not file or file.IsZombie():
     raise IOError("Could not open file by name '%s'"%(filename))
   return file
+
 
 def extractTH1(file,histname,setdir=True):
   """Get histogram by name from a given file."""
