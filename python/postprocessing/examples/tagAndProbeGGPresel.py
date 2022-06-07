@@ -138,7 +138,7 @@ class HggSelector(Module):
         pho_EB_highR9 = lambda x : (abs(x.eta) < 1.5 and x.r9 > 0.85)
         pho_EE_highR9 = lambda x : (abs(x.eta) > 1.5 and x.r9 > 0.9)
         pho_EB_lowR9 = lambda x : (abs(x.eta) < 1.5 and x.r9 < 0.85 and x.r9 > 0.5 and self.useLowR9(x,rho,True))
-        pho_EE_lowR9 = lambda x : (abs(x.eta) > 1.5 and x.r9 < 0.85 and x.r9 > 0.8 and self.useLowR9(x,rho,False))
+        pho_EE_lowR9 = lambda x : (abs(x.eta) > 1.5 and x.r9 < 0.9 and x.r9 > 0.8 and self.useLowR9(x,rho,False))
 
         photonsGood = [ph for ph in photons_sorted if (ph.electronVeto<0.5 and (pho_EB_highR9(ph) or pho_EE_highR9(ph) or pho_EB_lowR9(ph) or pho_EE_lowR9(ph)))]
         if (len(photonsGood)>1):
