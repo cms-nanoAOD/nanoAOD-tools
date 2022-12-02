@@ -18,22 +18,8 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.muSFProducer2 impor
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.ggTemporaryScale import *
 
 #very basic selection which is covered then by the actual Hgg selection and crop at 1000 evts
-selection='''Sum$(Photon_pt > 18 && abs(Photon_eta)<2.5) > 1'''
+#selection='''Sum$(Photon_pt > 18 && abs(Photon_eta)<2.5) > 1'''
 selection='''Sum$(Photon_pt > 18 && (Photon_isScEtaEB || Photon_isScEtaEE) && Photon_electronVeto > 0.5 && Photon_hoe < 0.08) > 1'''
-selection=""
-
-#work on a local file
-# a modified nanoAOD which contians extra phton features -> to be merged soon to the central stuff
-files=["/hadoop/cms/store/user/hmei/nanoaod_runII/HHggtautau/HHggtautau_Era2018_private_v2_20201005/test_nanoaod_1.root"]
-
-f16a=["root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAODAPVv9/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_preVFP_v11-v2/2520000/09C7F740-4B72-164F-802A-AD61543C717C.root"]
-
-f16b=["root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL16NanoAODv9/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v17-v2/2520000/9503E3B6-3BC0-A043-92BF-019E4C64026D.root"]
-
-f17=["root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL17NanoAODv9/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_mc2017_realistic_v9-v2/100000/89E8691C-A390-C74F-A065-70EF7E3B8F77.root"]
-
-f18=["root://cmsxrootd.fnal.gov///store/mc/RunIISummer20UL18NanoAODv9/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/100000/5816099C-2902-3348-8627-2DEB0BBC33CD.root"]
-
 
 #2016 modules MC
 PrefireCorr2016 = lambda : PrefCorr("L1prefiring_jetpt_2016BtoH.root", "L1prefiring_jetpt_2016BtoH", "L1prefiring_photonpt_2016BtoH.root", "L1prefiring_photonpt_2016BtoH")

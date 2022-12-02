@@ -31,26 +31,6 @@ config.section_("Data")
 config.Data.inputDBS = 'phys03'
 #config.Data.inputDBS = 'global'
 
-
-aaa=[
-"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v2/NANOAODSIM",
-"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v2/NANOAODSIM",
-"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
-"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM",
-]
-
-
-mc16a=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v2/NANOAODSIM",]
-mc16b=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v2/NANOAODSIM",]
-mc17=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",]
-mc18=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM",]
-
-samples=[
-  #"/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2016_APV_final",
-  #"/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2016_final",
-  "/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2018_final",
-  "/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2017_final",]
-
 mc16a=["/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2016_APV_final"]
 mc16b=["/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2016_final",]
 mc17=["/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2017_final",]
@@ -64,7 +44,7 @@ config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1 
 config.Data.totalUnits = 333 #override
 
-config.Data.outLFNDirBase = '/store/user/legianni/skimNano-TestUL'+version # cannot getUsernameFromSiteDB
+config.Data.outLFNDirBase = '/store/user/${USER}/skimNano-TestUL'+version # cannot getUsernameFromSiteDB
 config.Data.publication = False
 #config.Data.outputDatasetTag = 'skimNano-TestUL'+version
 
@@ -81,11 +61,7 @@ opds={}
 
 for sample in allsamples:
   
-    path="/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/"+sample
     path='/ceph/cms/store/user/fsetti/Summer20UL_nanoAODv9/'+sample
-    #path='/hadoop/cms/store/user/azecchin/nanoaod_runII/ttHHggXX/'+sample
-    #path=sample
-    
     
     if sample in mc16A:
       config.JobType.scriptArgs=["arg=16a"] #it seems this is not working without the = sign!!!
@@ -149,7 +125,7 @@ for sample in allsamples:
     config.Data.outputDatasetTag = 'skimNano-TestUL_'+opd+"_TESTS"
     #config.General.requestName = 'skimNano-TestUL'+opd+"--"+str(counter)
     #print files[0:2]
-    crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+#    crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
     print "DONE"
     
     counter+=1
