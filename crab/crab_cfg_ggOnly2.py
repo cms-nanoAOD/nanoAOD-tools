@@ -6,6 +6,7 @@ version="__TEST-SamplesV9-noPresel"
 
 import os 
 base = os.environ["CMSSW_BASE"]
+user = os.environ["USER"]
 
 config = Configuration()
 
@@ -31,11 +32,6 @@ config.section_("Data")
 config.Data.inputDBS = 'phys03'
 #config.Data.inputDBS = 'global'
 
-mc16a=["/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2016_APV_final"]
-mc16b=["/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2016_final",]
-mc17=["/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2017_final",]
-mc18=["/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2018_final",]
-
 from sa import *
 from allsamples import allsamples
 
@@ -44,7 +40,7 @@ config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1 
 config.Data.totalUnits = 333 #override
 
-config.Data.outLFNDirBase = '/store/user/${USER}/skimNano-TestUL'+version # cannot getUsernameFromSiteDB
+config.Data.outLFNDirBase = '/store/user/'+user+'/skimNano-TestUL'+version # cannot getUsernameFromSiteDB
 config.Data.publication = False
 #config.Data.outputDatasetTag = 'skimNano-TestUL'+version
 
@@ -53,9 +49,9 @@ config.Site.storageSite = "T2_US_UCSD"
 
 from CRABAPI.RawCommand import crabCommand
 
-import genf
+#import genf
 
-counter=1002
+counter=1
 
 opds={}
 
@@ -125,7 +121,7 @@ for sample in allsamples:
     config.Data.outputDatasetTag = 'skimNano-TestUL_'+opd+"_TESTS"
     #config.General.requestName = 'skimNano-TestUL'+opd+"--"+str(counter)
     #print files[0:2]
-#    crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+    crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
     print "DONE"
     
     counter+=1

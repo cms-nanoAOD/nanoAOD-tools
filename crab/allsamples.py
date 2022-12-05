@@ -651,3 +651,6 @@ allsamples=[
 #"GluGluToHHTo2G2Tau_node_cHHH2p45_TuneCP5_13TeV-powheg-pythia8_2016_APV_v2",
 #"GluGluToHHTo2G2W_semileptonic_node_cHHH2p45_2017_v2"
 ]
+allsamples=[
+'DiPhotonJetsBox_MGG-80toInf_13TeV-sherpa_RunIISummer19UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1_MINIAODSIM_final'
+]
