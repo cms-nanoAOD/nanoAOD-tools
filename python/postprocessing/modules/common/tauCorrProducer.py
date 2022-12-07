@@ -11,8 +11,8 @@ datapath = os.path.join(os.environ.get('CMSSW_BASE','CMSSW_BASE'),"src/PhysicsTo
 
 class TauCorrectionsProducer(Module):
     
-    def __init__(self, year, antiJetID='DeepTau2017v2p1VSjet', antiJetWPs=['Medium','Tight'],
-                             antiEleID='DeepTau2017v2p1VSe',   antiEleWPs=['VVLoose','Tight'],
+    def __init__(self, year, antiJetID='DeepTau2017v2p1VSjet', antiJetWPs=['Loose','Tight'],
+                             antiEleID='DeepTau2017v2p1VSe',   antiEleWPs=['VVLoose','VLoose','Tight'],
                              antiMuID='DeepTau2017v2p1VSmu',   antiMuWPs=['VLoose','Tight'],
                              antiJetPerDM=False, sys=True,
                              tes=True, fes=True, tesSys=True, path=datapath, verbose=False):
@@ -214,3 +214,9 @@ class TauCorrectionsProducer(Module):
 tauCorrs2016Legacy = lambda: TauCorrectionsProducer('2016Legacy')
 tauCorrs2017ReReco = lambda: TauCorrectionsProducer('2017ReReco')
 tauCorrs2018ReReco = lambda: TauCorrectionsProducer('2018ReReco')
+
+tauCorrs2016ULpreVFP  = lambda: TauCorrectionsProducer('UL2016_preVFP')
+tauCorrs2016ULpostVFB = lambda: TauCorrectionsProducer('UL2016_postVFP')
+tauCorrs2017UL        = lambda: TauCorrectionsProducer('UL2017')
+tauCorrs2018UL        = lambda: TauCorrectionsProducer('UL2018')
+

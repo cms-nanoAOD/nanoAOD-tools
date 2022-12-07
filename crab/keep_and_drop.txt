@@ -1,0 +1,9 @@
+# this is a comment
+#drop * # start with all
+keep Electron*
+keep Muon*
+keep Jet*
+drop FatJet*
+drop HLT*
+keep HLT*hoton*
+drop L1*

@@ -102,3 +102,22 @@ muonScaleRes2017 = lambda: muonScaleResProducer('roccor.Run2.v3',
                                                 'RoccoR2017.txt', 2017)
 muonScaleRes2018 = lambda: muonScaleResProducer('roccor.Run2.v3',
                                                 'RoccoR2018.txt', 2018)
+
+
+muonScaleRes2016v5 = lambda: muonScaleResProducer('roccor.Run2.v5',
+                                                'RoccoR2016.txt', 2016)
+muonScaleRes2017v5 = lambda: muonScaleResProducer('roccor.Run2.v5',
+                                                'RoccoR2017.txt', 2017)
+muonScaleRes2018v5 = lambda: muonScaleResProducer('roccor.Run2.v5',
+                                                'RoccoR2018.txt', 2018)
+
+muonScaleRes2016v5ULAPV = lambda: muonScaleResProducer('roccor.Run2.v5',
+                                                'RoccoR2016aUL.txt', 2016)
+muonScaleRes2016v5UL = lambda: muonScaleResProducer('roccor.Run2.v5',
+                                                'RoccoR2016bUL.txt', 2016)
+muonScaleRes2017v5UL = lambda: muonScaleResProducer('roccor.Run2.v5',
+                                                'RoccoR2017UL.txt', 2017)
+muonScaleRes2018v5UL = lambda: muonScaleResProducer('roccor.Run2.v5',
+                                                'RoccoR2018UL.txt', 2018)
+
+

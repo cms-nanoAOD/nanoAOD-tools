@@ -29,9 +29,11 @@ class jetmetUncertaintiesProducer(Module):
                  applySmearing=True,
                  applyHEMfix=False,
                  splitJER=False,
-                 saveMETUncs=['T1', 'T1Smear']
+                 saveMETUncs=['T1', 'T1Smear'],
+                 final_pt_suffix='nom'
      ):
 
+        self.final_pt_suffix=final_pt_suffix
         # globalTagProd only needs to be defined if METFixEE2017 is to be
         # recorrected, and should be the GT that was used for the production
         # of the nanoAOD files
@@ -239,13 +241,13 @@ class jetmetUncertaintiesProducer(Module):
         self.out.branch("%s_pt_raw" % self.jetBranchName,
                         "F",
                         lenVar=self.lenVar)
-        self.out.branch("%s_pt_nom" % self.jetBranchName,
+        self.out.branch("%s_pt_%s" %(self.jetBranchName, self.final_pt_suffix),
                         "F",
                         lenVar=self.lenVar)
         self.out.branch("%s_mass_raw" % self.jetBranchName,
                         "F",
                         lenVar=self.lenVar)
-        self.out.branch("%s_mass_nom" % self.jetBranchName,
+        self.out.branch("%s_mass_%s" %(self.jetBranchName, self.final_pt_suffix),
                         "F",
                         lenVar=self.lenVar)
         self.out.branch("%s_corr_JEC" % self.jetBranchName,
@@ -879,7 +881,7 @@ class jetmetUncertaintiesProducer(Module):
             met_T1Smear_py_unclEnDown = met_T1Smear_py_unclEnDown - met_deltaPy_unclEn
 
         self.out.fillBranch("%s_pt_raw" % self.jetBranchName, jets_pt_raw)
-        self.out.fillBranch("%s_pt_nom" % self.jetBranchName, jets_pt_nom)
+        self.out.fillBranch("%s_pt_%s" %(self.jetBranchName, self.final_pt_suffix), jets_pt_nom)
         self.out.fillBranch("%s_corr_JEC" % self.jetBranchName, jets_corr_JEC)
         self.out.fillBranch("%s_corr_JER" % self.jetBranchName, jets_corr_JER)
         if not self.isData:
@@ -897,7 +899,7 @@ class jetmetUncertaintiesProducer(Module):
                             math.atan2(met_T1_py, met_T1_px))
 
         self.out.fillBranch("%s_mass_raw" % self.jetBranchName, jets_mass_raw)
-        self.out.fillBranch("%s_mass_nom" % self.jetBranchName, jets_mass_nom)
+        self.out.fillBranch("%s_mass_%s" %(self.jetBranchName, self.final_pt_suffix), jets_mass_nom)
 
         if not self.isData:
             for jerID in self.splitJERIDs:
@@ -1075,3 +1077,25 @@ jetmetUncertainties2018AK4Puppi = lambda: jetmetUncertaintiesProducer(
     "2018", "Autumn18_V8_MC", ["Total"], jetType="AK4PFPuppi")
 jetmetUncertainties2018AK4PuppiAll = lambda: jetmetUncertaintiesProducer(
     "2018", "Autumn18_V8_MC", ["All"], jetType="AK4PFPuppi")
+
+
+jetmetUncertaintiesAPV2016UL = lambda: jetmetUncertaintiesProducer(
+    era="2016", globalTag="Summer19UL16APV_V7_MC", jerTag="Summer20UL16APV_JRV3_MC", jesUncertainties=["Total"])
+jetmetUncertaintiesAPV2016ULAll = lambda: jetmetUncertaintiesProducer(
+    era="2016", globalTag="Summer19UL16APV_V7_MC", jerTag="Summer20UL16APV_JRV3_MC", jesUncertainties=["All"], final_pt_suffix="nom")
+
+jetmetUncertainties2016UL = lambda: jetmetUncertaintiesProducer(
+    era="2016", globalTag="Summer19UL16_V7_MC", jerTag="Summer20UL16_JRV3_MC", jesUncertainties=["Total"])
+jetmetUncertainties2016ULAll = lambda: jetmetUncertaintiesProducer(
+    era="2016", globalTag="Summer19UL16_V7_MC", jerTag="Summer20UL16_JRV3_MC", jesUncertainties=["All"])
+
+jetmetUncertainties2017UL = lambda: jetmetUncertaintiesProducer(
+    era="2017", globalTag="Summer19UL17_V5_MC", jerTag="Summer19UL17_JRV2_MC", jesUncertainties=["Total"])
+jetmetUncertainties2017ULAll = lambda: jetmetUncertaintiesProducer(
+    era="2017", globalTag="Summer19UL17_V5_MC", jerTag="Summer19UL17_JRV2_MC", jesUncertainties=["All"])
+
+jetmetUncertainties2018UL = lambda: jetmetUncertaintiesProducer(
+    era="2018", globalTag="Summer19UL18_V5_MC",  jerTag="Summer19UL18_JRV2_MC", jesUncertainties=["Total"])
+jetmetUncertainties2018ULAll = lambda: jetmetUncertaintiesProducer(
+    era="2018", globalTag="Summer19UL18_V5_MC",  jerTag="Summer19UL18_JRV2_MC", jesUncertainties=["All"])
+
