@@ -1,5 +1,7 @@
-#this is not mean to be run locally
-#
+#!/bin/bash
+######################################
+# This is not mean to be run locally #
+######################################
 for i in "$@"
   do echo $i, "  UUU " 
 done
@@ -28,5 +30,5 @@ mv module $CMSSW_BASE/module
 mv python $CMSSW_BASE/python
 
 echo Found Proxy in: $X509_USER_PROXY
-python crab_script_ggOnly.py $1 $2
+python crab_script_ggOnly.py $1 $2 $3 # Job number, year/era definition, analysis definition
 fi
