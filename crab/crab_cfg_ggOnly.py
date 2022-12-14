@@ -93,12 +93,12 @@ for sample in allsamples:
 
 
   opd = sample.split("/")[-1]
-  lengthToFitName = 100-len("#"+str(counter))
-  config.General.requestName = opd[0:lengthToFitName]+"#"+str(counter)
-  config.Data.outputPrimaryDataset=opd
+  lengthToFitName = 100-len(args.version+"-"+"-"+str(counter))
+  config.General.requestName = args.version+"-"+opd[0:lengthToFitName]+"-"+str(counter)
+  config.Data.outputPrimaryDataset=opd[0:99]
   config.Data.outputDatasetTag = version+opd
   print opd, len(files)
-  #crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+  crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
   print "DONE\n"
   
   counter+=1
