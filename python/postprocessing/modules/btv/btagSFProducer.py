@@ -131,6 +131,24 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
+                'UL2016preVFP': {
+                    'inputFileName': "reshaping_deepJet_106XUL16preVFP_v2.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                'UL2016postVFP': {
+                    'inputFileName': "reshaping_deepJet_106XUL16postVFP_v3.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
                 '2017': {
                     'inputFileName': "DeepFlavour_94XSF_V3_B_F.csv",
                     'measurement_types': {
@@ -141,7 +159,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2017': {
-                    'inputFileName': "DeepJet_106XUL17SF.csv",
+                    'inputFileName': "reshaping_deepJet_106XUL17_v3.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -159,7 +177,7 @@ class btagSFProducer(Module):
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
                 'UL2018': {
-                    'inputFileName': "DeepJet_106XUL18SF.csv",
+                    'inputFileName': "reshaping_deepJet_106XUL18_v2.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
@@ -246,7 +264,7 @@ class btagSFProducer(Module):
         # initialize BTagCalibrationReader
         # (cf. https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration )
         self.calibration = ROOT.BTagCalibration(
-            self.algo, os.path.join(self.inputFilePath, self.inputFileName))
+            self.algo, os.path.join(self.inputFilePath, self.inputFileName), True)
         self.readers = {}
         for wp in self.selectedWPs:
             wp_btv = {"l": 0, "m": 1, "t": 2,
