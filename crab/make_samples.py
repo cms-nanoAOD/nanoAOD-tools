@@ -1,6 +1,6 @@
 import os
 
-maindir="/hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/"
+maindir="/ceph/cms/store/user/fsetti/Summer20UL_nanoAODv9/"
 
 #print os.listdir(maindir)
 
