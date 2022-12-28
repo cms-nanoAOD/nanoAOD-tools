@@ -1,100 +1,104 @@
-#from WMCore.Configuration import Configuration
-#from CRABClient.UserUtilities import config #getUsernameFromSiteDB
 from CRABClient.UserUtilities import config as Configuration
 
-version="__T"
-
+from datetime import date 
+import argparse
 import os 
-base = os.environ["CMSSW_BASE"]
 
+base = os.environ["CMSSW_BASE"]
+user = os.environ["USER"]
+
+parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+parser.add_argument("--analysis", default=None, required=True, choices=["ggtautau","ggbb"], help="Choose the analysis for which the skimming is to be run (Required)")
+parser.add_argument("--version", default=None, help="Name for the output folder. Default: 'skim_DATE_ANALYSIS', otherwise 'skim_DATE_ANALYSIS_VERSION'")
+parser.add_argument("--crabDir", default=base+"/..", help="Output folder for crab project files. Default: '"+base+"/..'")
+args = parser.parse_args()
+
+version="skim_"+date.today().strftime("%b%d%Y")+"_"+args.analysis+("_"+str(args.version) if args.version else "")
+print version
+
+
+### General crab configuration ###
 config = Configuration()
 
 config.section_("General")
-config.General.requestName = 'skimNano-TestUL'
 config.General.transferLogs = True
- 
-config.General.workArea = base+'/..'
+config.General.workArea = args.crabDir
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
 config.JobType.scriptExe = 'crab_script_ggOnly.sh'
-#config.JobType.scriptArgs= "foo"
-# hadd nano will not be needed once nano tools are in cmssw
 config.JobType.inputFiles = ['crab_script_ggOnly.py', '../scripts/haddnano.py', 'keep_and_drop.txt']
 config.JobType.sendPythonFolder = True
-
 config.JobType.allowUndistributedCMSSW = True #shouldn't be necessary
 
 config.section_("Data")
-#config.Data.inputDataset = '/DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAOD-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/NANOAODSIM'
-config.Data.inputDBS = 'phys03'
-config.Data.inputDBS = 'global'
+#config.Data.inputDBS = 'phys03' # shouldn't be necessary to define, since we are using local files. Defaults to 'global'.
+config.Data.splitting = 'FileBased'
+config.Data.unitsPerJob = 1 
+config.Data.allowNonValidInputDataset=True
 
-
-aaa=[
-"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v2/NANOAODSIM",
-"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v2/NANOAODSIM",
-"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",
-"/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM",
-]
-
-
-mc16a=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODAPVv9-106X_mcRun2_asymptotic_preVFP_v11-v2/NANOAODSIM",]
-mc16b=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v2/NANOAODSIM",]
-mc17=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL17NanoAODv9-106X_mc2017_realistic_v9-v2/NANOAODSIM",]
-mc18=["/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2/NANOAODSIM",]
-
-#drwxrwxr-x 11 fsetti fsetti 4,0K 15 feb 16.58 /hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2016_APV_final
-#drwxrwxr-x 11 fsetti fsetti 4,0K 15 feb 19.08 /hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2016_final
-#drwxrwxr-x 21 fsetti fsetti 4,0K 15 feb 19.36 /hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2018_final
-#drwxrwxr-x 21 fsetti fsetti 4,0K 15 feb 21.09 /hadoop/cms/store/user/fsetti/Summer20UL_nanoAODv9/GluGluToHHTo2G2Tau_node_cHHH1_TuneCP5_13TeV-powheg-pythia8_2017_final
-
-
-#config.Data.splitting = 'FileBased'
-config.Data.splitting = 'EventAwareLumiBased'
-config.Data.unitsPerJob = 10
-config.Data.totalUnits = 10 #override
-
-config.Data.outLFNDirBase = '/store/user/legianni/skimNano-TestUL'+version # cannot getUsernameFromSiteDB
+config.Data.outLFNDirBase = '/store/user/'+user+'/'+version
 config.Data.publication = False
-#config.Data.outputDatasetTag = 'skimNano-TestUL'+version
 
 config.section_("Site")
 config.Site.storageSite = "T2_US_UCSD"
+### General crab configuration ###
 
+
+from sa import *
+from allsamples import allsamples
 from CRABAPI.RawCommand import crabCommand
 
+counter=1
 
+for sample in allsamples:
 
-counter=21
-
-opds={}
-
-for sample in aaa:
+  path='/ceph/cms/store/user/fsetti/Summer20UL_nanoAODv9/'+sample # Probably better to have a common /ceph area
   
-    path=""
+  if sample in mc16A:
+    config.JobType.scriptArgs = ["arg=16a","arg="+args.analysis]
+    path=mc16A[sample]
+  if sample in mc16:
+    config.JobType.scriptArgs = ["arg=16b","arg="+args.analysis]
+    path=mc16[sample]
+  if sample in mc17:
+    config.JobType.scriptArgs = ["arg=17","arg="+args.analysis]
+    path=mc17[sample]
+  if sample in mc18:
+    config.JobType.scriptArgs = ["arg=18","arg="+args.analysis]
+    path=mc18[sample]
     
-    if sample in mc16a:
-      config.JobType.scriptArgs=["arg=16a"] #it seems this is not working without the = sign!!!
-      config.Data.inputDataset=sample
-    if sample in mc16b:
-      config.JobType.scriptArgs=["arg=16b"]
-      config.Data.inputDataset=sample
-    if sample in mc17:
-      config.JobType.scriptArgs=["arg=17"]
-      config.Data.inputDataset=sample
-    if sample in mc18:
-      config.JobType.scriptArgs=["arg=18"]
-      config.Data.inputDataset=sample
+  if sample in data16A:
+    config.JobType.scriptArgs = ["arg=16aD","arg="+args.analysis]
+    config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt'
+  if sample in data16:
+    config.JobType.scriptArgs = ["arg=16bD","arg="+args.analysis]
+    config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt'
+  if sample in data17:
+    config.JobType.scriptArgs = ["arg=17D","arg="+args.analysis]
+    config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt'
+  if sample in data18:
+    config.JobType.scriptArgs = ["arg=18D","arg="+args.analysis]
+    config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt'
+
+  
+  # Get files - it works at UCSD
+  files=os.listdir(path)
+  for i in range(len(files)):
+    files[i]=path.replace("/ceph/cms", "")+"/"+files[i]
+  
+  config.Data.userInputFiles = files
+  config.Data.totalUnits = len(files)
 
 
-    config.Data.outputDatasetTag = 'skimNano-TestUL_'+sample.split("/")[1].split("-")[0]+"_"+sample.split("/")[2].split("-")[0]
-    config.General.requestName = 'skimNano-TestUL'+sample.split("/")[1][0:30]+"--"+str(counter)
-    print config
-    crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
-    print "DONE"
-    
-    counter+=1
-    
-    #break
+  opd = sample.split("/")[-1]
+  lengthToFitName = 100-len(args.version+"-"+"-"+str(counter))
+  config.General.requestName = args.version+"-"+opd[0:lengthToFitName]+"-"+str(counter)
+  config.Data.outputPrimaryDataset=opd[0:99]
+  config.Data.outputDatasetTag = version+opd
+  print opd, len(files)
+  crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
+  print "DONE\n"
+  
+  counter+=1
