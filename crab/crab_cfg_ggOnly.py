@@ -35,7 +35,6 @@ config.JobType.allowUndistributedCMSSW = True #shouldn't be necessary
 config.section_("Data")
 #config.Data.inputDBS = 'phys03' # shouldn't be necessary to define, since we are using local files. Defaults to 'global'.
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 1 
 config.Data.allowNonValidInputDataset=True
 
 config.Data.outLFNDirBase = '/store/user/'+user+'/'+version
@@ -47,40 +46,49 @@ config.Site.storageSite = "T2_US_UCSD"
 
 
 from sa import *
-from allsamples import allsamples
+from allsamples import *
 from CRABAPI.RawCommand import crabCommand
 
 counter=1
 
-for sample in allsamples:
+for sample in XToYHToggbbSamples:
 
-  path='/ceph/cms/store/user/fsetti/Summer20UL_nanoAODv9/'+sample # Probably better to have a common /ceph area
+  path='/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/'+sample # Probably better to have a common /ceph area
   
-  if sample in mc16A:
-    config.JobType.scriptArgs = ["arg=16a","arg="+args.analysis]
-    path=mc16A[sample]
-  if sample in mc16:
-    config.JobType.scriptArgs = ["arg=16b","arg="+args.analysis]
-    path=mc16[sample]
-  if sample in mc17:
-    config.JobType.scriptArgs = ["arg=17","arg="+args.analysis]
-    path=mc17[sample]
-  if sample in mc18:
-    config.JobType.scriptArgs = ["arg=18","arg="+args.analysis]
-    path=mc18[sample]
-    
-  if sample in data16A:
-    config.JobType.scriptArgs = ["arg=16aD","arg="+args.analysis]
-    config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt'
-  if sample in data16:
-    config.JobType.scriptArgs = ["arg=16bD","arg="+args.analysis]
-    config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt'
-  if sample in data17:
-    config.JobType.scriptArgs = ["arg=17D","arg="+args.analysis]
-    config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt'
-  if sample in data18:
-    config.JobType.scriptArgs = ["arg=18D","arg="+args.analysis]
-    config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt'
+  # MC
+  if "Summer20UL1" in sample:
+    config.Data.unitsPerJob = 10
+    if "Summer20UL16" in sample and "APV" in sample:
+      config.JobType.scriptArgs = ["arg=16a","arg="+args.analysis]
+    elif "Summer20UL16" in sample:
+      config.JobType.scriptArgs = ["arg=16b","arg="+args.analysis]
+    elif "Summer20UL17" in sample:
+      config.JobType.scriptArgs = ["arg=17","arg="+args.analysis]
+    elif "Summer20UL18" in sample:
+      config.JobType.scriptArgs = ["arg=18","arg="+args.analysis]
+    else:
+      print("Couldn't identify sample year/era: %s", sample)
+
+  # Data
+  elif "Run201" in sample:
+    config.Data.unitsPerJob = 10
+    if "Run2016" in sample and "HIPM" in sample:
+      config.JobType.scriptArgs = ["arg=16aD","arg="+args.analysis]
+      #config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt'
+    elif "Run2016" in sample:
+      config.JobType.scriptArgs = ["arg=16bD","arg="+args.analysis]
+      #config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt'
+    elif "Run2017" in sample:
+      config.JobType.scriptArgs = ["arg=17D","arg="+args.analysis]
+      #config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt'
+    elif "Run2018" in sample:
+      config.JobType.scriptArgs = ["arg=18D","arg="+args.analysis]
+      #config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt'
+    else:
+      print("Couldn't identify sample year/era: %s", sample)
+
+  else:
+    print("Couldn't identify sample year/era: %s", sample)
 
   
   # Get files - it works at UCSD
@@ -94,9 +102,10 @@ for sample in allsamples:
 
   opd = sample.split("/")[-1]
   lengthToFitName = 100-len(args.version+"-"+"-"+str(counter))
-  config.General.requestName = args.version+"-"+opd[0:lengthToFitName]+"-"+str(counter)
+  shortName = args.version+"-"+opd[0:lengthToFitName]+"-"+str(counter)
+  config.General.requestName = shortName
   config.Data.outputPrimaryDataset=opd[0:99]
-  config.Data.outputDatasetTag = version+opd
+  config.Data.outputDatasetTag = shortName
   print opd, len(files)
   crabCommand('submit', config = config, dryrun = False) ## dryrun = True for local test
   print "DONE\n"
