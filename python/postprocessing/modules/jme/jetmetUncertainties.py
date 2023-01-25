@@ -48,7 +48,7 @@ class jetmetUncertaintiesProducer(Module):
         else:
             self.splitJERIDs = [""]  # "empty" ID for the overall JER
         self.metBranchName = metBranchName
-        self.rhoBranchName = "fixedGridRhoFastjetAll"
+        self.rhoBranchName = "Rho_fixedGridRhoFastjetAll"
         # --------------------------------------------------------------------
         # CV: globalTag and jetType not yet used in the jet smearer, as there
         # is no consistent set of txt files for JES uncertainties and JER scale
