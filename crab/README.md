@@ -25,8 +25,7 @@ scram b -j 4
 ## Usage
 ```bash
 cd skimming/directory/CMSSW_10_6_30/src/PhysicsTools/NanoAODTools/crab
-cmsenv
-source /cvmfs/cms.cern.ch/common/crab-setup.sh
+source setup.sh
 ```
 
 To select the samples to be skimmed, the `allsamples.py` needs to be modified, possibly also `sa.py`, if a new sample is added. The `make_samples.py` scripts helps with the creation of those files.
