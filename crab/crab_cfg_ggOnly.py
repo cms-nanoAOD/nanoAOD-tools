@@ -56,15 +56,15 @@ for sample in XToYHToggbbSamples:
   path='/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/'+sample # Probably better to have a common /ceph area
   
   # MC
-  if "Summer20UL1" in sample:
+  if "UL1" in sample:
     config.Data.unitsPerJob = 10
-    if "Summer20UL16" in sample and "APV" in sample:
+    if "UL16" in sample and "APV" in sample:
       config.JobType.scriptArgs = ["arg=16a","arg="+args.analysis]
-    elif "Summer20UL16" in sample:
+    elif "UL16" in sample:
       config.JobType.scriptArgs = ["arg=16b","arg="+args.analysis]
-    elif "Summer20UL17" in sample:
+    elif "UL17" in sample:
       config.JobType.scriptArgs = ["arg=17","arg="+args.analysis]
-    elif "Summer20UL18" in sample:
+    elif "UL18" in sample:
       config.JobType.scriptArgs = ["arg=18","arg="+args.analysis]
     else:
       print("Couldn't identify sample year/era: %s", sample)
