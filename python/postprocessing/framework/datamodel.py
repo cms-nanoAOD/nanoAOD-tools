@@ -121,6 +121,8 @@ class Collection:
             return self._cache[index]
         if index >= self._len:
             raise IndexError("Invalid index %r (len is %r) at %s" % (index, self._len, self._prefix))
+        elif index < 0:
+            raise IndexError("Invalid negative index %r" % index)
         ret = Object(self._event, self._prefix, index=index)
         if type(index) == int:
             self._cache[index] = ret
