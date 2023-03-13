@@ -262,7 +262,7 @@ class PostProcessor:
 
         print("Total time %.1f sec. to process %i events. Rate = %.1f Hz." % ((time.time() - t0), totEntriesRead, totEntriesRead / (time.time() - t0)))
 
-        if self.haddFileName:
+        if self.haddFileName and outFileNames:
             haddnano = "./haddnano.py" if os.path.isfile(
                 "./haddnano.py") else "haddnano.py"
             os.system("%s %s %s" %
