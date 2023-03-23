@@ -7,3 +7,4 @@ keep FatJet*
 drop HLT*
 keep HLT*hoton*
 drop L1*
+keep L1PreFiring*

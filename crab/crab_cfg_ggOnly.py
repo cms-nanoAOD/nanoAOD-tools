@@ -31,6 +31,7 @@ config.JobType.scriptExe = 'crab_script_ggOnly.sh'
 config.JobType.inputFiles = ['crab_script_ggOnly.py', '../scripts/haddnano.py', 'keep_and_drop.txt']
 config.JobType.sendPythonFolder = True
 config.JobType.allowUndistributedCMSSW = True #shouldn't be necessary
+config.JobType.maxMemoryMB = 2500
 
 config.section_("Data")
 #config.Data.inputDBS = 'phys03' # shouldn't be necessary to define, since we are using local files. Defaults to 'global'.
@@ -53,18 +54,23 @@ counter=1
 
 for sample in XToYHToggbbSamples:
 
-  path='/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/'+sample # Probably better to have a common /ceph area
+  path='/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/'
+  year = None
   
   # MC
   if "UL1" in sample:
-    config.Data.unitsPerJob = 10
+    config.Data.unitsPerJob = 5
     if "UL16" in sample and "APV" in sample:
+      year = "2016APV"
       config.JobType.scriptArgs = ["arg=16a","arg="+args.analysis]
     elif "UL16" in sample:
+      year = "2016nonAPV"
       config.JobType.scriptArgs = ["arg=16b","arg="+args.analysis]
     elif "UL17" in sample:
+      year = "2017"
       config.JobType.scriptArgs = ["arg=17","arg="+args.analysis]
     elif "UL18" in sample:
+      year = "2018"
       config.JobType.scriptArgs = ["arg=18","arg="+args.analysis]
     else:
       print("Couldn't identify sample year/era: %s", sample)
@@ -73,15 +79,19 @@ for sample in XToYHToggbbSamples:
   elif "Run201" in sample:
     config.Data.unitsPerJob = 10
     if "Run2016" in sample and "HIPM" in sample:
+      year = "2016APV"
       config.JobType.scriptArgs = ["arg=16aD","arg="+args.analysis]
       #config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt'
     elif "Run2016" in sample:
+      year = "2016nonAPV"
       config.JobType.scriptArgs = ["arg=16bD","arg="+args.analysis]
       #config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt'
     elif "Run2017" in sample:
+      year = "2017"
       config.JobType.scriptArgs = ["arg=17D","arg="+args.analysis]
       #config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt'
     elif "Run2018" in sample:
+      year = "2018"
       config.JobType.scriptArgs = ["arg=18D","arg="+args.analysis]
       #config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt'
     else:
@@ -92,6 +102,7 @@ for sample in XToYHToggbbSamples:
 
   
   # Get files - it works at UCSD
+  path = path + year + "/" + sample
   files=os.listdir(path)
   for i in range(len(files)):
     files[i]=path.replace("/ceph/cms", "")+"/"+files[i]
