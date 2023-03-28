@@ -175,10 +175,6 @@ class PostProcessor:
                     if toBeDeleted:
                         os.unlink(ftoread)
                 continue
-            elif elist and elist.GetN() == 0:
-                    # stop processing if no entries got pre-selected
-                    print('Pre-select 0 entries out of %s (0.00%%)' % (nEntries))
-                    continue
             else:
                 print('Pre-select %d entries out of %s (%.2f%%)' % (elist.GetN() if elist else nEntries, nEntries, (elist.GetN() if elist else nEntries) / (0.01 * nEntries) if nEntries else 0))
                 inAddFiles = []
@@ -234,7 +230,7 @@ class PostProcessor:
                     self.branchsel.selectBranches(inTree)
 
             # process events, if needed
-            if not fullClone:
+            if not fullClone and not (elist and elist.GetN() == 0):
                 eventRange = range(self.firstEntry, self.firstEntry +
                                     nEntries) if nEntries > 0 and not elist else None
                 (nall, npass, timeLoop) = eventLoop(
@@ -262,7 +258,7 @@ class PostProcessor:
 
         print("Total time %.1f sec. to process %i events. Rate = %.1f Hz." % ((time.time() - t0), totEntriesRead, totEntriesRead / (time.time() - t0)))
 
-        if self.haddFileName and outFileNames:
+        if self.haddFileName:
             haddnano = "./haddnano.py" if os.path.isfile(
                 "./haddnano.py") else "haddnano.py"
             os.system("%s %s %s" %
