@@ -26,16 +26,38 @@ analysis=sys.argv[3].split("=")[1]
 selection='''Sum$(Photon_pt > 18 && (Photon_isScEtaEB || Photon_isScEtaEE) && Photon_electronVeto > 0.5 && Photon_hoe < 0.08) > 1'''
 
 
-files=[ '/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/2018/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8042.root',
-        '/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/2018/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8043.root',
-        '/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/2018/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8044.root',
-        '/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/2018/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8045.root',
-        '/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/2018/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8046.root',
-        '/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/2018/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8047.root',
-        '/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/2018/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8048.root',
-        '/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/2018/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8049.root',
-        '/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/2018/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8050.root',
-        '/ceph/cms/store/group/Hgg/XToYHToggbb/customNanoAOD/2018/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_805.root' ]
+#files=[ '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8033.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8034.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8035.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8036.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8037.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8038.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8039.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8040.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8041.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_804.root' ]
+
+#files=[ '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8042.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8043.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8044.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8045.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8046.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8047.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8048.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8049.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8050.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_805.root' ]
+
+#files=[ '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8051.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8052.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8053.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8054.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8055.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8056.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8057.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8058.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_8059.root',
+#        '/ceph/cms/store/user/evourlio/XtoYH_customNanoAOD/EGamma_Run2018D-UL2018_MiniAODv2-v2_MINIAOD_v0/nanoaod_806.root' ]
 
 
 #2016 modules MC
