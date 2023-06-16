@@ -15,7 +15,7 @@ def zeroFill(tree, brName, brObj, allowNonBool=False):
         'u4', 'i'), 'Long64_t': ('i8', 'L'), 'Double_t': ('f8', 'D')}
     brType = brObj.GetLeaf(brName).GetTypeName()
     if (not allowNonBool) and (brType != "Bool_t"):
-        print(("Did not expect to back fill non-boolean branches", tree, brName, brObj.GetLeaf(br).GetTypeName()))
+        print(("Did not expect to back fill non-boolean branches ", tree, brName, brObj.GetLeaf(br).GetTypeName()))
     else:
         if brType not in branch_type_dict:
             raise RuntimeError('Impossible to backfill branch of type %s' % brType)
@@ -32,7 +32,7 @@ def zeroFill(tree, brName, brObj, allowNonBool=False):
 fileHandles = []
 goFast = True
 for fn in files:
-    print("Adding file" + str(fn))
+    print("Adding file " + str(fn))
     fileHandles.append(ROOT.TFile.Open(fn))
     if fileHandles[-1].GetCompressionSettings() != fileHandles[0].GetCompressionSettings():
         goFast = False
@@ -61,7 +61,7 @@ for e in fileHandles[0].GetListOfKeys():
                                  for x in otherObj.GetListOfBranches()])
             missingBranches = list(branchNames - otherBranches)
             additionalBranches = list(otherBranches - branchNames)
-            print("missing: " + str(missingBranches) + "\n Additional:" + str(additionalBranches))
+            print("missing: " + str(missingBranches) + "\n Additional: " + str(additionalBranches))
             for br in missingBranches:
                 # fill "Other"
                 zeroFill(otherObj, br, obj.GetListOfBranches().FindObject(br))
@@ -76,7 +76,7 @@ for e in fileHandles[0].GetListOfKeys():
                                  for x in otherObj.GetListOfBranches()])
             missingBranches = list(branchNames - otherBranches)
             additionalBranches = list(otherBranches - branchNames)
-            print("missing: " + str(missingBranches) + "\n Additional:" + str(additionalBranches))
+            print("missing: " + str(missingBranches) + "\n Additional: " + str(additionalBranches))
             for br in missingBranches:
                 # fill "Other"
                 zeroFill(otherObj, br, obj.GetListOfBranches(
