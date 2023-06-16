@@ -238,7 +238,7 @@ class PostProcessor:
                     eventRange=eventRange, maxEvents=self.maxEntries
                 )
                 print('Processed %d preselected entries from %s (%s entries). Finally selected %d entries' % (nall, fname, nEntries, npass))
-            elif outTree!=None:
+            elif outTree is not None:
                 nall = nEntries
                 print('Selected %d / %d entries from %s (%.2f%%)' % (outTree.tree().GetEntries(), nall, fname, outTree.tree().GetEntries() / (0.01 * nall) if nall else 0))
 
