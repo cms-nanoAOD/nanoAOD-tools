@@ -23,7 +23,7 @@ suffix=sys.argv[2].split("=")[1]
 analysis=sys.argv[3].split("=")[1]
 
 
-selection='''Sum$(Photon_pt > 18 && (Photon_isScEtaEB || Photon_isScEtaEE) && Photon_electronVeto > 0.5 && Photon_hoe < 0.08) > 1'''
+selection=''''''
 
 
 #2016 modules MC

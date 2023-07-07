@@ -5,6 +5,7 @@ keep Muon*
 keep Jet*
 keep FatJet*
 drop HLT*
+keep HLT*Ele*
 keep HLT*hoton*
 drop L1*
 keep L1PreFiring*
