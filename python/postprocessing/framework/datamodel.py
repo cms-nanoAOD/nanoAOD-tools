@@ -4,7 +4,8 @@ import math
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 statusflags = { # GenPart_statusFlags, stored bitwise:
-  # https://cms-nanoaod-integration.web.cern.ch/integration/master-102X/mc102X_doc.html#GenPart
+  # https://cms-nanoaod-integration.web.cern.ch/integration/master-106X/mc106Xul18_doc.html#GenPart
+  # https://github.com/cms-sw/cmssw/edit/master/PhysicsTools/NanoAOD/python/genparticles_cff.py
   'isPrompt':                      0,   'fromHardProcess':                     8,
   'isDecayedLeptonHadron':         1,   'isHardProcessTauDecayProduct':        9,
   'isTauDecayProduct':             2,   'isDirectHardProcessTauDecayProduct': 10,
@@ -90,6 +91,7 @@ class Object:
         return self.__getattr__(attr)
 
     def p4(self, corr_pt=None):
+        """Create TLorentzVector for this particle."""
         ret = ROOT.TLorentzVector()
         if corr_pt == None:
             ret.SetPtEtaPhiM(self.pt, self.eta, self.phi, self.mass)
@@ -109,8 +111,8 @@ class Object:
         return math.sqrt(dphi**2 + deta**2)
 
     def statusflag(self, *flags):
-      """Find if bit for statusflag is set (for GenPart only)."""
-      return all((self.statusFlags & (1 << statusflags[f]))>0 for f in flags)
+        """Find if bit for statusflag is set (for GenPart only)."""
+        return all((self.statusFlags & (1 << statusflags[f]))>0 for f in flags)
 
     def subObj(self, prefix):
         return Object(self._event, self._prefix + prefix)
