@@ -17,14 +17,14 @@ def getprodchain(part,genparts=None,event=None,decay=-1):
   chain = "%3s"%(part.pdgId)
   imoth = part.genPartIdxMother
   while imoth>=0:
-    if genparts:
+    if genparts is not None:
       moth = genparts[imoth]
       chain = "%3s -> "%(moth.pdgId)+chain
       imoth = moth.genPartIdxMother
-    elif event:
+    elif event is not None:
       chain = "%3s -> "%(event.GenPart_pdgId[imoth])+chain
       imoth = event.GenPart_genPartIdxMother[imoth]
-  if genparts and decay>0:
+  if genparts is not None and decay>0:
     chain = chain[:-3] # remove last particle
     chain += getdecaychain(part,genparts,indent=len(chain),depth=decay-1)
   return chain
@@ -36,7 +36,7 @@ def getdecaychain(part,genparts,indent=0,depth=999):
   imoth   = part._index
   ndaus   = 0
   indent_ = len(chain)+indent
-  for idau in range(imoth+1,len(genparts)): 
+  for idau in range(imoth+1,genparts._len): 
     dau = genparts[idau]
     if dau.genPartIdxMother==imoth: # found daughter
       if ndaus>=1:
@@ -75,8 +75,8 @@ class LHEDumper(Module):
       prompt   = particle.statusflag('isPrompt') #hasbit(particle.statusFlags,0)
       taudecay = particle.statusflag('isTauDecayProduct') #hasbit(particle.statusFlags,2)
       lastcopy = particle.statusflag('isLastCopy') #hasbit(particle.statusFlags,13)
-      ishardprompt = particle.statusflag('isHardPrompt')
-      if 0<=mothidx<len(particles):
+      #ishardprompt = particle.statusflag('isHardPrompt')
+      if 0<=mothidx<particles._len:
         moth    = particles[mothidx]
         mothpid = moth.pdgId
         mothdR  = max(-999,min(999,particle.DeltaR(moth))) #particle.p4().DeltaR(moth.p4())
