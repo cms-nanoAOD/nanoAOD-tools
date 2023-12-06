@@ -1,5 +1,9 @@
 # nanoAOD-tools
-Tools for working with NanoAOD (requiring only python + root, not CMSSW)
+A minimal set of tool for working with NanoAODs (with dependencies on only python + root, not on the CMSSW framework)
+
+**Please note that, starting with CMSSW_13_3_0 (with backports for the coming 13_0_16 and 13_1_2), the framework part of NanoAODTools is maintained as a CMSSW package, in [PhysicsTools/NanoAODTools](https://github.com/cms-sw/cmssw/tree/master/PhysicsTools/NanoAODTools)**. 
+
+This repository and the instructions below are still relevant only for older CMSSW releases.
 
 ## Checkout instructions: standalone
 
@@ -14,7 +18,7 @@ Repeat only the last command at the beginning of every session.
 
 Please never commit neither the build directory, nor the empty init.py files created by the script.
 
-## Checkout instructions: CMSSW
+## Checkout instructions: CMSSW (CMSSW 12X and below)
 
     cd $CMSSW_BASE/src
     git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
