@@ -29,7 +29,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'PSet.py'
 config.JobType.scriptExe = 'crab_script_ggOnly.sh'
 config.JobType.inputFiles = ['crab_script_ggOnly.py', '../scripts/haddnano.py', 'keep_and_drop.txt']
-config.JobType.sendPythonFolder = True
+#config.JobType.sendPythonFolder = True
 config.JobType.allowUndistributedCMSSW = True #shouldn't be necessary
 config.JobType.maxMemoryMB = 2500
 
@@ -59,7 +59,7 @@ for sample in XToYHToggbbSamples:
   
   # MC
   if "UL1" in sample:
-    config.Data.unitsPerJob = 5
+    config.Data.unitsPerJob = 3
     if "UL16" in sample and "APV" in sample:
       year = "2016APV"
       config.JobType.scriptArgs = ["arg=16a","arg="+args.analysis]
@@ -77,7 +77,7 @@ for sample in XToYHToggbbSamples:
 
   # Data
   elif "Run201" in sample:
-    config.Data.unitsPerJob = 10
+    config.Data.unitsPerJob = 5 
     if "Run2016" in sample and "HIPM" in sample:
       year = "2016APV"
       config.JobType.scriptArgs = ["arg=16aD","arg="+args.analysis]
