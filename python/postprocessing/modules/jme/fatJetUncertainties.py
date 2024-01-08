@@ -249,15 +249,6 @@ class fatJetUncertaintiesProducer(Module):
         self.out.branch("%s_corr_JEC" % self.jetBranchName,
                         "F",
                         lenVar=self.lenVar)
-        self.out.branch("%s_corr_JER" % self.jetBranchName,
-                        "F",
-                        lenVar=self.lenVar)
-        self.out.branch("%s_corr_JMS" % self.jetBranchName,
-                        "F",
-                        lenVar=self.lenVar)
-        self.out.branch("%s_corr_JMR" % self.jetBranchName,
-                        "F",
-                        lenVar=self.lenVar)
 
         if self.doGroomed:
             self.out.branch("%s_msoftdrop_raw" % self.jetBranchName,
@@ -280,6 +271,16 @@ class fatJetUncertaintiesProducer(Module):
             self.out.branch("%s_msoftdrop_tau21DDT_nom" % self.jetBranchName,
                             "F",
                             lenVar=self.lenVar)
+            self.out.branch("%s_corr_JMR" % self.jetBranchName,
+                            "F",
+                            lenVar=self.lenVar)
+            self.out.branch("%s_corr_JER" % self.jetBranchName,
+                            "F",
+                            lenVar=self.lenVar)
+            self.out.branch("%s_corr_JMS" % self.jetBranchName,
+                            "F",
+                            lenVar=self.lenVar)
+
             for shift in ["Up", "Down"]:
                 for jerID in self.splitJERIDs:
                     self.out.branch("%s_pt_jer%s%s" %
