@@ -90,27 +90,33 @@ float WeightCalculatorFromHistogram::checkIntegral(std::vector<float> wgt1, std:
   float myint=0;
   float refint=0;
   for(int i=0; i<(int)wgt1.size(); ++i) {
+    if(verbose_) {
+      std::cout << "i = " << i << " : wgt1 = " << wgt1[i] << " ; wgt2 = " << wgt2[i] << " ; refvals = " << refvals_[i] << '\n';
+    }
     myint += wgt1[i]*refvals_[i];
     refint += wgt2[i]*refvals_[i];
+  }
+  if(verbose_) {
+    std::cout << "myint = " << myint << "\nrefint = " << refint << '\n';
   }
   return (myint-refint)/refint;
 }
 
 void WeightCalculatorFromHistogram::fixLargeWeights(std::vector<float> &weights, float maxshift,float hardmax) {
-  float maxw = std::min(*(std::max_element(weights.begin(),weights.end())),float(5.));
-  std::vector<float> cropped;
-  while (maxw > hardmax) {
-    cropped.clear();  
-    for(int i=0; i<(int)weights.size(); ++i) cropped.push_back(std::min(maxw,weights[i]));
+  if(verbose_) {
+    std::cout << "hardmax = " << hardmax << "\n"
+                 "maxshift = " << maxshift << '\n';
+  }
+  std::vector<float> cropped = weights;
+  float sf = 1.;
+  do {
+    for(int i=0; i<(int)cropped.size(); ++i) cropped[i] = std::min(hardmax,cropped[i]);
     float shift = checkIntegral(cropped,weights);
-    if(verbose_) std::cout << "For maximum weight " << maxw << ": integral relative change: " << shift << std::endl;
-    if(fabs(shift) > maxshift) break;
-    maxw *= 0.95;
-  }
-  maxw /= 0.95;
-  if (cropped.size()>0) {
-      for(int i=0; i<(int)weights.size(); ++i) cropped[i] = std::min(maxw,weights[i]);
-      float normshift = checkIntegral(cropped,weights);
-      for(int i=0; i<(int)weights.size(); ++i) weights[i] = cropped[i]*(1-normshift);
-  }
+    sf = 1. / (1. + shift);
+    if(verbose_) {
+      std::cout << "For maximum weight " << hardmax << ": integral relative change: " << shift << '\n';
+    }
+    for(int i=0; i<(int)cropped.size(); ++i) cropped[i] *= sf;
+  } while ( sf > (1. + maxshift) );
+  for(int i=0; i<(int)weights.size(); ++i) weights[i] = cropped[i];
 }
