@@ -53,6 +53,9 @@ class btagSFProducer(Module):
         self.inputFileName = sfFileName
         self.measurement_types = None
         self.supported_wp = None
+        self.correlationModel = False
+        if "YearCorrelation" in self.era:
+            self.correlationModel = True
         supported_btagSF = {
             'csvv2': {
                 '2016': {
@@ -131,6 +134,15 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
+                'Legacy2016_YearCorrelation': {
+                    'inputFileName': "DeepJet_2016LegacySF_V1_YearCorrelation-V1_plusLF.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T"]
+                },
                 '2017': {
                     'inputFileName': "DeepFlavour_94XSF_V3_B_F.csv",
                     'measurement_types': {
@@ -139,6 +151,15 @@ class btagSFProducer(Module):
                         2: "incl"   # light
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                '2017_YearCorrelation': {
+                    'inputFileName': "DeepFlavour_94XSF_V3_B_F_comb_YearCorrelation-V1_plusLF.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T"]
                 },
                 'UL2017': {
                     'inputFileName': "DeepJet_106XUL17SF.csv",
@@ -157,6 +178,15 @@ class btagSFProducer(Module):
                         2: "incl"   # light
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
+                },
+                '2018_YearCorrelation': {
+                    'inputFileName': "DeepJet_102XSF_V1_YearCorrelation-V1_plusLF.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["L", "M", "T"]
                 },
                 'UL2018': {
                     'inputFileName': "DeepJet_106XUL18SF.csv",
@@ -210,8 +240,14 @@ class btagSFProducer(Module):
 
         # define systematic uncertainties
         self.systs = []
-        self.systs.append("up")
-        self.systs.append("down")
+        if self.correlationModel:
+            self.systs.append("up_correlated")
+            self.systs.append("up_uncorrelated")
+            self.systs.append("down_correlated")
+            self.systs.append("down_uncorrelated")
+        else:
+            self.systs.append("up")
+            self.systs.append("down")
         self.central_and_systs = ["central"]
         self.central_and_systs.extend(self.systs)
 
