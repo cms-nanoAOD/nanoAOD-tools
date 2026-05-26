@@ -4,10 +4,10 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 impor
 #jecredo option has been removed check why------> Doest matter because redo option was for fat jets not for AK4 jets 
 
 #createJMECorrector(isMC=True, dataYear=2016,runPeriod="B",jesUncert="Total",jetType="AK4PFchs",noGroom=False,metBranchName="MET",applySmearing=True, isFastSim=False, applyHEMfix=False,splitJER=False, saveMETUncs=['T1', 'T1Smear']
-jmeCorrectionsUL2016preVFP_MC_AK4CHS = createJMECorrector(True, "UL2016_preVFP", "", "All", "AK4PFchs", False,"MET")   #2016 MC AK4 CHS 
-jmeCorrectionsUL2016postVFP_MC_AK4CHS = createJMECorrector(True, "UL2016", "", "All", "AK4PFchs", False,"MET")   #2016 MC AK4 CHS
-jmeCorrectionsUL2017_MC_AK4CHS = createJMECorrector(True, "UL2017", "", "All", "AK4PFchs", False,"MET")   #2017 MC AK4 CHS
-jmeCorrectionsUL2018_MC_AK4CHS = createJMECorrector(True, "UL2018", "", "All", "AK4PFchs", False,"MET")   #2018 MC AK4 CHS
+jmeCorrectionsUL2016preVFP_MC_AK4CHS = createJMECorrector(True, "UL2016_preVFP", "", "All", "AK4PFchs", False,"MET", splitJER=True)   #2016 MC AK4 CHS 
+jmeCorrectionsUL2016postVFP_MC_AK4CHS = createJMECorrector(True, "UL2016", "", "All", "AK4PFchs", False,"MET", splitJER=True)   #2016 MC AK4 CHS
+jmeCorrectionsUL2017_MC_AK4CHS = createJMECorrector(True, "UL2017", "", "All", "AK4PFchs", False,"MET", splitJER=True)   #2017 MC AK4 CHS
+jmeCorrectionsUL2018_MC_AK4CHS = createJMECorrector(True, "UL2018", "", "All", "AK4PFchs", False,"MET", splitJER=True)   #2018 MC AK4 CHS
 
 #jecTag_ = jecTagsDATA[dataYear + runPeriod]
 
