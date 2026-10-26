@@ -165,10 +165,11 @@ if __name__ == "__main__":
     out_dir = args.out_dir
     lep = args.lepton
 
-    channels = ['WJetsToLNu_1J']
-                #'Tchannel','Tbarchannel','ttbar_SemiLeptonic','ttbar_FullyLeptonic','tw_antitop', 
-                # 'tw_top','Schannel','WJetsToLNu_0J', 'WJetsToLNu_1J', 'WJetsToLNu_2J', 'WWTo2L2Nu', 'WZTo2Q2L', 
-                # 'ZZTo2Q2L','DYJetsToLL','QCD'] # 'WWTolnulnu',
+    channels = [
+                'Tchannel','Tbarchannel','ttbar_SemiLeptonic','ttbar_FullyLeptonic','tw_antitop', 
+                'tw_top','Schannel','WJetsToLNu_0J', 'WJetsToLNu_1J', 'WJetsToLNu_2J', 'WWTo2L2Nu', 'WZTo2Q2L', 
+                'ZZTo2Q2L','DYJetsToLL','QCD' # 'WWTolnulnu',
+    ]
 
     tasks = [(year, channel, out_dir, lep) for channel in channels]
     with mp.Pool(processes=len(channels)) as pool:

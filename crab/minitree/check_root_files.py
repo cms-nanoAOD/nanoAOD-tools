@@ -9,6 +9,8 @@ if __name__ == '__main__':
 	parser = arg.ArgumentParser(description='Recursively check that every .root file under a directory opens and its tree can be read')
 	parser.add_argument('-d', '--dir', dest='Dir', type=str, required=True, help="directory to scan for .root files")
 	parser.add_argument('-t', '--tree', dest='TreeName', type=str, default='Events', help="tree name to read from each file (default: Events)")
+	parser.add_argument('-delete', '--delete', dest='Delete', action='store_true', help="delete files that fail the check")
+
 
 	args = parser.parse_args()
 
@@ -44,6 +46,10 @@ if __name__ == '__main__':
 			total_entries += nentries
 			if nentries > 0:
 				nonzero_entry_files.append(fname)
+			else:
+				if args.Delete:
+					print(f"Deleting file {fname} due to zero entries")
+					os.remove(fname)
 		except Exception as e:
 			bad_files.append((fname, str(e)))
 
