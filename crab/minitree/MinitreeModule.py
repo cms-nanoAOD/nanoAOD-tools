@@ -566,7 +566,8 @@ class MinitreeProducer(Module):
         #for i in (0,len(drs)):
            #print "dr = ",drs[i]
 
-        for jet in filter(lambda j:(j.pt>40 and abs(j.eta)<4.7 and j.jetId!=0 and j.puId!=0), jets):
+        puId_loose_bit = 1 if self.dataYear.startswith('UL2016') else 4
+        for jet in filter(lambda j:(j.pt>40 and abs(j.eta)<4.7 and j.jetVetoed==0 and j.jetId!=0 and (j.pt>=50 or (j.puId & puId_loose_bit)!=0)), jets):
             njet4v.SetPtEtaPhiM(jet.pt,jet.eta,jet.phi,jet.mass)
             if(lepton4v.DeltaR(njet4v)>0.4): 
                 jet_id.append(jet)

@@ -13,6 +13,7 @@ import gen_info_module as genInfo
 import dummy_module as dummy
 import jme as JME
 import argparse
+from jetVetoMapProducer import jetVetoMapProducer 
 
 #python3 crab_script_Minitree_local.py  -d Schannel -t 2J1T1_el_mc_UL2016postVFP -o /nfs/home/common/RUN2_UL/Minitree_trial/SIXTEEN_postVFP/2J1T1/el/Schannel/ -n 1 -p /nfs/home/common/RUN2_UL/Tree_crab/SIXTEEN_postVFP/MC/Schannel/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8/Tree_04_Jul23_MCUL2016postVFP_Schannel/230704_145222/0000/tree_1.root   &> /nfs/home/common/RUN2_UL/Minitree_trial/SIXTEEN_postVFP/2J1T1/el/Schannel/log/log_1.txt
 
@@ -134,13 +135,21 @@ for evts in range(len(Events_split[:-1])):
     print('--------------------')
 
     print(f'\n{Events_split[evts]}:{Events_split[evts+1]}')
-    treecut = treecut+f" && Entry$>={Events_split[evts]} && Entry$<{Events_split[evts+1]}"
+    #treecut = treecut+f" && Entry$>={Events_split[evts]} && Entry$<{Events_split[evts+1]}"
+    entry_cut = f"Entry$>={Events_split[evts]} && Entry$<{Events_split[evts+1]}"
     postfix = f"_{Events_split[evts]}_{Events_split[evts+1]}"
     print('\n treecut : ',treecut)
+    print('\n entry range : ',entry_cut)
     print('\n postfix : ',postfix)
 
+    jvm_dir = os.path.join(args.out_dir, "jvm_tmp_" + args.lognum)
+    p_jvm = PostProcessor(jvm_dir, inputFiles, entry_cut, postfix="", modules=[jetVetoMapProducer(year)], compression="LZ4:1", provenance=False, fwkJobReport=False, jsonInput=runsAndLumis())
+    p_jvm.run()
+    jvmFiles = [os.path.join(jvm_dir, os.path.basename(f)) for f in inputFiles]
+    print('\n jet-veto-map files (pass 1 output) : ', jvmFiles)
+
     p=PostProcessor(args.out_dir,
-    	inputFiles,
+    	jvmFiles,
 		treecut,
         postfix = postfix,
 		modules=runmodules,
@@ -149,4 +158,8 @@ for evts in range(len(Events_split[:-1])):
 		fwkJobReport=False,
 		jsonInput=runsAndLumis())
     p.run()
+
+    for f in jvmFiles:
+        if os.path.exists(f): os.remove(f)
+    if os.path.isdir(jvm_dir) and not os.listdir(jvm_dir): os.rmdir(jvm_dir)
 print("DONE")

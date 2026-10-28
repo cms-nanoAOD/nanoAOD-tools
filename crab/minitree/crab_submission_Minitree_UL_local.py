@@ -222,7 +222,7 @@ if __name__ == '__main__':
     
     print(run_commands,"\n")
     # print(Hadd_N_createoutfile_cmd[Channel])
-
+    '''
     pool = mp.Pool(processes=15)
     pool.map(run_cmd, run_commands)
     del run_commands
@@ -239,4 +239,4 @@ if __name__ == '__main__':
                if(keyinput=='yes'):os.system('rm ' + Out_dir + year_folder[year]+'/'+region+'/'+Hadded_out_file_name)
                else: exit(0)
         print("runing....", Hadd_N_createoutfile_cmd[Channel],"\n")
-        os.system(Hadd_N_createoutfile_cmd[Channel])
+        os.system(Hadd_N_createoutfile_cmd[Channel])'''

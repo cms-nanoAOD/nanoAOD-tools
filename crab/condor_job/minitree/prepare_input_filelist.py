@@ -125,6 +125,7 @@ for i in range(0,len(RequestNames)):
     	replacemachine(MinitreeModule,'x_sec = ',update_Xsection)
 
     replacemachine(crab_scriptfile,'treecut =', cut_string )
+    replacemachine(crab_scriptfile,'jvmModule =', "jvmModule = jetVetoMap_"+year+"()\n" )
     replacemachine(crab_scriptfile,'modules=', modules )
     replacemachine(crab_scriptfile,'outputbranchsel=', branchsel )
     replacemachine(crab_scriptfile,'#inputFiles=',removeline)

@@ -296,7 +296,8 @@ class cutflow:
 	    for jet in jets:
 	    	#print jet.jetId
 	    	islossepF=False
-	    	if(jet.pt>40 and abs(jet.eta)<4.7 and jet.jetId!=0 and jet.puId!=0):
+            puId_loose_bit = 1 if self.dataYear.startswith('UL2016') else 4
+	    	if(jet.pt>40 and abs(jet.eta)<4.7 and jet.jetId!=0 and jet.jetVetoed==0 and (jet.pt>=50 or (jet.puId & puId_loose_bit)!=0)):
 	 	        islossepF = True
 	 	        jetid_for_N_jets.append(jet)
 	 	        #print "jet.pt = ",jet.pt," jet.eta = ",abs(jet.eta), " jet.jetId = ",jet.jetId, "lossepF = ", lossepF
