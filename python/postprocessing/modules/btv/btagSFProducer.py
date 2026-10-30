@@ -93,7 +93,7 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL2017': {
+		'UL2017': {
                     'inputFileName': "DeepCSV_106XUL17SF.csv",
                     'measurement_types': {
                         0: "comb",  # b
@@ -111,7 +111,7 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL2018': {
+		'UL2018': {
                     'inputFileName': "DeepCSV_106XUL18SF.csv",
                     'measurement_types': {
                         0: "comb",  # b
@@ -140,15 +140,6 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL2017': {
-                    'inputFileName': "DeepJet_106XUL17SF.csv",
-                    'measurement_types': {
-                        0: "comb",  # b
-                        1: "comb",  # c
-                        2: "incl"   # light
-                    },
-                    'supported_wp': ["L", "M", "T", "shape_corr"]
-                },
                 '2018': {
                     'inputFileName': "DeepJet_102XSF_V1.csv",
                     'measurement_types': {
@@ -158,15 +149,42 @@ class btagSFProducer(Module):
                     },
                     'supported_wp': ["L", "M", "T", "shape_corr"]
                 },
-                'UL2018': {
-                    'inputFileName': "DeepJet_106XUL18SF.csv",
+		'UL2016preVFP': {
+                    'inputFileName': "reshaping_deepJet_106XUL16preVFP_v2_modified.csv",
                     'measurement_types': {
                         0: "comb",  # b
                         1: "comb",  # c
                         2: "incl"   # light
                     },
-                    'supported_wp': ["L", "M", "T", "shape_corr"]
+                    'supported_wp': ["shape_corr"]
                 },
+                'UL2016postVFP': {
+                    'inputFileName': "reshaping_deepJet_106XUL16postVFP_v3_modified.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["shape_corr"]
+                },
+                'UL2017': {
+                    'inputFileName': "reshaping_deepJet_106XUL17_v3_modified.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["shape_corr"]
+                },
+                'UL2018': {
+                    'inputFileName': "reshaping_deepJet_106XUL18_v2_modified.csv",
+                    'measurement_types': {
+                        0: "comb",  # b
+                        1: "comb",  # c
+                        2: "incl"   # light
+                    },
+                    'supported_wp': ["shape_corr"]
+                },	
             },
             'cmva': {
                 '2016': {

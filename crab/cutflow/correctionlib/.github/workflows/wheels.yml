@@ -1,0 +1,64 @@
+name: wheels
+
+on:
+  workflow_dispatch:
+  release:
+    types:
+      - published
+
+jobs:
+  make_sdist:
+    name: Make SDist
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Build SDist
+      run: pipx run build --sdist
+
+    - uses: actions/upload-artifact@v2
+      with:
+        path: dist/*.tar.gz
+
+  build_wheels:
+    name: Wheel on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, windows-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - uses: joerick/cibuildwheel@v2.8.1
+      env:
+        CIBW_SKIP: pp*-macosx* pp*-win*
+        CIBW_TEST_EXTRAS: test
+        CIBW_TEST_COMMAND: pytest {project}/tests
+        MACOSX_DEPLOYMENT_TARGET: 10.14
+
+    - name: Upload wheels
+      uses: actions/upload-artifact@v2
+      with:
+        path: wheelhouse/*.whl
+
+  upload_all:
+    needs: [build_wheels, make_sdist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: artifact
+        path: dist
+
+    - uses: pypa/gh-action-pypi-publish@v1.5.1
+      with:
+        user: __token__
+        password: ${{ secrets.pypi_token }}

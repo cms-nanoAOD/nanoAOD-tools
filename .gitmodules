@@ -1,0 +1,6 @@
+[submodule "crab/cutflow/crab/cutflow/correctionlib"]
+	path = crab/cutflow/crab/cutflow/correctionlib
+	url = git@github.com:cms-nanoAOD/correctionlib.git
+[submodule "crab/cutflow/correctionlib"]
+	path = crab/cutflow/correctionlib
+	url = git@github.com:cms-nanoAOD/correctionlib.git

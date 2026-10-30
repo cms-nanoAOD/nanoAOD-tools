@@ -1,0 +1,22 @@
+drop Electron*
+keep    Electron_eta
+keep    Electron_pt
+keep    Electron_cutBased 
+drop    Muon_mass
+drop    Muon_miniPFRelIso_all
+drop    Muon_miniPFRelIso_chg
+drop    Muon_pfRelIso03_all
+drop    Muon_pfRelIso03_chg
+drop    Muon_charge
+drop    Muon_isGlobal
+drop    Muon_isPFcand
+drop    Muon_isTracker
+drop    Muon_mediumId
+drop    Muon_mvaId
+drop    100
+drop    101
+drop    102
+drop    103
+
+keep Jet_btagSF_deepjet*
+drop FatJet*

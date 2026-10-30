@@ -1,0 +1,36 @@
+# REFERENCE 
+# http://research.cs.wisc.edu/htcondor/manual/
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookXrootdService
+
+#---------------------------------------------
+# voms-proxy-init --voms cms, to use T2 files
+# hplusAnalyzer_TIFR.sh is run by condor_submit
+# Arguments are passed to hplusAnalyzer_TIFR.sh
+#---------------------------------------------
+
+Universe              = vanilla
+x509userproxy         = /home/mikumar/x509up_u56567
+#use_x509userproxy    = true
+Executable            = runAtCondor.sh
+Arguments             = INPUT $(Process) $(Cluster)
+Transfer_Input_Files  = ../minitree.tar.gz, crab_script_NanoGen_minitree.py, Gen_mass_reconstract_SingleTop_minitree.py 
+#---------------------------------------------
+# hplusAnalyzer_TIFR.sh output are stored in .stdout
+# all kind of errors are stores in .stderr
+# CPU usage, RAM etc are stored in .log
+#---------------------------------------------
+
+Output                = condor_out_$(Process)_$(Cluster).stdout
+Error                 = condor_out_$(Process)_$(Cluster).stderr
+Log                   = condor_out_$(Process)_$(Cluster).log
+Notification          = Error
+
+#---------------------------------------------
+# transfer output from remote machine to T2
+# put the condor batch submission in queue 
+#---------------------------------------------
+
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+Queue
+

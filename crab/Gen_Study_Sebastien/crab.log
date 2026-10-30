@@ -1,0 +1,180 @@
+DEBUG 2021-11-16 09:19:40.470 UTC: 	 CRAB Client version: v3.210825
+DEBUG 2021-11-16 09:19:40.470 UTC: 	 Running on: Linux lxplus746.cern.ch 3.10.0-1160.45.1.el7.x86_64 #1 SMP Wed Oct 13 17:20:51 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux - CentOS Linux 7 (Core)
+DEBUG 2021-11-16 09:19:40.470 UTC: 	 Executing command: 'submit'
+DEBUG 2021-11-16 09:19:40.471 UTC: 	 Found CRAB cache file /afs/cern.ch/user/m/mikumar/.crab3
+INFO 2021-11-16 09:19:40.488 UTC: 	 Will use CRAB configuration file crab_cfg_skimTree.py
+DEBUG 2021-11-16 09:19:40.488 UTC: 	 Loading CRAB configuration file.
+ERROR 2021-11-16 09:19:40.496 UTC: 	 Invalid CRAB configuration: Parameter Data.unitsPerJob is mandatory for 'FileBased' splitting mode.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+ERROR 2021-11-16 09:19:40.497 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 151, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 136, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/submit.py", line 34, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 311, in __init__
+    self.loadConfig(self.options.config, self.args)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 95, in loadConfig
+    raise ConfigurationException(configmsg)
+ConfigurationException: Invalid CRAB configuration: Parameter Data.unitsPerJob is mandatory for 'FileBased' splitting mode.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+INFO 2021-11-16 09:19:40.500 UTC: 	 Log file is /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab.log
+DEBUG 2021-11-16 09:20:50.834 UTC: 	 CRAB Client version: v3.210825
+DEBUG 2021-11-16 09:20:50.835 UTC: 	 Running on: Linux lxplus746.cern.ch 3.10.0-1160.45.1.el7.x86_64 #1 SMP Wed Oct 13 17:20:51 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux - CentOS Linux 7 (Core)
+DEBUG 2021-11-16 09:20:50.835 UTC: 	 Executing command: 'submit'
+DEBUG 2021-11-16 09:20:50.835 UTC: 	 Found CRAB cache file /afs/cern.ch/user/m/mikumar/.crab3
+INFO 2021-11-16 09:20:50.836 UTC: 	 Will use CRAB configuration file crab_cfg_skimTree.py
+DEBUG 2021-11-16 09:20:50.836 UTC: 	 Loading CRAB configuration file.
+DEBUG 2021-11-16 09:20:50.837 UTC: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+ERROR 2021-11-16 09:20:50.837 UTC: 	 Working area '/afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016' already exists 
+Please change the requestName in the config file
+ERROR 2021-11-16 09:20:50.838 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 151, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 136, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/submit.py", line 34, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 315, in __init__
+    getattr(self.configuration.General, 'requestName', None))
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/ClientUtilities.py", line 394, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+ConfigException: Working area '/afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016' already exists 
+Please change the requestName in the config file
+INFO 2021-11-16 09:20:50.860 UTC: 	 Log file is /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab.log
+DEBUG 2021-11-16 09:21:06.687 UTC: 	 CRAB Client version: v3.210825
+DEBUG 2021-11-16 09:21:06.688 UTC: 	 Running on: Linux lxplus746.cern.ch 3.10.0-1160.45.1.el7.x86_64 #1 SMP Wed Oct 13 17:20:51 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux - CentOS Linux 7 (Core)
+DEBUG 2021-11-16 09:21:06.688 UTC: 	 Executing command: 'submit'
+DEBUG 2021-11-16 09:21:06.688 UTC: 	 Found CRAB cache file /afs/cern.ch/user/m/mikumar/.crab3
+INFO 2021-11-16 09:21:06.689 UTC: 	 Will use CRAB configuration file crab_cfg_skimTree.py
+DEBUG 2021-11-16 09:21:06.689 UTC: 	 Loading CRAB configuration file.
+DEBUG 2021-11-16 09:21:06.690 UTC: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+ERROR 2021-11-16 09:21:06.690 UTC: 	 Working area '/afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016' already exists 
+Please change the requestName in the config file
+ERROR 2021-11-16 09:21:06.690 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 151, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 136, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/submit.py", line 34, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 315, in __init__
+    getattr(self.configuration.General, 'requestName', None))
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/ClientUtilities.py", line 394, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+ConfigException: Working area '/afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016' already exists 
+Please change the requestName in the config file
+INFO 2021-11-16 09:21:06.698 UTC: 	 Log file is /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab.log
+DEBUG 2021-11-16 09:25:57.204 UTC: 	 CRAB Client version: v3.210825
+DEBUG 2021-11-16 09:25:57.204 UTC: 	 Running on: Linux lxplus746.cern.ch 3.10.0-1160.45.1.el7.x86_64 #1 SMP Wed Oct 13 17:20:51 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux - CentOS Linux 7 (Core)
+DEBUG 2021-11-16 09:25:57.204 UTC: 	 Executing command: 'submit'
+DEBUG 2021-11-16 09:25:57.205 UTC: 	 Found CRAB cache file /afs/cern.ch/user/m/mikumar/.crab3
+INFO 2021-11-16 09:25:57.209 UTC: 	 Will use CRAB configuration file crab_cfg_skimTree.py
+DEBUG 2021-11-16 09:25:57.209 UTC: 	 Loading CRAB configuration file.
+DEBUG 2021-11-16 09:25:57.214 UTC: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+ERROR 2021-11-16 09:25:57.214 UTC: 	 Working area '/afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016' already exists 
+Please change the requestName in the config file
+ERROR 2021-11-16 09:25:57.214 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 151, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 136, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/submit.py", line 34, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 315, in __init__
+    getattr(self.configuration.General, 'requestName', None))
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/ClientUtilities.py", line 394, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+ConfigException: Working area '/afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016' already exists 
+Please change the requestName in the config file
+INFO 2021-11-16 09:25:57.221 UTC: 	 Log file is /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab.log
+DEBUG 2021-11-16 11:35:14.386 UTC: 	 CRAB Client version: v3.210825
+DEBUG 2021-11-16 11:35:14.386 UTC: 	 Running on: Linux lxplus746.cern.ch 3.10.0-1160.45.1.el7.x86_64 #1 SMP Wed Oct 13 17:20:51 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux - CentOS Linux 7 (Core)
+DEBUG 2021-11-16 11:35:14.387 UTC: 	 Executing command: 'submit'
+DEBUG 2021-11-16 11:35:14.388 UTC: 	 Found CRAB cache file /afs/cern.ch/user/m/mikumar/.crab3
+INFO 2021-11-16 11:35:14.415 UTC: 	 Will use CRAB configuration file crab_cfg_skimTree.py
+DEBUG 2021-11-16 11:35:14.415 UTC: 	 Loading CRAB configuration file.
+DEBUG 2021-11-16 11:35:14.463 UTC: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+ERROR 2021-11-16 11:35:14.464 UTC: 	 Working area '/afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016' already exists 
+Please change the requestName in the config file
+ERROR 2021-11-16 11:35:14.464 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 151, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 136, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/submit.py", line 34, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 315, in __init__
+    getattr(self.configuration.General, 'requestName', None))
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/ClientUtilities.py", line 394, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+ConfigException: Working area '/afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016' already exists 
+Please change the requestName in the config file
+INFO 2021-11-16 11:35:14.488 UTC: 	 Log file is /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab.log
+DEBUG 2021-11-17 04:03:29.938 UTC: 	 CRAB Client version: v3.210825
+DEBUG 2021-11-17 04:03:29.938 UTC: 	 Running on: Linux lxplus746.cern.ch 3.10.0-1160.45.1.el7.x86_64 #1 SMP Wed Oct 13 17:20:51 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux - CentOS Linux 7 (Core)
+DEBUG 2021-11-17 04:03:29.938 UTC: 	 Executing command: 'submit'
+DEBUG 2021-11-17 04:03:29.939 UTC: 	 Found CRAB cache file /afs/cern.ch/user/m/mikumar/.crab3
+ERROR 2021-11-17 04:03:29.956 UTC: 	 CRAB configuration file crab_cfg.py not found.
+ERROR 2021-11-17 04:03:29.956 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 151, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 136, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/submit.py", line 34, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 311, in __init__
+    self.loadConfig(self.options.config, self.args)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 52, in loadConfig
+    raise ConfigurationException("CRAB configuration file %s not found." % (configname))
+ConfigurationException: CRAB configuration file crab_cfg.py not found.
+INFO 2021-11-17 04:03:29.974 UTC: 	 Log file is /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab.log
+DEBUG 2021-11-17 07:08:26.118 UTC: 	 CRAB Client version: v3.210825
+DEBUG 2021-11-17 07:08:26.118 UTC: 	 Running on: Linux lxplus746.cern.ch 3.10.0-1160.45.1.el7.x86_64 #1 SMP Wed Oct 13 17:20:51 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux - CentOS Linux 7 (Core)
+DEBUG 2021-11-17 07:08:26.118 UTC: 	 Executing command: 'status'
+DEBUG 2021-11-17 07:08:26.118 UTC: 	 Found CRAB cache file /afs/cern.ch/user/m/mikumar/.crab3
+ERROR 2021-11-17 07:08:26.120 UTC: 	 Cannot find .requestcache file in CRAB project directory /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016
+ERROR 2021-11-17 07:08:26.120 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 151, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 136, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/status.py", line 39, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 270, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 650, in validateOptions
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 512, in loadLocalCache
+    raise ex
+CachefileNotFoundException: Cannot find .requestcache file in CRAB project directory /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016
+INFO 2021-11-17 07:08:26.156 UTC: 	 Log file is /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab.log
+DEBUG 2021-11-17 07:08:48.853 UTC: 	 CRAB Client version: v3.210825
+DEBUG 2021-11-17 07:08:48.854 UTC: 	 Running on: Linux lxplus746.cern.ch 3.10.0-1160.45.1.el7.x86_64 #1 SMP Wed Oct 13 17:20:51 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux - CentOS Linux 7 (Core)
+DEBUG 2021-11-17 07:08:48.854 UTC: 	 Executing command: 'status'
+DEBUG 2021-11-17 07:08:48.854 UTC: 	 Found CRAB cache file /afs/cern.ch/user/m/mikumar/.crab3
+ERROR 2021-11-17 07:08:48.855 UTC: 	 Cannot find .requestcache file in CRAB project directory /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016
+ERROR 2021-11-17 07:08:48.856 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 151, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/bin/crab", line 136, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/status.py", line 39, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 270, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 650, in validateOptions
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.210825.01/lib/CRABClient/Commands/SubCommand.py", line 512, in loadLocalCache
+    raise ex
+CachefileNotFoundException: Cannot find .requestcache file in CRAB project directory /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab_Tchannel_wtop0p7_Tree_2016
+INFO 2021-11-17 07:08:48.859 UTC: 	 Log file is /afs/cern.ch/work/m/mikumar/private/NanoAOD_new/CMSSW_10_6_0/src/PhysicsTools/NanoAODTools/crab/Gen_Study_Sebastien/crab.log

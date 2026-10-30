@@ -1,0 +1,23 @@
+drop Muon*
+
+drop Electron_EtaSC
+drop 100
+drop 101
+drop 102
+drop 103
+
+
+drop Electron_dr03EcalRecHitSumEt	
+drop Electron_dr03TkSumPt
+drop Electron_dxyErr
+drop Electron_dzErr
+drop Electron_hoe
+drop Electron_miniPFRelIso_all
+drop Electron_miniPFRelIso_chg
+drop Electron_pfRelIso03_all	
+drop Electron_pfRelIso03_chg
+drop Electron_r9
+drop Electron_cutBased
+keep Jet_btagSF_deepjet*
+
+drop FatJet*

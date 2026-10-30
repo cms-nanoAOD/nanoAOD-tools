@@ -1,0 +1,5 @@
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_preVFP/Data/2J1L0T0_el/Run2016B_preVFP_el
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_preVFP/Data/2J1L0T0_el/Run2016C_preVFP_el
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_preVFP/Data/2J1L0T0_el/Run2016D_preVFP_el
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_preVFP/Data/2J1L0T0_el/Run2016E_preVFP_el
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_preVFP/Data/2J1L0T0_el/Run2016F_preVFP_el

@@ -1,0 +1,137 @@
+year =  UL2016preVFP
+dict_keys(['Tchannel_TuneCP5down', 'Tchannel_TuneCP5up', 'Tchannel_QCDinspired', 'Tchannel_Gluonmove',
+'Tchannel_erdON', 'Tbarchannel_TuneCP5down', 'Tbarchannel_TuneCP5up', 'Tbarchannel_QCDinspired', 'Tbarc
+hannel_Gluonmove', 'Tbarchannel_erdON', 'ttbar_FullyLeptonic_QCDinspired', 'ttbar_FullyLeptonic_Gluonmo
+ve', 'ttbar_FullyLeptonic_erdON', 'ttbar_FullyLeptonic_TuneCPup', 'ttbar_FullyLeptonic_TuneCPdown', 'tt
+bar_SemiLeptonic_QCDinspired', 'ttbar_SemiLeptonic_Gluonmove', 'ttbar_SemiLeptonic_erdON', 'ttbar_SemiL
+eptonic_TuneCP5up', 'ttbar_SemiLeptonic_TuneCP5down'])
+len(Datasets) =  20
+---------------------------------------      Tchannel_TuneCP5down       -------------------------------
+--
+sum(file.nevents): 22073000
+ Number of Events :  22.07
+Effective No. Events = 20.68
+Effective No. Events = 20681075
+totle files Evaluated = 27
+---------------------------------------      Tchannel_TuneCP5up       ---------------------------------
+sum(file.nevents): 21927000
+ Number of Events :  21.93
+Effective No. Events = 20.54
+Effective No. Events = 20545577
+totle files Evaluated = 29
+---------------------------------------      Tchannel_QCDinspired       -------------------------------
+--
+sum(file.nevents): 19928000
+ Number of Events :  19.93
+Effective No. Events = 18.67
+Effective No. Events = 18671220
+totle files Evaluated = 43
+---------------------------------------      Tchannel_Gluonmove       ---------------------------------
+sum(file.nevents): 21590000
+ Number of Events :  21.59
+Effective No. Events = 20.23
+Effective No. Events = 20230062
+totle files Evaluated = 41
+---------------------------------------      Tchannel_erdON       ---------------------------------
+sum(file.nevents): 22933000
+ Number of Events :  22.93
+Effective No. Events = 21.48
+Effective No. Events = 21487232
+totle files Evaluated = 23
+
+---------------------------------------      Tbarchannel_TuneCP5down       ---------------------------------
+sum(file.nevents): 10854000
+ Number of Events :  10.85
+Effective No. Events = 10.21
+Effective No. Events = 10216908
+totle files Evaluated = 30
+---------------------------------------      Tbarchannel_TuneCP5up       ---------------------------------
+sum(file.nevents): 10715000
+ Number of Events :  10.71
+Effective No. Events = 10.08
+Effective No. Events = 10086078
+totle files Evaluated = 22
+---------------------------------------      Tbarchannel_QCDinspired       ---------------------------------
+sum(file.nevents): 10346000
+ Number of Events :  10.35
+Effective No. Events = 9.73
+Effective No. Events = 9739578
+totle files Evaluated = 29
+---------------------------------------      Tbarchannel_Gluonmove       ---------------------------------
+sum(file.nevents): 10942000
+ Number of Events :  10.94
+Effective No. Events = 10.3
+Effective No. Events = 10300876
+totle files Evaluated = 27
+---------------------------------------      Tbarchannel_erdON       ---------------------------------
+sum(file.nevents): 11059000
+ Number of Events :  11.06
+Effective No. Events = 10.41
+Effective No. Events = 10410358
+totle files Evaluated = 14
+---------------------------------------      ttbar_FullyLeptonic_QCDinspired       ---------------------------------
+sum(file.nevents): 15518000
+ Number of Events :  15.52
+Effective No. Events = 15.39
+Effective No. Events = 15393170
+totle files Evaluated = 20
+
+---------------------------------------      ttbar_FullyLeptonic_Gluonmove       ---------------------------------
+sum(file.nevents): 16776000
+ Number of Events :  16.78
+Effective No. Events = 16.64
+Effective No. Events = 16641080
+totle files Evaluated = 17
+---------------------------------------      ttbar_FullyLeptonic_erdON       ---------------------------------
+sum(file.nevents): 16229000
+ Number of Events :  16.23
+Effective No. Events = 16.09
+Effective No. Events = 16097656
+totle files Evaluated = 32
+---------------------------------------      ttbar_FullyLeptonic_TuneCPup       ---------------------------------
+sum(file.nevents): 10381000
+ Number of Events :  10.38
+Effective No. Events = 10.29
+Effective No. Events = 10296740
+totle files Evaluated = 22
+---------------------------------------      ttbar_FullyLeptonic_TuneCPdown       ---------------------------------
+sum(file.nevents): 21583000
+ Number of Events :  21.58
+Effective No. Events = 21.4
+Effective No. Events = 21408999
+totle files Evaluated = 19
+---------------------------------------      ttbar_SemiLeptonic_QCDinspired       ---------------------------------
+sum(file.nevents): 56166000
+ Number of Events :  56.17
+# of files read = 50
+Effective No. Events = 55.71
+Effective No. Events = 55712233
+totle files Evaluated = 59
+---------------------------------------      ttbar_SemiLeptonic_Gluonmove       ---------------------------------
+sum(file.nevents): 56324000
+ Number of Events :  56.32
+# of files read = 50
+Effective No. Events = 55.86
+Effective No. Events = 55869179
+totle files Evaluated = 54
+
+---------------------------------------      ttbar_SemiLeptonic_erdON       ---------------------------------
+sum(file.nevents): 55704000
+ Number of Events :  55.7
+# of files read = 50
+Effective No. Events = 55.25
+Effective No. Events = 55254188
+totle files Evaluated = 57
+---------------------------------------      ttbar_SemiLeptonic_TuneCP5up       ---------------------------------
+sum(file.nevents): 46263000
+ Number of Events :  46.26
+# of files read = 50
+Effective No. Events = 45.88
+Effective No. Events = 45889214
+totle files Evaluated = 58
+---------------------------------------      ttbar_SemiLeptonic_TuneCP5down       ---------------------------------
+sum(file.nevents): 55514300
+ Number of Events :  55.51
+Effective No. Events = 55.06
+Effective No. Events = 55064026
+totle files Evaluated = 48

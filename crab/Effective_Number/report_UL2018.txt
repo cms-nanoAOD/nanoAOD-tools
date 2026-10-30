@@ -1,0 +1,396 @@
+                        ]
+[mikumar@lxplus744 Effective_Number]$ python Event_counter.py -y UL2018
+
+year =  UL2018
+['ttbar_FullyLeptonic_erdON', 'Tchannel_erdON', 'ttbar_FullyLeptonic_QCDinspired', 'ttbar_SemiLeptonic_Gluonmove', 'Tchannel_Gluonmove', 'Tchannel_TuneCP5up', 'ttbar_FullyLeptonic_TuneCPdown', 'ttbar_FullyLeptonic_TuneCPup', 'Tchannel_TuneCP5down', 'ttbar_SemiLeptonic_TuneCP5up', 'ttbar_SemiLeptonic_TuneCP5down', 'Tchannel_hdampup', 'Tbarchannel_TuneCP5down', 'ttbar_SemiLeptonic_erdON', 'Tbarchannel_QCDinspired', 'ttbar_FullyLeptonic_Gluonmove', 'Tchannel_QCDinspired', 'ttbar_SemiLeptonic_QCDinspired', 'Tbarchannel_erdON', 'Tbachannel_TuneCP5up', 'Tbarchannel_Gluonmove']
+len(Datasets) =  21
+
+---------------------------------------      ttbar_FullyLeptonic_erdON       ---------------------------------
+sum(file.nevents): 59973000
+ Number of Events :  59.97
+Effective No. Events = 59.49
+totle files Evaluated = 57
+
+---------------------------------------      Tchannel_erdON       ---------------------------------
+sum(file.nevents): 74920000
+ Number of Events :  74.92
+Effective No. Events = 70.19
+totle files Evaluated = 89
+
+---------------------------------------      ttbar_FullyLeptonic_QCDinspired       ---------------------------------
+sum(file.nevents): 59620000
+ Number of Events :  59.62
+# of files read = 100
+Effective No. Events = 59.13
+totle files Evaluated = 130
+
+---------------------------------------      ttbar_SemiLeptonic_Gluonmove       ---------------------------------
+sum(file.nevents): 195101000
+ Number of Events :  195.1
+# of files read = 100
+# of files read = 200
+Effective No. Events = 193.52
+totle files Evaluated = 217
+
+---------------------------------------      Tchannel_Gluonmove       ---------------------------------
+sum(file.nevents): 69631000
+ Number of Events :  69.63
+# of files read = 100
+Effective No. Events = 65.24
+totle files Evaluated = 100
+
+---------------------------------------      Tchannel_TuneCP5up       ---------------------------------
+sum(file.nevents): 75582000
+ Number of Events :  75.58
+Unable to load sec.protocol plugin libXrdSecztn.so
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 70.81
+totle files Evaluated = 90
+
+---------------------------------------      ttbar_FullyLeptonic_TuneCPdown       ---------------------------------
+sum(file.nevents): 59853000
+ Number of Events :  59.85
+Effective No. Events = 59.36
+totle files Evaluated = 59
+
+---------------------------------------      ttbar_FullyLeptonic_TuneCPup       ---------------------------------
+sum(file.nevents): 57064000
+ Number of Events :  57.06
+Effective No. Events = 56.6
+totle files Evaluated = 59
+
+---------------------------------------      Tchannel_TuneCP5down       ---------------------------------
+sum(file.nevents): 74992000
+ Number of Events :  74.99
+Effective No. Events = 70.27
+totle files Evaluated = 57
+
+---------------------------------------      ttbar_SemiLeptonic_TuneCP5up       ---------------------------------
+sum(file.nevents): 199394000
+ Number of Events :  199.39
+# of files read = 100
+Effective No. Events = 197.78
+totle files Evaluated = 165
+
+---------------------------------------      ttbar_SemiLeptonic_TuneCP5down       ---------------------------------
+sum(file.nevents): 189888000
+ Number of Events :  189.89
+# of files read = 100
+Effective No. Events = 188.35
+totle files Evaluated = 156
+
+---------------------------------------      Tchannel_hdampup       ---------------------------------
+sum(file.nevents): 59030000
+ Number of Events :  59.03
+Effective No. Events = 55.38
+totle files Evaluated = 62
+
+---------------------------------------      Tbarchannel_TuneCP5down       ---------------------------------
+sum(file.nevents): 36144000
+ Number of Events :  36.14
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 34.02
+totle files Evaluated = 55
+
+---------------------------------------      ttbar_FullyLeptonic_TuneCP5up       ---------------------------------
+sum(file.nevents): 57064000
+ Number of Events :  57.06
+# of files read = 50
+Effective No. Events = 56.6
+Effective No. Events = 56603362
+totle files Evaluated = 59
+
+---------------------------------------      ttbar_SemiLeptonic_erdON       ---------------------------------
+sum(file.nevents): 198188000
+ Number of Events :  198.19
+# of files read = 100
+Effective No. Events = 196.58
+totle files Evaluated = 166
+
+---------------------------------------      Tbarchannel_QCDinspired       ---------------------------------
+sum(file.nevents): 37106000
+ Number of Events :  37.11
+Unable to load sec.protocol plugin libXrdSecztn.so
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 34.93
+totle files Evaluated = 38
+
+---------------------------------------      ttbar_FullyLeptonic_TuneCP5down       ---------------------------------
+sum(file.nevents): 59853000
+ Number of Events :  59.85
+# of files read = 50
+
+Effective No. Events = 59.36
+Effective No. Events = 59369410
+totle files Evaluated = 59
+
+---------------------------------------      ttbar_FullyLeptonic_Gluonmove       ---------------------------------
+sum(file.nevents): 57189000
+ Number of Events :  57.19
+Effective No. Events = 56.72
+totle files Evaluated = 51
+
+---------------------------------------      Tchannel_QCDinspired       ---------------------------------
+sum(file.nevents): 74568000
+ Number of Events :  74.57
+Unable to load sec.protocol plugin libXrdSecztn.so
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 69.87
+totle files Evaluated = 57
+
+---------------------------------------      ttbar_SemiLeptonic_QCDinspired       ---------------------------------
+sum(file.nevents): 199323000
+ Number of Events :  199.32
+Unable to load sec.protocol plugin libXrdSecztn.so
+# of files read = 100
+Unable to load sec.protocol plugin libXrdSecztn.so
+Unable to load sec.protocol plugin libXrdSecztn.so
+# of files read = 200
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 197.71
+totle files Evaluated = 294
+
+---------------------------------------      Tbarchannel_erdON       ---------------------------------
+sum(file.nevents): 37552000
+ Number of Events :  37.55
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 35.35
+totle files Evaluated = 61
+
+---------------------------------------      Tbachannel_TuneCP5up       ---------------------------------
+sum(file.nevents): 36424000
+ Number of Events :  36.42
+Unable to load sec.protocol plugin libXrdSecztn.so
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 34.29
+totle files Evaluated = 44
+
+---------------------------------------      Tbarchannel_Gluonmove       ---------------------------------
+sum(file.nevents): 36558000
+ Number of Events :  36.56
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 34.41
+totle files Evaluated = 37
+
+
+
+[mikumar@lxplus744 Effective_Number]$ python Event_counter.py -y UL2018
+
+year =  UL2018
+['tw_antitop', 'QCD_Pt-600To800_MuEnriched', 'WJetsToLNu_2J', 'QCD_Pt-50to80_EMEnriched', 'Schannel', 'WJetsToLNu_1J', 'ZTo2Q2L', 'WJetsToLNu_0J', 'QCD_Pt-470To600_MuEnriched', 'ttbar_SemiLeptonic', 'QCD_Pt-20to30_EMEnriched', 'ZZTo2L2Nu', 'QCD_Pt-170To300_MuEnriched', 'QCD_Pt-800To1000_MuEnriched', 'QCD_Pt-15to20_EMEnriched', 'tw_top', 'QCD_Pt-80to120_EMEnriched', 'Tbarchannel', 'DYJetsToLL', 'Tchannel', 'QCD_Pt-30to50_EMEnriched', 'QCD_Pt-20To30_MuEnriched', 'WWTolnulnu', 'QCD_Pt-120To170_MuEnriched', 'QCD_Pt-300To470_MuEnriche', 'QCD_Pt-15To20_MuEnriched', 'WZTo2Q2L', 'WWTo2L2Nu', 'QCD_Pt-50To80_MuEnriched', 'QCD_Pt-80To120_MuEnriched', 'ttbar_FullyLeptonic', 'QCD_Pt-1000_MuEnriched', 'QCD_Pt-120to170_EMEnriched', 'QCD_Pt-300toInf_EMEnriched', 'QCD_Pt-30To50_MuEnriched', 'QCD_Pt-170to300_EMEnriched']
+len(Datasets) =  36
+
+---------------------------------------      tw_antitop       ---------------------------------
+sum(file.nevents): 10949620
+ Number of Events :  10.95
+Unable to load sec.protocol plugin libXrdSecztn.so
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 10.94
+totle files Evaluated = 16
+
+---------------------------------------      QCD_Pt-600To800_MuEnriched       ---------------------------------
+sum(file.nevents): 37197942
+ Number of Events :  37.2
+totle files Evaluated = 104
+
+---------------------------------------      WJetsToLNu_2J       ---------------------------------
+sum(file.nevents): 94925903
+ Number of Events :  94.93
+Effective No. Events = 29.63
+totle files Evaluated = 63
+
+---------------------------------------      QCD_Pt-50to80_EMEnriched       ---------------------------------
+sum(file.nevents): 10497272
+ Number of Events :  10.5
+totle files Evaluated = 7
+
+---------------------------------------      Schannel       ---------------------------------
+sum(file.nevents): 19365999
+ Number of Events :  19.37
+Effective No. Events = 12.6
+totle files Evaluated = 19
+
+---------------------------------------      WJetsToLNu_1J       ---------------------------------
+sum(file.nevents): 183483106
+ Number of Events :  183.48
+# of files read = 100
+Effective No. Events = 89.04
+totle files Evaluated = 149
+
+---------------------------------------      ZTo2Q2L       ---------------------------------
+sum(file.nevents): 29357938
+ Number of Events :  29.36
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 19.02
+totle files Evaluated = 25
+
+---------------------------------------      WJetsToLNu_0J       ---------------------------------
+sum(file.nevents): 172138190
+ Number of Events :  172.14
+# of files read = 100
+Effective No. Events = 138.08
+totle files Evaluated = 102
+
+---------------------------------------      QCD_Pt-470To600_MuEnriched       ---------------------------------
+sum(file.nevents): 38453296
+ Number of Events :  38.45
+totle files Evaluated = 84
+
+---------------------------------------      ttbar_SemiLeptonic       ---------------------------------
+sum(file.nevents): 476408000
+ Number of Events :  476.41
+Unable to load sec.protocol plugin libXrdSecztn.so
+Unable to load sec.protocol plugin libXrdSecztn.so
+# of files read = 100
+Unable to load sec.protocol plugin libXrdSecztn.so
+Unable to load sec.protocol plugin libXrdSecztn.so
+# of files read = 200
+# of files read = 300
+Effective No. Events = 472.55
+totle files Evaluated = 391
+
+---------------------------------------      QCD_Pt-20to30_EMEnriched       ---------------------------------
+sum(file.nevents): 14328846
+ Number of Events :  14.33
+totle files Evaluated = 11
+
+---------------------------------------      ZZTo2L2Nu       ---------------------------------
+sum(file.nevents): 56886000
+ Number of Events :  56.89
+Effective No. Events = 56.76
+totle files Evaluated = 64
+
+---------------------------------------      QCD_Pt-170To300_MuEnriched       ---------------------------------
+sum(file.nevents): 71870974
+ Number of Events :  71.87
+totle files Evaluated = 66
+
+---------------------------------------      QCD_Pt-800To1000_MuEnriched       ---------------------------------
+sum(file.nevents): 78942993
+ Number of Events :  78.94
+totle files Evaluated = 94
+
+---------------------------------------      QCD_Pt-15to20_EMEnriched       ---------------------------------
+sum(file.nevents): 7899865
+ Number of Events :  7.9
+totle files Evaluated = 36
+
+---------------------------------------      tw_top       ---------------------------------
+sum(file.nevents): 11270430
+ Number of Events :  11.27
+Effective No. Events = 11.26
+totle files Evaluated = 15
+
+---------------------------------------      QCD_Pt-80to120_EMEnriched       ---------------------------------
+sum(file.nevents): 9468372
+ Number of Events :  9.47
+totle files Evaluated = 10
+
+---------------------------------------      Tbarchannel       ---------------------------------
+sum(file.nevents): 95627000
+ Number of Events :  95.63
+# of files read = 100
+Effective No. Events = 90.02
+totle files Evaluated = 130
+
+---------------------------------------      DYJetsToLL       ---------------------------------
+sum(file.nevents): 195510810
+ Number of Events :  195.51
+# of files read = 100
+# of files read = 200
+Effective No. Events = 131.57
+totle files Evaluated = 204
+
+---------------------------------------      Tchannel       ---------------------------------
+sum(file.nevents): 178336000
+ Number of Events :  178.34
+Unable to load sec.protocol plugin libXrdSecztn.so
+# of files read = 100
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 167.11
+totle files Evaluated = 149
+
+---------------------------------------      QCD_Pt-30to50_EMEnriched       ---------------------------------
+sum(file.nevents): 8574589
+ Number of Events :  8.57
+totle files Evaluated = 25
+
+---------------------------------------      QCD_Pt-20To30_MuEnriched       ---------------------------------
+sum(file.nevents): 60640516
+ Number of Events :  60.64
+totle files Evaluated = 72
+
+---------------------------------------      WWTolnulnu       ---------------------------------
+sum(file.nevents): 4946000
+ Number of Events :  4.95
+Effective No. Events = 4.94
+totle files Evaluated = 24
+
+---------------------------------------      QCD_Pt-120To170_MuEnriched       ---------------------------------
+sum(file.nevents): 38022194
+ Number of Events :  38.02
+totle files Evaluated = 66
+
+---------------------------------------      QCD_Pt-300To470_MuEnriche       ---------------------------------
+sum(file.nevents): 58949756
+ Number of Events :  58.95
+totle files Evaluated = 71
+
+---------------------------------------      QCD_Pt-15To20_MuEnriched       ---------------------------------
+sum(file.nevents): 9325758
+ Number of Events :  9.33
+Effective No. Events = 0
+totle files Evaluated = 17
+
+---------------------------------------      WZTo2Q2L       ---------------------------------
+sum(file.nevents): 28576996
+ Number of Events :  28.58
+Effective No. Events = 17.82
+totle files Evaluated = 22
+
+---------------------------------------      WWTo2L2Nu       ---------------------------------
+sum(file.nevents): 9994000
+ Number of Events :  9.99
+Effective No. Events = 9.95
+totle files Evaluated = 37
+
+---------------------------------------      QCD_Pt-50To80_MuEnriched       ---------------------------------
+sum(file.nevents): 40022458
+
+---------------------------------------      QCD_Pt-80To120_MuEnriched       ---------------------------------
+sum(file.nevents): 45494357
+ Number of Events :  45.49
+totle files Evaluated = 60
+
+---------------------------------------      ttbar_FullyLeptonic       ---------------------------------
+sum(file.nevents): 145020000
+ Number of Events :  145.02
+# of files read = 100
+Effective No. Events = 143.84
+totle files Evaluated = 155
+
+---------------------------------------      QCD_Pt-1000_MuEnriched       ---------------------------------
+sum(file.nevents): 27427130
+ Number of Events :  27.43
+totle files Evaluated = 33
+
+---------------------------------------      QCD_Pt-120to170_EMEnriched       ---------------------------------
+sum(file.nevents): 9677904
+ Number of Events :  9.68
+totle files Evaluated = 15
+
+---------------------------------------      QCD_Pt-300toInf_EMEnriched       ---------------------------------
+sum(file.nevents): 2215994
+ Number of Events :  2.22
+totle files Evaluated = 5
+
+---------------------------------------      QCD_Pt-30To50_MuEnriched       ---------------------------------
+sum(file.nevents): 58737695
+ Number of Events :  58.74
+totle files Evaluated = 64
+
+---------------------------------------      QCD_Pt-170to300_EMEnriched       ---------------------------------
+sum(file.nevents): 3714642
+ Number of Events :  3.71
+totle files Evaluated = 5
+

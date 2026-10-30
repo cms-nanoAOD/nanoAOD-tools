@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/bin/env python3
 import ROOT
 import numpy
 import sys

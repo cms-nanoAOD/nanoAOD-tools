@@ -1,0 +1,78 @@
+[mikumar@ui crab]$ python Gen_info.py
+Because you requested a FJR we assume you want the final hadd. No name specified for the output file, will use tree.root
+Will write selected trees to .
+TClass::Init:0: RuntimeWarning: no dictionary for class ROOT::TIOFeatures is available
+Pre-select 10 entries out of 352047 (0.00%)
+pdg id b quark =  -5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+------fileter out-----
+     pdg id mother of b quark  21  statusFlags =  2433 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  22913 : isLastCopyBeforeFSR : isPrompt : isHardProcess : fromHardProcess : fromHardProcessBeforeFSR : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+pdg id b quark =  -5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+-------------------------
+pdg id b quark =  -5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  22913 : isLastCopyBeforeFSR : isPrompt : isHardProcess : fromHardProcess : fromHardProcessBeforeFSR : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  257 : isPrompt : fromHardProcess : 
+pdg id b quark =  -5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+pdg id b quark =  5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+-------------------------
+pdg id b quark =  -5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  22913 : isLastCopyBeforeFSR : isPrompt : isHardProcess : fromHardProcess : fromHardProcessBeforeFSR : isFirstCopy : 
+pdg id b quark =  -5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+pdg id b quark =  5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+-------------------------
+pdg id b quark =  -5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+------fileter out-----
+     pdg id mother of b quark  21  statusFlags =  2433 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  22913 : isLastCopyBeforeFSR : isPrompt : isHardProcess : fromHardProcess : fromHardProcessBeforeFSR : isFirstCopy : 
+pdg id b quark =  -5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+pdg id b quark =  5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+-------------------------
+pdg id b quark =  -5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+pdg id b quark =  -5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+-------------------------
+pdg id b quark =  -5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+------fileter out-----
+     pdg id mother of b quark  21  statusFlags =  2433 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  22913 : isLastCopyBeforeFSR : isPrompt : isHardProcess : fromHardProcess : fromHardProcessBeforeFSR : isFirstCopy : 
+pdg id b quark =  -5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+pdg id b quark =  5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+-------------------------
+pdg id b quark =  -5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  -5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+pdg id b quark =  5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+-------------------------
+pdg id b quark =  -5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+------fileter out-----
+     pdg id mother of b quark  21  statusFlags =  2433 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  22913 : isLastCopyBeforeFSR : isPrompt : isHardProcess : fromHardProcess : fromHardProcessBeforeFSR : isFirstCopy : 
+pdg id b quark =  -5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+pdg id b quark =  5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+-------------------------
+pdg id b quark =  -5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  22913 : isLastCopyBeforeFSR : isPrompt : isHardProcess : fromHardProcess : fromHardProcessBeforeFSR : isFirstCopy : 
+pdg id b quark =  -5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+pdg id b quark =  5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+-------------------------
+pdg id b quark =  -5  statusFlags =  4481 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+------fileter out-----
+     pdg id mother of b quark  21  statusFlags =  10625 : isPrompt : isHardProcess : fromHardProcess : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  22913 : isLastCopyBeforeFSR : isPrompt : isHardProcess : fromHardProcess : fromHardProcessBeforeFSR : isFirstCopy : 
+pdg id b quark =  5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+pdg id b quark =  -5  statusFlags =  8449 : isPrompt : fromHardProcess : isLastCopy : 
+-------------------------
+Processed 10 preselected entries from /grid_mnt/t3storage3/mikumar/Run2/SIXTEEN/minitree/Mc/2J1T1/final/Minitree_Tchannel_2J1T1_mu.root (352047 entries). Finally selected 10 entries
+Done ./Minitree_Tchannel_2J1T1_mu_Skim.root
+Total time 207.8 sec. to process 352047 events. Rate = 1694.4 Hz.
+Adding file./Minitree_Tchannel_2J1T1_mu_Skim.root
+MergingEvents
+MergingRuns
+MergingParameterSets
+MergingLuminosityBlocks
+MergingMetaData
+Merginguntagged
+DONE
+

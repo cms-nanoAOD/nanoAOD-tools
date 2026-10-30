@@ -1,0 +1,5 @@
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SEVENTEEN_new_v5/Data/2J1T1_el/Run2017B_el
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SEVENTEEN_new_v5/Data/2J1T1_el/Run2017C_el
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SEVENTEEN_new_v5/Data/2J1T1_el/Run2017D_el
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SEVENTEEN_new_v5/Data/2J1T1_el/Run2017E_el
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SEVENTEEN_new_v5/Data/2J1T1_el/Run2017F_el

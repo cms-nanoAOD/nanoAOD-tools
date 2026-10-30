@@ -1,0 +1,2 @@
+/store/user/mikumar/RUN2_UL/MiniTree_condor/EIGHTEEN/Mc/2J1T1_el/tw_antitop/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/EIGHTEEN/Mc/2J1T1_mu/tw_antitop/

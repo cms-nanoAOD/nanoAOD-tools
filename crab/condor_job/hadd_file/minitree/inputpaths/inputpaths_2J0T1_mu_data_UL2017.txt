@@ -1,0 +1,10 @@
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SEVENTEEN_v5/Data/2J0T1_mu/Run2017B_mu/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SEVENTEEN_v5/Data/2J0T1_mu/Run2017C_mu/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SEVENTEEN_v5/Data/2J0T1_mu/Run2017D_mu/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SEVENTEEN_v5/Data/2J0T1_mu/Run2017E_mu/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SEVENTEEN_v5/Data/2J0T1_mu/Run2017F_mu/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SEVENTEEN_v5/Data/2J0T1_el/Run2017B_el/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SEVENTEEN_v5/Data/2J0T1_el/Run2017C_el/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SEVENTEEN_v5/Data/2J0T1_el/Run2017D_el/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SEVENTEEN_v5/Data/2J0T1_el/Run2017E_el/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SEVENTEEN_v5/Data/2J0T1_el/Run2017F_el/

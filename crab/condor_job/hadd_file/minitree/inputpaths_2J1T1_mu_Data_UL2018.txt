@@ -1,0 +1,2 @@
+/store/user/mikumar/RUN2_UL/MiniTree_condor/EIGHTEEN/Data/2J1T1_mu/Run2017C_mu/
+/store/user/mikumar/RUN2_UL/MiniTree_condor/EIGHTEEN/Data/2J1T1_el/Run2017C_el/

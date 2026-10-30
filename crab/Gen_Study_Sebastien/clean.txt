@@ -1,0 +1,2 @@
+drop *
+keep top_mass_gen

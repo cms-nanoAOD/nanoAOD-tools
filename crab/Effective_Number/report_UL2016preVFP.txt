@@ -1,0 +1,257 @@
+[mikumar@lxplus759 Effective_Number]$ python Event_counter.py -y UL2016preVFP
+year =  UL2016preVFP
+['tw_antitop', 'QCD_Pt-600To800_MuEnriched', 'WJetsToLNu_2J', 'QCD_Pt-300To470_MuEnriched', 'QCD_Pt-50to80_EMEnriched', 'Schannel', 'WJetsToLNu_1J', 'QCD_Pt-120To170_MuEnriched', 'WJetsToLNu_0J', 'ZZTo2Q2L', 'QCD_Pt-470To600_MuEnriched', 'ttbar_SemiLeptonic', 'ZZTo2L2Nu', 'QCD_Pt-170To300_MuEnriched', 'QCD_Pt-800To1000_MuEnriched', 'tw_top', 'Tbarchannel', 'Tchannel', 'QCD_Pt-30to50_EMEnriched', 'QCD_Pt-20To30_MuEnriched', 'QCD_Pt-120to170_EMEnriched', 'WWTolnulnu', 'QCD_Pt-80to120_EMEnriched', 'QCD_Pt-15To20_MuEnriched', 'WZTo2Q2L', 'WWTo2L2Nu', 'QCD_Pt-50To80_MuEnriched', 'QCD_Pt-80To120_MuEnriched', 'ttbar_FullyLeptonic', 'QCD_Pt-1000_MuEnriched', 'DYJets', 'QCD_Pt-300toInf_EMEnriched', 'QCD_Pt-30To50_MuEnriched', 'QCD_Pt-170to300_EMEnriched']
+len(Datasets) =  34
+
+---------------------------------------      tw_antitop       ---------------------------------
+sum(file.nevents): 3.176485e+06
+ Number of Events :  3.176485e+06
+
+Effective No. Events =3176335
+totle files Evaluated = 12
+
+---------------------------------------      QCD_Pt-600To800_MuEnriched       ---------------------------------
+sum(file.nevents): 1.9598815e+07
+ Number of Events :  1.9598815e+07
+
+
+---------------------------------------      WJetsToLNu_2J       ---------------------------------
+sum(file.nevents): 8.7929021e+07
+ Number of Events :  8.7929021e+07
+
+Effective No. Events =27463756
+totle files Evaluated = 73
+
+---------------------------------------      QCD_Pt-300To470_MuEnriched       ---------------------------------
+sum(file.nevents): 2.8465385e+07
+ Number of Events :  2.8465385e+07
+
+
+---------------------------------------      QCD_Pt-50to80_EMEnriched       ---------------------------------
+sum(file.nevents): 5.440758e+06
+ Number of Events :  5.440758e+06
+
+
+---------------------------------------      Schannel       ---------------------------------
+sum(file.nevents): 5.518e+06
+ Number of Events :  5.518e+06
+
+Effective No. Events =3592772
+totle files Evaluated = 12
+
+---------------------------------------      WJetsToLNu_1J       ---------------------------------
+sum(file.nevents): 1.7346885e+08
+ Number of Events :  1.7346885e+08
+
+# of files read = 100
+Effective No. Events =84198168
+totle files Evaluated = 114
+
+---------------------------------------      QCD_Pt-120To170_MuEnriched       ---------------------------------
+sum(file.nevents): 1.9136907e+07
+ Number of Events :  1.9136907e+07
+
+
+---------------------------------------      WJetsToLNu_0J       ---------------------------------
+sum(file.nevents): 1.51109845e+08
+ Number of Events :  1.51109845e+08
+
+# of files read = 100
+Effective No. Events =121208493
+totle files Evaluated = 107
+
+---------------------------------------      ZZTo2Q2L       ---------------------------------
+sum(file.nevents): 1.6060738e+07
+ Number of Events :  1.6060738e+07
+
+Effective No. Events =10406942
+totle files Evaluated = 17
+
+---------------------------------------      QCD_Pt-470To600_MuEnriched       ---------------------------------
+sum(file.nevents): 1.9695298e+07
+ Number of Events :  1.9695298e+07
+
+
+---------------------------------------      ttbar_SemiLeptonic       ---------------------------------
+sum(file.nevents): 1.32178e+08
+ Number of Events :  1.32178e+08
+
+# of files read = 100
+Effective No. Events =131106831
+totle files Evaluated = 117
+
+---------------------------------------      ZZTo2L2Nu       ---------------------------------
+sum(file.nevents): 1.6862e+07
+ Number of Events :  1.6862e+07
+
+Effective No. Events =16826232
+totle files Evaluated = 25
+
+---------------------------------------      QCD_Pt-170To300_MuEnriched       ---------------------------------
+sum(file.nevents): 3.7080544e+07
+ Number of Events :  3.7080544e+07
+
+
+---------------------------------------      QCD_Pt-800To1000_MuEnriched       ---------------------------------
+sum(file.nevents): 3.893394e+07
+ Number of Events :  3.893394e+07
+
+
+---------------------------------------      tw_top       ---------------------------------
+sum(file.nevents): 3.294673e+06
+ Number of Events :  3.294673e+06
+
+Effective No. Events =3294485
+totle files Evaluated = 4
+
+---------------------------------------      Tbarchannel       ---------------------------------
+sum(file.nevents): 3.1024e+07
+ Number of Events :  3.1024e+07
+
+Effective No. Events =29205915
+totle files Evaluated = 46
+
+---------------------------------------      Tchannel       ---------------------------------
+sum(file.nevents): 5.5961e+07
+ Number of Events :  5.5961e+07
+
+Effective No. Events =52437432
+totle files Evaluated = 49
+
+---------------------------------------      QCD_Pt-30to50_EMEnriched       ---------------------------------
+sum(file.nevents): 4.361931e+06
+ Number of Events :  4.361931e+06
+
+
+---------------------------------------      QCD_Pt-20To30_MuEnriched       ---------------------------------
+sum(file.nevents): 3.1926643e+07
+ Number of Events :  3.1926643e+07
+
+
+---------------------------------------      QCD_Pt-120to170_EMEnriched       ---------------------------------
+sum(file.nevents): 4.852573e+06
+ Number of Events :  4.852573e+06
+
+
+---------------------------------------      WWTolnulnu       ---------------------------------
+sum(file.nevents): 4.932e+06
+ Number of Events :  4.932e+06
+
+Effective No. Events =4932000
+totle files Evaluated = 14
+
+---------------------------------------      QCD_Pt-80to120_EMEnriched       ---------------------------------
+ Number of Events :  
+
+---------------------------------------      QCD_Pt-15To20_MuEnriched       ---------------------------------
+sum(file.nevents): 4.749558e+06
+ Number of Events :  4.749558e+06
+
+
+---------------------------------------      WZTo2Q2L       ---------------------------------
+sum(file.nevents): 1.5678816e+07
+ Number of Events :  1.5678816e+07
+
+Effective No. Events =9780392
+totle files Evaluated = 17
+
+---------------------------------------      WWTo2L2Nu       ---------------------------------
+sum(file.nevents): 3.018e+06
+ Number of Events :  3.018e+06
+
+Effective No. Events =3006596
+totle files Evaluated = 12
+
+---------------------------------------      QCD_Pt-50To80_MuEnriched       ---------------------------------
+sum(file.nevents): 1.9724658e+07
+ Number of Events :  1.9724658e+07
+
+
+---------------------------------------      QCD_Pt-80To120_MuEnriched       ---------------------------------
+sum(file.nevents): 2.1978558e+07
+ Number of Events :  2.1978558e+07
+
+
+---------------------------------------      ttbar_FullyLeptonic       ---------------------------------
+sum(file.nevents): 3.7505e+07
+ Number of Events :  3.7505e+07
+
+Effective No. Events =37202073
+totle files Evaluated = 33
+
+---------------------------------------      QCD_Pt-1000_MuEnriched       ---------------------------------
+sum(file.nevents): 1.3660999e+07
+ Number of Events :  1.3660999e+07
+
+
+---------------------------------------      DYJets       ---------------------------------
+sum(file.nevents): 9.5170542e+07
+ Number of Events :  9.5170542e+07
+
+Effective No. Events =95170552
+totle files Evaluated = 66
+
+---------------------------------------      QCD_Pt-300toInf_EMEnriched       ---------------------------------
+sum(file.nevents): 1.142775e+06
+ Number of Events :  1.142775e+06
+
+
+---------------------------------------      QCD_Pt-30To50_MuEnriched       ---------------------------------
+sum(file.nevents): 2.866484e+07
+ Number of Events :  2.866484e+07
+
+
+---------------------------------------      QCD_Pt-170to300_EMEnriched       ---------------------------------
+sum(file.nevents): 1.855461e+06
+ Number of Events :  1.855461e+06
+
+[mikumar@lxplus744 Effective_Number]$ python Event_counter.py -y UL2016preVFP
+
+year =  UL2016preVFP
+['ttbar_FullyLeptonic_erdON', 'Tchannel_erdON', 'ttbar_FullyLeptonic_QCDinspired', 'ttbar_SemiLeptonic_Gluonmove', 'Tchannel_Gluonmove', 'Tchannel_TuneCP5up', 'ttbar_FullyLeptonic_TuneCPdown', 'ttbar_FullyLeptonic_TuneCPup', 'Tchannel_TuneCP5down', 'ttbar_SemiLeptonic_TuneCP5up', 'Tbarchannel_TuneCP5up', 'Tbarchannel_TuneCP5down', 'ttbar_SemiLeptonic_erdON', 'Tbarchannel_QCDinspired', 'ttbar_FullyLeptonic_Gluonmove', 'Tchannel_QCDinspired', 'ttbar_SemiLeptonic_QCDinspired', 'Tbarchannel_erdON', 'ttbar_SemiLeptonic_TuneCP5down', 'Tbarchannel_Gluonmove']
+len(Datasets) =  20
+
+---------------------------------------      ttbar_FullyLeptonic_erdON       ---------------------------------
+sum(file.nevents): 16229000
+ Number of Events :  16.23
+Unable to load sec.protocol plugin libXrdSecztn.so
+Unable to load sec.protocol plugin libXrdSecztn.so
+Effective No. Events = 16.09
+totle files Evaluated = 32
+
+
+---------------------------------------      ttbar_FullyLeptonic_QCDinspired       ---------------------------------
+sum(file.nevents): 15518000
+ Number of Events :  15.52
+Effective No. Events = 15.39
+totle files Evaluated = 20
+
+---------------------------------------      ttbar_SemiLeptonic_Gluonmove       ---------------------------------
+sum(file.nevents): 56324000
+ Number of Events :  56.32
+Effective No. Events = 55.86
+totle files Evaluated = 54
+
+
+
+---------------------------------------      ttbar_FullyLeptonic_TuneCPdown       ---------------------------------
+sum(file.nevents): 21583000
+ Number of Events :  21.58
+Effective No. Events = 21.4
+totle files Evaluated = 19
+
+---------------------------------------      ttbar_FullyLeptonic_TuneCPup       ---------------------------------
+sum(file.nevents): 10381000
+ Number of Events :  10.38
+Effective No. Events = 10.29
+totle files Evaluated = 22
+
+
+---------------------------------------      ttbar_FullyLeptonic_Gluonmove       ---------------------------------
+sum(file.nevents): 16776000
+ Number of Events :  16.78
+Effective No. Events = 16.64
+totle files Evaluated = 17
+
+
+

@@ -1,0 +1,14 @@
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tbarchannel_TuneCP5CR1
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tbarchannel_TuneCP5CR2
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tbarchannel_TuneCP5down
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tbarchannel_TuneCP5up
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tbarchannel_erdON
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tbarchannel_hdampdown
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tbarchannel_hdampup
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tchannel_TuneCP5CR1
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tchannel_TuneCP5CR2
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tchannel_TuneCP5down
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tchannel_TuneCP5up
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tchannel_erdON
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tchannel_hdampdown
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_postVFP_v5/Mc_sys/2J1T1_el/Tchannel_hdampup

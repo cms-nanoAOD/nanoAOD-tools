@@ -1,0 +1,5 @@
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SIXTEEN_preVFP_v5/Data/2J1T1_el/Run2016B_preVFP_el
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SIXTEEN_preVFP_v5/Data/2J1T1_el/Run2016C_preVFP_el
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SIXTEEN_preVFP_v5/Data/2J1T1_el/Run2016D_preVFP_el
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SIXTEEN_preVFP_v5/Data/2J1T1_el/Run2016E_preVFP_el
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SIXTEEN_preVFP_v5/Data/2J1T1_el/Run2016F_preVFP_el

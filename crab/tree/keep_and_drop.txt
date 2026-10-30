@@ -1,0 +1,150 @@
+# this  comment
+drop * # start with all
+
+keep event
+keep run
+keep luminosityBlock
+
+keep Flag_*
+
+keep HLT_Ele27_WPTight_Gsf*
+keep HLT_Ele28_WPTight_Gsf*
+keep HLT_Ele32_WPTight_Gsf*
+keep HLT_Ele35_WPTight_Gsf*
+keep HLT_Ele38_WPTight_Gsf*
+keep HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned*
+keep HLT_Ele27_eta2p1_WPTight_Gsf*
+keep HLT_Ele32_eta2p1_WPTight_Gsf*
+keep HLT_Ele32_WPTight_Gsf_L1DoubleEG_v*
+keep nTrigObj*
+keep TrigObj_*
+
+keep HLT_IsoMu20*
+keep HLT_IsoTkMu20*
+keep HLT_IsoMu24*
+keep HLT_IsoTkMu24*
+keep HLT_IsoMu24_eta2p1*
+keep HLT_IsoMu27*
+keep HLT_IsoTkMu27*
+keep HLT_IsoMu30*
+
+keep SV*
+
+keep PV*
+
+keep Pileup_gpudensity 
+keep Pileup_nPU
+keep Pileup_nTrueInt
+keep Pileup_pudensity
+keep GenPart*
+
+keep GenJet*
+
+keep GenVisTau*
+
+keep GenDressedLepton*
+
+keep Generator*
+
+keep PSWeight*
+
+keep LHEPdfWeight
+keep LHEScaleWeight*
+keep LHEWeight*
+
+keep nElectron
+keep Electron*
+
+keep nMuon
+keep Muon*
+keep L1PreFiringWeight*
+
+keep nTau
+keep Tau_*
+
+keep nJet
+keep Jet_pt
+keep Jet_eta
+keep Jet_phi
+keep Jet_mass
+keep Jet_partonFlavour
+keep Jet_hadronFlavour
+keep Jet_btagCMVA
+keep Jet_btagCSVV2
+keep Jet_btagDeepB
+keep Jet_btagDeepFlavB
+keep Jet_qgl
+keep Jet_genJetIdx
+keep Jet_jetId 
+keep Jet_puId
+keep Jet_chEmEF
+keep Jet_chHEF
+keep Jet_neEmEF
+keep Jet_neHEF
+keep Jet_muEF
+keep Jet_nConstituents
+keep Jet_nElectrons
+keep Jet_nMuons
+keep Jet_area
+keep Jet_bRegCorr
+keep Jet_bRegRes
+
+
+keep nFatJet
+keep FatJet_pt
+keep FatJet_eta
+keep FatJet_phi
+keep FatJet_mass
+keep FatJet_msoftdrop
+keep FatJet_hadronFlavour
+keep FatJet_btagCMVA
+keep FatJet_btagCSVV2
+keep FatJet_btagDeepB
+keep FatJet_btagDeepFlavB
+keep FatJet_genJetAK8Idx
+keep FatJet_jetId
+keep FatJet_nCHadrons
+keep FatJet_nBHadrons 
+keep FatJet_nConstituents
+keep FatJet_area
+keep FatJet_deepTagMD_TvsQCD	
+keep FatJet_deepTagMD_WvsQCD
+keep FatJet_deepTagMD_ZvsQCD
+keep FatJet_deepTag_TvsQCD
+keep FatJet_deepTag_WvsQCD
+keep FatJet_deepTag_ZvsQCD
+keep FatJet_electronIdx3SJ
+keep FatJet_muonIdx3SJ
+
+keep FatJet_particleNet_TvsQCD
+keep FatJet_particleNet_WvsQCD 
+keep FatJet_particleNet_ZvsQCD	
+keep FatJet_particleNet_mass
+
+keep FatJet_rawFactor	
+keep FatJet_subJetIdx1	
+keep FatJet_subJetIdx2
+
+ 
+keep MET*
+keep PuppiMET*
+
+#added in main module
+keep Jet_dR_Ljet_Isomu
+keep Jet_dR_Ljet_AntiIsomu
+keep Jet_dR_Ljet_Isoel
+keep Jet_dR_Ljet_AntiIsoel
+
+       
+keep Electron_EtaSC
+
+keep puWeight*
+keep LHEWeight*
+
+#------------------related to jme calculation--------------#
+keep RawMET*
+keep fixedGridRhoFastjetAll
+keep Jet_rawFactor
+keep Jet_muonSubtrFactor
+keep nCorrT1METJet
+keep CorrT1METJet*

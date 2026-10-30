@@ -1,0 +1,2 @@
+python3 -u crab_submission_Minitree_UL_local.py -y UL2016postVFP -l mu -r 2J1T1 &> Mintree_processing_mu_2J1T1_UL2016postVFP.out
+python3 -u crab_submission_Minitree_UL_local.py -y UL2016postVFP -l el -r 2J1T1 &> Mintree_processing_el_2J1T1_UL2016postVFP.out

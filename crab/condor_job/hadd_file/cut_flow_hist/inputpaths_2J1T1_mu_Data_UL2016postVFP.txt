@@ -1,0 +1,3 @@
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SIXTEEN_postVFP_v5/Data/2J1T1_mu/Run2016F_postVFP_mu
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SIXTEEN_postVFP_v5/Data/2J1T1_mu/Run2016G_postVFP_mu
+/store/user/mikumar/RUN2_UL/cutFlow_condor/SIXTEEN_postVFP_v5/Data/2J1T1_mu/Run2016H_postVFP_mu

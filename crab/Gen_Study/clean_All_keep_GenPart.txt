@@ -1,0 +1,82 @@
+drop *
+keep nGenPart
+keep GenPart*
+keep nGenJet
+keep GenJet*
+keep nGenDressedLepton
+keep GenDressedLepton*
+keep Generator_weight
+keep *Weight*
+keep *weight* 
+keep    event
+keep    top_ID
+keep    top_is_lastcopy
+keep    top_mass_gen
+keep    top_mass_gen_reco
+keep    top_pt_gen
+keep    top_pt_gen_reco
+keep    top_eta_gen
+keep    top_eta_gen_reco
+keep    top_phi_gen
+keep    tau_to_el_flag
+keep    tau_to_mu_flag
+keep    el_flag
+keep    mu_flag
+
+
+keep    lepton_ID
+keep    lepton_pt_gen
+keep    lepton_eta_gen
+keep    lepton_phi_gen
+
+keep    minidR_dresslep
+keep    DressLep_pt_gen
+keep    DressLep_eta_gen
+keep    DressLep_phi_gen
+keep    DressLep_mass_gen
+keep    DressLep_ID
+keep    DR_dresslepton_bjet
+
+keep    neutrino_ID
+keep    neutrino_pt_gen
+keep    neutrino_eta_gen
+keep    neutrino_phi_gen
+keep    neutrino_el_flag
+keep    neutrino_mu_flag
+
+keep    W_ID
+keep    W_mass_gen
+keep    W_mass_gen_reco
+keep    W_pt_gen
+keep    W_pt_gen_reco
+keep    W_eta_gen
+keep    W_eta_gen_reco
+keep    W_phi_gen
+keep    W_phi_gen_reco
+keep    W_to_el_flag
+keep    W_to_mu_flag
+
+keep    bjet_ID
+keep    bjet_pt_gen
+keep    bjet_eta_gen
+keep    bjet_phi_gen
+keep    bjet_mass_gen
+
+keep    bpart_ID
+keep    bpart_pt_gen
+keep    bpart_eta_gen
+keep    bpart_phi_gen
+keep    minDR_bpart_bjet
+
+keep    top_mass_gen_lastcopy
+keep    top_pt_gen_lastcopy
+keep    top_eta_gen_lastcopy
+keep    top_ID_lastcopy
+keep    top_phi_gen_lastcopy
+keep    top_PDG_lastcopy
+
+keep    atop_mass_gen_lastcopy
+keep    atop_pt_gen_lastcopy
+keep    atop_eta_gen_lastcopy
+keep    atop_ID_lastcopy
+keep    atop_phi_gen_lastcopy

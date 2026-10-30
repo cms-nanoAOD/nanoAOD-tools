@@ -1,0 +1,4 @@
+#python3 crab_submission_Minitree_UL_local.py -o /nfs/home/common/RUN2_UL/Minitree_trial/ -l mu -y UL2016postVFP -r 2J1T0 -data &> local_crab_report_mu_UL2016postVFP_2J1T0_data2.txt
+#python3 crab_submission_Minitree_UL_local.py -o /nfs/home/common/RUN2_UL/Minitree_trial/ -l el -y UL2016postVFP -r 2J1T0 &> local_crab_report_el_UL2016postVFP_2J1T0_MC2.txt
+#python3 crab_submission_Minitree_UL_local.py -o /nfs/home/common/RUN2_UL/Minitree_trial_crosscheck/ -l mu -y UL2018 -r 2J1T0  &> local_crab_report_mu_UL2018_2J1T0.txt
+python3 crab_submission_Minitree_UL_local.py -o /nfs/home/common/RUN2_UL/Minitree_trial_crosscheck/ -l el -y UL2017 -r 2J1T0  &> local_crab_report_el_UL2017_2J1T0.txt

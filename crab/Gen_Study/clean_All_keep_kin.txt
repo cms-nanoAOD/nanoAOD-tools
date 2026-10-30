@@ -1,0 +1,106 @@
+drop *
+keep   Event_wgt
+keep   L1PreFiringWeight_Nom
+keep   mtwMass
+
+keep   MuonPt
+keep   MuonEta
+keep   MuonPhi
+keep   MuonMass
+keep   MuonE
+
+keep   ElectronPt
+keep   ElectronEta
+keep   ElectronSCEta
+keep   ElectronPhi
+keep   ElectronMass
+
+
+keep   Px_nu
+keep   Py_nu
+keep   Pz_nu
+keep   Pt_nu
+
+keep    bJetMass
+keep    bJetPt
+keep    bJetEta
+keep    bJetPhi
+
+keep    topMass
+keep    topPt
+keep    mtwMass	
+
+
+keep 	bQurkPt_gen
+keep    bQurkEta_gen
+keep    bQurkPhi_gen
+keep    bQurkMass_gen
+
+    
+keep    mtwMass_gen
+keep    topPt_gen
+keep    topEta_gen
+keep    topPhi_gen
+keep    topMass_gen
+    
+    
+keep    MuonPt_gen
+keep    MuonEta_gen
+keep    MuonPhi_gen
+keep    MuonMass_gen
+    
+    
+keep    ElectronPt_gen
+keep    ElectronEta_gen
+keep    ElectronPhi_gen
+keep    ElectronMass_gen
+    
+keep    Pt_nu_gen
+keep    Eta_nu_gen
+keep    Phi_nu_gen
+keep    Mass_nu_gen
+    
+keep    Px_nu_gen
+keep    Py_nu_gen
+keep    Pz_nu_gen
+
+
+
+keep    bQurkPt_kin
+keep    bQurkEta_kin
+keep    bQurkPhi_kin
+keep    bQurkMass_kin
+
+keep 	findtau
+
+keep    topMass_fromTau
+
+keep    mtwMass_kin
+keep    topPt_kin
+keep    topEta_kin
+keep    topPhi_kin
+keep    topMass_kin
+
+
+keep    MuonPt_kin
+keep    MuonEta_kin
+keep    MuonPhi_kin
+keep    MuonMass_kin
+
+
+keep    ElectronPt_kin
+keep    ElectronEta_kin
+keep    ElectronPhi_kin
+keep    ElectronMass_kin
+
+keep    Pt_nu_kin
+keep    Eta_nu_kin
+keep    Phi_nu_kin
+keep    Mass_nu_kin
+
+keep    Px_nu_kin
+keep    Py_nu_kin
+keep    Pz_nu_kin
+
+keep    findmuon
+keep	findelectron

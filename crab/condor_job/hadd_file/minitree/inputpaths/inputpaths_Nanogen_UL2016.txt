@@ -1,0 +1,16 @@
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tbarchannel_wtop0p55
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tbarchannel_wtop0p7
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tbarchannel_wtop0p85
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tbarchannel_wtop1p0
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tbarchannel_wtop1p15
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tbarchannel_wtop1p3
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tbarchannel_wtop1p31
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tbarchannel_wtop1p45
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tchannel_wtop0p55
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tchannel_wtop0p7
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tchannel_wtop0p85
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tchannel_wtop1p0
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tchannel_wtop1p15
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tchannel_wtop1p3
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tchannel_wtop1p31
+/store/user/mikumar/RUN2_UL/MiniTree_condor/SIXTEEN_Nanogen/Mc_v9/Mc/Tchannel_wtop1p45
